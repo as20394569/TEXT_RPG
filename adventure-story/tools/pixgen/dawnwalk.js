@@ -29,7 +29,7 @@ const FACE={
 const BASEHAIR={
   down:['................','................','.....kkkkkk.....','...kkHHHjjHHkk..','..kHHHHjjHHHHHk.','.kHHHHHHjHHHHHk.','.kHHHHHHHHHHHHk.','.kHHHHHHHHHHHHk.','.kHhHHHHHHHHhHk.','.kHHkSSHHSSkHHk.'],
   left:['................','................','......kkkkk.....','....kkHHjHHkk...','...kHHHHjjHHHk..','..kHHHHHHHHHHHk.','.kHHHHHHHHHHHHk.','.kHHHkHHHHHHHHk.','.kHHSSkHHHHHHHk.','.kSSSSSHHHHHHk..','........HHHH....','........HHH.....','.........H......'],
-  up:  ['................','................','.....kkkkkk.....','...kkHHHHHHkk...','..kHHHHjjHHHHk..','.kHHHHjjjjHHHHk.','.kHHHHHjjHHHHHk.','.kHHHHHHHHHHHHk.','.kHHHHHHHHHHHHk.','.kHHHHHHHHHHHHk.','.kkHHHHHHHHHHkk.','..kkhHHHHHHhkk..','...khHHHHHHhk...']
+  up:  ['................','................','.....kkkkkk.....','...kkHHHHHHkk...','..kHHjjjHHHHHk..','.kHjjjHHHHHHHHk.','.kHjHHHHHHHHHHk.','.kHHHHHHHHHHHHk.','.kHHHHHHHHHHHHk.','.kHHHHHHHHHHHHk.','.kkHHHHHHHHHHkk.','..kkhHHHHHHhkk..','...khHHHHHHhk...']
 };
 // extra hair pixels per style: list of [dir, rows] painted after the base hair; 'H' pixels get auto-outlined
 const STY={

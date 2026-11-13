@@ -400,7 +400,7 @@ const FACE={
 const BASEHAIR={
   down:['................','................','.....kkkkkk.....','...kkHHHjjHHkk..','..kHHHHjjHHHHHk.','.kHHHHHHjHHHHHk.','.kHHHHHHHHHHHHk.','.kHHHHHHHHHHHHk.','.kHhHHHHHHHHhHk.','.kHHkSSHHSSkHHk.'],
   left:['................','................','......kkkkk.....','....kkHHjHHkk...','...kHHHHjjHHHk..','..kHHHHHHHHHHHk.','.kHHHHHHHHHHHHk.','.kHHHkHHHHHHHHk.','.kHHSSkHHHHHHHk.','.kSSSSSHHHHHHk..','........HHHH....','........HHH.....','.........H......'],
-  up:  ['................','................','.....kkkkkk.....','...kkHHHHHHkk...','..kHHHHjjHHHHk..','.kHHHHjjjjHHHHk.','.kHHHHHjjHHHHHk.','.kHHHHHHHHHHHHk.','.kHHHHHHHHHHHHk.','.kHHHHHHHHHHHHk.','.kkHHHHHHHHHHkk.','..kkhHHHHHHhkk..','...khHHHHHHhk...']
+  up:  ['................','................','.....kkkkkk.....','...kkHHHHHHkk...','..kHHjjjHHHHHk..','.kHjjjHHHHHHHHk.','.kHjHHHHHHHHHHk.','.kHHHHHHHHHHHHk.','.kHHHHHHHHHHHHk.','.kHHHHHHHHHHHHk.','.kkHHHHHHHHHHkk.','..kkhHHHHHHhkk..','...khHHHHHHhk...']
 };
 // extra hair pixels per style: list of [dir, rows] painted after the base hair; 'H' pixels get auto-outlined
 const STY={
@@ -500,6 +500,20 @@ function frames(lk){
 G.DawnWalk={frames,buildFrame,W,H};
 })(window);
 
+const PXC=new Map();
+/* native-size pixel frames of the field hero, used 3x in battle (crisp, same paper doll) */
+function heroPx(dir,fi){
+  const lk=look(),sk=SKINC[lk.skin]||SKINC[0];
+  const L2={g:lk.g,hair:lk.hair,hc:HAIRC[lk.hc][1],skin:sk[2],eye:EYEC[lk.eye][1],outfit:armKey(),weapon:'none'};
+  const key=JSON.stringify(L2);let F=PXC.get(key);
+  if(!F){
+    const raw=window.DawnWalk.frames(L2);F={};
+    for(const d in raw)F[d]=raw[d].map(fr=>{const c=document.createElement('canvas');c.width=fr[0].length;c.height=fr.length;const g=c.getContext('2d');
+      fr.forEach((row,y)=>row.forEach((v,x)=>{if(v){g.fillStyle=v;g.fillRect(x,y,1,1);}}));return c;});
+    PXC.set(key,F);if(PXC.size>4)PXC.delete(PXC.keys().next().value);
+  }
+  return F[dir][fi];
+}
 const DWC=new Map();
 function walkSheet(){
   const lk=look(),sk=SKINC[lk.skin]||SKINC[0];
@@ -1847,10 +1861,31 @@ function drawBHero(now){
   if(h.pose==='cast')ell(L,x,y-24,15,25,'rgba(255,240,180,'+(.12+.08*Math.sin(now/80)).toFixed(2)+')');
   const blink=now-h.flashT<260&&((now-h.flashT)/50|0)%2===0;
   if(h.pose==='ko'){
+    if(window.DawnWalk){const spr=heroPx('right',0);L.save();L.imageSmoothingEnabled=false;L.translate(x-6,y-6);L.rotate(Math.PI/2);L.drawImage(blink?whiteTmp(spr):spr,-30,-60,60,69);L.restore();drawSword(x-34,y-2,.15,22);return;}
     if(HB){L.drawImage(heroFrames()[15],x-32,y-60,64,64);return;}
     let spr=charSpr('hero','right',0,true);
     L.save();L.translate(x-22,y-12);L.rotate(Math.PI/2);L.drawImage(spr,-16,-48,32,52);L.restore();
     drawSword(x-30,y-1,.15,22);return;
+  }
+  if(window.DawnWalk){
+    const dir=h.dir==='down'?'down':'up';
+    let fi=0,oy=0;
+    if(h.pose==='run')fi=(now/110|0)%2?1:3;
+    else if(h.pose==='idle')oy=(now/500|0)%2;
+    else if(h.pose==='hurt')oy=1;
+    const free=h.pose==='ready'||h.pose==='swing'||h.pose==='spin';
+    let a=free?h.swA:(SWA[h.pose]!==undefined?SWA[h.pose]:-1.05);
+    if(h.pose==='idle')a+=Math.sin(now/420)*.06;
+    const glow=h.pose==='cast'||h.pose==='win'?'rgba(255,236,160,.45)':null;
+    const hx=x+(dir==='up'?13:-13),hy=y-17+oy;
+    const spr=heroPx(dir,fi);
+    L.save();L.imageSmoothingEnabled=false;
+    if(h.pose==='spin'&&((now/70|0)%2)){L.translate(x,0);L.scale(-1,1);L.translate(-x,0);}
+    if(dir==='down')drawSword(hx,hy,a,22,glow);
+    L.drawImage(blink?whiteTmp(spr):spr,x-30,y-67+oy,60,69);
+    if(dir==='up')drawSword(hx,hy,a,22,glow);
+    L.restore();
+    return;
   }
   if(HB){
     let fr=0;const st=now-(h.swT||0);
