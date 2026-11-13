@@ -199,28 +199,53 @@ const GEAR={
   wood:{name:'木劍',t:'w',atk:2},
   iron:{name:'鐵劍',t:'w',atk:6,price:60},
   steel:{name:'鋼劍',t:'w',atk:11,price:180},
-  rod:{name:'魔紋短劍',t:'w',atk:3,mag:6,price:70},
-  elf:{name:'精靈細劍',t:'w',atk:7,mag:13},
+  rod:{name:'魔紋杖',t:'w',wt:'rod',atk:3,mag:6,price:70},
+  elf:{name:'精靈細劍',t:'w',wt:'dagger',atk:7,mag:13},
   silver:{name:'銀紋劍',t:'w',atk:16,mag:3},
+  hunter:{name:'獵人短劍',t:'w',wt:'dagger',atk:5,price:65},
   cloth:{name:'布衣',t:'a',def:1},
-  leather:{name:'皮甲',t:'a',def:4,price:70},
-  chain:{name:'鎖甲',t:'a',def:8,price:200}
+  robe:{name:'見習長袍',t:'a',at:'cloth',def:2,mag:3,price:60},
+  leather:{name:'皮甲',t:'a',at:'light',def:4,price:70},
+  chain:{name:'鎖甲',t:'a',at:'heavy',def:8,price:200}
 };
-const BLADE={wood:'#c8a070',iron:'#cfd6e4',steel:'#e4ecf6',rod:'#b9a0f0',elf:'#9ff0c8',silver:'#f2f6ff'};
-const gearDesc=g=>g.t==='w'?('攻擊 +'+g.atk+(g.mag?'　魔力 +'+g.mag:'')):('防禦 +'+g.def);
+const CLS={
+  novice:{name:'見習冒險者',gr:{},desc:'還沒有職業。Lv5 可到冒險者公會轉職。'},
+  sword:{name:'劍士',gr:{str:1,vit:1},hpM:1.1,wt:['sword','dagger'],at:['heavy','light','cloth'],start:['iron','leather'],
+    desc:'力量、體質成長高，HP +10%。普攻有 15% 機率追擊。能穿鎖甲。'},
+  mage:{name:'法師',gr:{int:2},mpM:1.2,taken:1.1,wt:['rod','dagger'],at:['cloth'],start:['rod','robe'],
+    desc:'智力成長高，MP +20%。打中弱點傷害變 2 倍。身體較脆弱。'},
+  ranger:{name:'遊俠',gr:{agi:2},wt:['sword','dagger'],at:['light','cloth'],start:['hunter','leather'],
+    desc:'敏捷成長高，會心率提升。戰鬥開始有 30% 機率先制，逃跑必定成功。'}
+};
+const STATN={str:'力量',vit:'體質',int:'智力',agi:'敏捷'};
+const cls=()=>CLS[H.cls]||CLS.novice;
+const wtOf=g=>g.t==='w'?(g.wt||'sword'):(g.at||'cloth');
+function canEquip(k){const c=cls(),g=GEAR[k];if(!c.wt)return true;return g.t==='w'?c.wt.includes(wtOf(g)):c.at.includes(wtOf(g));}
+const clsOK=g=>{const ok=Object.keys(CLS).filter(k=>k!=='novice'&&(g.t==='w'?CLS[k].wt:CLS[k].at).includes(wtOf(g))).map(k=>CLS[k].name);return ok.length===3?'':'（'+ok.join('、')+'）';};
+const BLADE={hunter:'#d8d0c0',wood:'#c8a070',iron:'#cfd6e4',steel:'#e4ecf6',rod:'#b9a0f0',elf:'#9ff0c8',silver:'#f2f6ff'};
+const gearDesc=g=>(g.t==='w'?('攻擊 +'+g.atk+(g.mag?'　魔力 +'+g.mag:'')):('防禦 +'+g.def+(g.mag?'　魔力 +'+g.mag:'')))+clsOK(g);
 const ITEMS={
   herb:{name:'藥草',price:10,desc:'回復 30 HP'},
   ether:{name:'魔力水',price:25,desc:'回復 15 MP'}
 };
 const SK=[
-  {id:'slash',name:'強斬',lv:1,mp:3,type:'phys',pow:1.7,desc:'跳起蓄力重斬單一敵人，可觸發完美'},
-  {id:'fire',name:'火焰彈',lv:2,mp:5,type:'mag',pow:1.6,flat:6,el:'fire',desc:'火屬性魔法，攻擊單一敵人'},
-  {id:'heal',name:'治癒術',lv:3,mp:4,type:'heal',desc:'回復自己的 HP'},
-  {id:'spin',name:'迴旋斬',lv:4,mp:5,type:'phys',pow:1,all:true,desc:'衝進敵陣旋轉，斬擊所有敵人'},
-  {id:'ice',name:'冰霜刺',lv:5,mp:6,type:'mag',pow:1.7,flat:6,el:'ice',desc:'冰屬性魔法，攻擊單一敵人'},
-  {id:'guard',name:'鐵壁架式',lv:6,mp:3,type:'guard',desc:'3 回合內受到的傷害減半'},
-  {id:'bolt',name:'雷光閃',lv:8,mp:9,type:'mag',pow:1.2,flat:6,el:'thunder',all:true,desc:'雷屬性魔法，攻擊所有敵人'}
+  {id:'slash',name:'強斬',lv:1,cls:'*',mp:3,type:'phys',pow:1.7,desc:'跳起蓄力重斬單一敵人'},
+  {id:'heal',name:'治癒術',lv:3,cls:'*',mp:4,type:'heal',self:1,desc:'回復自己的 HP'},
+  {id:'pierce',name:'破甲斬',lv:5,cls:'sword',mp:4,type:'phys',pow:1.5,desc:'無視一半防禦的重斬，打硬殼魔物很有效'},
+  {id:'spin',name:'迴旋斬',lv:6,cls:'sword',mp:5,type:'phys',pow:1,all:true,desc:'衝進敵陣旋轉，斬擊所有敵人'},
+  {id:'guard',name:'鐵壁架式',lv:8,cls:'sword',mp:3,type:'guard',self:1,desc:'3 回合內受到的傷害減半'},
+  {id:'warcry',name:'戰吼',lv:10,cls:'sword',mp:5,type:'buff',self:1,desc:'3 回合內攻擊力 +30%'},
+  {id:'fire',name:'火焰彈',lv:5,cls:'mage',mp:5,type:'mag',pow:1.6,flat:6,el:'fire',desc:'火屬性魔法，攻擊單一敵人'},
+  {id:'ice',name:'冰霜刺',lv:6,cls:'mage',mp:6,type:'mag',pow:1.7,flat:6,el:'ice',desc:'冰屬性魔法，攻擊單一敵人'},
+  {id:'medit',name:'冥想',lv:7,cls:'mage',mp:0,type:'self',self:1,desc:'回復 25% MP，這回合受到的傷害 +30%'},
+  {id:'bolt',name:'雷光閃',lv:9,cls:'mage',mp:9,type:'mag',pow:1.2,flat:6,el:'thunder',all:true,desc:'雷屬性魔法，攻擊所有敵人'},
+  {id:'burst',name:'魔力爆發',lv:11,cls:'mage',mp:12,type:'mag',pow:1.4,flat:8,all:true,desc:'無屬性魔法，重創所有敵人'},
+  {id:'double',name:'二連刺',lv:5,cls:'ranger',mp:3,type:'phys',pow:.75,desc:'連刺兩下，每下都能會心'},
+  {id:'steal',name:'偷竊',lv:6,cls:'ranger',mp:2,type:'steal',desc:'偷取金幣或道具，每隻限一次，頭目無效'},
+  {id:'shadow',name:'影步',lv:7,cls:'ranger',mp:4,type:'self',self:1,desc:'必定閃開下一次敵人的攻擊'},
+  {id:'venom',name:'毒刃',lv:10,cls:'ranger',mp:5,type:'phys',pow:1,desc:'造成傷害並讓敵人中毒 3 回合'}
 ];
+const skOK=s=>s.cls==='*'||s.cls===H.cls;
 const MON={
   slime:{name:'綠膠滴',hp:16,atk:6,def:1,spd:3,exp:4,gold:3,weak:'fire',style:'hop'},
   rat:{name:'棘尾鼠',hp:20,atk:9,def:2,spd:7,exp:6,gold:5,sk:{name:'啃咬',pow:1.4,ch:.25,k:'melee'}},
@@ -347,7 +372,7 @@ function walkSheet(){
   if(pdReady('walk'))return composeSheet('walk');
   return HS['w'+armKey()];
 }
-const BLADE_TINT={wood:'#c89050',iron:'#b4c0d2',steel:null,rod:'#b48cff',elf:'#7ef0b0',silver:'#eef6ff'};
+const BLADE_TINT={hunter:'#d2c4a8',wood:'#c89050',iron:'#b4c0d2',steel:null,rod:'#b48cff',elf:'#7ef0b0',silver:'#eef6ff'};
 function heroFrames(){
   if(pdReady('battle'))return composeSheet('battle');
   const arm=HS[H.arm]?H.arm:'cloth',key=arm+'|'+H.wpn;
@@ -390,6 +415,7 @@ const PAL={
   kid:{out:'#241610',hair:'#c8792e',hairL:'#f0a858',skin:'#f6d2b0',skinD:'#d9a882',eye:'#2f6a3a',coat:'#3f8a5a',coatD:'#2c6440',coatL:'#5aa874',pants:'#6a4a2a',boots:'#4a2e1c',belt:'#4a2e1c',gold:'#e8b84a'},
   woman:{out:'#26121a',hair:'#8a2e3e',hairL:'#c65e6e',skin:'#f6d2b0',skinD:'#d9a882',eye:'#5a3a8a',coat:'#d8c49a',coatD:'#ae9670',coatL:'#f2e6c6',pants:'#5a7a8a',boots:'#4a2e1c',belt:'#7a4a2a',gold:'#e8b84a',longHair:1,robe:1},
   trav:{out:'#16160e',hair:'#4a5a34',hairL:'#6e8456',skin:'#e0b48c',skinD:'#c09068',eye:'#2a3a2a',coat:'#5a6a3a',coatD:'#3e4a28',coatL:'#7a8a52',armor:'#8a7a5a',armorL:'#c4b48a',pants:'#4a3a2a',boots:'#3a2a1a',belt:'#2a1a12',gold:'#c9a14a'},
+  guild:{out:'#141420',hair:'#b8502e',hairL:'#e07a4a',skin:'#e6b892',skinD:'#c49470',eye:'#2a2a3a',coat:'#2e4a7a',coatD:'#1e3256',coatL:'#4a6aa4',armor:'#b8bcc8',armorL:'#eef0f6',pants:'#2a2a36',boots:'#3a2a1e',belt:'#5a3a22',gold:'#e8c050',beard:1},
   smith:{out:'#18100c',hair:'#3a2a1e',hairL:'#5e4632',skin:'#d9a882',skinD:'#b08060',eye:'#2a1a12',coat:'#6a5a4e',coatD:'#4a3e34',coatL:'#8a7a6a',pants:'#3a2e26',boots:'#2a1e16',belt:'#5a3a22',gold:'#c9a14a',beard:1,apron:1}
 };
 function drawChar(g,x,y,dir,f,p,opt){
@@ -578,19 +604,19 @@ function resetP(){Object.assign(P,{dir:'down',moving:false,dx:0,dy:0,t:0,step:0,
 function place(tx,ty){P.x=tx;P.y=ty;P.moving=false;P.t=0;}
 function reset(){
   Object.keys(H).forEach(k=>delete H[k]);Object.keys(F).forEach(k=>delete F[k]);
-  Object.assign(H,{name:'洛恩',lv:1,exp:0,str:5,vit:5,int:4,agi:4,pts:0,hp:0,mp:0,gold:20,wpn:'wood',arm:'cloth',bag:{herb:1,ether:1},own:['wood','cloth'],look:Object.assign({},LOOK0)});
+  Object.assign(H,{name:'洛恩',lv:1,exp:0,str:5,vit:5,int:4,agi:4,pts:0,cls:'novice',hp:0,mp:0,gold:20,wpn:'wood',arm:'cloth',bag:{herb:1,ether:1},own:['wood','cloth'],look:Object.assign({},LOOK0)});
   Object.assign(F,{quest:0,key:false,gate:false,tree:false,boss:false,ch:{}});
   H.hp=mhp();H.mp=mmp();
   W.map='village';resetP();place(7,10);P.dir='up';GT=0;
 }
-const mhp=()=>20+H.vit*4+H.lv*3;
-const mmp=()=>8+H.int*2+H.lv;
-const atk=()=>H.str*2+GEAR[H.wpn].atk;
-const mag=()=>H.int*2+(GEAR[H.wpn].mag||0);
+const mhp=()=>Math.round((20+H.vit*4+H.lv*3)*(cls().hpM||1));
+const mmp=()=>Math.round((8+H.int*2+H.lv)*(cls().mpM||1));
+const atk=()=>Math.round((H.str*2+GEAR[H.wpn].atk)*(B&&B.warcry>0?1.3:1));
+const mag=()=>H.int*2+(GEAR[H.wpn].mag||0)+(GEAR[H.arm].mag||0);
 const def=()=>H.vit+GEAR[H.arm].def;
 const spd=()=>H.agi;
 const need=lv=>6*lv*lv+6*lv;
-const learned=()=>SK.filter(s=>s.lv<=H.lv);
+const learned=()=>SK.filter(s=>s.lv<=H.lv&&skOK(s));
 
 const KEY='adventure-story-save-v2';
 const snapshot=()=>({H:JSON.parse(JSON.stringify(H)),F:JSON.parse(JSON.stringify(F)),W:{map:W.map,x:P.x,y:P.y,dir:P.dir}});
@@ -598,7 +624,7 @@ function save(){try{localStorage.setItem(KEY,JSON.stringify(snapshot()));}catch(
 function loadSave(){try{const s=JSON.parse(localStorage.getItem(KEY));return s&&s.H&&s.W&&MAPS[s.W.map]?s:null;}catch(e){return null;}}
 function applySave(s){
   reset();Object.assign(H,s.H);Object.assign(F,s.F);
-  if(!F.ch)F.ch={};if(!H.bag)H.bag={herb:0,ether:0};if(!H.look)H.look=Object.assign({},LOOK0);
+  if(!F.ch)F.ch={};if(!H.bag)H.bag={herb:0,ether:0};if(!H.look)H.look=Object.assign({},LOOK0);if(!CLS[H.cls])H.cls='novice';
   W.map=s.W.map;P.dir=s.W.dir||'down';
   if(!Number.isInteger(s.W.x)||s.W.x>=20){P.x=Math.floor(s.W.x/16);P.y=Math.floor((s.W.y-2)/16);}else{P.x=s.W.x;P.y=s.W.y;}
   if(solid(P.x,P.y)){const st=W.map==='village'?[7,10]:W.map==='field'?[9,18]:W.map==='forest'?[8,16]:[1,15];P.x=st[0];P.y=st[1];}
@@ -624,7 +650,7 @@ function say(text,o){
     else timer=setInterval(()=>{i++;dlgT.textContent=text.slice(0,i);if(i>=text.length)complete();},20);
   });
 }
-const FACES={'村長':'elder','小孩':'kid','村民':'woman','旅人':'trav','店主':'smith','旅店老闆':'woman'};
+const FACES={'公會長':'guild','村長':'elder','小孩':'kid','村民':'woman','旅人':'trav','店主':'smith','旅店老闆':'woman'};
 async function talk(lines,name){for(const l of lines)await say(l,{name,face:FACES[name]});}
 
 function openMenu(cfg){return new Promise(res=>{ui.menu={cfg,idx:cfg.start||0,res,parent:ui.menu,busy:false,items:[]};renderMenu();});}
@@ -866,9 +892,10 @@ MAPS.village.ents.push(
     }
     else if(F.boss)await talk(['風鈴又響了。謝謝你，'+H.name+'。','村子會一直記得你的名字。'],n);
     else if(F.key)await talk(['你拿到鑰石了！岩窟就在草原的東邊。','岩鎧獸蓄力之後的崩岩衝擊非常痛。看到牠蓄力，那一回合就先防禦吧！'],n);
-    else await talk(['往北穿過草原，就是霧語森林。','古樹怕火。等你學會火焰彈再去吧。'],n);
+    else await talk(['往北穿過草原，就是霧語森林。','古樹又粗又硬，還怕火。先練到 Lv5，去冒險者公會轉職再去吧。'],n);
   }},
   {x:11,y:11,pk:'kid',dir:'left',talk:()=>talk(['魔物也有怕的東西喔！','綠膠滴跟苔菇怪怕火，會飛的風羽雀怕冰。','打中弱點，傷害會變成 1.5 倍！'],'小孩')},
+  {x:13,y:7,pk:'guild',dir:'down',talk:()=>guildTalk()},
   {x:6,y:6,pk:'woman',dir:'right',talk:()=>talk(['升級會拿到 3 點能力點數，按「選單」就能分配。','想揮劍就點力量，想放魔法就點智力。','體質和敏捷也別忘了，活下來才打得贏。'],'村民')}
 );
 MAPS.field.ents.push(
@@ -880,6 +907,39 @@ MAPS.cave.ents.push(
   {x:14,y:9,kind:'spring',talk:async()=>{fullHeal();sfx('heal');await talk(['清澈的泉水從岩縫湧出。','HP 和 MP 完全回復了！']);save();}}
 );
 
+async function guildTalk(){
+  const n='公會長';
+  if(H.cls!=='novice'){
+    const nx=SK.find(s=>s.lv>H.lv&&skOK(s));
+    await talk(['身為'+cls().name+'，表現得不錯嘛，'+H.name+'。',nx?'練到 Lv '+nx.lv+' 就能學會「'+nx.name+'」。':'你已經學會這個職業的所有技能了。','等你更強一點，公會還有更高階的試煉。'],n);
+    return;
+  }
+  if(H.lv<5){await talk(['這裡是冒險者公會。','等你到了 Lv5，就能選擇自己的職業：劍士、法師或遊俠。','現在先去草原多練練吧，Lv '+H.lv+' 還太早了。'],n);return;}
+  await talk(['Lv5 了啊，'+H.name+'。是時候決定你要走的路了。','職業一旦決定就不能更改，好好想清楚。'],n);
+  for(;;){
+    const keys=['sword','mage','ranger'];
+    hideDlg();
+    const i=await choose(keys.map(k=>({label:CLS[k].name,desc:CLS[k].desc})).concat([{label:'再考慮一下'}]),{pos:'bottom',cols:1});
+    if(i<0||i===3){await talk(['想好了再來找我。'],n);return;}
+    const k=keys[i],c=CLS[k],sk=SK.filter(s=>s.cls===k);
+    await say(c.name+'：'+c.desc+'\n技能：'+sk.map(s=>s.name+'(Lv'+s.lv+')').join('、'),{name:n,face:'guild'});
+    hideDlg();
+    const y=await choose([{label:'成為'+c.name},{label:'看看其他職業'}],{pos:'bottom',cols:2});
+    if(y!==0)continue;
+    H.cls=k;
+    const lv=Math.max(0,H.lv-4),gr=c.gr;Object.keys(gr).forEach(s=>H[s]+=gr[s]*lv);
+    c.start.forEach(g=>{if(!H.own.includes(g))H.own.push(g);});
+    const w=c.start.find(g=>GEAR[g].t==='w'),a=c.start.find(g=>GEAR[g].t==='a');
+    if(!canEquip(H.wpn)||GEAR[w].atk+(GEAR[w].mag||0)>GEAR[H.wpn].atk+(GEAR[H.wpn].mag||0))H.wpn=w;
+    if(!canEquip(H.arm)||GEAR[a].def>GEAR[H.arm].def)H.arm=a;
+    fullHeal();sfx('lv');
+    await talk(['好！從今天起，你就是一名'+c.name+'了！','這是公會送你的裝備：「'+GEAR[w].name+'」和「'+GEAR[a].name+'」。'],n);
+    if(lv&&Object.keys(gr).length)await say('職業加成補發：'+Object.keys(gr).map(s=>STATN[s]+' +'+gr[s]*lv).join('、')+'。');
+    const got=SK.filter(s=>s.cls===k&&s.lv<=H.lv);
+    if(got.length)await say('學會了新技能「'+got.map(s=>s.name).join('」「')+'」！');
+    save();return;
+  }
+}
 async function chest(x,y){
   const k=W.map+':'+x+','+y;
   const c=CHESTS[k];F.ch[k]=1;sfx('get');
@@ -897,7 +957,7 @@ async function gate(){
   }else await talk(['厚重的石門緊閉著，中央有個菱形的凹槽。','似乎需要某種鑰石。']);
 }
 async function shop(kind){
-  const list=kind==='w'?['iron','rod','steel','leather','chain']:['herb','ether'];
+  const list=kind==='w'?['iron','hunter','rod','steel','robe','leather','chain']:['herb','ether'];
   await say(kind==='w'?'歡迎光臨武具店！好裝備能救你一命。':'歡迎光臨！藥草多帶幾株準沒錯。',{name:'店主',face:'smith'});
   hideDlg();
   await openMenu({title:kind==='w'?'武具店':'道具店',pos:'full',hint:'B 鍵離開',
@@ -909,7 +969,7 @@ async function shop(kind){
         disabled:own||H.gold<g.price,
         act:async()=>{
           H.gold-=g.price;sfx('get');
-          if(GEAR[k]){H.own.push(k);if(g.t==='w')H.wpn=k;else H.arm=k;await say('買下了「'+g.name+'」，馬上裝備起來了！');}
+          if(GEAR[k]){H.own.push(k);if(canEquip(k)){if(g.t==='w')H.wpn=k;else H.arm=k;await say('買下了「'+g.name+'」，馬上裝備起來了！');}else await say('買下了「'+g.name+'」。（目前的職業不能裝備）');}
           else H.bag[k]=(H.bag[k]||0)+1;
         }};
     })});
@@ -961,7 +1021,7 @@ async function bossFight(id){
 }
 
 const statusHtml=()=>
-  '<div class="row"><b>'+H.name+'</b><span>Lv '+H.lv+'</span><span>EXP '+H.exp+'/'+need(H.lv)+'</span><span>'+H.gold+' G</span></div>'+
+  '<div class="row"><b>'+H.name+'</b><span>'+cls().name+'</span><span>Lv '+H.lv+'</span><span>EXP '+H.exp+'/'+need(H.lv)+'</span><span>'+H.gold+' G</span></div>'+
   '<div class="row"><span>HP '+H.hp+'/'+mhp()+'</span><span>MP '+H.mp+'/'+mmp()+'</span></div>'+
   '<div class="row"><span>攻擊 '+atk()+'</span><span>魔力 '+mag()+'</span><span>防禦 '+def()+'</span><span>速度 '+spd()+'</span></div>'+
   '<div class="row"><span>'+GEAR[H.wpn].name+'</span><span>'+GEAR[H.arm].name+'</span></div>';
@@ -977,7 +1037,7 @@ async function allocMenu(){
 async function equipMenu(){
   await openMenu({title:'裝備',pos:'full',head:statusHtml,
     items:()=>H.own.map(k=>{const g=GEAR[k],on=H.wpn===k||H.arm===k;
-      return {label:g.name,tag:on?'裝備中':(g.t==='w'?'武器':'防具'),desc:gearDesc(g),act:async()=>{
+      return {label:g.name,tag:on?'裝備中':!canEquip(k)?'不能裝備':(g.t==='w'?'武器':'防具'),desc:gearDesc(g),disabled:!on&&!canEquip(k),act:async()=>{
         if(g.t==='w')H.wpn=k;else H.arm=k;
         H.hp=Math.min(H.hp,mhp());H.mp=Math.min(H.mp,mmp());
       }};})});
@@ -995,7 +1055,7 @@ async function pauseMenu(){
     {label:'裝備',desc:'更換武器與防具',act:async()=>{await equipMenu();}},
     {label:'道具',desc:'使用藥草或魔力水',act:async()=>{await itemMenu();}},
     {label:'技能一覽',desc:learned().map(s=>s.name+'(MP'+s.mp+')').join('、'),act:async()=>{
-      const nx=SK.find(s=>s.lv>H.lv);
+      const nx=SK.find(s=>s.lv>H.lv&&skOK(s));
       await say('已學會：'+learned().map(s=>s.name).join('、')+'。'+(nx?'\nLv '+nx.lv+' 會學到「'+nx.name+'」。':''));
     }},
     {label:'存檔',desc:'保存目前的冒險紀錄',act:async()=>{save();sfx('get');await say('冒險紀錄已保存。');}},
@@ -1072,14 +1132,15 @@ function buildBG(th){
   });
   return bg;
 }
-function physD(e,pow){
-  let d=(atk()*pow-e.def*.6)*(.9+Math.random()*.2);
-  const crit=Math.random()<.05+H.agi*.006;if(crit)d*=1.5;
+function physD(e,pow,o){
+  o=o||{};
+  let d=(atk()*pow-e.def*.6*(1-(o.pierce||0)))*(.9+Math.random()*.2);
+  const crit=Math.random()<.05+H.agi*(H.cls==='ranger'?.008:.006);if(crit)d*=1.5;
   return {d:Math.max(1,Math.round(d)),crit};
 }
 function magD(e,s){
   let d=(mag()*s.pow+s.flat-e.def*.3)*(.9+Math.random()*.2);
-  const weak=e.weak===s.el;if(weak)d*=1.5;
+  const weak=!!s.el&&e.weak===s.el;if(weak)d*=H.cls==='mage'?2:1.5;
   return {d:Math.max(1,Math.round(d)),weak};
 }
 function hitEnemy(e,d,o){
@@ -1102,7 +1163,7 @@ function hitEnemy(e,d,o){
 }
 const HAND=h=>HB?{x:h.x+20,y:h.y-36-(h.z||0)}:({x:h.x+(h.dir==='up'?11:h.dir==='down'?-11:h.dir==='left'?-1:1),y:h.y-17-(h.z||0)});
 async function heroHome(){const h=B.hero;h.pose='run';h.dir='up';await moveTo(h,HERO.x,HERO.y,220,ease.io);h.pose='idle';}
-async function swingAt(t,pow,heavy){
+async function swingAt(t,pow,heavy,o){
   const h=B.hero;h.dir='up';h.pose='run';
   await moveTo(h,HERO.x+20,HERO.y-16,200,ease.out);
   h.pose='ready';h.swA=-2.6;h.heavy=!!heavy;
@@ -1114,14 +1175,80 @@ async function swingAt(t,pow,heavy){
   await anim(110,k=>{h.swA=-2.6+k*2.4;if(heavy)h.z=14*(1-k);});
   h.z=0;
   fxAdd({type:'claw',x:t.x+t.ox,y:t.y-t.h/2,heavy,dur:300});
-  const dm=physD(t,pow);hitEnemy(t,dm.d,{crit:dm.crit,heavy});
+  const dm=physD(t,pow,o);hitEnemy(t,dm.d,{crit:dm.crit,heavy});
+  if(o&&o.after)o.after(t);
   await wait(heavy?260:180);
-  await heroHome();
+  if(!(o&&o.stay))await heroHome();
 }
-async function physAttack(t,pow,heavy,name){
+async function physAttack(t,pow,heavy,name,o){
   if(!t||t.dead)t=alive()[0];
   await msg(name?H.name+'使出'+name+'！':H.name+'的攻擊！');
-  await swingAt(t,pow,heavy);
+  await swingAt(t,pow,heavy,o);
+}
+async function doubleStab(t,s){
+  if(!t||t.dead)t=alive()[0];
+  await msg(H.name+'使出'+s.name+'！');
+  await swingAt(t,s.pow,false,{stay:1});
+  if(!t.dead&&alive().length){const h=B.hero;h.pose='ready';await wait(60);await swingAt(t,s.pow,false);}
+  else await heroHome();
+}
+async function stealAct(t,s){
+  if(!t||t.dead)t=alive()[0];
+  const h=B.hero;
+  await msg(H.name+'使出'+s.name+'！');
+  h.pose='run';h.dir='up';
+  await moveTo(h,t.x+t.ox-14,t.y+10,220,ease.out);
+  h.pose='swing';h.swT=performance.now();sfx('slash');
+  await wait(160);
+  if(t.big)B.q.push('頭目身上偷不到東西！');
+  else if(t.stolen)B.q.push(t.name+'身上已經沒東西了。');
+  else if(Math.random()<.75){
+    t.stolen=1;sfx('get');
+    if(Math.random()<.35){const k=Math.random()<.7?'herb':'ether';H.bag[k]=(H.bag[k]||0)+1;B.q.push('偷到了 '+ITEMS[k].name+'！');popN(h.x,h.y-52,ITEMS[k].name,'#ffe060',10);}
+    else{const g=Math.max(3,Math.round(t.gold*(.6+Math.random()*.6)));H.gold+=g;B.q.push('偷到了 '+g+' G！');popN(h.x,h.y-52,'+'+g+'G','#ffe060',10);}
+  }else B.q.push('偷竊失敗了！');
+  await wait(200);
+  await heroHome();
+}
+async function burstSpell(s){
+  await msg(H.name+'施放了'+s.name+'！');
+  await castPose('200,150,255',460);
+  sfx('boom');B.flashT=performance.now();
+  for(const e of alive()){
+    fxAdd({type:'ring',x:e.x,y:e.y-e.h/2,c:'200,150,255',r:30,dur:380});
+    sparks(e.x,e.y-e.h/2,'#e4c8ff',12,90);
+    const r=magD(e,s);hitEnemy(e,Math.round(r.d*(1+H.mp/Math.max(1,mmp())*.3)),{color:'#e4c8ff'});
+    await wait(120);
+  }
+  await wait(260);B.hero.pose='idle';
+}
+async function warcryAct(s){
+  const h=B.hero;
+  await msg(H.name+'發出'+s.name+'！');
+  h.pose='win';sfx('lv');shake(2,240);
+  fxAdd({type:'ring',x:h.x,y:h.y-22,c:'255,120,80',r:36,dur:420});
+  B.warcry=4;
+  await wait(520);h.pose='idle';
+  B.q.push('3 回合內攻擊力提升！');
+}
+async function meditAct(s){
+  const h=B.hero;
+  await msg(H.name+'開始'+s.name+'。');
+  h.pose='guard';sfx('magic');B.medit=true;
+  fxAdd({type:'circle',x:h.x,y:h.y,c:'140,200,255',dur:560});
+  const v=Math.max(0,Math.min(mmp()-H.mp,Math.round(mmp()*.25)));H.mp+=v;
+  popN(h.x,h.y-52,'+'+v,'#8cc8ff',12);
+  await wait(560);
+  B.q.push('MP 回復了 '+v+'！');
+}
+async function shadowAct(s){
+  const h=B.hero;
+  await msg(H.name+'使出'+s.name+'！');
+  h.pose='run';sfx('ok');B.dodge=1;
+  await anim(300,k=>{h.kx=Math.sin(k*Math.PI*2)*8;});h.kx=0;
+  fxAdd({type:'ring',x:h.x,y:h.y-22,c:'190,170,255',r:26,dur:340});
+  h.pose='idle';
+  B.q.push('身形變得難以捉摸！');
 }
 async function spinAttack(s){
   const h=B.hero,al=alive();
@@ -1218,10 +1345,22 @@ async function itemAct(k){
 }
 async function heroAct(a){
   const h=B.hero;
-  if(a.t==='atk')await physAttack(a.target,1,false);
+  if(a.t==='atk'){
+    await physAttack(a.target,1,false);
+    const t=a.target&&!a.target.dead?a.target:null;
+    if(H.cls==='sword'&&t&&H.hp>0&&Math.random()<.15){B.q.push('追擊！');await flushQ();await swingAt(t,.6,false);}
+  }
   else if(a.t==='sk'){
     const s=a.s;H.mp-=s.mp;
     if(s.id==='slash')await physAttack(a.target,s.pow,true,s.name);
+    else if(s.id==='pierce')await physAttack(a.target,s.pow,true,s.name,{pierce:.5});
+    else if(s.id==='double')await doubleStab(a.target,s);
+    else if(s.id==='venom')await physAttack(a.target,s.pow,false,s.name,{after:t=>{if(!t.dead){t.poison=3;B.q.push(t.name+'中毒了！');}}});
+    else if(s.id==='steal')await stealAct(a.target,s);
+    else if(s.id==='burst')await burstSpell(s);
+    else if(s.id==='warcry')await warcryAct(s);
+    else if(s.id==='medit')await meditAct(s);
+    else if(s.id==='shadow')await shadowAct(s);
     else if(s.id==='spin')await spinAttack(s);
     else if(s.id==='fire')await fireSpell(a.target,s);
     else if(s.id==='ice')await iceSpell(a.target,s);
@@ -1239,12 +1378,13 @@ async function heroAct(a){
 }
 function damageHero(e,pow,heavy){
   const h=B.hero;
-  if(Math.random()<Math.min(.15,H.agi*.005)){
+  if(B.dodge>0||Math.random()<Math.min(.15,H.agi*.005)){
+    B.dodge=0;
     popN(h.x,h.y-50,'MISS','#cfd6f5',9);
     anim(260,k=>{h.kx=-Math.sin(k*Math.PI)*12;});B.q.push(H.name+'閃開了！');return;
   }
   let d=(e.atk*pow-def()*.5)*(.9+Math.random()*.2),m=1;
-  if(B.defend)m*=.5;if(B.guard>0)m*=.5;
+  if(B.defend)m*=.5;if(B.guard>0)m*=.5;if(B.medit)m*=1.3;m*=cls().taken||1;
   d=Math.max(1,Math.round(Math.max(1,d)*m));
   H.hp=Math.max(0,H.hp-d);
   sfx('hurt');sparks(h.x+4,h.y-26,'#ff8a6a',9);
@@ -1352,7 +1492,7 @@ async function command(){
       const i=await choose(sk.map(s=>({label:s.name,tag:'MP'+s.mp,desc:s.desc,disabled:H.mp<s.mp})),{pos:'bottom',cols:2});
       if(i<0)continue;
       const s=sk[i];
-      if(s.type==='heal'||s.type==='guard'||s.all)return {t:'sk',s};
+      if(s.self||s.all)return {t:'sk',s};
       const t=await pickTarget();if(t)return {t:'sk',s,target:t};
     }
     else if(c===2){
@@ -1372,7 +1512,7 @@ async function battle(ids,opt){
   await fade(.9,70,'#ffffff');await fade(0,70);await fade(.9,70);await fade(1,200,'#0d0a08');
   const cnt={},seen={};ids.forEach(id=>cnt[id]=(cnt[id]||0)+1);
   const pos=MON[ids[0]].big?[[116,90]]:ids.length===1?[[112,82]]:ids.length===2?[[94,78],[132,88]]:[[80,70],[113,90],[143,70]];
-  B={theme:MAPS[W.map].theme,bg:buildBG(MAPS[W.map].theme),guard:0,defend:false,parts:[],pops:[],fx:[],q:[],shakeT:0,shakeM:0,cmd:0,flashT:-9999,victory:0,
+  B={theme:MAPS[W.map].theme,bg:buildBG(MAPS[W.map].theme),guard:0,warcry:0,dodge:0,medit:false,pre:false,defend:false,parts:[],pops:[],fx:[],q:[],shakeT:0,shakeM:0,cmd:0,flashT:-9999,victory:0,
     hero:{x:HERO.x-80,y:HERO.y,pose:'run',dir:'up',swA:-1,flashT:-9999,z:0,kx:0,ky:0},
     en:ids.map((id,i)=>{
       const m=MON[id],sc=m.big?4:2;
@@ -1386,6 +1526,7 @@ async function battle(ids,opt){
   await anim(480,k=>{const q=ease.out(k);h.x=HERO.x-80*(1-q);B.en.forEach(e=>e.x=e.hx+90*(1-q));});
   h.pose='idle';
   await say(opt.boss?B.en[0].name+'擋住了去路！':ids.length>1?'魔物群出現了！':'野生的'+B.en[0].name+'跳了出來！',{auto:700});
+  if(H.cls==='ranger'&&!opt.boss&&Math.random()<.3){B.pre=true;sfx('ok');await say('先制攻擊！魔物還沒反應過來。',{auto:700});}
   let result=null;
   while(!result){
     const act=await command();
@@ -1394,13 +1535,13 @@ async function battle(ids,opt){
       if(opt.boss){await msg('這場戰鬥無法逃跑！');continue;}
       const top=Math.max.apply(null,alive().map(e=>e.spd));
       h.dir='down';h.pose='run';
-      if(Math.random()<clamp(.55+(spd()-top)*.05,.3,.95)){sfx('ok');await moveTo(h,h.x-10,h.y+70,400,ease.in);await msg('成功逃跑了！');result='run';break;}
+      if(H.cls==='ranger'||Math.random()<clamp(.55+(spd()-top)*.05,.3,.95)){sfx('ok');await moveTo(h,h.x-10,h.y+70,400,ease.in);await msg('成功逃跑了！');result='run';break;}
       await moveTo(h,h.x,h.y+8,150,ease.out);h.dir='up';h.pose='hurt';await msg('逃跑失敗！');
       await moveTo(h,HERO.x,HERO.y,150,ease.io);h.pose='idle';
       heroTurn=false;
     }
     const prio=(act.t==='def'||(act.t==='sk'&&act.s.type==='guard'))?100:0;
-    const order=alive().map(e=>({who:e,s:e.spd+Math.random()*3}));
+    const order=B.pre?[]:alive().map(e=>({who:e,s:e.spd+Math.random()*3}));B.pre=false;
     if(heroTurn)order.push({who:null,s:spd()+Math.random()*3+prio});
     order.sort((a,b)=>b.s-a.s);
     B.defend=act.t==='def';
@@ -1410,8 +1551,18 @@ async function battle(ids,opt){
       if(H.hp<=0){result='lose';break;}
       if(!alive().length){result='win';break;}
     }
-    B.defend=false;
+    B.defend=false;B.medit=false;
     if(B.guard>0)B.guard--;
+    if(B.warcry>0)B.warcry--;
+    if(!result){
+      for(const e of alive()){
+        if(e.poison>0){
+          e.poison--;await msg(e.name+'受到毒素侵蝕！');
+          hitEnemy(e,Math.max(1,Math.round(e.maxhp*.08)),{color:'#a8f070'});await flushQ();
+        }
+      }
+      if(!alive().length)result='win';
+    }
   }
   if(result==='win'){
     await wait(300);
@@ -1422,11 +1573,13 @@ async function battle(ids,opt){
     H.exp+=exp;H.gold+=gold;
     await say('戰鬥勝利！獲得 '+exp+' 經驗值和 '+gold+' G。');
     while(H.exp>=need(H.lv)){
-      H.exp-=need(H.lv);H.lv++;H.pts+=3;fullHeal();sfx('lv');
+      H.exp-=need(H.lv);H.lv++;H.pts+=3;
+      const gr=cls().gr,gk=Object.keys(gr);gk.forEach(k=>H[k]+=gr[k]);
+      fullHeal();sfx('lv');
       fxAdd({type:'ring',x:h.x,y:h.y-22,c:'255,210,74',r:34,dur:500});
-      await say('升級了！'+H.name+'升到 Lv '+H.lv+'，獲得 3 點能力點數。');
-      const s=SK.find(s=>s.lv===H.lv);
-      if(s)await say('學會了新技能「'+s.name+'」！');
+      await say('升級了！'+H.name+'升到 Lv '+H.lv+'，獲得 3 點能力點數。'+(gk.length?'\n'+cls().name+'加成：'+gk.map(k=>STATN[k]+' +'+gr[k]).join('、'):''));
+      for(const s of SK.filter(s=>s.lv===H.lv&&skOK(s)))await say('學會了新技能「'+s.name+'」！');
+      if(H.cls==='novice'&&H.lv===5)await say('（可以回晨露村，到冒險者公會轉職了！）');
     }
   }else if(result==='lose'){
     h.pose='ko';await wait(700);
