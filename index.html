@@ -373,7 +373,7 @@ function art(key,label,r='r169',extra='',under){
   return `<div class="art ${r} ${extra}" data-art="${key}"><div class="art-ph"><em>插畫位</em><b>${label}</b><i>${key}.png · ${ASZ[r]}</i></div>${img}</div>`;
 }
 /* 男女版插畫還沒到時，先退回共用版 */
-const ALT=k=>{if(!k)return null;{const m=k.match(/^(story_ch\d_\w+?_[mf])_(\w+)$/);if(m){const a=m[2];if(ADV[a]){const base=Object.keys(CLS).find(c=>(CLS[c].adv||[]).includes(a));return base&&base!=='swordsman'?m[1]+'_'+base:m[1]}return m[1]}}let m=k.match(/^(.*)_(hurt|low|win|lose|atk|skill|cast)$/);if(m)return m[1];m=k.match(/^ally_(\w+)$/);if(m)return 'npc_'+m[1];if(/^event_/.test(k))return 'area_'+AREAS[RUN?RUN.area:0].id;m=k.match(/^(.*)_(m|f)$/);if(m)return m[1];m=k.match(/^story_ch(\d)_(mid|pre)$/);return m?'area_'+AREAS[+m[1]-1].id:null};
+const ALT=k=>{if(!k)return null;{const m=k.match(/^portrait_(\w+?)_([mf])(?:_(smile|serious))?$/);if(m){return m[3]?`portrait_${m[1]}_${m[2]}`:`class_${m[1]}_${m[2]}`}}{const m=k.match(/^(story_ch\d_\w+?_[mf])_(\w+)$/);if(m){const a=m[2];if(ADV[a]){const base=Object.keys(CLS).find(c=>(CLS[c].adv||[]).includes(a));return base&&base!=='swordsman'?m[1]+'_'+base:m[1]}return m[1]}}let m=k.match(/^(.*)_(hurt|low|win|lose|atk|skill|cast)$/);if(m)return m[1];m=k.match(/^ally_(\w+)$/);if(m)return 'npc_'+m[1];if(/^event_/.test(k))return 'area_'+AREAS[RUN?RUN.area:0].id;m=k.match(/^(.*)_(m|f)$/);if(m)return m[1];m=k.match(/^story_ch(\d)_(mid|pre)$/);return m?'area_'+AREAS[+m[1]-1].id:null};
 /* 小圖示：有插畫就蓋在線條圖示上 */
 const icon=(key,fb)=>key in ATL?`${fb}<i class="ii at" style="background-position:${(ATL[key]%ATC)/(ATC-1)*100}% ${Math.floor(ATL[key]/ATC)/(ATR-1)*100}%"></i>`:`${fb}${MISS.has(key)?'':`<img class="ii" src="art/${key}.webp" alt="" onerror="reTry(this,'${key}')||(MISS.add('${key}'),this.remove())">`}`;
 const gIco=id=>icon('icon_'+id,SLOTCH[GEAR[id].slot]);
@@ -383,6 +383,8 @@ function tx(t){if(!S)return t;const f=S.sex==='f';t=t.replace(/\{wfix\}/g,{sword
 const you=t=>S&&S.sex==='f'?String(t).replace(/你/g,'妳'):t;
 const HK=()=>`class_${S.adv||S.cls}_${S.sex}`;
 const SCLS=()=>S.adv?'_'+S.adv:S.cls==='swordsman'?'':'_'+S.cls;
+const PKEY=(e)=>`portrait_${S.adv||S.cls}_${S.sex}${e?'_'+e:''}`;
+const heroFace=t=>/謝謝|一起|嗯|太好|請多指教|好！/.test(t)?'smile':/[！？]|……|對不起|別|不/.test(t)?'serious':'';
 const SKEY=(n,io)=>`story_ch${n}_${io}_${S.sex}${SCLS()}`;
 function toast(t){const T=$('#toast');while(T.children.length>=3)T.firstChild.remove();const d=document.createElement('div');d.textContent=t;T.appendChild(d);setTimeout(()=>d.remove(),2300)}
 
@@ -1221,12 +1223,12 @@ function chatTick(){if(!S)return;const el=$('#chat');
 
 /* ============ 畫面 ============ */
 function bar(k,v,m,cls=''){return `<div class="bar ${k} ${cls}"><i style="width:${Math.max(0,Math.min(100,v/m*100))}%"></i><span>${k.toUpperCase()} ${v}/${m}</span></div>`}
-let WARM=0;function warm(){if(WARM||!S)return;WARM=1;try{preload(['','_hurt','_low','_win','_lose','_atk','_skill','_cast'].map(x=>HK()+x));const n=Math.min(S.main.ch,4);preload([SKEY(n+1,'intro'),SKEY(n+1,'mid'),SKEY(n+1,'outro'),'atlas_ui','town_bg',...AREAS.map(a=>'area_'+a.id),...AREAS[n].mobs.map(m=>'mob_'+m),'mob_'+AREAS[n].boss,'battle_'+AREAS[n].id])}catch(e){}}
+let WARM=0;function warm(){if(WARM||!S)return;WARM=1;try{preload(['','_hurt','_low','_win','_lose','_atk','_skill','_cast'].map(x=>HK()+x));preload([PKEY(),PKEY('smile'),PKEY('serious')]);const n=Math.min(S.main.ch,4);preload([SKEY(n+1,'intro'),SKEY(n+1,'mid'),SKEY(n+1,'outro'),'atlas_ui','town_bg',...AREAS.map(a=>'area_'+a.id),...AREAS[n].mobs.map(m=>'mob_'+m),'mob_'+AREAS[n].boss,'battle_'+AREAS[n].id])}catch(e){}}
 function render(){try{bgmAuto()}catch(e){}if(!WARM)setTimeout(warm,400);setTimeout(()=>{try{tipCheck()}catch(e){}},60);
   const app=$('#app');
   if(!S){app.className='pre';$('#main').innerHTML=vTitle();return}
   app.className='';clamp();const s=stats();
-  $('#hud').innerHTML=`<button class="ava" data-a="tab" data-v="char" aria-label="角色">${art(HK(),clsName(),'r11','mini')}</button>
+  $('#hud').innerHTML=`<button class="ava" data-a="tab" data-v="char" aria-label="角色">${art(PKEY(),clsName(),'r11','mini')}</button>
     <div class="hud-mid"><div class="hud-n"><b>${esc(S.name)}</b>${title()?`<span style="color:#ffd27a">「${title()}」</span>`:''}<span>Lv.${S.lv} ${clsName()}</span><span class="pw">戰力 ${power()}</span></div>${bar('hp',S.hp,s.HP)}${bar('mp',S.mp,s.MP)}${bar('exp',S.exp,need(S.lv))}</div>
     <div class="hud-r"><span class="cur g">G ${S.gold}</span><button class="set" data-a="openM" data-v="settings">設定</button></div>`;
   $('#nav').innerHTML=[['town','城','城鎮'],['adv','冒','冒險'],['char','角','角色'],['bag','包','背包'],['quest','任','任務']].map(([k,c,n])=>
@@ -1432,7 +1434,7 @@ function drawStory(){const el=$('#story');if(!STORY){el.hidden=true;el.innerHTML
   const L=STORY.lines[STORY.i];el.hidden=false;
   if(!Array.isArray(L)){el.innerHTML=`<button class="skip" data-a="storySkip">跳過</button>${art(STORY.key,STORY.label)}
     <div class="say" style="display:flex;flex-direction:column"><div class="who">${esc(you(tx(L.q||'{name} 要怎麼做？')))}</div><div class="choices">${L.choice.map((o,i)=>o.cond&&!okLine(['','',o.cond])?'':`<button class="btn" data-a="storyPick" data-v="${i}">${esc(you(tx(o.t)))}</button>`).join('')}</div></div>`;return}
-  const [w,t]=L,who=tx(w),hero=w==='{name}',k=hero?HK():NPC[w];
+  const [w,t]=L,who=tx(w),hero=w==='{name}',k=hero?PKEY(heroFace(t)):NPC[w];
   el.innerHTML=`<button class="skip" data-a="storySkip">跳過</button>${art(STORY.key,STORY.label)}
    <button class="say" data-a="storyNext" style="text-align:left">${k?`<div class="pt">${art(k,who,'r34','mini')}</div>`:'<span></span>'}<div><div class="who">${esc(who)}</div><p>${esc(you(tx(t)))}</p></div><div class="nx">點擊繼續 ▼</div></button>`}
 function storyPick(i){const o=STORY.lines[STORY.i].choice[i],f=o.fx||{};
