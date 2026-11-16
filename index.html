@@ -1336,7 +1336,7 @@ function vQuest(){
   const tabs=`<div class="tabs">${[['main','主線'],['story','人物故事'],['side','支線委託'],['daily','每日']].map(([k,n])=>`<button class="${QTAB===k?'on':''}" data-a="qTab" data-v="${k}">${n}${k==='story'&&nstDot()?' <span class="tag new">!</span>':''}</button>`).join('')}</div>`;
   let body='';
   if(QTAB==='main'){const m=S.main;
-    if(m.ch>=CH.length)body=`${art(SKEY(5,'outro'),'結局插畫')}<h3>第一部「蒼藍誓約」完</h3><p>${you('你')}是晨星鎮的蒼藍勇者。北方冰原上那盞「第五盞燈」的故事，將在第二部揭曉。</p><p class="sub">在那之前：完成人物故事、挑戰無盡之塔、收集圖鑑與成就，把裝備打磨到極致。</p>`;
+    if(m.ch>=CH.length)body=`${art(SKEY(5,'outro'),'結局插畫')}<h3>第一部「北方大道」完</h3><p>北方大道重新通行了，但黑霧還在。王國瞞了二十年的事，將在第二部揭曉。</p><p class="sub">在那之前：完成人物故事、挑戰無盡之塔、收集圖鑑與成就，把裝備打磨到極致。</p>`;
     else{const c=CH[m.ch];
       body=`${art(SKEY(m.ch+1,'intro'),c.t)}<h3>${c.t}</h3><p>${c.goal}</p><div class="list">${c.steps.map((st,i)=>{const done=m.acc&&i<m.step,now=m.acc&&i===m.step;return `<div class="step ${done?'done':''}"><span>${done?'✔':'・'}</span><span>${st.type==='kill'?`擊敗 ${MOBS[st.mob].n} ${st.n} 隻`:`討伐首領 ${MOBS[st.mob].n}`}</span>${now&&st.type==='kill'?`<i>${m.prog}/${st.n}</i>`:''}</div>`}).join('')}</div>
       <p class="sub">地點：${AREAS[m.ch].n}　獎勵：${rwText(c.rw)}</p>${m.ch>0?`<p class="sub">與露娜的羈絆：<span class="bond">${'◆'.repeat(Math.min(10,S.bond||0))||'—'}</span></p>`:''}
