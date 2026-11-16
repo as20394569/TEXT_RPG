@@ -91,7 +91,7 @@ h3{font-family:var(--display);font-size:16px;color:var(--navy)}
 .art-ph em{font-style:normal;font-size:10px;padding:0 6px;border:1px solid currentColor;border-radius:8px}
 .art-ph b{font-family:var(--display);font-size:14px}
 .art-ph i{font-style:normal;font-size:10px;font-family:ui-monospace,Menlo,monospace;opacity:.8;word-break:break-all}
-.art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.art img.under{z-index:0}.art img:not(.under){z-index:1}
 .art.mini img{object-position:50% 12%}
 .art.mini{border:none;border-radius:0;height:100%}.art.mini em,.art.mini i{display:none}.art.mini b{font-size:11px}
 
@@ -365,14 +365,15 @@ const ATL={"icon_a_0":0,"icon_a_1":1,"icon_a_2":2,"icon_a_3":3,"icon_a_4":4,"ico
 const SHO=['','mage','ranger','cleric','knight','berserker','archmage','warlock','sniper','assassin','bishop','templar'];
 const shKey=k=>{const m=k&&k.match(/^story_ch(\d)_(intro|mid|outro)_([mf])(?:_(\w+))?$/);if(!m)return null;const i=SHO.indexOf(m[4]||'');return i<0?null:{f:`sheet_ch${m[1]}_${m[2]}_${m[3]}`,i}};
 const shPos=i=>`background-position:${(i%4)/3*100}% ${Math.floor(i/4)/2*100}%`;
-function art(key,label,r='r169',extra=''){
+function art(key,label,r='r169',extra='',under){
   const sk=shKey(key);if(sk)return `<div class="art ${r} ${extra} has" data-art="${key}"><i class="sht" style="background-image:url(art/${sk.f}.webp);${shPos(sk.i)}"></i></div>`;
   const src=artSrc(key);
-  const img=src?`<img src="art/${src}.webp" alt="" onload="this.parentNode.classList.add('has')" onerror="reTry(this,'${src}')||artErr(this,'${src}')">`:'';
+  const u=under&&under!==src&&!MISS.has(under)&&PRE[under]?`<img class="under" src="art/${under}.webp" alt="">`:'';
+  const img=src?`${u}<img src="art/${src}.webp" alt="" onload="this.parentNode.classList.add('has')" onerror="reTry(this,'${src}')||artErr(this,'${src}')">`:'';
   return `<div class="art ${r} ${extra}" data-art="${key}"><div class="art-ph"><em>插畫位</em><b>${label}</b><i>${key}.png · ${ASZ[r]}</i></div>${img}</div>`;
 }
 /* 男女版插畫還沒到時，先退回共用版 */
-const ALT=k=>{if(!k)return null;{const m=k.match(/^(story_ch\d_\w+?_[mf])_(\w+)$/);if(m){const a=m[2];if(ADV[a]){const base=Object.keys(CLS).find(c=>(CLS[c].adv||[]).includes(a));return base&&base!=='swordsman'?m[1]+'_'+base:m[1]}return m[1]}}let m=k.match(/^(.*)_(hurt|low|win|lose|atk|skill)$/);if(m)return m[1];m=k.match(/^ally_(\w+)$/);if(m)return 'npc_'+m[1];if(/^event_/.test(k))return 'area_'+AREAS[RUN?RUN.area:0].id;m=k.match(/^(.*)_(m|f)$/);if(m)return m[1];m=k.match(/^story_ch(\d)_(mid|pre)$/);return m?'area_'+AREAS[+m[1]-1].id:null};
+const ALT=k=>{if(!k)return null;{const m=k.match(/^(story_ch\d_\w+?_[mf])_(\w+)$/);if(m){const a=m[2];if(ADV[a]){const base=Object.keys(CLS).find(c=>(CLS[c].adv||[]).includes(a));return base&&base!=='swordsman'?m[1]+'_'+base:m[1]}return m[1]}}let m=k.match(/^(.*)_(hurt|low|win|lose|atk|skill|cast)$/);if(m)return m[1];m=k.match(/^ally_(\w+)$/);if(m)return 'npc_'+m[1];if(/^event_/.test(k))return 'area_'+AREAS[RUN?RUN.area:0].id;m=k.match(/^(.*)_(m|f)$/);if(m)return m[1];m=k.match(/^story_ch(\d)_(mid|pre)$/);return m?'area_'+AREAS[+m[1]-1].id:null};
 /* 小圖示：有插畫就蓋在線條圖示上 */
 const icon=(key,fb)=>key in ATL?`${fb}<i class="ii at" style="background-position:${(ATL[key]%ATC)/(ATC-1)*100}% ${Math.floor(ATL[key]/ATC)/(ATR-1)*100}%"></i>`:`${fb}${MISS.has(key)?'':`<img class="ii" src="art/${key}.webp" alt="" onerror="reTry(this,'${key}')||(MISS.add('${key}'),this.remove())">`}`;
 const gIco=id=>icon('icon_'+id,SLOTCH[GEAR[id].slot]);
@@ -1070,7 +1071,7 @@ function checkDaily(){const d=new Date().toDateString();if(S.daily.date!==d)S.da
 let AC=null,MG=null,BG=null,NBH=null,NBL=null,WAVE={},MUTE=false,BGMOFF=false;
 try{MUTE=localStorage.getItem(KEY+'_mute')==='1';BGMOFF=localStorage.getItem(KEY+'_bgm')==='0'}catch(e){}
 function ctx(){try{if(!AC){AC=new(window.AudioContext||window.webkitAudioContext)();const c=AC.createDynamicsCompressor();c.connect(AC.destination);
-  MG=AC.createGain();MG.gain.value=.32;MG.connect(c);BG=AC.createGain();BG.gain.value=.13;BG.connect(c);
+  const lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.value=2400;lp.Q.value=.4;lp.connect(c);MG=AC.createGain();MG.gain.value=.22;MG.connect(lp);const lp2=AC.createBiquadFilter();lp2.type='lowpass';lp2.frequency.value=3200;lp2.Q.value=.4;lp2.connect(c);BG=AC.createGain();BG.gain.value=.11;BG.connect(lp2);
   /* 紅白機風噪音：1-bit LFSR，高頻與低頻兩種 */
   const mk=(hold,short)=>{const b=AC.createBuffer(1,AC.sampleRate,AC.sampleRate),d=b.getChannelData(0);let r=1,v=1;for(let i=0;i<d.length;i++){if(i%hold===0){const bit=((r>>0)^(r>>(short?6:1)))&1;r=(r>>1)|(bit<<14);v=(r&1)?1:-1}d[i]=v}return b};
   NBH=mk(2,false);NBL=mk(24,false);
@@ -1078,13 +1079,13 @@ function ctx(){try{if(!AC){AC=new(window.AudioContext||window.webkitAudioContext
   [.125,.25,.5].forEach(dt=>{const n=32,re=new Float32Array(n),im=new Float32Array(n);for(let k=1;k<n;k++)re[k]=2/(k*Math.PI)*Math.sin(k*Math.PI*dt);WAVE[dt]=AC.createPeriodicWave(re,im)})}
   if(AC.state==='suspended')AC.resume();return AC}catch(e){return null}}
 function ac(){return MUTE?null:ctx()}
-function osc(a,w){const o=a.createOscillator();if(w==='tri')o.type='triangle';else o.setPeriodicWave(WAVE[w||.5]);return o}
+function osc(a,w){const o=a.createOscillator();if(w==='tri')o.type='triangle';else o.setPeriodicWave(WAVE[w===.125?.25:w||.5]);return o}
 /* 方波音：f→f2 滑音，階梯式音量 */
 function sq(f,d,v,t0,f2,w,out){const a=out?ctx():ac();if(!a)return;const t=a.currentTime+(t0||0),o=osc(a,w),g=a.createGain();
   o.frequency.setValueAtTime(f,t);if(f2)o.frequency.linearRampToValueAtTime(f2,t+d);
-  g.gain.setValueAtTime(v||.1,t);g.gain.setValueAtTime((v||.1)*.6,t+d*.5);g.gain.linearRampToValueAtTime(0,t+d);o.connect(g);g.connect(out||MG);o.start(t);o.stop(t+d+.02)}
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v||.1,t+.008);g.gain.setValueAtTime((v||.1)*.6,t+d*.5);g.gain.linearRampToValueAtTime(0,t+d+.03);o.connect(g);g.connect(out||MG);o.start(t);o.stop(t+d+.05)}
 function nz(d,v,t0,low,rate,out){const a=out?ctx():ac();if(!a)return;const t=a.currentTime+(t0||0),s=a.createBufferSource(),g=a.createGain();
-  s.buffer=low?NBL:NBH;s.playbackRate.value=rate||1;s.loop=true;g.gain.setValueAtTime(v||.2,t);g.gain.linearRampToValueAtTime(0,t+d);s.connect(g);g.connect(out||MG);s.start(t,Math.random()*.5);s.stop(t+d+.02)}
+  s.buffer=low?NBL:NBH;s.playbackRate.value=rate||1;s.loop=true;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime((v||.2)*.55,t+.006);g.gain.linearRampToValueAtTime(0,t+d+.03);s.connect(g);g.connect(out||MG);s.start(t,Math.random()*.5);s.stop(t+d+.05)}
 const arp=(fs,st,d,v,t,w)=>fs.forEach((f,i)=>sq(f,d,v,(t||0)+i*st,0,w));
 const SFX={
   hit(t=.15){nz(.09,.32,t);sq(260,.08,.18,t,60,.5)},
@@ -1220,7 +1221,8 @@ function chatTick(){if(!S)return;const el=$('#chat');
 
 /* ============ 畫面 ============ */
 function bar(k,v,m,cls=''){return `<div class="bar ${k} ${cls}"><i style="width:${Math.max(0,Math.min(100,v/m*100))}%"></i><span>${k.toUpperCase()} ${v}/${m}</span></div>`}
-function render(){try{bgmAuto()}catch(e){}setTimeout(()=>{try{tipCheck()}catch(e){}},60);
+let WARM=0;function warm(){if(WARM||!S)return;WARM=1;try{preload(['','_hurt','_low','_win','_lose','_atk','_skill','_cast'].map(x=>HK()+x));const n=Math.min(S.main.ch,4);preload([SKEY(n+1,'intro'),SKEY(n+1,'mid'),SKEY(n+1,'outro'),'atlas_ui','town_bg',...AREAS.map(a=>'area_'+a.id),...AREAS[n].mobs.map(m=>'mob_'+m),'mob_'+AREAS[n].boss,'battle_'+AREAS[n].id])}catch(e){}}
+function render(){try{bgmAuto()}catch(e){}if(!WARM)setTimeout(warm,400);setTimeout(()=>{try{tipCheck()}catch(e){}},60);
   const app=$('#app');
   if(!S){app.className='pre';$('#main').innerHTML=vTitle();return}
   app.className='';clamp();const s=stats();
@@ -1290,8 +1292,8 @@ function vBattle(){const s=stats(),fx=B.fx||{},intro=B.intro,a=AREAS[RUN.area];B
   else cmd=`<div class="cmd"><button class="btn pri" data-a="bAtk">攻擊</button><button class="btn" data-a="bMenu" data-v="skill">技能</button><button class="btn" data-a="bMenu" data-v="item">道具</button><button class="btn" data-a="bGuard">防禦</button><button class="btn" data-a="bFlee">逃跑</button><button class="btn ${B.auto?'pri':''}" data-a="bAuto">自動 ${B.auto?'開':'關'}</button></div>`;
   return `<div class="battle"><div class="stage bg-${a.id} ${fx.quake&&!fk?'quake':''} ${(sk&&sk[0]==='meteor')||(fk&&fk.fx==='slam')?'quakel':''}" ${sk?`style="--c:${sk[1]}"`:fk?`style="--c:${fk.c}"`:''}><img class="bg" src="art/battle_${a.id}.webp" alt="" ${MISS.has('battle_'+a.id)?'hidden':''} onerror="reTry(this,'battle_${a.id}')||(MISS.add('battle_${a.id}'),this.remove())">
    <div class="ibox foe-i" data-a="openM" data-v="foe" role="button" aria-label="查看怪物情報"><div class="nm"><span>${B.name}${B.kind==='boss'?' <span class="tag red">首領</span>':''}</span><span>${(B.adds||[]).length?'<span class="tag">目標</span> ':''}Lv${B.L} ⓘ</span></div>${bbar(B.hp,B.max,fp)}<div class="num">${B.hp}/${B.max}</div>${st?`<div class="chips">${st}</div>`:''}${(B.adds||[]).length?`<div class="addrow">${B.adds.map((f,i)=>`<button class="addf" data-a="bTarget" data-v="${i}" aria-label="切換目標：${f.name}">${art('mob_'+f.id,f.m.n,'r11')}<span>${f.m.n}${bbar(f.hp,f.max)}</span></button>`).join('')}</div><div class="sub" style="font-size:10px">點小頭像切換目標</div>`:''}</div>
-   <div class="spr foe ${B.m.fly?'fly':''} ${B.kind==='boss'?'boss':''} ${foeC}"><div class="plat"></div>${B.id==='shadow'?art(HK(),'試煉之影','r34','shadowimg'):art('mob_'+B.id+(B.hp<=0?'_lose':atk&&fx.d>0?'_hurt':B.hp<B.max*.3?'_low':''),B.m.n,'r11')}${foeFx}</div>
-   <div class="spr me ${meC}"><div class="plat"></div>${art(HK()+(theirs&&fx.d>0?'_hurt':sk?'_skill':atk?'_atk':S.hp<s.HP*.3?'_low':''),clsName(),'r34')}${meFx}</div>
+   <div class="spr foe ${B.m.fly?'fly':''} ${B.kind==='boss'?'boss':''} ${foeC}"><div class="plat"></div>${B.id==='shadow'?art(HK(),'試煉之影','r34','shadowimg'):art('mob_'+B.id+(B.hp<=0?'_lose':atk&&fx.d>0?'_hurt':B.hp<B.max*.3?'_low':''),B.m.n,'r11','','mob_'+B.id)}${foeFx}</div>
+   <div class="spr me ${meC}"><div class="plat"></div>${art(HK()+(theirs&&fx.d>0?'_hurt':sk?(['heal','buff','shield'].includes(sk[0])?'_cast':'_skill'):atk?'_atk':S.hp<s.HP*.3?'_low':''),clsName(),'r34','',HK())}${meFx}</div>
    <div class="ibox me-i"><div class="nm"><span>${esc(S.name)}</span><span>Lv${S.lv}</span></div>${bbar(S.hp,s.HP,pp)}<div class="num">HP ${S.hp}/${s.HP}</div>${bbar(S.mp,s.MP,null,'m')}<div class="num">MP ${S.mp}/${s.MP}</div>${me?`<div class="chips">${me}</div>`:''}</div>
    ${AL?`<div class="ally ${AL.hp<=0?'down':''} ${aD||aH?'aact':''} ${aHit?'ahit':''}">${art('ally_'+AL.id,AL.n,'r34')}${bbar(AL.hp,AL.max)}${aD?`<span class="dmg sm">⚔${aD}</span>`:aH?`<span class="dmg heal sm">+${aH}</span>`:aHit?`<span class="dmg sm">-${aHit}</span>`:''}</div>`:''}
    ${sk?skillFx(sk[0],fx.hits||1):fk?foeSkillFx(fx.fsk):''}${fx.cut?`<div class="cutin ${theirs?'bad':''}">${fx.cut}</div>`:''}</div>
@@ -1673,7 +1675,7 @@ function mkFoe(id,kind){const m=MOBS[id],bs=!!m.boss,el=kind==='elite',nm=!!(RUN
   return{id,m,L,a:st.a,kind:bs?'boss':kind,mut,nm,aff,name:pre+m.n,hp:st.HP,max:st.HP,atk:st.ATK,mag:st.MAG,def:st.DEF,crit:st.CRIT,eva:st.EVA,fb:[],fshield:0,st:{},rage:0,bm}}
 function startBattle(id,kind,nAdds){const F=mkFoe(id,kind),m=F.m,bs=F.kind==='boss';
   const pool=RUN?AREAS[RUN.area].mobs:[id],adds=[];for(let i=0;i<(nAdds||0);i++){const f=mkFoe(pick(pool),'');f.hp=f.max=Math.round(f.max*.75);adds.push(f)}
-  preload([...['','_hurt','_low','_win','_lose','_atk','_skill'].map(x=>HK()+x),...(id==='shadow'?[]:['','_hurt','_low','_win','_lose'].map(x=>'mob_'+id+x)),...adds.map(f=>'mob_'+f.id),'battle_'+(AREAS.find(a=>a.boss===id||a.mobs.includes(id))||{id:'plain'}).id]);
+  preload([...['','_hurt','_low','_win','_lose','_atk','_skill','_cast'].map(x=>HK()+x),...(id==='shadow'?[]:['','_hurt','_low','_win','_lose'].map(x=>'mob_'+id+x)),...adds.map(f=>'mob_'+f.id),'battle_'+(AREAS.find(a=>a.boss===id||a.mobs.includes(id))||{id:'plain'}).id]);
   allyAuto();const ally=id==='shadow'?null:mkAlly();if(ally)ally.hp=ally.max;
   B=Object.assign({cls:{brk:0,marks:[],focus:0,faith:0},counter:0,endure:0,adds,ally,taunt:0,
      buffs:[],shield:0,pst:{poison:0,regen:0,burn:0,bleed:0,weak:0,stun:0},guard:false,
@@ -2029,7 +2031,7 @@ const ACT={
     let d=0,st=0;L.forEach(g=>{const r=dismantle(g);d+=r[0];st+=r[1]});toast(`分解 ${L.length} 件，獲得星塵×${d}${st?`、強化石×${st}`:''}`);save();render()},
   reforge(u){const g=gearBy(+u);if(!canReforge(g))return;const c=reforgeCost(g);addItem('dust',-c.d);S.gold-=c.g;g.sub=rollSubs(GEAR[g.id].t,g.r);SFX.buff();toast('洗練完成，詞條已重新隨機');save();render()},
   rest(){const c=S.lv*4;if(S.gold<c)return;S.gold-=c;const s=stats();S.hp=s.HP;S.mp=s.MP;toast('睡了一覺，HP 與 MP 全滿');save();closeM();render()},
-  advance(k){if(S.lv<TRIAL.lv||S.adv||!S.trial)return;S.adv=k;const b=ADV[k].bonus;for(const a in b)S.attr[a]+=b[a];learn();const s=stats();S.hp=s.HP;S.mp=s.MP;sys(`${S.name} 轉職為【${ADV[k].n}】！`);toast(`轉職成功：${ADV[k].n}`);save();render()},
+  advance(k){if(S.lv<TRIAL.lv||S.adv||!S.trial)return;S.adv=k;WARM=0;const b=ADV[k].bonus;for(const a in b)S.attr[a]+=b[a];learn();const s=stats();S.hp=s.HP;S.mp=s.MP;sys(`${S.name} 轉職為【${ADV[k].n}】！`);toast(`轉職成功：${ADV[k].n}`);save();render()},
   mainAccept(){if(!chLvOk()){toast(`需要 Lv.${CHLV[S.main.ch]}`);return}const m=S.main,c=CH[m.ch];play(c.intro,SKEY(m.ch+1,'intro'),c.t+' 開場',()=>{m.acc=true;m.step=0;m.prog=0;save();render();toast('已接受主線任務')})},
   mainDone(){if(!mainReady())return;const m=S.main,c=CH[m.ch];play(c.outro,SKEY(m.ch+1,'outro'),c.t+' 結尾',()=>{const t=give(c.rw);m.ch++;m.acc=false;m.step=0;m.prog=0;m.mid=false;m.pre=false;sys(`${S.name} 完成了「${c.t}」！`);save();render();
     openM('msg',{t:'章節完成',b:`<div class="panel"><h3>${c.t}</h3><p>獲得：${t}</p>${m.ch<CH.length?`<p class="sub">新地點「${AREAS[m.ch].n}」已開放，商店也進了新貨。</p>`:''}</div><button class="btn pri big" data-a="closeM">確定</button>`})})},
