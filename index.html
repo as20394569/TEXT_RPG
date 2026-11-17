@@ -941,7 +941,7 @@ if(P2){
     bandit:{n:'街道盜賊',lv:26,ty:'swift',sk:['m_knife','m_smoke']},
     deserter:{n:'逃兵騎士',lv:27,ty:'brute',hpM:1.15,sk:['m_oldoath','m_shieldbash']},
     stormhawk:{n:'雷鷹',lv:28,ty:'caster',hpM:.85,mat:'m_gear',sk:['m_thunderdive','m_galewing']},
-    weathergolem:{n:'失控的氣象機兵',lv:30,ty:'tank',boss:1,hpM:1.3,mat:'m_gear',sk:['m_storm','m_lightning','m_recalib']}});
+    weathergolem:{n:'失控的氣象機兵',lv:30,ty:'caster',boss:1,hpM:1.3,mat:'m_gear',sk:['m_storm','m_lightning','m_recalib']}});
   MOBS.stormhawk.fly=1;
   Object.assign(SKM,{
     m_knife:{n:'飛刀',pow:.6,h:3,fx:'orb',c:'#d8d8d8',d:'連丟三把飛刀'},
@@ -1725,6 +1725,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'2.3',d:'2026-11-17',t:'首領蓄力技',b:'首領會每隔幾回合蓄力，下一回合放出無法閃避的【毀滅一擊】。看到蓄力提示就先防禦，傷害會降到四分之一。'},
   {v:'2.2',d:'2026-11-17',t:'物理／魔法傷害區分',b:'魔物新增魔法抗性：魔力造成的傷害看魔抗，攻擊造成的傷害看防禦。防禦型怕魔法、魔法型怕物理，圖鑑會標示弱點。'},
   {v:'2.1',d:'2026-11-17',t:'首領戰調整',b:'首領新增「首領護甲」：每回合受到的傷害最多為最大 HP 的 12%（惡夢 10%）。首領 HP 降到一半時會進入狂怒，獲得護盾並提升攻擊。裝備練起來後，首領戰不會再三下結束。'},
   {v:'2.0',d:'2026-11-17',t:'第二部「霧之彼岸」開幕',b:'第六章「王都的回信」上線！新地區灰石街道（Lv.26–30）、四種新魔物與首領「失控的氣象機兵」、第 6 階裝備、雷鳴套裝、新角色王都使者希瑟。完成第一部的冒險者可直接在任務頁接受第六章。'},
@@ -1762,7 +1763,8 @@ function mkFoe(id,kind){const m=MOBS[id],bs=!!m.boss,el=kind==='elite',nm=!!(RUN
   const aff=[];if(mut||nm){const ks=Object.keys(AFF).sort(()=>Math.random()-.5);aff.push(...ks.slice(0,bs&&nm?2:1))}
   if(aff.includes('rage'))st.ATK=Math.round(st.ATK*1.4),st.MAG=Math.round(st.MAG*1.4);if(aff.includes('shell'))st.DEF=Math.round(st.DEF*1.8),st.MRES=Math.round(st.MRES*1.8);if(aff.includes('swift'))st.EVA+=15,st.CRIT+=15;
   const pre=(nm?'惡夢・':'')+(mut?'蝕化・':'')+(el?'精英':'');
-  return{id,m,L,a:st.a,kind:bs?'boss':kind,mut,nm,aff,name:pre+m.n,hp:st.HP,max:st.HP,atk:st.ATK,mag:st.MAG,def:st.DEF,mres:st.MRES,crit:st.CRIT,eva:st.EVA,fb:[],fshield:0,st:{},rage:0,bm}}
+  const bdm=bs?(RUN&&!RUN.tower?1.7+RUN.area*.15:1.4):1;
+  return{id,m,L,a:st.a,kind:bs?'boss':kind,mut,nm,aff,name:pre+m.n,hp:st.HP,max:st.HP,atk:Math.round(st.ATK*bdm),mag:Math.round(st.MAG*bdm),def:st.DEF,mres:st.MRES,crit:st.CRIT,eva:st.EVA,fb:[],fshield:0,st:{},rage:0,bm}}
 function startBattle(id,kind,nAdds){const F=mkFoe(id,kind),m=F.m,bs=F.kind==='boss';
   const pool=RUN?AREAS[RUN.area].mobs:[id],adds=[];for(let i=0;i<(nAdds||0);i++){const f=mkFoe(pick(pool),'');f.hp=f.max=Math.round(f.max*.75);adds.push(f)}
   preload([...['','_hurt','_low','_win','_lose','_atk','_skill','_cast'].map(x=>HK()+x),...(id==='shadow'?[]:['','_hurt','_low','_win','_lose'].map(x=>'mob_'+id+x)),...adds.map(f=>'mob_'+f.id),'battle_'+(AREAS.find(a=>a.boss===id||a.mobs.includes(id))||{id:'plain'}).id]);
@@ -1789,7 +1791,7 @@ const buffSum=k=>B.buffs.reduce((a,b)=>a+(b[k]||0),0);
 const CDM={swordsman:.013,cleric:.011,ranger:.005,mage:0};const clsDm=()=>1+(CDM[S.cls]||0)*S.lv;
 /* 首領護甲：每回合傷害上限；半血時進入狂怒（護盾＋攻擊上升） */
 const capB=d=>{if(!B||B.kind!=='boss')return d;const lim=Math.round(B.max*(B.nm?.1:.12)),r=Math.max(1,Math.min(d,lim-(B.tk||0)));B.tk=(B.tk||0)+r;return r};
-function bossPhase(){if(B&&B.kind==='boss'&&!B.ph2&&B.hp>0&&B.hp<=B.max*.5){B.ph2=1;B.fshield=(B.fshield||0)+Math.round(B.max*.12);B.fb.push({id:'ph2',n:'狂怒',atk:.3,t:4});blog(`${B.name} 被逼入絕境，進入狂怒！（獲得護盾、攻擊上升）`)}}
+function bossPhase(){if(B&&B.kind==='boss'&&!B.ph2&&B.hp>0&&B.hp<=B.max*.5){B.ph2=1;B.fshield=(B.fshield||0)+Math.round(B.max*.12);blog(`${B.name} 被逼入絕境，張開了護盾！`)}}
 function hitFoe(stat,pow,o){o=o||{};const s=stats();if(!o.sure&&Math.random()*100<(B.eva+fbSum('eva'))*.6)return{d:0,cr:false,miss:true};let base=clsDm()*(stat==='BOTH'?s.ATK+s.MAG:s[stat])*(1+buffSum('atk')+(s.FOCUSATK&&B.cls.focus>=rmax(5)?s.FOCUSATK/100:0))*(B.pst.weak>0?.75:1);
   const fdef=stat==='MAG'?(B.mres??B.def):stat==='BOTH'?((B.mres??B.def)+B.def)/2:B.def;let d=base*pow*100/(100+fdef*(1+fbSum('def'))*(1-(o.pierce||0)))*(.9+Math.random()*.2);const cr=!!o.sure||Math.random()*100<s.CRIT+(o.cr||0)+(hasP('sw1')&&B.cls.brk>=3?15:0);if(cr)d*=(s.CD+(hasP('rg3')&&B.cls.focus>=5?30:0)+s.BRKCD*B.cls.brk)/100;
   d=capB(Math.max(1,Math.round(d)));if(B.fshield>0){const ab=Math.min(B.fshield,d);B.fshield-=ab;d-=ab}B.hp=Math.max(0,B.hp-d);bossPhase();return{d,cr}}
@@ -1845,7 +1847,8 @@ function foeTurn(){if(!B)return;B.tk=0;const s=stats();
   const fx=B.fx={by:'foe'};
   if(B.kind==='boss'&&!B.rage&&B.hp<B.max*.5){B.rage=1;B.atk=Math.round(B.atk*1.3);B.mag=Math.round(B.mag*1.3);fx.cut=`${B.m.n} 暴走`;fx.fsk='m_rage';blog(`${B.name} 進入暴走狀態！攻擊大幅提升`)}
   else if(B.st.stun>0){B.st.stun--;fx.stun=1;blog(`${B.name} 暈眩中，無法行動`)}
-  else{const id=foePick(),k=id?SKM[id]:null,nm=k?`【${k.n}】`:'攻擊';
+  else if(B.kind==='boss'&&!B.chg&&!B.big&&B.turn>=3&&B.turn%4===3){B.chg=1;fx.cut='蓄力';fx.fsk='m_rage';blog(`⚠ ${B.name} 開始蓄力……下回合將發動【毀滅一擊】！先防禦！`);toast(`${B.m.n} 正在蓄力，下回合先防禦！`)}
+  else{const big=B.chg?(B.chg=0,1):0,id=big?null:foePick(),k=big?{n:'毀滅一擊',pow:2.6,mag:B.mag>B.atk?1:0}:id?SKM[id]:null,nm=k?`【${k.n}】`:'攻擊';
     if(k){fx.cut=k.n;fx.fsk=id}
     if(k&&k.cost)B.hp=Math.max(1,B.hp-Math.round(B.max*k.cost));
     if(k&&!k.pow){const ps=[];
@@ -1856,12 +1859,12 @@ function foeTurn(){if(!B)return;B.tk=0;const s=stats();
       blog(`${B.name} 使用${nm}，${ps.join('，')}`)}
     else if(allyTgt()){allyHurt((k&&k.mag?B.mag:B.atk)*(k?k.pow:1)*(k&&k.h||1)*(1+fbSum('atk')),nm,B.name)}
     else{let tot=0,hit=0,cr=false;
-      for(let i=0;i<(k&&k.h||1);i++){if(Math.random()*100<s.EVA+buffSum('eva'))continue;hit++;
+      for(let i=0;i<(k&&k.h||1);i++){if(!big&&Math.random()*100<s.EVA+buffSum('eva'))continue;hit++;
         const base=(k&&k.mag?B.mag:B.atk)*(k?k.pow:1)*(1+fbSum('atk'))*(B.st.weak>0?.75:1);
         const res=k&&k.mag?100/(100+s.DEF*.5+s.A.INT*1.5):100/(100+s.DEF*(1+buffSum('def'))*(1-(k&&k.pierce||0)));
         let d=base*res*(.9+Math.random()*.2);if(Math.random()*100<B.crit+fbSum('crit')+(k&&k.cr||0)){d*=1.5;cr=true}tot+=d}
       if(!hit){fx.miss=1;SFX.miss();blog(`你閃開了 ${B.name} 的${nm}！`);if(S.cls==='ranger'){B.cls.focus=Math.min(rmax(5),B.cls.focus+2);blog(`專注 ${B.cls.focus}`)}}
-      else{let d=tot;if(B.guard)d*=.5;let gd=false;if(s.GUARD&&Math.random()*100<s.GUARD){d*=.5;gd=true}d=Math.max(1,Math.round(d));let ctr=false;if(B.counter){d=Math.max(1,Math.round(d*.3));B.counter=0;ctr=true}
+      else{let d=tot;if(B.guard)d*=big?.25:.5;let gd=false;if(s.GUARD&&Math.random()*100<s.GUARD){d*=.5;gd=true}d=Math.max(1,Math.round(d));let ctr=false;if(B.counter){d=Math.max(1,Math.round(d*.3));B.counter=0;ctr=true}
         let ab=0;if(B.shield>0){ab=Math.min(B.shield,d);B.shield-=ab;d-=ab}
         fx.d=d;fx.cr=cr;fx.quake=!!k||d>s.HP*.15;SFX.hurt(k?.85:0);buzz(k?120:50);S.hp=Math.max(0,S.hp-d);
         blog(`${B.name} 的${nm}造成 ${d} 傷害${cr?'（爆擊）':''}${ab?`（護盾吸收 ${ab}）`:''}${gd?'（格擋）':''}${ctr?'（招架成功）':''}`);
@@ -1888,6 +1891,7 @@ function foeTurn(){if(!B)return;B.tk=0;const s=stats();
 function autoAct(){if(!B||B.busy||!B.auto)return;const s=stats(),sk=mySkills().filter(k=>S.mp>=mpCost(k)&&!(SK[k].ult&&B.ultUsed));
   if(S.hp<s.HP*.4){const h=sk.find(k=>SK[k].heal);if(h)return pAct('skill',h);const p=['pot2','pot'].find(k=>S.items[k]);if(p)return pAct('item',p)}
   const C=B.cls,est=k=>{const x=SK[k];return x.dmg.p*(x.dmg.h||1)*(1+(x.fin||0)*C.brk+(x.det||0)*C.marks.length+(x.aim||0)*C.focus+(x.faithAmp?Math.min(1,C.faith/100):0)+(x.faithSpend?C.faith/100*1.2:0))};
+  if(B.chg)return pAct('guard');
   if(S.cls==='swordsman'&&!B.counter&&sk.includes('guard')&&Math.random()<.2)return pAct('skill','guard');
   const d=sk.filter(k=>SK[k].dmg).sort((a,b)=>est(b)-est(a))[0];
   d?pAct('skill',d):pAct('atk')}
