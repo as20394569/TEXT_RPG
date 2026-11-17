@@ -358,7 +358,7 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 window.MISS=new Set();
 /* 載入失敗先重試一次；失敗名單每 2 分鐘清空，避免網路抖一下就永遠不顯示 */
 setInterval(()=>MISS.clear(),120000);
-const PRE={};function preload(ks){ks.forEach(k=>{const sk=shKey(k);if(sk)k=sk.f;else if(k in ATL)k='atlas_ui';if(!k||PRE[k]||MISS.has(k))return;const i=new Image();i.decoding='async';i.src='art/'+k+'.webp';PRE[k]=i})}
+const PRE={};function preload(ks){ks.forEach(k=>{if(k&&/^npc_\w+$/.test(k))k='portrait_'+k;const sk=shKey(k);if(sk)k=sk.f;else if(k in ATL)k='atlas_ui';if(!k||PRE[k]||MISS.has(k))return;const i=new Image();i.decoding='async';i.src='art/'+k+'.webp';PRE[k]=i})}
 window.reTry=(img,key)=>{if(img.dataset.r)return false;img.dataset.r=1;setTimeout(()=>{img.src='art/'+key+'.webp?r='+Date.now()},700);return true};
 const ASZ={r169:'1280×720',r34:'768×1024',r11:'768×768'};
 /* 插畫位：把圖檔放到 art/<key>.png 就會自動取代預留框 */
@@ -366,7 +366,7 @@ const ATL={"icon_a_0":0,"icon_a_1":1,"icon_a_2":2,"icon_a_3":3,"icon_a_4":4,"ico
 const SHO=['','mage','ranger','cleric','knight','berserker','archmage','warlock','sniper','assassin','bishop','templar'];
 const shKey=k=>{const m=k&&k.match(/^story_ch(\d)_(intro|mid|outro)_([mf])(?:_(\w+))?$/);if(!m)return null;const i=SHO.indexOf(m[4]||'');return i<0?null:{f:`sheet_ch${m[1]}_${m[2]}_${m[3]}`,i}};
 const shPos=i=>`background-position:${(i%4)/3*100}% ${Math.floor(i/4)/2*100}%`;
-function art(key,label,r='r169',extra='',under){
+function art(key,label,r='r169',extra='',under){if(key&&/^npc_\w+$/.test(key))key='portrait_'+key;if(under&&/^npc_\w+$/.test(under))under='portrait_'+under;
   const sk=shKey(key);if(sk)return `<div class="art ${r} ${extra} has" data-art="${key}"><i class="sht" style="background-image:url(art/${sk.f}.webp);${shPos(sk.i)}"></i></div>`;
   const src=artSrc(key);
   const u=under&&under!==src&&!MISS.has(under)&&PRE[under]?`<img class="under" src="art/${under}.webp" alt="">`:'';
@@ -374,9 +374,9 @@ function art(key,label,r='r169',extra='',under){
   return `<div class="art ${r} ${extra}" data-art="${key}"><div class="art-ph"><em>插畫位</em><b>${label}</b><i>${key}.png · ${ASZ[r]}</i></div>${img}</div>`;
 }
 /* 男女版插畫還沒到時，先退回共用版 */
-const ALT=k=>{if(!k)return null;{const m=k.match(/^portrait_(npc_\w+?)(?:_(smile|serious))?$/);if(m)return m[2]?`portrait_${m[1]}`:m[1]}{const m=k.match(/^portrait_(\w+?)_([mf])(?:_(smile|serious))?$/);if(m){return m[3]?`portrait_${m[1]}_${m[2]}`:`class_${m[1]}_${m[2]}`}}{const m=k.match(/^(story_ch\d_\w+?_[mf])_(\w+)$/);if(m){const a=m[2];if(ADV[a]){const base=Object.keys(CLS).find(c=>(CLS[c].adv||[]).includes(a));return base&&base!=='swordsman'?m[1]+'_'+base:m[1]}return m[1]}}let m=k.match(/^(.*)_(hurt|low|win|lose|atk|skill|cast)$/);if(m)return m[1];m=k.match(/^ally_(\w+)$/);if(m)return 'npc_'+m[1];if(/^event_/.test(k))return 'area_'+AREAS[RUN?RUN.area:0].id;m=k.match(/^(.*)_(m|f)$/);if(m)return m[1];m=k.match(/^story_ch(\d)_(mid|pre)$/);return m?'area_'+AREAS[+m[1]-1].id:null};
+const ALT=k=>{if(!k)return null;{const m=k.match(/^portrait_(npc_\w+?)(?:_(smile|serious))?$/);if(m)return m[2]?`portrait_${m[1]}`:null}{const m=k.match(/^portrait_(\w+?)_([mf])(?:_(smile|serious))?$/);if(m){return m[3]?`portrait_${m[1]}_${m[2]}`:`class_${m[1]}_${m[2]}`}}{const m=k.match(/^(story_ch\d_\w+?_[mf])_(\w+)$/);if(m){const a=m[2];if(ADV[a]){const base=Object.keys(CLS).find(c=>(CLS[c].adv||[]).includes(a));return base&&base!=='swordsman'?m[1]+'_'+base:m[1]}return m[1]}}let m=k.match(/^(.*)_(hurt|low|win|lose|atk|skill|cast)$/);if(m)return m[1];m=k.match(/^ally_(\w+)$/);if(m)return 'portrait_npc_'+m[1];if(/^event_/.test(k))return 'area_'+AREAS[RUN?RUN.area:0].id;m=k.match(/^(.*)_(m|f)$/);if(m)return m[1];m=k.match(/^story_ch(\d)_(mid|pre)$/);return m?'area_'+AREAS[+m[1]-1].id:null};
 /* 小圖示：有插畫就蓋在線條圖示上 */
-const icon=(key,fb)=>key in ATL?`${fb}<i class="ii at" style="background-position:${(ATL[key]%ATC)/(ATC-1)*100}% ${Math.floor(ATL[key]/ATC)/(ATR-1)*100}%"></i>`:`${fb}${MISS.has(key)?'':`<img class="ii" src="art/${key}.webp" alt="" onerror="reTry(this,'${key}')||(MISS.add('${key}'),this.remove())">`}`;
+const icon=(key,fb)=>(key&&/^npc_\w+$/.test(key)&&(key='portrait_'+key),key in ATL)?`${fb}<i class="ii at" style="background-position:${(ATL[key]%ATC)/(ATC-1)*100}% ${Math.floor(ATL[key]/ATC)/(ATR-1)*100}%"></i>`:`${fb}${MISS.has(key)?'':`<img class="ii" src="art/${key}.webp" alt=""${key.startsWith('portrait_')?' style="object-fit:cover;object-position:50% 12%"':''} onerror="reTry(this,'${key}')||(MISS.add('${key}'),this.remove())">`}`;
 const gIco=id=>icon('icon_'+id,SLOTCH[GEAR[id].slot]);
 function artSrc(k){while(k&&MISS.has(k))k=ALT(k);return k}
 function artErr(img,src){MISS.add(src);const a=artSrc(ALT(src));if(a){delete img.dataset.r;img.onerror=()=>reTry(img,a)||artErr(img,a);img.src='art/'+a+'.webp'}else img.remove()}
