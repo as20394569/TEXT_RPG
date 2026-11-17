@@ -654,7 +654,7 @@ const AFF={rage:{n:'狂暴',d:'攻擊 +40%'},shell:{n:'堅殼',d:'防禦 +80%'},
 const HST={poison:'中毒',burn:'灼燒',bleed:'流血',weak:'虛弱',stun:'暈眩'};
 function mobBuild(m,lv,mult,kindHP){const w=MTY[m.ty].w,pts=20+lv*5,a={};for(const k in w)a[k]=Math.max(1,Math.round(pts*w[k]*mult));
   const sw=m.ty==='swift';return{a,HP:Math.round((18+a.VIT*5+lv*18)*(m.hpM||1)*kindHP),ATK:Math.round((sw?a.DEX:a.STR)*2+lv),MAG:Math.round(a.INT*2.2+lv),
-    DEF:Math.round(a.VIT+lv),CRIT:Math.min(40,Math.round(5+a.LUK*.5+a.DEX*.15)),EVA:Math.min(30,Math.round(a.DEX*.35))}}
+    DEF:Math.round(a.VIT+lv),MRES:Math.round(a.INT+a.VIT*.5+lv),CRIT:Math.min(40,Math.round(5+a.LUK*.5+a.DEX*.15)),EVA:Math.min(30,Math.round(a.DEX*.35))}}
 const AREAS=[
   {id:'plain',n:'微風草原',lv:'1–5',base:1,d:'晨星鎮外的遼闊草原，新手冒險者的起點。',mobs:['slime','hornrabbit','goblin'],boss:'goblinboss'},
   {id:'forest',n:'迷霧森林',lv:'5–10',base:5,d:'終年被霧籠罩的古老森林，最近霧氣染上了紫色。',mobs:['shroom','wolf','treant'],boss:'treeking'},
@@ -1635,7 +1635,7 @@ let DEXTAB='m';
 function vDex(){dexInit();const ms=dexMobs(),gs=dexGear(),mk=ms.filter(k=>S.dex.m[k]).length,gk=gs.filter(k=>S.dex.g[k]).length;
   const tabs=`<div class="tabs"><button class="${DEXTAB==='m'?'on':''}" data-a="dexTab" data-v="m">魔物 ${mk}/${ms.length}</button><button class="${DEXTAB==='g'?'on':''}" data-a="dexTab" data-v="g">裝備 ${gk}/${gs.length}</button></div>`;
   let body;
-  if(DEXTAB==='m')body=`<div class="dexg">${ms.map(k=>{const n=S.dex.m[k],m=MOBS[k];const ar=AREAS.find(a=>a.boss===k||a.mobs.includes(k));return `<div class="dexc ${n?'':'unk'}">${art('mob_'+k,n?m.n:'？？？','r11')}<b>${n?m.n:'？？？'}</b><span class="sub">${n?`Lv${m.lv}・${MTY[m.ty].n}・擊敗 ${n}`:(ar?ar.n:'')}</span>${n&&m.mat?`<span class="sub">掉落：${ITEMS[m.mat].n}</span>`:''}</div>`}).join('')}</div>`;
+  if(DEXTAB==='m')body=`<div class="dexg">${ms.map(k=>{const n=S.dex.m[k],m=MOBS[k];const ar=AREAS.find(a=>a.boss===k||a.mobs.includes(k));return `<div class="dexc ${n?'':'unk'}">${art('mob_'+k,n?m.n:'？？？','r11')}<b>${n?m.n:'？？？'}</b><span class="sub">${n?`Lv${m.lv}・${MTY[m.ty].n}（${{tank:'怕魔法',caster:'怕物理',brute:'略怕魔法',swift:'物魔皆可'}[m.ty]}）・擊敗 ${n}`:(ar?ar.n:'')}</span>${n&&m.mat?`<span class="sub">掉落：${ITEMS[m.mat].n}</span>`:''}</div>`}).join('')}</div>`;
   else body=`<div class="list">${gs.map(id=>{const g=GEAR[id],k=S.dex.g[id];return `<div class="item ${k?'':'unk'}"><span class="ico c${id.startsWith('u_')?4:Math.min(4,g.t||0)}">${k?gIco(id):'<b>？</b>'}</span><span class="grow"><b>${k?g.n:'？？？'}</b><span class="sub">${SLOTS[g.slot]}・Lv${g.lv}${k&&g.ud?'・'+g.ud:''}</span></span></div>`}).join('')}</div>`;
   return{t:'冒險圖鑑',b:tabs+'<p class="sub">擊敗魔物、取得裝備就會登錄。收集進度也會解鎖成就。</p>'+body}}
 
@@ -1725,6 +1725,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'2.2',d:'2026-11-17',t:'物理／魔法傷害區分',b:'魔物新增魔法抗性：魔力造成的傷害看魔抗，攻擊造成的傷害看防禦。防禦型怕魔法、魔法型怕物理，圖鑑會標示弱點。'},
   {v:'2.1',d:'2026-11-17',t:'首領戰調整',b:'首領新增「首領護甲」：每回合受到的傷害最多為最大 HP 的 12%（惡夢 10%）。首領 HP 降到一半時會進入狂怒，獲得護盾並提升攻擊。裝備練起來後，首領戰不會再三下結束。'},
   {v:'2.0',d:'2026-11-17',t:'第二部「霧之彼岸」開幕',b:'第六章「王都的回信」上線！新地區灰石街道（Lv.26–30）、四種新魔物與首領「失控的氣象機兵」、第 6 階裝備、雷鳴套裝、新角色王都使者希瑟。完成第一部的冒險者可直接在任務頁接受第六章。'},
   {v:'1.5',d:'2026-11-17',t:'屬性改版',b:'副屬性變得有用：敏捷增加連擊、智力讓技能省 MP、體質增加每回合回血、幸運提高爆擊傷害、掉寶率與金幣。新增屬性重置（Lv.10 以前免費）。NPC 全面換上新的表情立繪。'},
@@ -1759,9 +1760,9 @@ function mkFoe(id,kind){const m=MOBS[id],bs=!!m.boss,el=kind==='elite',nm=!!(RUN
   const st=mobBuild(m,L,mult,kh);
   const BMOD={goblinboss:'scout',zenos:'galeAlly'},bm=bs&&!nm&&S.flags[BMOD[id]]&&S.main.ch===RUN.area;if(bm)st.HP=Math.round(st.HP*.8);
   const aff=[];if(mut||nm){const ks=Object.keys(AFF).sort(()=>Math.random()-.5);aff.push(...ks.slice(0,bs&&nm?2:1))}
-  if(aff.includes('rage'))st.ATK=Math.round(st.ATK*1.4),st.MAG=Math.round(st.MAG*1.4);if(aff.includes('shell'))st.DEF=Math.round(st.DEF*1.8);if(aff.includes('swift'))st.EVA+=15,st.CRIT+=15;
+  if(aff.includes('rage'))st.ATK=Math.round(st.ATK*1.4),st.MAG=Math.round(st.MAG*1.4);if(aff.includes('shell'))st.DEF=Math.round(st.DEF*1.8),st.MRES=Math.round(st.MRES*1.8);if(aff.includes('swift'))st.EVA+=15,st.CRIT+=15;
   const pre=(nm?'惡夢・':'')+(mut?'蝕化・':'')+(el?'精英':'');
-  return{id,m,L,a:st.a,kind:bs?'boss':kind,mut,nm,aff,name:pre+m.n,hp:st.HP,max:st.HP,atk:st.ATK,mag:st.MAG,def:st.DEF,crit:st.CRIT,eva:st.EVA,fb:[],fshield:0,st:{},rage:0,bm}}
+  return{id,m,L,a:st.a,kind:bs?'boss':kind,mut,nm,aff,name:pre+m.n,hp:st.HP,max:st.HP,atk:st.ATK,mag:st.MAG,def:st.DEF,mres:st.MRES,crit:st.CRIT,eva:st.EVA,fb:[],fshield:0,st:{},rage:0,bm}}
 function startBattle(id,kind,nAdds){const F=mkFoe(id,kind),m=F.m,bs=F.kind==='boss';
   const pool=RUN?AREAS[RUN.area].mobs:[id],adds=[];for(let i=0;i<(nAdds||0);i++){const f=mkFoe(pick(pool),'');f.hp=f.max=Math.round(f.max*.75);adds.push(f)}
   preload([...['','_hurt','_low','_win','_lose','_atk','_skill','_cast'].map(x=>HK()+x),...(id==='shadow'?[]:['','_hurt','_low','_win','_lose'].map(x=>'mob_'+id+x)),...adds.map(f=>'mob_'+f.id),'battle_'+(AREAS.find(a=>a.boss===id||a.mobs.includes(id))||{id:'plain'}).id]);
@@ -1790,7 +1791,7 @@ const CDM={swordsman:.013,cleric:.011,ranger:.005,mage:0};const clsDm=()=>1+(CDM
 const capB=d=>{if(!B||B.kind!=='boss')return d;const lim=Math.round(B.max*(B.nm?.1:.12)),r=Math.max(1,Math.min(d,lim-(B.tk||0)));B.tk=(B.tk||0)+r;return r};
 function bossPhase(){if(B&&B.kind==='boss'&&!B.ph2&&B.hp>0&&B.hp<=B.max*.5){B.ph2=1;B.fshield=(B.fshield||0)+Math.round(B.max*.12);B.fb.push({id:'ph2',n:'狂怒',atk:.3,t:4});blog(`${B.name} 被逼入絕境，進入狂怒！（獲得護盾、攻擊上升）`)}}
 function hitFoe(stat,pow,o){o=o||{};const s=stats();if(!o.sure&&Math.random()*100<(B.eva+fbSum('eva'))*.6)return{d:0,cr:false,miss:true};let base=clsDm()*(stat==='BOTH'?s.ATK+s.MAG:s[stat])*(1+buffSum('atk')+(s.FOCUSATK&&B.cls.focus>=rmax(5)?s.FOCUSATK/100:0))*(B.pst.weak>0?.75:1);
-  let d=base*pow*100/(100+B.def*(1+fbSum('def'))*(1-(o.pierce||0)))*(.9+Math.random()*.2);const cr=!!o.sure||Math.random()*100<s.CRIT+(o.cr||0)+(hasP('sw1')&&B.cls.brk>=3?15:0);if(cr)d*=(s.CD+(hasP('rg3')&&B.cls.focus>=5?30:0)+s.BRKCD*B.cls.brk)/100;
+  const fdef=stat==='MAG'?(B.mres??B.def):stat==='BOTH'?((B.mres??B.def)+B.def)/2:B.def;let d=base*pow*100/(100+fdef*(1+fbSum('def'))*(1-(o.pierce||0)))*(.9+Math.random()*.2);const cr=!!o.sure||Math.random()*100<s.CRIT+(o.cr||0)+(hasP('sw1')&&B.cls.brk>=3?15:0);if(cr)d*=(s.CD+(hasP('rg3')&&B.cls.focus>=5?30:0)+s.BRKCD*B.cls.brk)/100;
   d=capB(Math.max(1,Math.round(d)));if(B.fshield>0){const ab=Math.min(B.fshield,d);B.fshield-=ab;d-=ab}B.hp=Math.max(0,B.hp-d);bossPhase();return{d,cr}}
 function pAct(type,arg){if(!B||B.busy)return;const s=stats();
   if(type==='skill'&&S.mp<mpCost(arg)){toast('MP 不足');return}
