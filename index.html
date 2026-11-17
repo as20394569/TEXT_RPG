@@ -152,8 +152,8 @@ input,textarea{font:inherit;width:100%;padding:8px 10px;border:2px solid var(--l
 @keyframes inR{from{transform:translateX(160%)}}@keyframes inL{from{transform:translateX(-160%)}}
 .lunge-me{animation:lgM .4s}@keyframes lgM{40%{transform:translate(38%,-28%)}}
 .lunge-foe{animation:lgF .4s}@keyframes lgF{40%{transform:translate(-38%,28%)}}
-.spr.hit .art{animation:hitA .5s .2s}@keyframes hitA{0%,40%,80%{opacity:.15;transform:translateX(-5px)}20%,60%{opacity:1;transform:translateX(5px)}}
-.spr.faint{animation:faint .5s .6s forwards}@keyframes faint{to{transform:translateY(60%);opacity:0}}
+.spr.hit .art{animation:hitA .5s .2s}@keyframes hitA{0%{filter:brightness(3) saturate(0)}25%{filter:brightness(1.6) sepia(1) hue-rotate(-40deg) saturate(4)}60%{filter:brightness(1.3)}100%{filter:none}}
+.spr.faint{animation:faint .5s .6s forwards}.faintl{animation:faint .5s 1.4s forwards}@keyframes faint{to{transform:translateY(60%);opacity:0}}
 .spr.glow .art{animation:glow .7s}@keyframes glow{50%{box-shadow:0 0 18px 6px #fff7b0;filter:brightness(1.4)}}
 .quake{animation:quake .4s .2s}@keyframes quake{20%,60%{transform:translate(-6px,3px)}40%,80%{transform:translate(6px,-3px)}}
 .fl{position:absolute;inset:-10%;border-radius:50%;opacity:0;animation:fl .45s .2s;pointer-events:none}
@@ -374,7 +374,7 @@ function art(key,label,r='r169',extra='',under){if(key&&/^npc_\w+$/.test(key))ke
   return `<div class="art ${r} ${extra}" data-art="${key}"><div class="art-ph"><em>插畫位</em><b>${label}</b><i>${key}.png · ${ASZ[r]}</i></div>${img}</div>`;
 }
 /* 男女版插畫還沒到時，先退回共用版 */
-const ALT=k=>{if(!k)return null;{const m=k.match(/^portrait_(npc_\w+?)(?:_(smile|serious))?$/);if(m)return m[2]?`portrait_${m[1]}`:null}{const m=k.match(/^portrait_(\w+?)_([mf])(?:_(smile|serious))?$/);if(m){return m[3]?`portrait_${m[1]}_${m[2]}`:`class_${m[1]}_${m[2]}`}}{const m=k.match(/^(story_ch\d_\w+?_[mf])_(\w+)$/);if(m){const a=m[2];if(ADV[a]){const base=Object.keys(CLS).find(c=>(CLS[c].adv||[]).includes(a));return base&&base!=='swordsman'?m[1]+'_'+base:m[1]}return m[1]}}let m=k.match(/^(.*)_(hurt|low|win|lose|atk|skill|cast)$/);if(m)return m[1];m=k.match(/^ally_(\w+)$/);if(m)return 'portrait_npc_'+m[1];if(/^event_/.test(k))return 'area_'+AREAS[RUN?RUN.area:0].id;m=k.match(/^(.*)_(m|f)$/);if(m)return m[1];m=k.match(/^story_ch(\d)_(mid|pre)$/);return m?'area_'+AREAS[+m[1]-1].id:null};
+const ALT=k=>{if(!k)return null;{const m=k.match(/^portrait_(npc_\w+?)(?:_(smile|serious))?$/);if(m)return m[2]?`portrait_${m[1]}`:null}{const m=k.match(/^portrait_(\w+?)_([mf])(?:_(smile|serious))?$/);if(m){return m[3]?`portrait_${m[1]}_${m[2]}`:`class_${m[1]}_${m[2]}`}}{const m=k.match(/^(story_ch\d_\w+?_[mf])_(\w+)$/);if(m){const a=m[2];if(ADV[a]){const base=Object.keys(CLS).find(c=>(CLS[c].adv||[]).includes(a));return base&&base!=='swordsman'?m[1]+'_'+base:m[1]}return m[1]}}{const q=k.match(/^(class_\w+?_[mf])_sk_(\w+)$/);if(q)return q[1]+(SKA[q[2]]&&['heal','buff','shield'].includes(SKA[q[2]][0])?'_cast':'_skill')}let m=k.match(/^(.*)_(hurt|low|win|lose|atk|skill|cast)$/);if(m)return m[1];m=k.match(/^ally_(\w+)$/);if(m)return 'portrait_npc_'+m[1];if(/^event_/.test(k))return 'area_'+AREAS[RUN?RUN.area:0].id;m=k.match(/^(.*)_(m|f)$/);if(m)return m[1];m=k.match(/^story_ch(\d)_(mid|pre)$/);return m?'area_'+AREAS[+m[1]-1].id:null};
 /* 小圖示：有插畫就蓋在線條圖示上 */
 const icon=(key,fb)=>(key&&/^npc_\w+$/.test(key)&&(key='portrait_'+key),key in ATL)?`${fb}<i class="ii at" style="background-position:${(ATL[key]%ATC)/(ATC-1)*100}% ${Math.floor(ATL[key]/ATC)/(ATR-1)*100}%"></i>`:`${fb}${MISS.has(key)?'':`<img class="ii" src="art/${key}.webp" alt=""${key.startsWith('portrait_')?' style="object-fit:cover;object-position:50% 12%"':''} onerror="reTry(this,'${key}')||(MISS.add('${key}'),this.remove())">`}`;
 const gIco=id=>icon('icon_'+id,SLOTCH[GEAR[id].slot]);
@@ -1306,7 +1306,7 @@ function chatTick(){if(!S)return;const el=$('#chat');
 
 /* ============ 畫面 ============ */
 function bar(k,v,m,cls=''){return `<div class="bar ${k} ${cls}"><i style="width:${Math.max(0,Math.min(100,v/m*100))}%"></i><span>${k.toUpperCase()} ${v}/${m}</span></div>`}
-let WARM=0;function warm(){if(WARM||!S)return;WARM=1;try{preload(['','_hurt','_low','_win','_lose','_atk','_skill','_cast'].map(x=>HK()+x));preload([PKEY(),PKEY('smile'),PKEY('serious')]);const n=Math.min(S.main.ch,CH.length-1);preload([SKEY(n+1,'intro'),SKEY(n+1,'mid'),SKEY(n+1,'outro'),'atlas_ui','town_bg',...AREAS.map(a=>'area_'+a.id),...[...AREAS[n].mobs,AREAS[n].boss].flatMap(m=>['mob_'+m,'mob_'+m+'_atk']),'portrait_npc_luna','portrait_npc_ria','battle_'+AREAS[n].id])}catch(e){}}
+let WARM=0;function warm(){if(WARM||!S)return;WARM=1;try{preload(['','_hurt','_low','_win','_lose','_atk','_skill','_cast'].map(x=>HK()+x));preload(mySkills().map(k=>HK()+'_sk_'+k));preload([PKEY(),PKEY('smile'),PKEY('serious')]);const n=Math.min(S.main.ch,CH.length-1);preload([SKEY(n+1,'intro'),SKEY(n+1,'mid'),SKEY(n+1,'outro'),'atlas_ui','town_bg',...AREAS.map(a=>'area_'+a.id),...[...AREAS[n].mobs,AREAS[n].boss].flatMap(m=>['','_atk','_hurt','_low','_lose'].map(x=>'mob_'+m+x)),'portrait_npc_luna','portrait_npc_ria','battle_'+AREAS[n].id])}catch(e){}}
 function render(){try{bgmAuto()}catch(e){}if(!WARM)setTimeout(warm,400);setTimeout(()=>{try{tipCheck()}catch(e){}},60);
   const app=$('#app');
   if(!S){app.className='pre';$('#main').innerHTML=vTitle();return}
@@ -1368,18 +1368,30 @@ function vBattle(){const s=stats(),fx=B.fx||{},intro=B.intro,a=AREAS[RUN.area];B
   const me=[C.focus?`<span class="chip" style="color:var(--exp)">專注 ${C.focus}</span>`:'',S.cls==='cleric'?`<span class="chip" style="color:var(--r4)">信仰 ${C.faith}</span>`:'',B.counter?'<span class="chip">招架反擊</span>':'',B.endure?'<span class="chip">鬥氣解放</span>':'',...B.buffs.map(b=>`<span class="chip">${b.n} ${b.t}</span>`),B.shield>0?`<span class="chip">護盾 ${B.shield}</span>`:'',...['poison','burn','bleed','weak','stun'].filter(h=>B.pst[h]>0).map(h=>`<span class="chip" style="color:var(--hp)">${HST[h]} ${B.pst[h]}</span>`),B.pst.regen>0?`<span class="chip">再生 ${B.pst.regen}</span>`:'',B.guard?'<span class="chip">防禦中</span>':''].join('');
   
   if(fx.by)B.pfx=fx;const mine=fx.by==='me',theirs=fx.by==='foe',atk=mine&&fx.d!=null;const sk=fx.skill?SKA[fx.skill]:null,fk=theirs&&fx.fsk?(SKM[fx.fsk]||{fx:'roar',c:'#ff4a4a'}):null;B.delayBar=!!(sk||fk);
-  const foeC=[intro?'in-r':'',atk&&fx.d>0?(sk?'hitl':'hit'):'',theirs&&!fx.stun?(fk?(MELEE[fk.fx]?'charge lunge2':'charge'):'lunge-foe'):'',B.hp<=0?'faint':'',B.mut?'mut':'',B.nm?'nm':''].join(' ');
+  const foeC=[intro?'in-r':'',atk&&fx.d>0?(sk?'hitl':'hit'):'',theirs&&!fx.stun?(fk?(MELEE[fk.fx]?'charge lunge2':'charge'):'lunge-foe'):'',B.hp<=0?(sk?'faintl':'faint'):'',B.mut?'mut':'',B.nm?'nm':''].join(' ');
   const meC=[intro?'in-l':'',sk?(sk[0]==='slash'||sk[0]==='spin'?'cast dash':'cast'):atk?'lunge-me':'',mine&&fx.glow&&!sk?'glow':'',theirs&&fx.d>0?(fk?'hitl':'hit'):''].join(' ');
   const foeFx=(fx.fheal?`<span class="dmg heal ${fk?'late':''}">+${fx.fheal}</span>`:'')+(atk&&fx.d===0?'<span class="dmg miss">MISS</span>':'')+(atk&&fx.d>0?(sk?`<span class="dmg late ${fx.cr?'cr':''}">-${fx.d}${fx.cr?'!':''}</span>`:`<span class="dmg ${fx.cr?'cr':''}">-${fx.d}${fx.cr?'!':''}</span>`):'');
   const meFx=(theirs?(fx.miss?'<span class="dmg miss">MISS</span>':fx.d>0?(fk?`<span class="dmg late ${fx.cr?'cr':''}">-${fx.d}</span>`:`<span class="dmg">-${fx.d}</span>`):fx.d===0?'<span class="dmg miss">擋下</span>':''):'')+(fx.heal?`<span class="dmg heal ${sk?'late':''}">+${fx.heal}</span>`:'');
+  /* 動作依時間發生：先出手，命中瞬間才受傷／倒地，之後回到待機 */
+  const fB='mob_'+B.id,fIdle=h=>fB+(h<=0?'_lose':h<30?'_low':''),mB=HK(),mIdle=h=>mB+(h<30?'_low':'');
+  const fHit=atk&&fx.d>0,mHit=theirs&&fx.d>0,tF=sk?950:250,tM=fk?950:250;
+  const fKey0=theirs&&!fx.stun?fB+'_atk':fHit?fIdle(fp??100):B.hp<=0?fB+'_lose':fIdle(B.fhp);
+  const mKey0=sk?mB+'_sk_'+fx.skill:atk?mB+'_atk':mHit?mIdle(pp??100):mIdle(B.php);
+  const RV=B.rv=(B.rv||0)+1,swap=(sel,key,ms)=>setTimeout(()=>{if(!B||B.rv!==RV)return;const im=document.querySelector(sel+' .art img:not(.under)'),k=artSrc(key);if(im&&k&&!im.src.endsWith('/'+k+'.webp')){const u='art/'+k+'.webp',pre=new Image();pre.onload=()=>{if(B&&B.rv===RV)im.src=u};pre.onerror=()=>MISS.add(k);pre.src=u}},ms);
+  if(fHit){const sv=fx.d/B.max*5,dd=B.hp<=0,cc=fx.cr;setTimeout(()=>PFX.impact('foe',dd?1:sv,cc,dd),tF);}
+  if(mHit){const sv=fx.d/s.HP*4,cc=fx.cr;setTimeout(()=>PFX.impact('me',sv,cc,S.hp<=0),tM);}
+  if(fHit){swap('.spr.foe',B.hp<=0?fB+'_lose':fB+'_hurt',tF);if(B.hp>0)swap('.spr.foe',fIdle(B.fhp),tF+650)}
+  else if(theirs&&!fx.stun)swap('.spr.foe',fIdle(B.fhp),tM+500);
+  if(mHit){swap('.spr.me',mB+'_hurt',tM);swap('.spr.me',mIdle(B.php),tM+650)}
+  else if(mine&&(sk||atk))swap('.spr.me',mIdle(B.php),(sk?950:250)+500);
   let cmd;
   if(B.menu==='skill')cmd=`<div class="cmd col">${mySkills().map(k=>{const lv=S.skl[k]||1;return `<button class="btn" data-a="bSkill" data-v="${k}" ${S.mp<mpCost(k)||(SK[k].ult&&B.ultUsed)?'disabled':''} ${SK[k].ult?'style="border-color:var(--r4);color:var(--r4)"':''}>${('skill_'+k) in ATL?`<i class="bi at" style="background-position:${(ATL['skill_'+k]%ATC)/(ATC-1)*100}% ${Math.floor(ATL['skill_'+k]/ATC)/(ATR-1)*100}%"></i>`:''}${SK[k].n} Lv${lv}<small>${SK[k].ult?(B.ultUsed?'已使用':'奧義'):'MP '+mpCost(k)}</small></button>`}).join('')}<button class="btn" data-a="bMenu" data-v="main">返回</button></div>`;
   else if(B.menu==='item'){const us=Object.keys(S.items).filter(k=>ITEMS[k].use);cmd=`<div class="cmd col">${us.map(k=>`<button class="btn" data-a="bItem" data-v="${k}">${ITEMS[k].n} ×${S.items[k]}<small>${ITEMS[k].d}</small></button>`).join('')||'<p class="empty">沒有可用的道具</p>'}<button class="btn" data-a="bMenu" data-v="main">返回</button></div>`}
   else cmd=`<div class="cmd"><button class="btn pri" data-a="bAtk">攻擊</button><button class="btn" data-a="bMenu" data-v="skill">技能</button><button class="btn" data-a="bMenu" data-v="item">道具</button><button class="btn" data-a="bGuard">防禦</button><button class="btn" data-a="bFlee">逃跑</button><button class="btn ${B.auto?'pri':''}" data-a="bAuto">自動 ${B.auto?'開':'關'}</button></div>`;
   return `<div class="battle"><div class="stage bg-${a.id} ${fx.quake&&!fk?'quake':''} ${(sk&&sk[0]==='meteor')||(fk&&fk.fx==='slam')?'quakel':''}" ${sk?`style="--c:${sk[1]}"`:fk?`style="--c:${fk.c}"`:''}><img class="bg" src="art/battle_${a.id}.webp" alt="" ${MISS.has('battle_'+a.id)?'hidden':''} onerror="reTry(this,'battle_${a.id}')||(MISS.add('battle_${a.id}'),this.remove())">
    <div class="ibox foe-i" data-a="openM" data-v="foe" role="button" aria-label="查看怪物情報"><div class="nm"><span>${B.name}${B.kind==='boss'?' <span class="tag red">首領</span>':''}</span><span>${(B.adds||[]).length?'<span class="tag">目標</span> ':''}Lv${B.L} ⓘ</span></div>${bbar(B.hp,B.max,fp)}<div class="num">${B.hp}/${B.max}</div>${st?`<div class="chips">${st}</div>`:''}${(B.adds||[]).length?`<div class="addrow">${B.adds.map((f,i)=>`<button class="addf" data-a="bTarget" data-v="${i}" aria-label="切換目標：${f.name}">${art('mob_'+f.id,f.m.n,'r11')}<span>${f.m.n}${bbar(f.hp,f.max)}</span></button>`).join('')}</div><div class="sub" style="font-size:10px">點小頭像切換目標</div>`:''}</div>
-   <div class="spr foe ${B.m.fly?'fly':''} ${B.kind==='boss'?'boss':''} ${foeC}"><div class="plat"></div>${B.id==='shadow'?art(HK(),'試煉之影','r34','shadowimg'):art('mob_'+B.id+(B.hp<=0?'_lose':atk&&fx.d>0?'_hurt':theirs?'_atk':B.hp<B.max*.3?'_low':''),B.m.n,'r11','','mob_'+B.id)}${foeFx}</div>
-   <div class="spr me ${meC}"><div class="plat"></div>${art(HK()+(theirs&&fx.d>0?'_hurt':sk?(['heal','buff','shield'].includes(sk[0])?'_cast':'_skill'):atk?'_atk':S.hp<s.HP*.3?'_low':''),clsName(),'r34','',HK())}${meFx}</div>
+   <div class="spr foe ${B.m.fly?'fly':''} ${B.kind==='boss'?'boss':''} ${foeC}"><div class="plat"></div>${B.id==='shadow'?art(HK(),'試煉之影','r34','shadowimg'):art(fKey0,B.m.n,'r11','','mob_'+B.id)}${foeFx}</div>
+   <div class="spr me ${meC}"><div class="plat"></div>${art(mKey0,clsName(),'r34','',HK())}${meFx}</div>
    <div class="ibox me-i"><div class="nm"><span>${esc(S.name)}</span><span>Lv${S.lv}</span></div>${bbar(S.hp,s.HP,pp)}<div class="num">HP ${S.hp}/${s.HP}</div>${bbar(S.mp,s.MP,null,'m')}<div class="num">MP ${S.mp}/${s.MP}</div>${me?`<div class="chips">${me}</div>`:''}</div>
    ${AL?`<div class="ally ${AL.hp<=0?'down':''} ${aD||aH?'aact':''} ${aHit?'ahit':''}">${art('ally_'+AL.id,AL.n,'r34')}${bbar(AL.hp,AL.max)}${aD?`<span class="dmg sm">⚔${aD}</span>`:aH?`<span class="dmg heal sm">+${aH}</span>`:aHit?`<span class="dmg sm">-${aHit}</span>`:''}</div>`:''}
    ${sk?skillFx(sk[0],fx.hits||1):fk?foeSkillFx(fx.fsk):''}${fx.cut?`<div class="cutin ${theirs?'bad':''}">${fx.cut}</div>`:''}</div>
@@ -1725,6 +1737,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'2.4',d:'2026-11-17',t:'戰鬥演出強化',b:'主角每個技能都有專屬動作（陸續上線）。受傷、倒地改在命中瞬間才出現。新增打擊頓幀、擊退、震屏、會彈跳的碎石與塵土，箭矢改為拋物線飛行。'},
   {v:'2.3',d:'2026-11-17',t:'首領蓄力技',b:'首領會每隔幾回合蓄力，下一回合放出無法閃避的【毀滅一擊】。看到蓄力提示就先防禦，傷害會降到四分之一。'},
   {v:'2.2',d:'2026-11-17',t:'物理／魔法傷害區分',b:'魔物新增魔法抗性：魔力造成的傷害看魔抗，攻擊造成的傷害看防禦。防禦型怕魔法、魔法型怕物理，圖鑑會標示弱點。'},
   {v:'2.1',d:'2026-11-17',t:'首領戰調整',b:'首領新增「首領護甲」：每回合受到的傷害最多為最大 HP 的 12%（惡夢 10%）。首領 HP 降到一半時會進入狂怒，獲得護盾並提升攻擊。裝備練起來後，首領戰不會再三下結束。'},
@@ -1765,7 +1778,7 @@ function mkFoe(id,kind){const m=MOBS[id],bs=!!m.boss,el=kind==='elite',nm=!!(RUN
   const pre=(nm?'惡夢・':'')+(mut?'蝕化・':'')+(el?'精英':'');
   const bdm=bs?(RUN&&!RUN.tower?1.7+RUN.area*.15:1.4):1;
   return{id,m,L,a:st.a,kind:bs?'boss':kind,mut,nm,aff,name:pre+m.n,hp:st.HP,max:st.HP,atk:Math.round(st.ATK*bdm),mag:Math.round(st.MAG*bdm),def:st.DEF,mres:st.MRES,crit:st.CRIT,eva:st.EVA,fb:[],fshield:0,st:{},rage:0,bm}}
-function startBattle(id,kind,nAdds){const F=mkFoe(id,kind),m=F.m,bs=F.kind==='boss';
+function startBattle(id,kind,nAdds){const F=mkFoe(id,kind),m=F.m,bs=F.kind==='boss';try{preload(['','_atk','_hurt','_low','_lose'].map(x=>'mob_'+id+x))}catch(e){}
   const pool=RUN?AREAS[RUN.area].mobs:[id],adds=[];for(let i=0;i<(nAdds||0);i++){const f=mkFoe(pick(pool),'');f.hp=f.max=Math.round(f.max*.75);adds.push(f)}
   preload([...['','_hurt','_low','_win','_lose','_atk','_skill','_cast'].map(x=>HK()+x),...(id==='shadow'?[]:['','_hurt','_low','_win','_lose'].map(x=>'mob_'+id+x)),...adds.map(f=>'mob_'+f.id),'battle_'+(AREAS.find(a=>a.boss===id||a.mobs.includes(id))||{id:'plain'}).id]);
   allyAuto();const ally=id==='shadow'?null:mkAlly();if(ally)ally.hp=ally.max;
@@ -1920,7 +1933,7 @@ function lose(){SFX.lose();const lid=B?B.id:null;const lost=Math.round(S.gold*.1
   openM('msg',{t:'戰敗',b:`<div class="panel"><div class="duo">${art(HK()+'_lose','戰敗','r34')}${lid&&lid!=='shadow'?art('mob_'+lid+'_win','','r11'):''}</div><p>${you('你')}倒下了。巡邏隊把你送回晨星鎮，途中遺失了 ${lost} G。</p><p class="sub">強化裝備、分配屬性點，或先到旅店休息再出發吧。</p></div><button class="btn pri big" data-a="closeM">確定</button>`})}
 
 /* ============ 粒子特效（Canvas） ============ */
-const PFX=(()=>{let cv,cx,P=[],Q=[],raf=0,W=0,Hh=0,t0=0,SR={x:0,y:0,w:360,h:260};
+const PFX=(()=>{let HS=0,cv,cx,P=[],Q=[],raf=0,W=0,Hh=0,t0=0,SR={x:0,y:0,w:360,h:260};
   const rnd=(a,b)=>a+Math.random()*(b-a),pk=a=>Array.isArray(a)?a[Math.floor(Math.random()*a.length)]:a;
   function ensure(){const app=$('#app');if(!cv||!app.contains(cv)){cv=document.createElement('canvas');cv.id='pfx';app.appendChild(cv);cx=cv.getContext('2d')}
     const r=app.getBoundingClientRect(),d=Math.min(2,window.devicePixelRatio||1);if(W!==r.width||Hh!==r.height){W=r.width;Hh=r.height;cv.width=W*d;cv.height=Hh*d;cx.setTransform(d,0,0,d,0,0)}}
@@ -1929,10 +1942,10 @@ const PFX=(()=>{let cv,cx,P=[],Q=[],raf=0,W=0,Hh=0,t0=0,SR={x:0,y:0,w:360,h:260}
   function add(o){P.push(Object.assign({age:0,rot:0,vr:0,g:0,drag:0,add:true,grow:0,vx:0,vy:0},o))}
   function emit(o){const [x,y]=pt(o.x,o.y),U=SR.w;for(let i=0;i<(o.n||1);i++){const a=rnd(o.a0??0,o.a1??6.283),sp=rnd(o.s0||0,o.s1||0)*U;
     add({x:x+rnd(-1,1)*(o.jx||0)*U,y:y+rnd(-1,1)*(o.jy||0)*U,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:rnd(o.l0||.4,o.l1||.8),sz:rnd(o.z0||.006,o.z1||.012)*U,
-      c:pk(o.c),sh:o.sh||'dot',g:(o.g||0)*U,drag:o.drag||0,add:o.add!==false,vr:rnd(-1,1)*(o.spin||0),rot:rnd(0,6.28),grow:o.grow||0,fade:o.fade,len:o.len})}}
+      c:pk(o.c),sh:o.sh||'dot',g:(o.g||0)*U,drag:o.drag||0,gy:o.gy!=null?SR.y+SR.h*o.gy:null,bn:o.bn,add:o.add!==false,vr:rnd(-1,1)*(o.spin||0),rot:rnd(0,6.28),grow:o.grow||0,fade:o.fade,len:o.len})}}
   const at=(ms,fn)=>Q.push({t:performance.now()+ms,fn});
   /* 飛行物：from→to，dur 秒，沿途留尾跡 */
-  function shot(f,t,dur,o){const [x0,y0]=pt(f[0],f[1]),[x1,y1]=pt(t[0],t[1]);add({x:x0,y:y0,vx:(x1-x0)/dur,vy:(y1-y0)/dur,life:dur,sz:(o.z||.012)*SR.w,c:o.c,sh:o.sh||'dot',len:o.len,tr:o.tr,rot:Math.atan2(y1-y0,x1-x0)})}
+  function shot(f,t,dur,o){const [x0,y0]=pt(f[0],f[1]),[x1,y1]=pt(t[0],t[1]),arc=o.arc!=null?o.arc:o.sh==='arrow'?1.1:0,g=arc*SR.w,vy=(y1-y0)/dur-.5*g*dur;add({x:x0,y:y0,vx:(x1-x0)/dur,vy,g,aim:o.sh==='arrow',life:dur,sz:(o.z||.012)*SR.w,c:o.c,sh:o.sh||'dot',len:o.len,tr:o.tr,rot:Math.atan2(vy,x1-x0)})}
   function slash(f,ang,len,wd,c,bend){const [x,y]=pt(f[0],f[1]);add({x,y,life:.3,sh:'slash',ang,L:len*SR.w,bend:bend??.22,sz:wd*SR.w,c})}
   function cut(f,ang,len,wd,c,life){const [x,y]=pt(f[0],f[1]);add({x,y,life:life||.32,sh:'cut',ang,L:len*SR.w,sz:wd*SR.w,c})}
   function scr(c,life){add({x:0,y:0,life:life||.25,sh:'scr',c})}
@@ -1968,9 +1981,9 @@ const PFX=(()=>{let cv,cx,P=[],Q=[],raf=0,W=0,Hh=0,t0=0,SR={x:0,y:0,w:360,h:260}
     }}
   function loop(now){raf=requestAnimationFrame(loop);stage();
     for(let i=Q.length-1;i>=0;i--)if(now>=Q[i].t){const f=Q[i].fn;Q.splice(i,1);try{f()}catch(e){}}
-    const dt=Math.min(.05,t0?(now-t0)/1000:.016);t0=now;cx.clearRect(0,0,W,Hh);
+    const dt=now<HS?0:Math.min(.05,t0?(now-t0)/1000:.016);t0=now;cx.clearRect(0,0,W,Hh);
     for(let i=P.length-1;i>=0;i--){const p=P[i];p.age+=dt;if(p.age>=p.life){P.splice(i,1);continue}
-      if(p.drag){const f=Math.max(0,1-p.drag*dt);p.vx*=f;p.vy*=f}p.vy+=p.g*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.rot+=p.vr*dt;
+      if(p.drag){const f=Math.max(0,1-p.drag*dt);p.vx*=f;p.vy*=f}p.vy+=p.g*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.rot+=p.vr*dt;if(p.aim)p.rot=Math.atan2(p.vy,p.vx);if(p.gy!=null&&p.y>p.gy){p.y=p.gy;p.vy*=-(p.bn||.3);p.vx*=.55;p.vr*=.5;if(Math.abs(p.vy)<SR.w*.04){p.vy=0;p.g=0}}
       if(p.tr&&Math.random()<(p.tr.r||.9)){const t=p.tr;add({x:p.x+rnd(-1,1)*p.sz*.6,y:p.y+rnd(-1,1)*p.sz*.6,vx:rnd(-1,1)*SR.w*.04,vy:(t.up||0)*SR.w,life:rnd(.2,.45),sz:p.sz*rnd(.4,.8),c:pk(t.c),sh:t.sh||'dot',add:t.add!==false,grow:t.grow||-.6})}
       const k=p.age/p.life;draw(p,k,p.fade==='in'?Math.sin(k*Math.PI)*1.2:1-k*k)}
     cx.globalCompositeOperation='source-over';cx.globalAlpha=1;
@@ -2078,7 +2091,21 @@ const PFX=(()=>{let cv,cx,P=[],Q=[],raf=0,W=0,Hh=0,t0=0,SR={x:0,y:0,w:360,h:260}
     heal(c){at(350,()=>ring(F,c,.22,.7,.012));for(let t=0;t<700;t+=60)at(350+t,()=>emit({x:F[0],y:F[1]+.12,n:2,jx:.1,a0:-1.75,a1:-1.4,s0:.12,s1:.25,l0:.7,l1:1,z0:.008,z1:.011,c,sh:'cross'}))},
     roar(c){for(let i=0;i<3;i++)at(300+i*150,()=>ring(F,c,.35+i*.08,.55,.016));at(350,()=>emit({x:F[0],y:F[1],n:24,s0:.6,s1:1.2,l0:.25,l1:.45,z0:.002,z1:.004,c:[c,'#ffffff'],sh:'streak',len:2}))}};
   const reduce=()=>{try{return matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){return false}};
+  /* 物理打擊感：頓幀、擊退、震屏、碎石彈跳、塵土 */
+  function impact(side,str,cr,dead){if(reduce())return;run();str=Math.max(.15,Math.min(1,str));const T=side==='foe'?F:H,gy=T[1]+(side==='foe'?.17:.3),dir=side==='foe'?1:-1;
+    HS=performance.now()+(cr?110:60)+str*60;
+    emit({x:T[0],y:T[1],n:Math.round(6+str*14),a0:dir>0?-2.4:-.75-Math.PI*.15,a1:dir>0?-.2:-2.9+Math.PI*.15,s0:.4,s1:.9+str*.6,l0:.5,l1:1,z0:.003,z1:.006,c:['#ffffff','#ffe08a','#ffb04a'],sh:'streak',len:1,g:2.4,gy,bn:.35,drag:.6});
+    emit({x:T[0],y:gy-.02,n:Math.round(3+str*9),a0:-2.9,a1:-.25,s0:.25,s1:.6+str*.6,l0:.7,l1:1.3,z0:.004,z1:.009,c:['#8a7a66','#a8977e','#5e5348'],sh:'shard',g:2.8,gy,bn:.4,spin:12,add:false,drag:.4});
+    emit({x:T[0]+dir*.03,y:gy,n:Math.round(4+str*8),jx:.06,a0:dir>0?-.5:-2.64,a1:dir>0?.1:-3.24,s0:.05,s1:.18+str*.2,l0:.6,l1:1.1,z0:.012,z1:.024,c:['rgba(200,185,160,.5)','rgba(170,155,135,.45)'],sh:'smoke',grow:1.4,drag:2.2,g:-.05,add:false});
+    if(cr){ring(T,'#ffffff',.22,.3,.012);scr('rgba(255,255,255,.18)',.12)}
+    if(dead)at(250,()=>emit({x:T[0],y:gy,n:18,jx:.1,a0:-3.1,a1:-.05,s0:.1,s1:.35,l0:.8,l1:1.5,z0:.016,z1:.03,c:['rgba(190,175,150,.55)','rgba(150,135,115,.5)'],sh:'smoke',grow:1.6,drag:2,g:-.04,add:false}));
+    const st=document.querySelector('.stage'),sp=document.querySelector(side==='foe'?'.spr.foe .art img:not(.under)':'.spr.me .art img:not(.under)');
+    const hs=HS-performance.now(),A=3+str*9+(cr?4:0);
+    setTimeout(()=>{try{if(st)st.animate([{transform:'translate(0,0)'},{transform:`translate(${A*dir}px,${-A*.5}px)`},{transform:`translate(${-A*.6*dir}px,${A*.4}px)`},{transform:`translate(${A*.3*dir}px,0)`},{transform:'translate(0,0)'}],{duration:260+str*120,easing:'ease-out'});
+      if(sp&&!dead)sp.animate([{transform:'translateX(0) rotate(0)'},{transform:`translateX(${dir*(8+str*22)}px) rotate(${dir*(2+str*5)}deg)`,offset:.22},{transform:`translateX(${dir*(3+str*6)}px) rotate(${dir}deg)`,offset:.6},{transform:'translateX(0) rotate(0)'}],{duration:480+str*200,easing:'cubic-bezier(.2,.9,.3,1)'})}catch(e){}},Math.max(0,hs));
+    buzz(Math.round(20+str*40))}
   return{
+    impact,
     me(fx){if(reduce())return;run();const k=fx.skill;if(k&&S[k])return S[k]();if(fx.d===0)return S.miss();if(fx.d!=null)return (S['basic_'+S_CLS()]||S.basic_swordsman)();if(fx.glow)S.heal()},
     foe(fx){if(reduce())return;run();if(fx.fsk){const k=SKM[fx.fsk]||{fx:'roar',c:'#ff4a4a'};return (FO[k.fx]||FO.roar)(k.c,k.h)}
       if(fx.miss)return at(150,()=>emit({x:H[0]+.05,y:H[1],n:5,a0:3,a1:3.3,s0:.6,s1:1,l0:.15,l1:.3,z0:.002,z1:.003,c:'#ffffff',sh:'streak',len:2}));
