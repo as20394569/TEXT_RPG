@@ -513,14 +513,14 @@ const STATN={atk:'攻擊',mag:'魔力',def:'防禦',hp:'HP',mp:'MP',crit:'爆擊
 const PCT=new Set(['brkcd','detamp','focusatk','answer','mpp','mpreg','healp','faithg','crit','cd','eva','ls','atkp','magp','defp','hpp','regen','mpcut','burn','double','stun','guard','shield']);
 const fmt=(k,v)=>`${STATN[k]} +${v}${PCT.has(k)?'%':''}`;
 const GEAR={};
-const TLV=[1,5,10,15,20],TPRICE=[60,300,900,2200,5000];
-const WN={swordsman:['鐵劍','鋼刃長劍','秘銀大劍','霜牙劍','弒魔聖劍'],mage:['橡木杖','水晶杖','符文法杖','冰魄杖','星辰權杖'],ranger:['獵弓','長弓','精靈弓','風雪弩','蒼穹神弓'],cleric:['木槌','祈禱錘','聖銀戰錘','霜輝聖錘','天使之證']};
+const TLV=[1,5,10,15,20,26],TPRICE=[60,300,900,2200,5000,9000];
+const WN={swordsman:['鐵劍','鋼刃長劍','秘銀大劍','霜牙劍','弒魔聖劍','雷霆王劍'],mage:['橡木杖','水晶杖','符文法杖','冰魄杖','星辰權杖','天候權杖'],ranger:['獵弓','長弓','精靈弓','風雪弩','蒼穹神弓','雷鷹長弓'],cleric:['木槌','祈禱錘','聖銀戰錘','霜輝聖錘','天使之證','白塔聖錘']};
 for(const c in WN)WN[c].forEach((n,i)=>{const v=5+i*9;GEAR[`w_${c}_${i}`]=Object.assign({n,slot:'weapon',cls:c,t:i,lv:TLV[i],price:TPRICE[i]},c==='mage'?{mag:v}:c==='cleric'?{atk:Math.round(v*.6),mag:Math.round(v*.85)}:{atk:v})});
-const ARMOR={head:[['皮帽','鐵盔','秘銀頭冠','霜紋盔','龍角冠'],i=>({def:2+i*4,hp:8+i*20}),.6],
-  body:[['旅人布衣','硬皮甲','鎖子甲','霜紋鎧','龍鱗聖甲'],i=>({def:3+i*7,hp:10+i*30}),.8],
-  feet:[['草鞋','皮靴','疾風靴','雪原長靴','天馬之靴'],i=>({def:1+i*3,eva:1+i}),.5],
-  ring:[['木紋戒指','銀戒','礦晶戒','霜華戒','魔眼戒'],i=>({mp:8+i*12,crit:1+i}),.6],
-  neck:[['狼牙項鍊','護身符','礦晶墜飾','冰心墜鍊','誓約之鍊'],i=>({hp:15+i*35,cd:5+i*5}),.7]};
+const ARMOR={head:[['皮帽','鐵盔','秘銀頭冠','霜紋盔','龍角冠','白塔頭盔'],i=>({def:2+i*4,hp:8+i*20}),.6],
+  body:[['旅人布衣','硬皮甲','鎖子甲','霜紋鎧','龍鱗聖甲','王都近衛鎧'],i=>({def:3+i*7,hp:10+i*30}),.8],
+  feet:[['草鞋','皮靴','疾風靴','雪原長靴','天馬之靴','驛馬長靴'],i=>({def:1+i*3,eva:1+i}),.5],
+  ring:[['木紋戒指','銀戒','礦晶戒','霜華戒','魔眼戒','雷紋戒'],i=>({mp:8+i*12,crit:1+i}),.6],
+  neck:[['狼牙項鍊','護身符','礦晶墜飾','冰心墜鍊','誓約之鍊','王家徽鍊'],i=>({hp:15+i*35,cd:5+i*5}),.7]};
 for(const sl in ARMOR){const [ns,f,pm]=ARMOR[sl];ns.forEach((n,i)=>GEAR[SLOTP[sl]+'_'+i]=Object.assign({n,slot:sl,t:i,lv:TLV[i],price:Math.round(TPRICE[i]*pm)},f(i)))}
 /* 附加詞條：數值依裝備階級成長 */
 const SUBS={atk:t=>2+t*3,mag:t=>2+t*3,def:t=>2+t*3,hp:t=>15+t*25,mp:t=>8+t*10,crit:t=>2+t,cd:t=>5+t*3,eva:t=>1+t,ls:t=>2+t,atkp:t=>3+Math.round(t*1.5),magp:t=>3+Math.round(t*1.5),STR:t=>1+t,DEX:t=>1+t,INT:t=>1+t,VIT:t=>1+t,LUK:t=>1+t};
@@ -929,6 +929,81 @@ const CHTXT=[
    ['旁白','【第一部「北方大道」完】第二部製作中。在那之前，各地首領仍會復活，人物故事、無盡之塔和傳說裝備還在等{你|妳}。']]}];
 
 CHTXT.forEach((x,i)=>Object.assign(CH[i],x));
+/* ===== 第二部「霧之彼岸」：P2 開啟後才加入第六章（美術到齊前保持關閉） ===== */
+const P2=false;
+const ASET=t=>t<5?t:9+(t-5);
+SETS.push({n:'雷鳴',b2:{crit:6,cd:10},b4:{stun:10,atkp:6,magp:6},d2:'爆擊率 +6%、爆擊傷害 +10%',d4:'攻擊時 10% 機率暈眩，攻擊與魔力 +6%'});
+for(const k of ['a','f','h','r','n'])if(ATL['icon_'+k+'_4']!=null)ATL['icon_'+k+'_5']=ATL['icon_'+k+'_4'];
+for(const c in WN)if(ATL[`icon_w_${c}_4`]!=null)ATL[`icon_w_${c}_5`]=ATL[`icon_w_${c}_4`];
+if(P2){
+  Object.assign(ITEMS,{m_gear:{n:'雷擊齒輪',d:'氣象機兵身上掉下來的零件，還帶著靜電',sell:200,mat:1}});
+  Object.assign(MOBS,{
+    bandit:{n:'街道盜賊',lv:26,ty:'swift',sk:['m_knife','m_smoke']},
+    deserter:{n:'逃兵騎士',lv:27,ty:'brute',hpM:1.15,sk:['m_oldoath','m_shieldbash']},
+    stormhawk:{n:'雷鷹',lv:28,ty:'caster',hpM:.85,mat:'m_gear',sk:['m_thunderdive','m_galewing']},
+    weathergolem:{n:'失控的氣象機兵',lv:30,ty:'tank',boss:1,hpM:1.3,mat:'m_gear',sk:['m_storm','m_lightning','m_recalib']}});
+  MOBS.stormhawk.fly=1;
+  Object.assign(SKM,{
+    m_knife:{n:'飛刀',pow:.6,h:3,fx:'orb',c:'#d8d8d8',d:'連丟三把飛刀'},
+    m_smoke:{n:'煙霧彈',self:{eva:35,t:2},hst:{weak:2},fx:'spore',c:'#a8a8a8',d:'迴避 +35%，主角攻擊下降'},
+    m_oldoath:{n:'舊日劍誓',pow:1.8,pierce:.35,fx:'claw',c:'#e8d27a',d:'王國劍術，無視 35% 防禦'},
+    m_shieldbash:{n:'盾擊',pow:1.2,hst:{stun:1},p:.35,fx:'slam',c:'#c9c9c9',d:'35% 機率使主角暈眩'},
+    m_thunderdive:{n:'雷霆俯衝',mag:1,pow:1.7,hst:{burn:2},fx:'beam',c:'#ffe45a',d:'帶電俯衝，灼燒 2 回合'},
+    m_galewing:{n:'疾風翼',self:{eva:30,crit:15,t:3},fx:'aura',c:'#cfe8ff',d:'迴避 +30%、爆擊 +15%'},
+    m_storm:{n:'人造暴風',mag:1,pow:.7,h:3,hst:{weak:2},fx:'orb',c:'#8fdcff',d:'三道暴風，主角攻擊下降'},
+    m_lightning:{n:'落雷校正',mag:1,pow:2.2,hst:{stun:1},p:.3,fx:'beam',c:'#ffe45a',d:'巨大落雷，30% 機率暈眩'},
+    m_recalib:{n:'重新校準',shield:.2,self:{def:.4,t:3},fx:'aura',c:'#ffe45a',d:'護盾 20%，防禦 +40%'}});
+  GEAR.u_storm={n:'氣象院的懷錶',slot:'ring',t:5,lv:30,price:16000,mp:90,crit:7,uq:{cd:30,stun:8,magp:10},ud:'爆擊傷害 +30%、攻擊時 8% 機率暈眩、魔力 +10%',uniq:1};
+  BOSSU.weathergolem='u_storm';
+  AREAS.push({id:'road',n:'灰石街道',lv:'26–30',base:26,d:'通往王都的古老石板路。二十年沒人走，盜賊和逃兵占了驛站。',mobs:['bandit','deserter','stormhawk'],boss:'weathergolem'});
+  Object.assign(NPC,{'希瑟':'npc_heather','失控的氣象機兵':'mob_weathergolem','逃兵騎士':'mob_deserter'});
+  CH[4].outro[CH[4].outro.length-1]=['旁白','【第一部「北方大道」完】幾天後，一封蓋著王家封蠟的信送到了公會。——第二部「霧之彼岸」開始。'];
+  CH.push({t:'第六章　王都的回信',goal:'沿灰石街道前往王都白塔城',steps:[{type:'kill',mob:'deserter',n:5},{type:'boss',mob:'weathergolem'}],rw:{gold:9000,exp:6000,gem:300,items:{stone:6,pot2:5}},
+  intro:[
+   ['旁白','北方大道重開的第十天。晨星鎮的街上第一次出現了南方來的商隊。'],
+   ['旁白','商隊後面跟著一匹白馬。騎士翻身下馬，把一封蓋著王家封蠟的信放在公會櫃檯上。'],
+   ['希瑟','王都使者，希瑟。奉國王陛下之命，請「破霧者」{name} 前往白塔城受勳。'],
+   ['莉雅','受、受勳！？{name}，是國王耶！'],
+   ['艾德溫','……二十年來，王都一封信都沒回過。霧一退，第一封就是受勳令？'],
+   ['希瑟','學者先生，我只負責送信。陛下的心思，不是我能揣測的。'],
+   ['露娜','{name}，我跟{你|妳}去。我也想知道，二十年前是誰下令不准任何人提起那支遠征隊。'],
+   ['希瑟','路上要小心。灰石街道荒廢太久，驛站被盜賊占了，還有……穿著王國鎧甲的逃兵。'],
+   ['{name}','逃兵？'],
+   ['希瑟','二十年前守在霧邊的駐軍。霧吞掉北方那天，他們丟下崗位逃了。王國至今還在通緝他們。'],
+   ['瑪莎','{name}，帶著這個。……阿姨年輕時也走過那條路，那時候兩旁全是麥田。']],
+  mid:[
+   ['旁白','街道中段的驛站裡，一群逃兵騎士圍著火堆。帶頭的老騎士看見你們，沒有拔劍。'],
+   ['逃兵騎士','……破霧者？霧真的退了？'],
+   ['逃兵騎士','我們不是逃兵。是王國下令撤退，再對外宣稱我們擅離職守。因為我們看到了不該看的東西。'],
+   ['露娜','你們看到了什麼？'],
+   ['逃兵騎士','遠征隊出發那天早上，隊員們在驛站的簽到簿上寫名字。每個人都在笑，像是要去參加婚禮。'],
+   ['旁白','老騎士從懷裡掏出一本發黃的簿子。最後一頁，有一行清秀的字跡。'],
+   ['旁白','「等我回來　艾琳」'],
+   ['逃兵騎士','她是隊裡最年輕的。出發前還跟我借了一枝筆，說回來再還我。……那枝筆，我等了二十年。'],
+   ['希瑟','……艾琳？'],
+   ['旁白','希瑟的臉色一瞬間變得蒼白，但她什麼都沒說。'],
+   {q:'{name} 要怎麼處理這本簽到簿？',choice:[
+    {t:'請老騎士讓我們帶走，交給王都查證',fx:{flag:'erinBook'},lines:[['逃兵騎士','……拿去吧。如果你們能讓王國承認這件事，我們就能回家了。'],['{name}','我答應你。']]},
+    {t:'問希瑟認不認識艾琳',fx:{bond:1,flag:'heatherAsk'},lines:[['希瑟','……我母親叫艾琳。她在我三歲那年出門，再也沒有回來。'],['希瑟','王國告訴我，她死於一場礦坑意外。'],['露娜','……希瑟小姐。']]}]}],
+  pre:[
+   ['旁白','王都城牆已經看得見了。但街道盡頭，一具三層樓高的機械巨人擋住了去路。'],
+   ['旁白','它胸口刻著「王立氣象院・七號」，頭頂捲著一團不自然的雷雲。'],
+   ['艾德溫','是澤諾斯那個研究院做的氣象機兵！二十年沒人管，它還在照原本的指令轉……'],
+   ['希瑟','它在攻擊所有往北走的人。指令是——「不准任何人靠近霧」。'],
+   ['{name}','那就讓它停下來。霧的事，我們自己去問清楚。']],
+  outro:[
+   ['旁白','機兵單膝跪地，雷雲散開。它胸口的玻璃窗裡，夾著一張褪色的照片：一群穿著氣象院制服的人，站在霧前微笑。'],
+   ['旁白','白塔城到了。城門口的告示欄上，貼著一張新的公告。'],
+   ['旁白','「王立氣象院即日起全面封鎖。一切關於北方黑霧之紀錄，列為王室機密。」'],
+   ['艾德溫','……公告的日期，是北方大道重開的隔天。'],
+   ['露娜','他們找{你|妳}來，根本不是要受勳。是要看看「破霧者」知道多少。'],
+   ['希瑟','……受勳典禮在三天後。在那之前，王宮會安排你們住在城裡。'],
+   ['希瑟','我只是送信的人。但是……我母親的名字，不該只是一行字。','#heatherAsk'],
+   ['希瑟','那本簽到簿，請不要讓王宮的人看到。','#erinBook'],
+   ['希瑟','如果你們想查，氣象院的舊紀錄都堆在王都地下書庫。入口在大教堂底下。'],
+   ['艾德溫','地下書庫……三百年前的檔案也在那裡。{name}，這次換我帶路了。'],
+   ['旁白','【第六章 完】第七章「沉沒的檔案館」製作中。']]});
+}
 const SQ=[
   {id:'s1',ch:0,n:'黏答答的麻煩',npc:'蜜可',d:'擊敗史萊姆 5 隻',type:'kill',mob:'slime',c:5,rw:{gold:80,exp:60,items:{pot:3}}},
   {id:'s2',ch:0,n:'藥水的原料',npc:'蜜可',d:'交付史萊姆凝膠 3 個',type:'item',item:'m_gel',c:3,rw:{gold:120,exp:50,items:{stone:1}}},
@@ -943,6 +1018,9 @@ const SQ=[
   {id:'s11',ch:4,n:'黑暗的殘渣',npc:'艾德溫',d:'交付蝕霧碎片 6 個',type:'item',item:'m_dark',c:6,rw:{gold:3000,exp:2000,gem:100}},
   {id:'s12',ch:4,n:'百戰勇者',npc:'莉雅',d:'完成冒險 20 次',type:'stat',key:'run',c:20,rw:{gem:200,gold:2000}}
 ];
+if(P2)SQ.push(
+   {id:'s13',ch:5,n:'驛站的清掃',npc:'莉雅',d:'擊敗街道盜賊 8 隻',type:'kill',mob:'bandit',c:8,rw:{gold:4000,exp:3000,items:{stone:2}}},
+   {id:'s14',ch:5,n:'會打雷的零件',npc:'巴爾德',d:'交付雷擊齒輪 5 個',type:'item',item:'m_gear',c:5,rw:{gold:5000,exp:2500,gem:100}});
 /* ============ NPC 故事支線 ============
    a = 接取時的劇情，req = 需要完成的事，b = 完成後的劇情。pre = 前一段故事 id，ch = 需要完成的主線章數 */
 const NST=[
@@ -1150,7 +1228,7 @@ document.addEventListener('visibilitychange',()=>{if(!AC)return;document.hidden?
 
 /* ============ 計算 ============ */
 const need=lv=>Math.round((30+lv*28+lv*lv*4)*(2+lv*.8+Math.max(0,lv-25)*1.2));
-const CHLV=[1,7,13,19,24];const chLvOk=()=>S.lv>=(CHLV[S.main.ch]||1);
+const CHLV=[1,7,13,19,24,26];const chLvOk=()=>S.lv>=(CHLV[S.main.ch]||1);
 const xpPen=L=>{const d=S.lv-L-5;return d>0?Math.max(.2,1-d*.15):1};
 const clsName=()=>S.adv?ADV[S.adv].n:CLS[S.cls].n;
 const gearBy=u=>S.gear.find(g=>g.u===u);
@@ -1180,7 +1258,7 @@ function rollSubs(t,r){return Object.keys(SUBS).sort(()=>Math.random()-.5).slice
 function addGear(id,r,set){const g={u:S.uid++,id,r,p:0,sub:rollSubs(GEAR[id].t,r),lock:false,sock:r>=4?[null,null]:r>=3?[null]:[]};if(r>=4&&!GEAR[id].uniq)g.sp=pick(Object.keys(SPEC));if(set!=null)g.set=set;S.gear.push(g);if(S.dex)S.dex.g[id]=1;return g}
 function rollRar(minR,bonus){const w=RW.map((x,i)=>i<minR?0:x*(i>=2?bonus||1:1)),t=w.reduce((a,b)=>a+b);let r=Math.random()*t;for(let i=0;i<5;i++){if((r-=w[i])<0)return i}return 4}
 function makeGear(tier,r,hard){const sl=pick(Object.keys(SLOTS)),id=sl==='weapon'?`w_${S.cls}_${tier}`:`${SLOTP[sl]}_${tier}`;
-  const g=addGear(id,r,hard&&r>=3&&Math.random()<.4?CSET[S.cls]:r>=2&&Math.random()<.35?tier:null);if(r>=3)sys(`恭喜 ${S.name} 獲得【${gearName(g)}】！`);return g}
+  const g=addGear(id,r,hard&&r>=3&&Math.random()<.4?CSET[S.cls]:r>=2&&Math.random()<.35?ASET(tier):null);if(r>=3)sys(`恭喜 ${S.name} 獲得【${gearName(g)}】！`);return g}
 const rollGear=(tier,minR,bonus,hard)=>makeGear(tier,rollRar(minR||0,bonus),hard);
 function dismantle(g){const d=DIS[g.r][0]+g.p*2,st=DIS[g.r][1];addItem('dust',d);if(st)addItem('stone',st);for(const gm of g.sock||[])if(gm)addItem(gm,1);if(g.r>=3&&Math.random()<.4){const gm=pick(GEMS);addItem(gm,1);toast(`分解時取得 ${ITEMS[gm].n}`)}S.gear=S.gear.filter(x=>x.u!==g.u);return [d,st]}
 function gainExp(n){
@@ -1224,7 +1302,7 @@ function chatTick(){if(!S)return;const el=$('#chat');
 
 /* ============ 畫面 ============ */
 function bar(k,v,m,cls=''){return `<div class="bar ${k} ${cls}"><i style="width:${Math.max(0,Math.min(100,v/m*100))}%"></i><span>${k.toUpperCase()} ${v}/${m}</span></div>`}
-let WARM=0;function warm(){if(WARM||!S)return;WARM=1;try{preload(['','_hurt','_low','_win','_lose','_atk','_skill','_cast'].map(x=>HK()+x));preload([PKEY(),PKEY('smile'),PKEY('serious')]);const n=Math.min(S.main.ch,4);preload([SKEY(n+1,'intro'),SKEY(n+1,'mid'),SKEY(n+1,'outro'),'atlas_ui','town_bg',...AREAS.map(a=>'area_'+a.id),...AREAS[n].mobs.map(m=>'mob_'+m),'mob_'+AREAS[n].boss,'battle_'+AREAS[n].id])}catch(e){}}
+let WARM=0;function warm(){if(WARM||!S)return;WARM=1;try{preload(['','_hurt','_low','_win','_lose','_atk','_skill','_cast'].map(x=>HK()+x));preload([PKEY(),PKEY('smile'),PKEY('serious')]);const n=Math.min(S.main.ch,CH.length-1);preload([SKEY(n+1,'intro'),SKEY(n+1,'mid'),SKEY(n+1,'outro'),'atlas_ui','town_bg',...AREAS.map(a=>'area_'+a.id),...AREAS[n].mobs.map(m=>'mob_'+m),'mob_'+AREAS[n].boss,'battle_'+AREAS[n].id])}catch(e){}}
 function render(){try{bgmAuto()}catch(e){}if(!WARM)setTimeout(warm,400);setTimeout(()=>{try{tipCheck()}catch(e){}},60);
   const app=$('#app');
   if(!S){app.className='pre';$('#main').innerHTML=vTitle();return}
@@ -1342,7 +1420,7 @@ function vQuest(){
   const tabs=`<div class="tabs">${[['main','主線'],['story','人物故事'],['side','支線委託'],['daily','每日']].map(([k,n])=>`<button class="${QTAB===k?'on':''}" data-a="qTab" data-v="${k}">${n}${k==='story'&&nstDot()?' <span class="tag new">!</span>':''}</button>`).join('')}</div>`;
   let body='';
   if(QTAB==='main'){const m=S.main;
-    if(m.ch>=CH.length)body=`${art(SKEY(5,'outro'),'結局插畫')}<h3>第一部「北方大道」完</h3><p>北方大道重新通行了，但黑霧還在。王國瞞了二十年的事，將在第二部揭曉。</p><p class="sub">在那之前：完成人物故事、挑戰無盡之塔、收集圖鑑與成就，把裝備打磨到極致。</p>`;
+    if(m.ch>=CH.length)body=P2?`${art(SKEY(CH.length,'outro'),'最新章節插畫')}<h3>第二部「霧之彼岸」進行中</h3><p>王都封鎖了氣象院。艾琳是誰？二十年前的遠征隊，真的死了嗎？</p><p class="sub">下一章製作中。在那之前：挑戰灰石街道的首領、無盡之塔與惡夢難度，把裝備打磨到極致。</p>`:`${art(SKEY(5,'outro'),'結局插畫')}<h3>第一部「北方大道」完</h3><p>北方大道重新通行了，但黑霧還在。王國瞞了二十年的事，將在第二部揭曉。</p><p class="sub">在那之前：完成人物故事、挑戰無盡之塔、收集圖鑑與成就，把裝備打磨到極致。</p>`;
     else{const c=CH[m.ch];
       body=`${art(SKEY(m.ch+1,'intro'),c.t)}<h3>${c.t}</h3><p>${c.goal}</p><div class="list">${c.steps.map((st,i)=>{const done=m.acc&&i<m.step,now=m.acc&&i===m.step;return `<div class="step ${done?'done':''}"><span>${done?'✔':'・'}</span><span>${st.type==='kill'?`擊敗 ${MOBS[st.mob].n} ${st.n} 隻`:`討伐首領 ${MOBS[st.mob].n}`}</span>${now&&st.type==='kill'?`<i>${m.prog}/${st.n}</i>`:''}</div>`}).join('')}</div>
       <p class="sub">地點：${AREAS[m.ch].n}　獎勵：${rwText(c.rw)}</p>${m.ch>0?`<p class="sub">與露娜的羈絆：<span class="bond">${'◆'.repeat(Math.min(10,S.bond||0))||'—'}</span></p>`:''}
@@ -1374,7 +1452,7 @@ const reforgeCost=g=>({d:10*(GEAR[g.id].t+1),g:100*(GEAR[g.id].t+1)});
 const canReforge=g=>!!g&&g.r>0&&(S.items.dust||0)>=reforgeCost(g).d&&S.gold>=reforgeCost(g).g;
 const MV={
   msg:v=>v,news(){return vNews()},lshop(){return vLShop()},dex(){return vDex()},ach(){return vAch()},craft(){return vCraft()},
-  shop(){const tier=Math.min(4,S.main.ch);
+  shop(){const tier=Math.min(AREAS.length-1,S.main.ch);
     const its=['pot','pot2','eth','eth2','stone'].filter(k=>tier>=2||!k.endsWith('2')).map(k=>`<div class="item"><span class="ico c0">${icon('item_'+k,ic(ITEMS[k].use?'potion':'mat'))}</span><span class="grow"><b>${ITEMS[k].n}</b><span class="sub">${ITEMS[k].d}・持有 ${S.items[k]||0}</span></span><button class="btn sm" data-a="buyItem" data-v="${k}" ${S.gold>=ITEMS[k].price?'':'disabled'}>${ITEMS[k].price} G</button></div>`).join('');
     const gs=[];for(let t=Math.max(0,tier-1);t<=tier;t++)for(const sl in SLOTS)gs.push(sl==='weapon'?`w_${S.cls}_${t}`:`${SLOTP[sl]}_${t}`);
     const gl=gs.reverse().map(id=>{const g=GEAR[id],f={u:0,id,r:0,p:0};return `<div class="item"><span class="ico c0">${gIco(id)}</span><span class="grow"><b>${g.n}</b><span class="sub">Lv.${g.lv}・${gearDesc(f)}</span></span><button class="btn sm" data-a="buyGear" data-v="${id}" ${S.gold>=g.price?'':'disabled'}>${g.price} G</button></div>`}).join('');
@@ -1385,7 +1463,7 @@ const MV={
       <div class="list">${gs.map(g=>`<div class="item"><span class="ico c${g.r}">${gIco(g.id)}</span><span class="grow" data-a="openGear" data-v="${g.u}"><b class="c${g.r}">${gearName(g)}</b><span class="sub">${g.p>=15?'已達強化上限':`${enhCost(g)} G・強化石×${enhStone(g)}・成功率 ${enhRate(g)}%`}${eqd.includes(g.u)?'・裝備中':''}</span></span><button class="btn sm pri" data-a="enh" data-v="${g.u}" ${canEnh(g)?'':'disabled'}>強化</button></div>`).join('')}</div>
       <p class="sub">每 +1 提升 8% 主屬性，上限 +15。點裝備名稱可以洗練詞條、鎖定或分解。</p>`}},
   inn(){const c=S.lv*4;return{t:'旅店',b:npcSay('npc_martha','瑪莎','累了吧？睡一覺就能恢復精神。')+`<button class="btn pri big" data-a="rest" ${S.gold>=c?'':'disabled'}>休息一晚（${c} G）</button>`}},
-  altar(){const rows=AREAS.map((A,i)=>{const lock=i>=S.main.ch+1&&!S.main.done;return `<div class="gsec"><b>${A.n}　<small class="sub">Lv.${A.lv}</small></b>${lock?'<span class="sub">星象尚未顯現……推進主線後再來。</span>':`<span class="subl">◆ 地區套裝【${SETS[i].n}】：此地魔物掉落（稀有以上）</span><span class="subl">◆ 首領專屬【${GEAR[BOSSU[A.boss]].n}】：${MOBS[A.boss].n}，掉落率 8%（惡夢 20%）</span>`}</div>`}).join('');
+  altar(){const rows=AREAS.map((A,i)=>{const lock=i>=S.main.ch+1&&!S.main.done;return `<div class="gsec"><b>${A.n}　<small class="sub">Lv.${A.lv}</small></b>${lock?'<span class="sub">星象尚未顯現……推進主線後再來。</span>':`<span class="subl">◆ 地區套裝【${SETS[ASET(i)].n}】：此地魔物掉落（稀有以上）</span><span class="subl">◆ 首領專屬【${GEAR[BOSSU[A.boss]].n}】：${MOBS[A.boss].n}，掉落率 8%（惡夢 20%）</span>`}</div>`}).join('');
     const cs=SETS[CSET[S.cls]];
     return{t:'星象台',b:npcSay('npc_oracle','占星師','星辰不賣裝備，只告訴你去哪裡找。好裝備，要自己打出來。')+rows+`<div class="gsec"><b>職業套裝【${cs.n}】</b><span class="subl">◆ 只從<b class="c3">異變種</b>與<b class="c4">惡夢模式</b>的魔物身上掉落</span><span class="sub">2 件：${cs.d2}　4 件：${cs.d4}</span></div>`}},
   temple(){let b=npcSay('npc_edwin','艾德溫','轉職是冒險者的第二次誕生。先證明你能贏過自己的影子。');
@@ -1577,7 +1655,7 @@ const ACH=[
   {id:'dexg',n:'收藏家',d:'裝備圖鑑登錄一半以上',c:()=>{const g=dexGear();return g.filter(k=>S.dex.g[k]).length>=g.length/2},rw:{items:{stone:5}}},
   {id:'story',n:'晨星鎮的朋友',d:'完成所有人物故事',c:()=>NST.every(q=>(S.nst[q.id]||{}).done),rw:{gold:8000,items:{gem_w:1}}},
   {id:'bond10',n:'燈火的搭檔',d:'與露娜的羈絆達到 10',c:()=>(S.bond||0)>=10,rw:{items:{eth2:5}}},
-  {id:'main',n:'蒼藍勇者',d:'完成第一部主線',c:()=>S.main.ch>=CH.length,rw:{gold:10000}},
+  {id:'main',n:'蒼藍勇者',d:'完成第一部主線',c:()=>S.main.ch>=5,rw:{gold:10000}},
   {id:'t10',n:'登塔者',d:'無盡之塔到達第 10 層',c:()=>S.tower.best>=10,rw:{items:{stone:3}}},
   {id:'t30',n:'雲上之人',d:'無盡之塔到達第 30 層',c:()=>S.tower.best>=30,rw:{items:{gem_y:1,stone:5}}},
   {id:'t50',n:'塔頂的風',d:'無盡之塔到達第 50 層',c:()=>S.tower.best>=50,rw:{gold:50000}},
