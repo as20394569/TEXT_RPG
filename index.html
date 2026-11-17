@@ -1245,10 +1245,14 @@ function gearTotals(){const e={},add=o=>{for(const k in o)e[k]=(e[k]||0)+o[k]};
   const c=setCounts();for(const i in c){if(c[i]>=2)add(SETS[i].b2);if(c[i]>=4)add(SETS[i].b4)}
   for(const id in PASS)if(PASS[id].st&&hasP(id))add(PASS[id].st);return e}
 function stats(){const e=gearTotals(),a={},c=CLS[S.cls],v=k=>e[k]||0,p=k=>1+v(k)/100;for(const k in ATTR)a[k]=S.attr[k]+v(k);
-  return{HP:Math.round((60+a.VIT*12+S.lv*8+v('hp'))*p('hpp')),MP:Math.round((20+a.INT*5+S.lv*3+v('mp'))*p('mpp')),ATK:Math.round((a[c.atk]*2+v('atk'))*p('atkp')),MAG:Math.round((a.INT*2.2+v('mag'))*p('magp')),
-    DEF:Math.round((a.VIT*1.2+v('def'))*p('defp')),CRIT:Math.min(75,Math.round(5+a.LUK*.6+a.DEX*.2+v('crit'))),CD:150+v('cd'),EVA:Math.min(45,Math.round(a.DEX*.6+v('eva'))),
-    LS:v('ls'),REGEN:v('regen'),MPCUT:Math.min(50,v('mpcut')),BURN:v('burn'),DOUBLE:v('double'),STUN:v('stun'),GUARD:v('guard'),SHIELD:v('shield'),MPREG:v('mpreg'),RESMAX:v('resmax'),BRKCD:v('brkcd'),DETAMP:v('detamp'),FOCUSATK:v('focusatk'),ANSWER:v('answer'),HEALP:v('healp'),FAITHG:v('faithg'),A:a}}
+  return{HP:Math.round((60+a.VIT*14+S.lv*8+v('hp'))*p('hpp')),MP:Math.round((20+a.INT*5+S.lv*3+v('mp'))*p('mpp')),ATK:Math.round((a[c.atk]*2+v('atk'))*p('atkp')),MAG:Math.round((a.INT*2.2+v('mag'))*p('magp')),
+    DEF:Math.round((a.VIT*1.4+v('def'))*p('defp')),CRIT:Math.min(75,Math.round(5+a.LUK*.6+a.DEX*.2+v('crit'))),CD:150+Math.round(a.LUK*.8)+v('cd'),EVA:Math.min(45,Math.round(a.DEX*.6+v('eva'))),
+    LS:v('ls'),REGEN:v('regen')+Math.min(3,a.VIT*.03),MPCUT:Math.min(50,Math.round(v('mpcut')+Math.min(20,a.INT*.15))),BURN:v('burn'),DOUBLE:v('double')+Math.min(20,Math.round(a.DEX*.15)),STUN:v('stun'),GUARD:v('guard'),SHIELD:v('shield'),MPREG:v('mpreg'),RESMAX:v('resmax'),BRKCD:v('brkcd'),DETAMP:v('detamp'),FOCUSATK:v('focusatk'),ANSWER:v('answer'),HEALP:v('healp'),FAITHG:v('faithg'),A:a}}
 function power(){const s=stats();return Math.round(s.HP/4+s.MP/4+s.ATK*3+s.MAG*3+s.DEF*2.5+s.CRIT*4+(s.CD-150)*1.5+s.EVA*3+s.LS*5+(s.BURN+s.DOUBLE+s.STUN+s.GUARD+s.SHIELD)*3)}
+const baseAttr=()=>{const a=Object.assign({},CLS[S.cls].base),g=CLS[S.cls].grow;for(const k in g)a[k]+=g[k]*(S.lv-1);if(S.adv){const b=ADV[S.adv].bonus;for(const k in b)a[k]+=b[k]}return a};
+const freePts=()=>{const b=baseAttr();let n=0;for(const k in ATTR)n+=Math.max(0,S.attr[k]-b[k]);return n};
+const respecCost=()=>S.lv<10?0:S.lv*150;
+let CT={};const confirmTap=k=>{const t=Date.now();if(CT[k]&&t-CT[k]<3000){CT={};return true}CT={[k]:t};toast('再按一次確認');return false};
 const mpCost=k=>Math.max(1,Math.round(SK[k].mp*(1-stats().MPCUT/100)));
 function clamp(){const s=stats();S.hp=Math.min(S.hp,s.HP);S.mp=Math.min(S.mp,s.MP)}
 function mySkills(){return Object.keys(SK).filter(k=>(SK[k].c===S.cls||SK[k].c===S.adv)&&S.lv>=SK[k].lv)}
@@ -1256,7 +1260,7 @@ function learn(quiet){for(const k of mySkills())if(!S.skl[k]){S.skl[k]=1;if(!qui
 function addItem(id,n){S.items[id]=(S.items[id]||0)+n;if(S.items[id]<=0)delete S.items[id]}
 function rollSubs(t,r){return Object.keys(SUBS).sort(()=>Math.random()-.5).slice(0,Math.min(4,r)).map(k=>({k,v:Math.max(1,Math.round(SUBS[k](t)*(.7+Math.random()*.3)))}))}
 function addGear(id,r,set){const g={u:S.uid++,id,r,p:0,sub:rollSubs(GEAR[id].t,r),lock:false,sock:r>=4?[null,null]:r>=3?[null]:[]};if(r>=4&&!GEAR[id].uniq)g.sp=pick(Object.keys(SPEC));if(set!=null)g.set=set;S.gear.push(g);if(S.dex)S.dex.g[id]=1;return g}
-function rollRar(minR,bonus){const w=RW.map((x,i)=>i<minR?0:x*(i>=2?bonus||1:1)),t=w.reduce((a,b)=>a+b);let r=Math.random()*t;for(let i=0;i<5;i++){if((r-=w[i])<0)return i}return 4}
+function rollRar(minR,bonus){const lu=1+Math.min(.5,(S?stats().A.LUK:0)*.004);const w=RW.map((x,i)=>i<minR?0:x*(i>=2?(bonus||1)*lu:1)),t=w.reduce((a,b)=>a+b);let r=Math.random()*t;for(let i=0;i<5;i++){if((r-=w[i])<0)return i}return 4}
 function makeGear(tier,r,hard){const sl=pick(Object.keys(SLOTS)),id=sl==='weapon'?`w_${S.cls}_${tier}`:`${SLOTP[sl]}_${tier}`;
   const g=addGear(id,r,hard&&r>=3&&Math.random()<.4?CSET[S.cls]:r>=2&&Math.random()<.35?ASET(tier):null);if(r>=3)sys(`恭喜 ${S.name} 獲得【${gearName(g)}】！`);return g}
 const rollGear=(tier,minR,bonus,hard)=>makeGear(tier,rollRar(minR||0,bonus),hard);
@@ -1399,7 +1403,7 @@ function vChar(){const s=stats(),sc=setCounts();
    <div class="stat-g"><div><span>HP</span><b>${s.HP}</b></div><div><span>MP</span><b>${s.MP}</b></div><div><span>攻擊</span><b>${s.ATK}</b></div><div><span>魔力</span><b>${s.MAG}</b></div><div><span>防禦</span><b>${s.DEF}</b></div><div><span>爆擊</span><b>${s.CRIT}%</b></div><div><span>迴避</span><b>${s.EVA}%</b></div><div><span>爆傷</span><b>${s.CD}%</b></div><div><span>吸血</span><b>${s.LS}%</b></div><div><span>戰力</span><b>${power()}</b></div></div>
    <p class="sub">下一級還需 ${Math.max(0,need(S.lv)-S.exp)} EXP</p></div></div></div>
   <div class="panel"><h3>職業特色</h3><p class="sub">${CLS[S.cls].f}</p>${Object.keys(PASS).filter(id=>PASS[id].c===S.cls||PASS[id].c===S.adv).map(id=>`<span class="subl row ${hasP(id)?'':'sub'}" style="gap:6px"><span class="ico c4" style="width:30px;height:30px">${icon('pass_'+id,ic('skill'))}</span><span class="grow">被動【${PASS[id].n}】Lv.${PASS[id].lv}：${PASS[id].d}</span></span>`).join('')}${S.adv?`<p class="sub">${ADV[S.adv].n}：${ADV[S.adv].d}</p>`:''}</div>
-  <div class="panel"><h3>屬性　<span class="tag ${S.pts?'red':'off'}">可用 ${S.pts} 點</span></h3>${Object.keys(ATTR).map(k=>`<div class="attr"><span>${ATTR[k]}<span class="sub">　${{STR:'物理攻擊',DEX:'迴避・爆擊',INT:'魔力・MP',VIT:'HP・防禦',LUK:'爆擊・運氣檢定'}[k]}</span></span><b>${S.attr[k]}${s.A[k]>S.attr[k]?`<small class="up">+${s.A[k]-S.attr[k]}</small>`:''}</b><button class="btn sm" data-a="addPt" data-v="${k}" ${S.pts?'':'disabled'}>＋</button></div>`).join('')}</div>
+  <div class="panel"><h3>屬性　<span class="tag ${S.pts?'red':'off'}">可用 ${S.pts} 點</span><button class="btn sm" style="float:right" data-a="respec">重置（${respecCost()} G）</button></h3>${Object.keys(ATTR).map(k=>`<div class="attr"><span>${ATTR[k]}<span class="sub">　${{STR:'物理攻擊',DEX:'迴避・爆擊・連擊',INT:'魔力・MP・技能省 MP',VIT:'HP・防禦・每回合回血',LUK:'爆擊・爆傷・掉寶・金幣'}[k]}</span></span><b>${S.attr[k]}${s.A[k]>S.attr[k]?`<small class="up">+${s.A[k]-S.attr[k]}</small>`:''}</b><button class="btn sm" data-a="addPt" data-v="${k}" ${S.pts?'':'disabled'}>＋</button></div>`).join('')}</div>
   ${Object.keys(ALLY).some(k=>ALLY[k].open())?`<div class="panel"><h3>同行夥伴</h3><div class="party">${[...Object.keys(ALLY).filter(k=>ALLY[k].open()),'none'].map(k=>`<button class="btn ${(S.party||'none')===k?'on':''}" data-a="setParty" data-v="${k}">${k==='none'?'<b>獨自冒險</b><span class="sub">不帶夥伴</span>':`${art(ALLY[k].img,ALLY[k].n,'r11','mini')}<b>${ALLY[k].n}</b><span class="sub">${ALLY[k].role}</span>`}</button>`).join('')}</div><p class="sub">${S.party&&S.party!=='none'?ALLY[S.party].d+(S.party==='luna'?'　羈絆越深，露娜越強。':''):'不帶夥伴時，所有戰鬥都靠自己。'}</p></div>`:''}
   <div class="panel"><h3>裝備</h3><div class="list">${eq}</div>${setHtml}</div>
   <div class="panel"><h3>技能　<span class="tag ${S.sp?'red':'off'}">技能點 ${S.sp}</span></h3><div class="list">${sk}</div>${nxt?`<div class="chips">${nxt}</div>`:''}</div>`}
@@ -1721,6 +1725,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'1.5',d:'2026-11-17',t:'屬性改版',b:'副屬性變得有用：敏捷增加連擊、智力讓技能省 MP、體質增加每回合回血、幸運提高爆擊傷害、掉寶率與金幣。新增屬性重置（Lv.10 以前免費）。NPC 全面換上新的表情立繪。'},
   {v:'1.4',d:'2026-11-17',t:'整體平衡調整',b:'升級節奏放慢，主線各章需要等級門檻。強化成本與成功率重新設計，傳說裝備更稀有。首領強度依地區遞增，戰鬥超過 20 回合敵人會開始力竭。各職業傷害重新校正。'},
   {v:'1.3',d:'2026-11-16',t:'主線改版「北方大道」',b:'主線劇情全面改寫，黑霧的真相留給第二部。人物故事同步更新。新增冒險圖鑑、成就與稱號、合成工坊、無盡之塔、新手引導與存檔備份。'},
   {v:'1.2',d:'2026-11-16',t:'夥伴與多對一戰鬥',b:'露娜加入戰鬥，蓋爾在人物故事後可以入隊。第三區之後會同時遇到多隻魔物，冒險路線改為岔路選擇。'},
@@ -1881,7 +1886,7 @@ function autoAct(){if(!B||B.busy||!B.auto)return;const s=stats(),sk=mySkills().f
   const d=sk.filter(k=>SK[k].dmg).sort((a,b)=>est(b)-est(a))[0];
   d?pAct('skill',d):pAct('atk')}
 function spoil(){const m=B.m,L=B.L,bs=B.kind==='boss',el=B.kind==='elite',T=B.tot||(B.tot={exp:0,gold:0,got:[],names:[]}),got=T.got;
-  const xm=(B.mut?3:1)*(B.nm?2.5:1),lk=RUN&&RUN.bless==='luck',exp=Math.round((10+L*6)*(bs?5:el?2:1)*xm*liveExp()*xpPen(L)),gold=Math.round((6+L*4)*(bs?6:el?2:1)*(.9+Math.random()*.3)*xm*(lk?1.3:1));S.gold+=gold;T.exp+=exp;T.gold+=gold;T.names.push(B.name);
+  const xm=(B.mut?3:1)*(B.nm?2.5:1),lk=RUN&&RUN.bless==='luck',exp=Math.round((10+L*6)*(bs?5:el?2:1)*xm*liveExp()*xpPen(L)),gold=Math.round((6+L*4)*(bs?6:el?2:1)*(.9+Math.random()*.3)*xm*(lk?1.3:1)*(1+Math.min(.4,stats().A.LUK*.004)));S.gold+=gold;T.exp+=exp;T.gold+=gold;T.names.push(B.name);
   if(m.mat&&Math.random()<.6){addItem(m.mat,1);got.push(ITEMS[m.mat].n)}
   if(Math.random()<.12){addItem('pot',1);got.push('治療藥水')}
   if(bs||Math.random()<.06){addItem('stone',bs?2:1);got.push(bs?'強化石×2':'強化石')}
@@ -2093,6 +2098,7 @@ const ACT={
   bMenu(v){if(B.busy)return;B.menu=v;render()},
   bAuto(){AUTO=B.auto=!B.auto;render();if(B.auto)setTimeout(autoAct,300)},
   addPt(v){if(S.pts<1)return;S.pts--;S.attr[v]++;save();render()},
+  respec(){const c=respecCost();if(S.gold<c){toast(`需要 ${c} G`);return}const fr=freePts();if(fr<1){toast('目前沒有分配過的點數');return}if(!confirmTap('respec'))return;S.gold-=c;S.attr=baseAttr();S.pts+=fr;clamp();toast(`已重置，退回 ${fr} 點`);save();render()},
   skUp(v){if(S.sp<1||(S.skl[v]||1)>=5)return;S.sp--;S.skl[v]=(S.skl[v]||1)+1;toast(`【${SK[v].n}】提升到 Lv.${S.skl[v]}`);save();render()},
   bagTab(v){BAGTAB=v;render()},gearF(v){BAGF=v;render()},qTab(v){QTAB=v;render()},
   useItem(k){if(RUN&&B)return;const it=ITEMS[k],s=stats();if(it.use.hp&&S.hp>=s.HP||it.use.mp&&S.mp>=s.MP){toast('已經是滿的');return}
