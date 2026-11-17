@@ -334,7 +334,7 @@ input,textarea{font:inherit;width:100%;padding:8px 10px;border:2px solid var(--l
 .dexc .art{width:100%}.dexc .sub{font-size:10px}
 .unk .art img,.unk .ico{filter:brightness(0) opacity(.35)}.unk b{color:var(--sub)}
 #tip{position:absolute;left:8px;right:8px;bottom:70px;z-index:45;background:var(--panel);border:2px solid var(--gold);border-radius:10px;padding:8px 10px;box-shadow:0 4px 14px rgba(0,0,0,.35);display:flex;flex-direction:column;gap:4px;font-size:13px}
-#tip[hidden]{display:none}#tip b{color:var(--navy);font-size:14px}#tip p{margin:0}#tip .btn{align-self:flex-end}
+#fab{position:absolute;right:10px;bottom:78px;z-index:44;border:2px solid var(--gold);border-radius:20px;background:rgba(20,30,60,.82);color:#ffe9a8;font:700 13px var(--display,sans-serif);padding:6px 12px;box-shadow:0 3px 10px rgba(0,0,0,.35)}#fab.on{background:linear-gradient(#e0a020,#b06a10);color:#fff;animation:fabp 1.4s infinite}#fab[hidden]{display:none}@keyframes fabp{50%{box-shadow:0 0 0 6px rgba(255,200,60,.25)}}#tip[hidden]{display:none}#tip b{color:var(--navy);font-size:14px}#tip p{margin:0}#tip .btn{align-self:flex-end}
 .ebanner{display:flex;gap:8px;align-items:center;padding:8px;border:2px solid #d9a441;border-radius:10px;background:linear-gradient(90deg,#fff5dc,#ffe7b0)}
 </style>
 </head>
@@ -345,6 +345,7 @@ input,textarea{font:inherit;width:100%;padding:8px 10px;border:2px solid var(--l
   <main id="main"></main>
   <nav id="nav"></nav>
   <div id="tip" hidden></div>
+  <button id="fab" data-a="fullAuto" hidden>全自動 關</button>
   <div id="modal" hidden></div>
   <div id="story" hidden></div>
   <div id="toast"></div>
@@ -1776,6 +1777,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'2.8',d:'2026-11-17',t:'全自動冒險',b:'右下角新增「全自動」按鈕：自動隨機選路、自動處理事件與祭壇、自動戰鬥；冒險結束會回城休息再出發同一地區。戰敗或金幣不夠休息時自動停止，再按一次即可關閉。'},
   {v:'2.7',d:'2026-11-17',t:'地區音樂與載入改善',b:'每個地區都有自己的探索音樂：草原、迷霧森林、廢棄礦坑、霜雪山脈、黑霧要塞、灰石街道、無盡之塔。圖片載入失敗會自動重試三次。特效改成較柔和的手繪風格。'},
   {v:'2.6',d:'2026-11-17',t:'怪物招式特效',b:'所有怪物招式都換上專屬特效：落石會真的砸下碎石、冰錐是冰柱、催眠粉會飄星星、落雷校正是一道巨雷劈下……招式名稱和畫面一致。'},
   {v:'2.5',d:'2026-11-17',t:'屬性弱點',b:'每種魔物都有弱點屬性（傷害 ×1.5）與抗性屬性（×0.6），打中弱點會跳出「弱點！」。點戰鬥中的怪物名稱可查看弱點、招牌技能與詞綴；圖鑑也會標示。自動戰鬥會優先使用打得到弱點的技能。'},
@@ -2316,6 +2318,28 @@ const ACT={
 document.addEventListener('click',e=>{
   if(e.target.id==='modal'){closeM();return}
   const t=e.target.closest('[data-a]');if(!t||t.disabled)return;const f=ACT[t.dataset.a];if(f)f(t.dataset.v,t)});
+
+/* ============ 全自動：隨機路線、自動點擊 ============ */
+let FA=null;
+function faDraw(){const b=$('#fab');if(!b)return;b.hidden=!S;b.className=FA?'on':'';b.textContent=FA?'全自動 開':'全自動 關'}
+function faStop(m){if(!FA)return;FA=null;if(B){B.auto=AUTO=false}faDraw();if(m)toast(m)}
+function faClick(sel,rnd){const bs=[...document.querySelectorAll(sel)].filter(b=>!b.disabled&&b.offsetParent!==null);if(!bs.length)return false;(rnd?pick(bs):bs[0]).click();return true}
+function faTick(){faDraw();if(!FA||!S)return;
+  if(faClick('#tip [data-a="tipOk"]'))return;
+  const st=$('#story');if(st&&!st.hidden){faClick('#story [data-a="storyPick"]',1)||faClick('#story [data-a="storyNext"]');return}
+  if(MODAL){if(B&&MODAL.k!=='msg'){closeM();return}faClick('#modal .sheet-b [data-a="closeM"].pri')||faClick('#modal .x');return}
+  if(B){if(!B.auto){B.auto=AUTO=true;render();setTimeout(autoAct,200)}return}
+  if(RUN){if(TAB!=='adv'){TAB='adv';render();return}faClick('#main [data-a="pickFork"]',1)||faClick('#main [data-a="evPick"]',1)||faClick('#main [data-a="bless"]',1)||faClick('#main [data-a="runNext"]')||faClick('#main [data-a="towerNext"]')||faClick('#main [data-a="finish"]');return}
+  /* 回城：休息後重新出發同一地區 */
+  const s=stats();if(S.hp<s.HP*.7||S.mp<s.MP*.5){const c=S.lv*4;if(S.gold<c){faStop('金幣不足以休息，全自動停止');return}ACT.rest();return}
+  if(FA.tower){faStop('高塔挑戰結束');return}
+  TAB='adv';startRun(FA.area,FA.nm)}
+ACT.fullAuto=()=>{if(FA){faStop('全自動已關閉');return}
+  if(RUN)FA={area:RUN.area,nm:!!RUN.nm,tower:!!RUN.tower};
+  else{let i=0;AREAS.forEach((a,k)=>{if(S.main.ch>=k&&a.base<=S.lv+2)i=k});FA={area:i,nm:false,tower:false}}
+  toast('全自動開啟：隨機選路，自動戰鬥');faDraw();faTick()};
+{const _lose=lose;lose=function(){_lose.apply(this,arguments);faStop('戰敗，全自動停止')}}
+setInterval(faTick,1100);
 
 /* ============ 啟動 ============ */
 load();if(S){migrate();checkDaily();learn(true)}
