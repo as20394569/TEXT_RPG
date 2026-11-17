@@ -1051,10 +1051,10 @@ const FAKE=['夜雨聲煩','小籠包戰神','月見草','Kirara','阿土伯','�
 const KEY='azure_oath_save_v1';
 let S=null,TAB='town',RUN=null,B=null,MODAL=null,STORY=null;
 let NEWCLS='swordsman',NEWSEX='m',BAGF='all',NEWNAME='',BAGTAB='gear',QTAB='main',AUTO=false,CHATQ=[];
-function save(){try{if(S&&S.ach)checkAch()}catch(e){}try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
-function load(){try{const s=localStorage.getItem(KEY);if(s)S=JSON.parse(s)}catch(e){S=null}}
+let BAKT=0;function save(){try{if(S&&S.ach)checkAch()}catch(e){}try{const j=JSON.stringify(S);localStorage.setItem(KEY,j);if(Date.now()-BAKT>300000){BAKT=Date.now();localStorage.setItem(KEY+'_bak',j)}}catch(e){}}
+function load(){try{const s=localStorage.getItem(KEY);if(s)S=JSON.parse(s)}catch(e){S=null}if(!S||!S.cls){try{const b=localStorage.getItem(KEY+'_bak');if(b){S=JSON.parse(b);setTimeout(()=>toast('主存檔損壞，已從備份還原'),800)}}catch(e){}}}
 function newGame(name,cls,sex){
-  S={v:2,name,cls,sex,adv:null,lv:1,exp:0,gold:100,attr:Object.assign({},CLS[cls].base),pts:0,sp:0,skl:{},hp:1,mp:1,
+  S={created:Date.now(),v:2,name,cls,sex,adv:null,lv:1,exp:0,gold:100,attr:Object.assign({},CLS[cls].base),pts:0,sp:0,skl:{},hp:1,mp:1,
      eq:{weapon:null,head:null,body:null,feet:null,ring:null,neck:null},gear:[],items:{pot:3,eth:1},uid:1,
      main:{ch:0,step:0,prog:0,acc:false},side:{},nst:{},cleared:{},flags:{},bond:0,
      st:{kills:0,run:0,enh:0,check:0,craft:0,nmboss:0},tut:{},dex:{m:{},g:{}},ach:{},tower:{best:0},daily:{date:'',kill:0,run:0,enh:0,got:{},sign:false}};
@@ -1249,6 +1249,7 @@ function vTitle(){const c=CLS[NEWCLS];return `<div class="title">${art('title_bg
 function vTown(){
   const F=[['guild','npc_ria','莉雅','冒險者公會','主線與委託'],['smith','npc_bald','巴爾德','鐵匠鋪','強化・分解'],['shop','npc_miko','蜜可','道具商店','藥水與裝備'],['inn','npc_martha','瑪莎','旅店',`休息回復（${S.lv*4} G）`],['altar','npc_oracle','占星師','星象台','掉落情報'],['temple','npc_edwin','艾德溫','轉職神殿','Lv.20 轉職試煉']];
   return `<div class="banner">${art('town_bg','晨星鎮全景')}<div class="cap">晨星鎮<small>頻道 1</small></div></div>
+  ${S.lv>=5&&Date.now()-(S.lastExport||S.created||0)>6048e5?`<div class="panel"><div class="row"><div class="grow"><b>備份提醒</b><div class="sub">進度只存在這台裝置，建議複製存檔碼留底。</div></div><button class="btn sm" data-a="openM" data-v="settings">去備份</button></div></div>`:''}
   ${S.daily.sign?'':`<div class="panel"><div class="row"><div class="grow"><b>每日簽到</b><div class="sub">今日獎勵：300 G、治療藥水×2</div></div><button class="btn pri sm" data-a="sign">領取</button></div></div>`}
   <div class="grid2">${F.map(([k,a,who,n,d])=>`<button class="fac" data-a="fac" data-v="${k}"><div class="pt">${art(a,who,'r34','mini')}</div><div><b>${n}${nstFor(k).length||(k==='inn'&&nstFor('inn').length)?' <span class="tag new">!</span>':''}</b><span>${d}</span></div></button>`).join('')}</div>
   ${nstDot()?`<div class="panel"><h3>鎮上的故事</h3><div class="list">${NST.filter(q=>['new','ready'].includes(nstState(q))).map(q=>`<button class="item" data-a="${nstState(q)==='new'?'nstStart':'nstEnd'}" data-v="${q.id}"><span class="ico c4">${icon(NPC[q.npc]||'npc_boy','<b>'+q.npc[0]+'</b>')}</span><span class="grow"><b>${q.npc}</b><span class="sub">${nstState(q)==='new'?you('好像有話想對你說……'):`「${q.n}」可以完成了`}</span></span><span class="tag new">!</span></button>`).join('')}</div></div>`:''}
@@ -2059,7 +2060,7 @@ const ACT={
   mute(){MUTE=!MUTE;try{localStorage.setItem(KEY+'_mute',MUTE?'1':'0')}catch(e){}drawModal()},
   storyNext(){stNext()},storyPick(v){storyPick(+v)},storySkip(){storyEnd()},
   copyArt(){const t=$('#artTxt');t.select();try{navigator.clipboard.writeText(t.value).then(()=>toast('已複製插畫清單'),()=>toast('請長按文字框手動複製'))}catch(e){toast('請長按文字框手動複製')}},
-  exportSave(){try{const c=saveCode();$('#saveTxt').value=c;try{navigator.clipboard.writeText(c);toast('存檔碼已複製，請貼到記事本保存')}catch(e){toast('已產生存檔碼，請手動複製')}}catch(e){toast('產生失敗')}},
+  exportSave(){try{S.lastExport=Date.now()}catch(e){}try{const c=saveCode();$('#saveTxt').value=c;try{navigator.clipboard.writeText(c);toast('存檔碼已複製，請貼到記事本保存')}catch(e){toast('已產生存檔碼，請手動複製')}}catch(e){toast('產生失敗')}},
   importSave(){const t=$('#saveTxt').value.trim();let o=loadCode(t);if(!o){try{o=JSON.parse(decodeURIComponent(escape(atob(t))));if(!o||!o.cls||!o.attr)o=null}catch(e){o=null}}
     if(!o){toast('存檔碼無效，請確認是否完整貼上');return}if(IMPOK!==t){IMPOK=t;toast(`讀到「${o.name}」Lv.${o.lv}。會覆蓋目前進度，確定的話再按一次`);return}
     IMPOK=null;S=o;migrate();RUN=null;B=null;checkDaily();save();closeM();TAB='town';render();toast('讀取成功')},
