@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#1c2440"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>蒼藍誓約 Online</title>
@@ -2072,5 +2073,6 @@ document.addEventListener('click',e=>{
 load();if(S){migrate();checkDaily();learn(true)}
 render();chatTick();setInterval(chatTick,4000);
 </script>
+<script>if('serviceWorker' in navigator&&/github\.io$/.test(location.hostname))navigator.serviceWorker.register('sw.js').catch(()=>{})</script>
 </body>
 </html>
