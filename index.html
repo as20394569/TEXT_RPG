@@ -1601,7 +1601,7 @@ function mkAlly(){if(!S.party||!ALLY[S.party]||!ALLY[S.party].open())return null
   return S.party==='luna'?{id:'luna',n:'露娜',max:Math.round(s.HP*.7),pw:pw*.5*bond,def:s.DEF*.6,cd:0,heal:.2*bond}
                          :{id:'gale',n:'蓋爾',max:Math.round(s.HP*1.05),pw:pw*.62,def:s.DEF*1.1,cd:0}}
 function allyAct(){const A=B.ally;if(!A||A.hp<=0||B.allyTurn===B.turn||B.hp<=0)return;B.allyTurn=B.turn;const s=stats();A.cd=Math.max(0,A.cd-1);
-  const hit=(p,nm)=>{let d=A.pw*p*100/(100+B.def*(1+fbSum('def')))*(.9+Math.random()*.2);d=Math.max(1,Math.round(d));if(B.fshield>0){const ab=Math.min(B.fshield,d);B.fshield-=ab;d-=ab}B.hp=Math.max(0,B.hp-d);B.allyD=d;blog(`${A.n}${nm}，造成 ${d} 傷害`)};
+  const hit=(p,nm)=>{let d=A.pw*p*100/(100+B.def*(1+fbSum('def')))*(.9+Math.random()*.2);d=capB(Math.max(1,Math.round(d)));if(B.fshield>0){const ab=Math.min(B.fshield,d);B.fshield-=ab;d-=ab}B.hp=Math.max(0,B.hp-d);bossPhase();B.allyD=d;blog(`${A.n}${nm}，造成 ${d} 傷害`)};
   if(A.id==='luna'){
     if(S.hp<s.HP*.45&&!A.cd){const h=Math.round(s.HP*A.heal);S.hp=Math.min(s.HP,S.hp+h);A.cd=3;B.allyH=h;blog(`露娜舉起提燈：「撐住！」為你回復 ${h} HP`)}
     else if(B.turn%4===0){hit(1.6,'點燃燈火，【蒼焰】直擊');if(B.hp>0&&Math.random()<.4){B.st.burn=2;blog(`${B.name} 被蒼焰灼燒`)}}
@@ -1725,6 +1725,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'2.1',d:'2026-11-17',t:'首領戰調整',b:'首領新增「首領護甲」：每回合受到的傷害最多為最大 HP 的 12%（惡夢 10%）。首領 HP 降到一半時會進入狂怒，獲得護盾並提升攻擊。裝備練起來後，首領戰不會再三下結束。'},
   {v:'2.0',d:'2026-11-17',t:'第二部「霧之彼岸」開幕',b:'第六章「王都的回信」上線！新地區灰石街道（Lv.26–30）、四種新魔物與首領「失控的氣象機兵」、第 6 階裝備、雷鳴套裝、新角色王都使者希瑟。完成第一部的冒險者可直接在任務頁接受第六章。'},
   {v:'1.5',d:'2026-11-17',t:'屬性改版',b:'副屬性變得有用：敏捷增加連擊、智力讓技能省 MP、體質增加每回合回血、幸運提高爆擊傷害、掉寶率與金幣。新增屬性重置（Lv.10 以前免費）。NPC 全面換上新的表情立繪。'},
   {v:'1.4',d:'2026-11-17',t:'整體平衡調整',b:'升級節奏放慢，主線各章需要等級門檻。強化成本與成功率重新設計，傳說裝備更稀有。首領強度依地區遞增，戰鬥超過 20 回合敵人會開始力竭。各職業傷害重新校正。'},
@@ -1785,9 +1786,12 @@ function procs(s,d){const ps=[];
   return ps}
 const buffSum=k=>B.buffs.reduce((a,b)=>a+(b[k]||0),0);
 const CDM={swordsman:.013,cleric:.011,ranger:.005,mage:0};const clsDm=()=>1+(CDM[S.cls]||0)*S.lv;
+/* 首領護甲：每回合傷害上限；半血時進入狂怒（護盾＋攻擊上升） */
+const capB=d=>{if(!B||B.kind!=='boss')return d;const lim=Math.round(B.max*(B.nm?.1:.12)),r=Math.max(1,Math.min(d,lim-(B.tk||0)));B.tk=(B.tk||0)+r;return r};
+function bossPhase(){if(B&&B.kind==='boss'&&!B.ph2&&B.hp>0&&B.hp<=B.max*.5){B.ph2=1;B.fshield=(B.fshield||0)+Math.round(B.max*.12);B.fb.push({id:'ph2',n:'狂怒',atk:.3,t:4});blog(`${B.name} 被逼入絕境，進入狂怒！（獲得護盾、攻擊上升）`)}}
 function hitFoe(stat,pow,o){o=o||{};const s=stats();if(!o.sure&&Math.random()*100<(B.eva+fbSum('eva'))*.6)return{d:0,cr:false,miss:true};let base=clsDm()*(stat==='BOTH'?s.ATK+s.MAG:s[stat])*(1+buffSum('atk')+(s.FOCUSATK&&B.cls.focus>=rmax(5)?s.FOCUSATK/100:0))*(B.pst.weak>0?.75:1);
   let d=base*pow*100/(100+B.def*(1+fbSum('def'))*(1-(o.pierce||0)))*(.9+Math.random()*.2);const cr=!!o.sure||Math.random()*100<s.CRIT+(o.cr||0)+(hasP('sw1')&&B.cls.brk>=3?15:0);if(cr)d*=(s.CD+(hasP('rg3')&&B.cls.focus>=5?30:0)+s.BRKCD*B.cls.brk)/100;
-  d=Math.max(1,Math.round(d));if(B.fshield>0){const ab=Math.min(B.fshield,d);B.fshield-=ab;d-=ab}B.hp=Math.max(0,B.hp-d);return{d,cr}}
+  d=capB(Math.max(1,Math.round(d)));if(B.fshield>0){const ab=Math.min(B.fshield,d);B.fshield-=ab;d-=ab}B.hp=Math.max(0,B.hp-d);bossPhase();return{d,cr}}
 function pAct(type,arg){if(!B||B.busy)return;const s=stats();
   if(type==='skill'&&S.mp<mpCost(arg)){toast('MP 不足');return}
   if(type==='skill'&&SK[arg].ult&&B.ultUsed){toast('奧義每場戰鬥只能用一次');return}
@@ -1830,7 +1834,7 @@ function pAct(type,arg){if(!B||B.busy)return;const s=stats();
   setTimeout(foeTurn,type==='skill'?1750:850)}
 function foePick(){const ks=(B.m.sk||[]).filter(id=>{const k=SKM[id];return !(k.heal&&B.hp>B.max*.55)&&!(k.self&&B.fb.some(b=>b.id===id))&&!(k.shield&&B.fshield>0)});
   const ch=B.kind==='boss'?.5:(B.kind==='elite'||B.mut||B.nm)?.42:.3;return ks.length&&Math.random()<ch?pick(ks):null}
-function foeTurn(){if(!B)return;const s=stats();
+function foeTurn(){if(!B)return;B.tk=0;const s=stats();
   for(const k of ['poison','burn'])if(B.st[k]>0){const d=Math.max(1,Math.round(B.max*(k==='poison'?.05:.04)*(B.kind==='boss'?.5:1)));B.hp=Math.max(0,B.hp-d);B.st[k]--;blog(`${B.name} 受到${FOE[k]}傷害 ${d}`)}
   addsDot();
   if(B.hp<=0){render();setTimeout(win,1200);return}
