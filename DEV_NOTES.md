@@ -1,0 +1,41 @@
+# 蒼藍誓約 Online — 開發筆記（自動排程必讀）
+
+## 製作人已確立的方向
+- 直式手機網頁日式 JRPG，線上遊戲風格（像早期日系 MMO 的單人版）。單檔 `index.html`，美術在 `art/`（`art/list.json` 由 `build_list.py` 產生）。
+- 部署：GitHub `as20394569/TEXT_RPG` 的 main，Pages：https://as20394569.github.io/TEXT_RPG/
+- 節奏慢沒關係，**不要為了加快而砍升級曲線**（製作人明確否決過）。玩家抱怨的是「平淡」：重點放在**每回合有判斷、路線有取捨、事件有後果、掉寶有驚喜**。
+- 技能特效：線上遊戲風的發光動畫（聚氣→出招→命中→收尾），在 `PFX` 內 `CS`（主角）、`CB`（普攻）、`CMX`（怪物）。**不要用舊的圓點粒子、不要貼圖式特效、不要卡通描邊圖形**。特效要符合招式名稱。
+- 命中回饋：閃白、火花、衝擊環、傷害數字彈跳。
+- 怪物有「下回合行動預告」（`intentHtml`、`B.next`），紅色⚠大招可完美防禦得破綻。
+- 岔路有危險度與特殊標記（`TAGS`、`rTag`），事件顯示成功率、有祝福／驚動魔物（`evTwist`）。
+- 文字一律繁體中文，自然、不老套。招式名稱要像真的遊戲招式。
+
+## 美術流程（Codex 畫圖）
+- Codex 在使用者電腦的 ChatGPT 桌面 App（Codex）裡，對話串「繪製蒼藍誓約 Online 插畫」。輸出資料夾：`C:\Users\Administrator\Documents\ChatGPT\cluade畫圖\azure-oath\art_v3\`
+- 下指令：computer_resolve_access(["ChatGPT"], clipboardWrite) → request_access → 寫剪貼簿 → 開 ChatGPT → 截圖 → 點輸入框 → ctrl+v → 放大確認 → Enter → release_lock。輸入框裡若是灰字是提示文字；若是使用者自己打的草稿，**不要覆蓋**，改天再送。
+- 審圖：stage 新圖、拼接圖檢查。**手的數量、握武器的手（刺客短刀最常出錯）、多餘特效、浮空武器、弓弦、背景不透明**，畫錯就退回並寫清楚哪張、哪裡錯。
+- 刺客圖的方法：以同名劍士圖改圖（不要重新生成）。
+- 轉檔規格：class/portrait/ally 600×800 RGBA webp q82；mob 512；battle 960×720 cover；area/event/story/title/town 960×540 cover；icon/item/pass/skill 進 `art/atlas_ui.webp`（12×12 格、每格 128）。
+- 換圖後跑 `python3 build_list.py`，並把 `sw.js` 的快取名稱版本號 +1（`ao-art-vN`）。
+
+## 工作方式
+1. clone → 讀本檔與 NEWS（`index.html` 裡的 `NEWS` 陣列）。
+2. 本機 `python3 -m http.server 8765` + Playwright（chrome）：新遊戲、全自動 `ACT.fullAuto()` 跑幾分鐘，抓 pageerror、卡住、缺圖、數值異常。
+3. 修錯誤 > 讓戰鬥/路線/事件更有趣 > 裝備與技能平衡 > 介面。
+4. 存檔相容：改結構要在讀檔處補預設值，舊存檔不能壞。
+5. 每次更新在 `NEWS` 最上面加一筆（版本 +0.1、日期、標題、說明）。
+6. commit 訊息繁中，push main。
+
+## 不要做的事
+- 不改升級速度、不刪玩家存檔、不改儲存庫設定、不動其他儲存庫、不建立或修改其他排程。
+- 會改變遊戲方向的大改動，寫進下方「待製作人決定」，不要直接做。
+
+## 待辦
+- 開局只有 1 招（劍士 slash），前期戰鬥選擇少 → 考慮 Lv1 給 2 招或普攻有變化。
+- 裝備：掉寶缺少「驚喜」（稀有詞綴、套裝、掉落演出）。
+- 技能：檢查 53 招的 MP 與傷害是否有明顯沒人用的招。
+- 待退回 Codex：sniper_f_hurt 弓弦沒接上弓、sniper_m_sk_arrowstorm 沒弓弦、templar_f_skill 灰底、bishop_f_win 與 bishop_f_sk_miracle 法杖浮空。
+- banner_fest1 還是舊畫風。
+
+## 待製作人決定
+（自動排程把沒把握的事寫在這裡）
