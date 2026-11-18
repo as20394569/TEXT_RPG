@@ -400,7 +400,7 @@ const ATTR={STR:'力量',DEX:'敏捷',INT:'智力',VIT:'體質',LUK:'幸運'};
 const CLS={
   swordsman:{n:'劍士',d:'站在最前面的人。血厚、防高，越打越順手。',f:'破綻：普攻與「裂甲擊」會在敵人身上堆疊破綻（最多 5 層），每層讓你的攻擊 +6%；再用「十字裂斬」全部清算。',base:{STR:8,DEX:5,INT:3,VIT:8,LUK:4},grow:{STR:1,VIT:1},atk:'STR',basic:'ATK',adv:['knight','berserker']},
   mage:{n:'法師',d:'火力最高，身體最脆。靠順序取勝的人。',f:'印記：「點火」「霜針」會在敵人身上留下印記（最多 3 個），再用「引雷」全部引爆。普攻會回流少量 MP。',base:{STR:2,DEX:4,INT:10,VIT:5,LUK:5},grow:{INT:2},atk:'STR',basic:'MAG',adv:['archmage','warlock']},
-  ranger:{n:'遊俠',d:'不硬碰硬，等對方露出空檔。',f:'專注：普攻、閃過攻擊都會累積專注（最多 5 層），「屏息」一箭把專注全部打出去。',base:{STR:4,DEX:10,INT:3,VIT:5,LUK:6},grow:{DEX:1,LUK:1},atk:'DEX',basic:'ATK',adv:['sniper','assassin']},
+  ranger:{n:'遊俠',d:'不硬碰硬，等對方露出空檔。',f:'專注：普攻、閃過攻擊都會累積專注（最多 5 層），每層讓你的攻擊 +6%；「屏息」一箭把專注全部打出去。',base:{STR:4,DEX:10,INT:3,VIT:5,LUK:6},grow:{DEX:1,LUK:1},atk:'DEX',basic:'ATK',adv:['sniper','assassin']},
   cleric:{n:'神官',d:'打得慢，但很難倒下。',f:'信仰：治療、祈禱與普攻會累積信仰，滿 100 時神會「回應」——自動回復 25% HP 並降下聖光。',base:{STR:4,DEX:4,INT:8,VIT:8,LUK:4},grow:{INT:1,VIT:1},atk:'STR',basic:'MAG',adv:['bishop','templar']}
 };
 const ADV={
@@ -426,10 +426,10 @@ const SK={
   thunder:{n:'引雷',c:'mage',lv:8,mp:12,dmg:{s:'MAG',p:1.8},det:.9,d:'引爆所有印記，每個印記傷害 +90%。'},
   meteor:{n:'墜星',c:'archmage',lv:20,mp:20,dmg:{s:'MAG',p:3},mark2:1,det:.6,d:'先留下兩個印記，再連同既有印記一起引爆，每個 +60%。'},
   drain:{n:'汲魂',c:'warlock',lv:20,mp:14,dmg:{s:'MAG',p:2.2},drain:.5,mark:'蝕',d:'傷害的 50% 轉為 HP，留下「蝕」印記。'},
-  dshot:{n:'雙矢',c:'ranger',lv:1,mp:4,dmg:{s:'ATK',p:.9,h:2},focus:1,d:'連射兩箭，專注 +1。'},
+  dshot:{n:'雙矢',c:'ranger',lv:1,mp:4,dmg:{s:'ATK',p:1,h:2},focus:1,d:'連射兩箭，專注 +1。'},
   pshot:{n:'蛇牙箭',c:'ranger',lv:1,mp:6,dmg:{s:'ATK',p:1.1},foe:{poison:3},focus:1,d:'淬毒的箭，中毒 3 回合，專注 +1。'},
   dodge:{n:'伏身',c:'ranger',lv:3,mp:6,buff:{eva:40,t:3},d:'3 回合迴避 +40%。每次閃過攻擊，專注 +2。'},
-  snipe:{n:'屏息',c:'ranger',lv:8,mp:10,dmg:{s:'ATK',p:1.6,cr:30},aim:.45,d:'耗盡專注，每層傷害 +45%，爆擊率 +30%。'},
+  snipe:{n:'屏息',c:'ranger',lv:5,mp:10,dmg:{s:'ATK',p:1.6,cr:30},aim:.45,d:'耗盡專注，每層傷害 +45%，爆擊率 +30%。'},
   rain:{n:'驟雨',c:'sniper',lv:20,mp:16,dmg:{s:'ATK',p:.8,h:4},aim:.15,keep:1,d:'連射四箭，每層專注讓每一箭 +15%，不消耗專注。'},
   stab:{n:'影縫',c:'assassin',lv:20,mp:12,dmg:{s:'ATK',p:2,sure:1},aim:.3,d:'必定爆擊，耗盡專注，每層傷害 +30%。'},
   heal:{n:'微光',c:'cleric',lv:1,mp:6,heal:2,faith:25,d:'回復 HP，信仰 +25。'},
@@ -1379,7 +1379,7 @@ function vTown(){
 function vAreas(){return `<h2>選擇冒險地點</h2>`+AREAS.map((a,i)=>{const open=S.main.ch>=i,bossOn=bossReady(i);
   return `<div class="panel area ${open?'':'lock'}">${art('area_'+a.id,a.n)}
   <div class="row"><h3 class="grow">${a.n}</h3><span class="tag">Lv ${a.lv}</span>${S.cleared[i]?'<span class="tag ok">已通關</span>':''}</div>
-  <p class="sub">${a.d}</p><div class="chips">${a.mobs.map(m=>`<span class="chip">${MOBS[m].n}</span>`).join('')}<span class="chip" style="color:var(--hp)">首領 ${MOBS[a.boss].n}${bossOn?'':'（未現身）'}</span></div>
+  <p class="sub">${a.d}</p><div class="chips">${a.mobs.map(m=>`<span class="chip">${MOBS[m].n}</span>`).join('')}<span class="chip" style="color:var(--hp)">首領 ${MOBS[a.boss].n}${bossOn?'':'（未現身）'}</span></div>${open&&bossOn&&!S.cleared[i]&&S.lv<MOBS[a.boss].lv?`<p class="sub" style="color:var(--hp)">⚠ ${MOBS[a.boss].n} 已在深處等著（Lv ${MOBS[a.boss].lv}）。現在 Lv ${S.lv}，這趟終點會直接碰上它——不夠強就先在岔路多打幾場、換好裝備。</p>`:''}
   ${open?`<div class="row"><button class="btn pri grow" data-a="startRun" data-v="${i}">出發冒險</button>${S.cleared[i]?`<button class="btn grow" data-a="startNm" data-v="${i}" style="background:linear-gradient(#5a2a4a,#2a1430);color:#ffb3d0;border-color:#a04a7a">惡夢 Lv${AREAS[i].base+10}+</button>`:''}</div>${S.cleared[i]?'<p class="sub">惡夢模式：怪物 +10 級並帶詞綴，掉寶更好。</p>':''}`:`<button class="btn" disabled>完成${CH[i-1].t.slice(0,3)}後開放</button>`}</div>`}).join('')+vTowerCard()}
 function vTowerCard(){return towerOpen()?`<div class="panel area">${art('area_tower','無盡之塔')}<div class="row"><h3 class="grow">無盡之塔</h3><span class="tag red">挑戰</span></div><p class="sub">一層一層往上爬，看你能走多高。最高紀錄：第 ${S.tower.best||0} 層。</p><button class="btn pri" data-a="startTower">進入高塔</button></div>`:`<div class="panel area lock"><div class="row"><h3 class="grow">無盡之塔</h3></div><button class="btn" disabled>完成第三章後開放</button></div>`}
 function bossReady(i){return !!S.cleared[i]||(S.main.ch===i&&S.main.acc&&(CH[i].steps[S.main.step]||{}).type==='boss')}
@@ -1792,6 +1792,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'3.7',d:'2026-11-19',t:'遊俠專注增傷＋自動戰鬥會看預告',b:'遊俠的專注現在每層讓攻擊 +6%，「屏息」提前到 Lv.5 就能學，雙矢每箭 90%→100%：攢專注變強、什麼時候一箭打光要自己拿捏。自動戰鬥變聰明了：看到敵人下回合要出傷害招，劍士會先架招架反擊、法師會先開薄冰鏡；打首領和精英時會先上增益（伏身、晨禱、鬥氣解放）。冒險地點卡片新增提醒：首領已現身但你等級還不夠時，會先告訴你終點會碰上它。'},
   {v:'3.6',d:'2026-11-19',t:'開局兩招＋閃耀裝備',b:'四職業 Lv.1 就有兩招可選：劍士多了招架反擊、法師多了霜針、遊俠多了蛇牙箭、神官多了審光；原本 Lv.5 的招式提前到 Lv.3。劍士的破綻現在每層讓攻擊 +6%，疊越多越痛。新增 5% 機率掉落「✧閃耀」裝備：多一條詞條、最強詞條 ×1.5，洗練也不會消失。撿到史詩、傳說或閃耀裝備時，勝利畫面會跳出發光的戰利品卡片。'},
   {v:'3.5',d:'2026-11-19',t:'路線與事件改版',b:'岔路會標出危險度，還可能出現特殊標記：💎寶物守衛、💰懸賞、☠詛咒之地、👑大寶箱（小心寶箱怪）、💧靈泉、🎲命運之地。事件選項直接顯示成功率；成功有機會獲得本趟祝福，失敗可能驚動魔物開戰，大成功必掉裝備。同一趟不會遇到重複事件。'},
   {v:'3.4',d:'2026-11-18',t:'敵人行動預告',b:'所有怪物都會在頭上顯示下回合要做什麼。看到紅色⚠大招時按防禦：傷害只剩 25%，還會看穿破綻，下次攻擊 +50%。'},
@@ -1886,7 +1887,7 @@ const basicEl=()=>({swordsman:'phys',ranger:'phys',mage:'arcane',cleric:'holy'}[
 /* 首領護甲：每回合傷害上限；半血時進入狂怒（護盾＋攻擊上升） */
 const capB=d=>{if(!B||B.kind!=='boss')return d;const lim=B.max,r=Math.max(1,Math.min(d,lim-(B.tk||0)));B.tk=(B.tk||0)+r;return r};
 function bossPhase(){if(B&&B.kind==='boss'&&!B.ph2&&B.hp>0&&B.hp<=B.max*.5){B.ph2=1;B.fshield=(B.fshield||0)+Math.round(B.max*.12);blog(`${B.name} 被逼入絕境，張開了護盾！`)}}
-function hitFoe(stat,pow,o){o=o||{};const s=stats();if(!o.sure&&Math.random()*100<(B.eva+fbSum('eva'))*.6)return{d:0,cr:false,miss:true};let base=clsDm()*(B.opening?1.5:1)*(S.cls==='swordsman'&&B.cls&&B.cls.brk?1+.06*B.cls.brk:1)*(stat==='BOTH'?s.ATK+s.MAG:s[stat])*(1+buffSum('atk')+(s.FOCUSATK&&B.cls.focus>=rmax(5)?s.FOCUSATK/100:0))*(B.pst.weak>0?.75:1);
+function hitFoe(stat,pow,o){o=o||{};const s=stats();if(!o.sure&&Math.random()*100<(B.eva+fbSum('eva'))*.6)return{d:0,cr:false,miss:true};let base=clsDm()*(B.opening?1.5:1)*(S.cls==='swordsman'&&B.cls&&B.cls.brk?1+.06*B.cls.brk:1)*(S.cls==='ranger'&&B.cls&&B.cls.focus?1+.06*B.cls.focus:1)*(stat==='BOTH'?s.ATK+s.MAG:s[stat])*(1+buffSum('atk')+(s.FOCUSATK&&B.cls.focus>=rmax(5)?s.FOCUSATK/100:0))*(B.pst.weak>0?.75:1);
   const fdef=stat==='MAG'?(B.mres??B.def):stat==='BOTH'?((B.mres??B.def)+B.def)/2:B.def;const em=elMul(B.id,B.curEl);if(em!==1)B.elHit=em>1?'w':'r';let d=em*base*pow*100/(100+fdef*(1+fbSum('def'))*(1-(o.pierce||0)))*(.9+Math.random()*.2);const cr=!!o.sure||Math.random()*100<s.CRIT+(o.cr||0)+(hasP('sw1')&&B.cls.brk>=3?15:0);if(cr)d*=(s.CD+(hasP('rg3')&&B.cls.focus>=5?30:0)+s.BRKCD*B.cls.brk)/100;
   d=capB(Math.max(1,Math.round(d)));if(B.fshield>0){const ab=Math.min(B.fshield,d);B.fshield-=ab;d-=ab}B.hp=Math.max(0,B.hp-d);bossPhase();return{d,cr}}
 function pAct(type,arg){if(!B||B.busy)return;const s=stats();
@@ -1991,7 +1992,10 @@ function autoAct(){if(!B||B.busy||!B.auto)return;const s=stats(),sk=mySkills().f
   if(S.hp<s.HP*.4){const h=sk.find(k=>SK[k].heal);if(h)return pAct('skill',h);const p=['pot2','pot'].find(k=>S.items[k]);if(p)return pAct('item',p)}
   const C=B.cls,est=k=>{const x=SK[k];return elMul(B.id,SKEL2[k]||'phys')*x.dmg.p*(x.dmg.h||1)*(1+(x.fin||0)*C.brk+(x.det||0)*C.marks.length+(x.aim||0)*C.focus+(x.faithAmp?Math.min(1,C.faith/100):0)+(x.faithSpend?C.faith/100*1.2:0))};
   if(B.chg||(B.next&&isDng(SKM[B.next])))return pAct('guard');
-  if(S.cls==='swordsman'&&!B.counter&&sk.includes('guard')&&Math.random()<.2)return pAct('skill','guard');
+  /* 看預告決定：對方下回合要出傷害招就先架刀；強敵開場先上增益 */
+  const nk=B.next&&SKM[B.next],hit=nk?!!nk.pow:'next' in B;
+  if(!B.counter&&hit){const g=sk.find(k=>(SK[k].counter||(SK[k].shield&&!(B.shield>0)))&&!SK[k].dmg);if(g&&(nk||Math.random()<.35))return pAct('skill',g)}
+  if(B.kind==='boss'||B.kind==='elite'||B.hp>s.ATK*6){const bf=sk.find(k=>SK[k].buff&&!SK[k].dmg&&!B.buffs.some(b=>b.id===k)&&S.mp>=mpCost(k)+8);if(bf&&S.hp>s.HP*.5)return pAct('skill',bf)}
   const d=sk.filter(k=>SK[k].dmg).sort((a,b)=>est(b)-est(a))[0];
   d?pAct('skill',d):pAct('atk')}
 function spoil(){const m=B.m,L=B.L,bs=B.kind==='boss',el=B.kind==='elite',T=B.tot||(B.tot={exp:0,gold:0,got:[],names:[]}),got=T.got;
