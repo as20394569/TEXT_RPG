@@ -1382,10 +1382,20 @@ function vAreas(){return `<h2>選擇冒險地點</h2>`+AREAS.map((a,i)=>{const o
   <p class="sub">${a.d}</p><div class="chips">${a.mobs.map(m=>`<span class="chip">${MOBS[m].n}</span>`).join('')}<span class="chip" style="color:var(--hp)">首領 ${MOBS[a.boss].n}${bossOn?'':'（未現身）'}</span></div>${open&&bossOn&&!S.cleared[i]&&S.lv<MOBS[a.boss].lv?`<p class="sub" style="color:var(--hp)">⚠ ${MOBS[a.boss].n} 已在深處等著（Lv ${MOBS[a.boss].lv}）。現在 Lv ${S.lv}，這趟終點會直接碰上它——不夠強就先在岔路多打幾場、換好裝備。</p>`:''}
   ${open?`<div class="row"><button class="btn pri grow" data-a="startRun" data-v="${i}">出發冒險</button>${S.cleared[i]?`<button class="btn grow" data-a="startNm" data-v="${i}" style="background:linear-gradient(#5a2a4a,#2a1430);color:#ffb3d0;border-color:#a04a7a">惡夢 Lv${AREAS[i].base+10}+</button>`:''}</div>${S.cleared[i]?'<p class="sub">惡夢模式：怪物 +10 級並帶詞綴，掉寶更好。</p>':''}`:`<button class="btn" disabled>完成${CH[i-1].t.slice(0,3)}後開放</button>`}</div>`}).join('')+vTowerCard()}
 function vTowerCard(){return towerOpen()?`<div class="panel area">${art('area_tower','無盡之塔')}<div class="row"><h3 class="grow">無盡之塔</h3><span class="tag red">挑戰</span></div><p class="sub">一層一層往上爬，看你能走多高。最高紀錄：第 ${S.tower.best||0} 層。</p><button class="btn pri" data-a="startTower">進入高塔</button></div>`:`<div class="panel area lock"><div class="row"><h3 class="grow">無盡之塔</h3></div><button class="btn" disabled>完成第三章後開放</button></div>`}
+/* 首領前哨的戰前準備：三選一，各有代價 */
+const PREP={scout:{n:'🔭 偵察動向',d:'摸清首領的習慣，開戰時首領 HP -12%'},trap:{n:'🪤 布置陷阱',d:'用一瓶治療藥水當誘餌，首領開場中毒 4 回合、攻擊下降 2 回合'},camp:{n:'🔥 營火調息',d:'免費回復 30% HP／MP，但火光驚動首領：攻擊 +12%'}};
+const prepCost=L=>20+L*8;
+function gatePrep(L){if(RUN.prep)return `<p class="sub" style="color:var(--exp)">已完成準備：${PREP[RUN.prep].n}</p>`;const g=prepCost(L),pot=S.items.pot||0;
+  return `<div class="lbl">戰前準備（只能選一項）</div><div class="list">${[['scout',S.gold>=g,`${g} G`],['trap',pot>0,'治療藥水×1'],['camp',true,'免費']].map(([k,ok,c])=>`<button class="btn" style="text-align:left" data-a="gatePrep" data-v="${k}" ${ok?'':'disabled'}><b>${PREP[k].n}</b>　<span class="tag ${ok?'':'off'}">${c}</span><br><span class="sub">${PREP[k].d}</span></button>`).join('')}</div>`}
+function doPrep(k){if(!RUN||RUN.prep||!PREP[k])return;const a=AREAS[RUN.area],L=MOBS[a.boss].lv+(RUN.nm?10:0),s=stats();
+  if(k==='scout'){const g=prepCost(L);if(S.gold<g){toast('金幣不足');return}S.gold-=g}
+  else if(k==='trap'){if(!S.items.pot){toast('沒有治療藥水');return}addItem('pot',-1)}
+  else{S.hp=Math.min(s.HP,S.hp+Math.round(s.HP*.3));S.mp=Math.min(s.MP,S.mp+Math.round(s.MP*.3))}
+  RUN.prep=k;toast(`${PREP[k].n}：準備完成`);save();render()}
 function bossGate(a){const m=MOBS[a.boss],L=m.lv+(RUN.nm?10:0),d=L-S.lv,st=stats(),hp=S.hp/st.HP,pot=(S.items.pot||0)+(S.items.pot2||0);
   const [c,t]=d>=3?['var(--hp)','勝算很低']:d>=1?['var(--r4)','硬仗']:d>=-2?['var(--exp)','勢均力敵']:['var(--ok,#7fdc8a)','游刃有餘'];
   const warn=[hp<.5&&'HP 不到一半',S.mp<st.MP*.3&&'MP 見底',!pot&&'身上沒有藥水'].filter(Boolean);
-  return `<div class="panel" style="border-color:${c}">${art('mob_'+a.boss,m.n,'r11')}<h3 style="color:${c}">★ 首領前哨：${m.n}　Lv ${L}</h3><p class="sub">你 Lv ${S.lv}・HP ${S.hp}/${st.HP}・MP ${S.mp}/${st.MP}・藥水 ${pot}　→　<b style="color:${c}">${t}</b></p>${warn.length?`<p class="sub" style="color:var(--hp)">⚠ ${warn.join('、')}</p>`:''}<p class="sub">${S.cleared[RUN.area]?'打過的首領，掉寶照樣豐厚。':'撤退不會失去戰利品；輸了會掉 10% 金幣。'}</p><button class="btn pri big" data-a="bossGo">挑戰首領</button><button class="btn" data-a="retreat">撤退回城（保留戰利品）</button></div>`}
+  return `<div class="panel" style="border-color:${c}">${art('mob_'+a.boss,m.n,'r11')}<h3 style="color:${c}">★ 首領前哨：${m.n}　Lv ${L}</h3><p class="sub">你 Lv ${S.lv}・HP ${S.hp}/${st.HP}・MP ${S.mp}/${st.MP}・藥水 ${pot}　→　<b style="color:${c}">${t}</b></p>${warn.length?`<p class="sub" style="color:var(--hp)">⚠ ${warn.join('、')}</p>`:''}<p class="sub">${S.cleared[RUN.area]?'打過的首領，掉寶照樣豐厚。':'撤退不會失去戰利品；輸了會掉 10% 金幣。'}</p>${gatePrep(L)}<button class="btn pri big" data-a="bossGo">挑戰首領</button><button class="btn" data-a="retreat">撤退回城（保留戰利品）</button></div>`}
 function bossReady(i){return !!S.cleared[i]||(S.main.ch===i&&S.main.acc&&(CH[i].steps[S.main.step]||{}).type==='boss')}
 function vRun(){if(RUN.tower)return vTower();const a=AREAS[RUN.area],v=RUN.view,last=RUN.step>=RUN.nodes.length-1;
   const pips=`<div class="pips">${RUN.nodes.map((t,i)=>`<span class="pip ${i<RUN.step||(i===RUN.step&&v.type==='res')?'done':i===RUN.step?'now':''} ${t==='boss'?'boss':''}">${t==='boss'||t==='elite'||t==='story'?'★':t?(i<=RUN.step?NODE[t]?NODE[t][0]:i+1:i+1):'⋔'}</span>`).join('')}</div>`;
@@ -1797,6 +1807,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'3.9',d:'2026-11-19',t:'首領前哨：戰前準備三選一',b:'在首領前哨可以先做一項戰前準備，但只能選一個：🔭 偵察動向（花金幣，首領開場 HP -12%）、🪤 布置陷阱（拿一瓶治療藥水當誘餌，首領開場中毒 4 回合、攻擊下降）、🔥 營火調息（免費回 30% HP／MP，但火光會驚動首領，攻擊 +12%）。錢、藥水、血量，看你缺哪個再決定。全自動也會依狀態挑一項。'},
   {v:'3.8',d:'2026-11-19',t:'首領前哨＋自動戰鬥會用毒和火',b:'走到首領前會先停在「首領前哨」：顯示首領等級、你的 HP／MP／藥水和勝算，要硬闖還是帶著戰利品撤退由你決定。全自動在等級差太多或狀態太差時會先撤退練功，不再一直衝去送死掉金幣。自動戰鬥會把中毒、灼燒、虛弱、暈眩的價值算進去：遊俠會用蛇牙箭、法師更常點火，對付厚血的敵人更有效率。'},
   {v:'3.7',d:'2026-11-19',t:'遊俠專注增傷＋自動戰鬥會看預告',b:'遊俠的專注現在每層讓攻擊 +6%，「屏息」提前到 Lv.5 就能學，雙矢每箭 90%→100%：攢專注變強、什麼時候一箭打光要自己拿捏。自動戰鬥變聰明了：看到敵人下回合要出傷害招，劍士會先架招架反擊、法師會先開薄冰鏡；打首領和精英時會先上增益（伏身、晨禱、鬥氣解放）。冒險地點卡片新增提醒：首領已現身但你等級還不夠時，會先告訴你終點會碰上它。'},
   {v:'3.6',d:'2026-11-19',t:'開局兩招＋閃耀裝備',b:'四職業 Lv.1 就有兩招可選：劍士多了招架反擊、法師多了霜針、遊俠多了蛇牙箭、神官多了審光；原本 Lv.5 的招式提前到 Lv.3。劍士的破綻現在每層讓攻擊 +6%，疊越多越痛。新增 5% 機率掉落「✧閃耀」裝備：多一條詞條、最強詞條 ×1.5，洗練也不會消失。撿到史詩、傳說或閃耀裝備時，勝利畫面會跳出發光的戰利品卡片。'},
@@ -1862,6 +1873,10 @@ function startBattle(id,kind,nAdds){const F=mkFoe(id,kind),m=F.m,bs=F.kind==='bo
      log:[bs?`首領 ${m.n} 擋住了去路！`:F.mut?`被蝕霧侵蝕的 ${m.n} 出現了！氣息完全不同……`:adds.length?`${F.name} 帶著 ${adds.map(f=>f.name).join('、')} 出現了！`:`${F.name} 出現了！`,...(F.aff.length?[`詞綴：${F.aff.map(x=>AFF[x].n).join('、')}`]:[]),...(F.bm?[id==='zenos'?'蓋爾從側面牽制住了澤諾斯！':'你事先摸清了牠的弱點！']:[]),...(ally?[`${ally.n}與你並肩作戰`]:[])],busy:false,auto:AUTO,menu:'main',turn:1,fx:null,intro:true,shown:0,last:0},F);SFX.enc();
   B.next=foePick();
   if(RUN&&RUN.bless){const BL={atk:{n:'戰意祝福',atk:.15},def:{n:'守護祝福',def:.35},luck:{n:'幸運祝福'}}[RUN.bless];B.buffs.push(Object.assign({id:'bless',t:999},BL))}
+  if(bs&&RUN&&RUN.prep&&!RUN.prepUsed){RUN.prepUsed=1;const p=RUN.prep;
+    if(p==='scout'){B.hp=B.max=Math.round(B.max*.88);B.log.push('🔭 你摸清了首領的習慣，找到牠的舊傷（HP -12%）')}
+    else if(p==='trap'){B.st.poison=4;B.st.weak=2;B.log.push('🪤 首領踩進陷阱！中毒、攻擊下降')}
+    else if(p==='camp'){B.atk=Math.round(B.atk*1.12);B.mag=Math.round(B.mag*1.12);B.log.push('🔥 營火的光驚動了首領，牠怒氣沖沖（攻擊 +12%）')}}
   if(hasP('cl2'))B.cls.faith=30;
   const s0=stats();if(s0.SHIELD){B.shield=Math.round(s0.HP*s0.SHIELD/100);B.log.push(`裝備效果：獲得 ${B.shield} 點護盾`)}
   if(B.auto)setTimeout(autoAct,700)}
@@ -2534,7 +2549,7 @@ const ACT={
   trial(){if(S.adv||S.trial||S.lv<TRIAL.lv)return;if(S.hp<=1){toast('HP 太低，先到旅店休息');return}const sh=SHADOW[S.cls];MOBS.shadow.ty=sh[0];MOBS.shadow.sk=sh[1];
     closeM();TAB='adv';RUN={area:Math.min(4,Math.max(0,S.main.ch)),trial:true,nm:false,step:0,nodes:['boss'],loot:{gold:0,exp:0,items:[]},view:{type:'start'}};startBattle('shadow','boss');render()},
   startNm(v){if(S.hp<=1){toast('HP 太低，先到旅店休息');return}startRun(+v,true)},
-  runNext(){runNext()},bossGo(){if(!RUN)return;RUN.gate=1;runNext()},retreat(){if(RUN.step<0){RUN=null;render()}else finish(false)},finish(){finish(true)},
+  runNext(){runNext()},bossGo(){if(!RUN)return;RUN.gate=1;runNext()},gatePrep(v){doPrep(v)},retreat(){if(RUN.step<0){RUN=null;render()}else finish(false)},finish(){finish(true)},
   evPick(v){evPick(+v)},
   bAtk(){pAct('atk')},bGuard(){pAct('guard')},bFlee(){pAct('flee')},bSkill(v){pAct('skill',v)},bItem(v){pAct('item',v)},
   bMenu(v){if(B.busy)return;B.menu=v;render()},
@@ -2609,7 +2624,7 @@ function faTick(){faDraw();if(!FA||!S)return;
   if(MODAL){if(B&&MODAL.k!=='msg'){closeM();return}faClick('#modal .sheet-b [data-a="closeM"].pri')||faClick('#modal .x');return}
   if(B){if(!B.auto){B.auto=AUTO=true;render();setTimeout(autoAct,200)}return}
   if(RUN){if(TAB!=='adv'){TAB='adv';render();return}
-    if(RUN.view&&RUN.view.type==='gate'){const L=MOBS[AREAS[RUN.area].boss].lv+(RUN.nm?10:0),st=stats();if((!S.cleared[RUN.area]&&S.lv<L-1)||(S.hp<st.HP*.35&&!S.items.pot&&!S.items.pot2)){toast('全自動：首領太強，先撤退練功');faClick('#main [data-a="retreat"]')}else faClick('#main [data-a="bossGo"]');return}
+    if(RUN.view&&RUN.view.type==='gate'){const L=MOBS[AREAS[RUN.area].boss].lv+(RUN.nm?10:0),st=stats();if((!S.cleared[RUN.area]&&S.lv<L-1)||(S.hp<st.HP*.35&&!S.items.pot&&!S.items.pot2)){toast('全自動：首領太強，先撤退練功');faClick('#main [data-a="retreat"]')}else{if(!RUN.prep){if(S.hp<st.HP*.6)doPrep('camp');else if(S.gold>=prepCost(L)*3)doPrep('scout');else if((S.items.pot||0)>2)doPrep('trap')}faClick('#main [data-a="bossGo"]')}return}
     faClick('#main [data-a="pickFork"]',1)||faClick('#main [data-a="evPick"]',1)||faClick('#main [data-a="evFight"]')||faClick('#main [data-a="bless"]',1)||faClick('#main [data-a="runNext"]')||faClick('#main [data-a="towerNext"]')||faClick('#main [data-a="finish"]');return}
   /* 回城：休息後重新出發同一地區 */
   const s=stats();if(S.hp<s.HP*.7||S.mp<s.MP*.5){const c=S.lv*4;if(S.gold<c){faStop('金幣不足以休息，全自動停止');return}ACT.rest();return}
