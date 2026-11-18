@@ -602,54 +602,54 @@ for(const k of ['bat','icesprite','phantom','icedragon','zenos'])MOBS[k].fly=1;
 const SKM={
   m_goo:{n:'黏液噴射',mag:1,pow:.9,hst:{weak:2},fx:'orb',c:'#7fd3ff',d:'噴出黏液，主角攻擊下降 2 回合'},
   m_split:{n:'分裂再生',heal:.2,fx:'heal',c:'#7fd3ff',d:'分出一小塊身體，回復 20% HP'},
-  m_horn:{n:'角突進',pow:1.6,cr:25,fx:'slam',c:'#ffffff',d:'低頭猛衝，爆擊率高'},
-  m_hop:{n:'跳開',self:{eva:30,t:2},fx:'aura',c:'#cfff9a',d:'迴避 +30%，持續 2 回合'},
+  m_horn:{n:'尖角衝撞',pow:1.6,cr:25,fx:'slam',c:'#ffffff',d:'低頭猛衝，爆擊率高'},
+  m_hop:{n:'蹦跳閃避',self:{eva:30,t:2},fx:'aura',c:'#cfff9a',d:'迴避 +30%，持續 2 回合'},
   m_sneak:{n:'偷襲',pow:1.4,pierce:.4,fx:'claw',c:'#ffd27a',d:'無視 40% 防禦'},
-  m_rock:{n:'亂丟石頭',pow:.55,h:3,fx:'orb',c:'#c9b08a',d:'連丟三顆石頭'},
+  m_rock:{n:'投石',pow:.55,h:3,fx:'orb',c:'#c9b08a',d:'連丟三顆石頭'},
   m_cleave:{n:'黑晶重擊',pow:1.8,hst:{stun:1},p:.3,fx:'slam',c:'#b06cff',d:'重擊，30% 機率使主角暈眩'},
-  m_rally:{n:'號令',self:{atk:.4,t:3},fx:'roar',c:'#ff9a4a',d:'攻擊 +40%，持續 3 回合'},
+  m_rally:{n:'戰吼號令',self:{atk:.4,t:3},fx:'roar',c:'#ff9a4a',d:'攻擊 +40%，持續 3 回合'},
   m_spore:{n:'毒孢子',mag:1,pow:.8,hst:{poison:3},fx:'spore',c:'#9ae05a',d:'使主角中毒 3 回合'},
-  m_sleep:{n:'催眠粉',mag:1,pow:.4,hst:{stun:1},p:.55,fx:'spore',c:'#d6a8ff',d:'55% 機率讓主角睡著 1 回合'},
+  m_sleep:{n:'催眠花粉',mag:1,pow:.4,hst:{stun:1},p:.55,fx:'spore',c:'#d6a8ff',d:'55% 機率讓主角睡著 1 回合'},
   m_bite:{n:'撕咬',pow:1.3,hst:{bleed:3},fx:'claw',c:'#ff5a4a',d:'造成流血 3 回合'},
-  m_howl:{n:'狼嚎',self:{atk:.3,crit:15,t:3},fx:'roar',c:'#ffe0a0',d:'攻擊 +30%、爆擊 +15%'},
+  m_howl:{n:'月下狼嚎',self:{atk:.3,crit:15,t:3},fx:'roar',c:'#ffe0a0',d:'攻擊 +30%、爆擊 +15%'},
   m_root:{n:'根鬚纏繞',pow:1,hst:{weak:2},fx:'slam',c:'#8fbf5a',d:'纏住主角，攻擊下降 2 回合'},
   m_photo:{n:'光合作用',heal:.15,fx:'heal',c:'#cfff9a',d:'回復 15% HP'},
-  m_rotmist:{n:'腐化孢霧',mag:1,pow:1.2,hst:{poison:3},fx:'spore',c:'#b06cff',d:'紫色孢霧，中毒 3 回合'},
-  m_rootcage:{n:'根牢',pow:1.5,hst:{stun:1},p:.4,fx:'slam',c:'#7a5a3a',d:'40% 機率困住主角 1 回合'},
+  m_rotmist:{n:'腐敗毒霧',mag:1,pow:1.2,hst:{poison:3},fx:'spore',c:'#b06cff',d:'紫色孢霧，中毒 3 回合'},
+  m_rootcage:{n:'荊棘牢籠',pow:1.5,hst:{stun:1},p:.4,fx:'slam',c:'#7a5a3a',d:'40% 機率困住主角 1 回合'},
   m_sap:{n:'樹液再生',heal:.18,fx:'heal',c:'#d6b25a',d:'回復 18% HP'},
   m_sonic:{n:'超音波',mag:1,pow:1,hst:{weak:2},fx:'roar',c:'#d6a8ff',d:'刺耳音波，主角攻擊下降'},
   m_suck:{n:'吸血',pow:1.1,drain:.6,fx:'drain',c:'#ff5a7a',d:'吸取 60% 傷害'},
-  m_bone:{n:'骨刃',pow:1.6,fx:'claw',c:'#ffffff',d:'鋒利的骨頭斬擊'},
+  m_bone:{n:'骨刃斬',pow:1.6,fx:'claw',c:'#ffffff',d:'鋒利的骨頭斬擊'},
   m_rebuild:{n:'骸骨重組',heal:.25,fx:'heal',c:'#e8e0c8',d:'把散掉的骨頭裝回去，回復 25% HP'},
   m_boulder:{n:'落石',pow:1.7,fx:'slam',c:'#c9b08a',d:'舉起巨石砸下'},
-  m_petrify:{n:'岩化',self:{def:.7,t:3},fx:'aura',c:'#c9b08a',d:'防禦 +70%，持續 3 回合'},
-  m_quake:{n:'地裂衝撞',pow:1.9,hst:{stun:1},p:.25,fx:'slam',c:'#d6b25a',d:'25% 機率使主角暈眩'},
+  m_petrify:{n:'岩石硬化',self:{def:.7,t:3},fx:'aura',c:'#c9b08a',d:'防禦 +70%，持續 3 回合'},
+  m_quake:{n:'震地衝撞',pow:1.9,hst:{stun:1},p:.25,fx:'slam',c:'#d6b25a',d:'25% 機率使主角暈眩'},
   m_devour:{n:'吞噬',pow:1.4,drain:.5,fx:'drain',c:'#7fd3ff',d:'吞下光芒，吸取 50% 傷害'},
-  m_burrow:{n:'鑽地',self:{eva:40,t:2},fx:'aura',c:'#d6b25a',d:'迴避 +40%，持續 2 回合'},
+  m_burrow:{n:'遁地',self:{eva:40,t:2},fx:'aura',c:'#d6b25a',d:'迴避 +40%，持續 2 回合'},
   m_frostfang:{n:'冰牙',pow:1.4,hst:{weak:2},fx:'claw',c:'#8fdcff',d:'冰凍咬擊，主角攻擊下降'},
   m_icicle:{n:'冰錐',mag:1,pow:.75,h:2,fx:'orb',c:'#8fdcff',d:'連射兩根冰錐'},
-  m_fog:{n:'冰霧',self:{eva:30,t:3},fx:'aura',c:'#d8f2ff',d:'迴避 +30%，持續 3 回合'},
-  m_avalanche:{n:'雪崩拳',pow:2,fx:'slam',c:'#e8f6ff',d:'一拳砸碎地面'},
+  m_fog:{n:'寒霧',self:{eva:30,t:3},fx:'aura',c:'#d8f2ff',d:'迴避 +30%，持續 3 回合'},
+  m_avalanche:{n:'雪崩重拳',pow:2,fx:'slam',c:'#e8f6ff',d:'一拳砸碎地面'},
   m_icebody:{n:'寒冰之軀',shield:.18,fx:'aura',c:'#8fdcff',d:'獲得 18% 最大 HP 的冰盾'},
-  m_zero:{n:'絕對零度吐息',mag:1,pow:2,hst:{stun:1},p:.3,fx:'beam',c:'#8fdcff',d:'冰之吐息，30% 機率凍住主角'},
+  m_zero:{n:'絕對零度',mag:1,pow:2,hst:{stun:1},p:.3,fx:'beam',c:'#8fdcff',d:'冰之吐息，30% 機率凍住主角'},
   m_wingshard:{n:'冰翼亂舞',mag:1,pow:.6,h:3,fx:'orb',c:'#d8f2ff',d:'振翅射出三片冰刃'},
-  m_scale:{n:'冰鱗',self:{def:.5,t:3},fx:'aura',c:'#8fdcff',d:'防禦 +50%，持續 3 回合'},
-  m_darkblade:{n:'闇之劍',pow:1.7,pierce:.5,fx:'claw',c:'#b06cff',d:'無視 50% 防禦的斬擊'},
-  m_blackshield:{n:'黑盾',shield:.15,fx:'aura',c:'#6a3a9a',d:'獲得 15% 最大 HP 的護盾'},
+  m_scale:{n:'冰鱗護體',self:{def:.5,t:3},fx:'aura',c:'#8fdcff',d:'防禦 +50%，持續 3 回合'},
+  m_darkblade:{n:'暗影劍擊',pow:1.7,pierce:.5,fx:'claw',c:'#b06cff',d:'無視 50% 防禦的斬擊'},
+  m_blackshield:{n:'暗黑之盾',shield:.15,fx:'aura',c:'#6a3a9a',d:'獲得 15% 最大 HP 的護盾'},
   m_soul:{n:'噬魂',mag:1,pow:1.3,drain:.5,hst:{poison:2},fx:'drain',c:'#b06cff',d:'吸取靈魂並使主角中毒'},
-  m_vanish:{n:'隱匿',self:{eva:50,t:2},fx:'aura',c:'#d6a8ff',d:'迴避 +50%，持續 2 回合'},
-  m_hellfire:{n:'煉獄戟',pow:1.6,hst:{burn:3},fx:'beam',c:'#ff7a2a',d:'帶火的突刺，灼燒 3 回合'},
+  m_vanish:{n:'隱身',self:{eva:50,t:2},fx:'aura',c:'#d6a8ff',d:'迴避 +50%，持續 2 回合'},
+  m_hellfire:{n:'煉獄火戟',pow:1.6,hst:{burn:3},fx:'beam',c:'#ff7a2a',d:'帶火的突刺，灼燒 3 回合'},
   m_pact:{n:'惡魔契約',self:{atk:.5,t:3},cost:.1,fx:'roar',c:'#ff4a4a',d:'燒掉 10% HP，攻擊 +50%'},
   m_end:{n:'終焉之闇',mag:1,pow:2.1,hst:{poison:3},fx:'beam',c:'#7a3aff',d:'黑暗洪流，中毒 3 回合'},
   m_engulf:{n:'黑霧吞噬',mag:1,pow:1.5,drain:.5,fx:'drain',c:'#5a2a8a',d:'吸取 50% 傷害'},
-  m_dread:{n:'術士的威壓',hst:{stun:1},p:.6,self:{atk:.3,t:3},fx:'roar',c:'#ff4a4a',d:'60% 機率震懾主角，自身攻擊 +30%'}};
+  m_dread:{n:'魔王威壓',hst:{stun:1},p:.6,self:{atk:.3,t:3},fx:'roar',c:'#ff4a4a',d:'60% 機率震懾主角，自身攻擊 +30%'}};
 /* 高難度詞綴：異變種與惡夢模式的怪物會帶上 */
 MOBS.shadow={n:'試煉之影',lv:24,ty:'brute',boss:1,sk:['s_cut','m_dread','s_mirror']};
-Object.assign(SKM,{s_cut:{n:'影之斬',pow:1.7,pierce:.3,fx:'claw',c:'#9a7aff',d:'模仿你的劍技，無視 30% 防禦'},
-  s_bolt:{n:'影之魔彈',mag:1,pow:.8,h:2,fx:'orb',c:'#9a7aff',d:'模仿你的魔法，連射兩發'},
-  s_arrow:{n:'影之箭雨',pow:.6,h:3,fx:'orb',c:'#9a7aff',d:'模仿你的箭術，連射三箭'},
-  s_light:{n:'影之聖光',mag:1,pow:1.6,fx:'beam',c:'#9a7aff',d:'扭曲的聖光'},
-  s_mirror:{n:'鏡像',self:{atk:.3,def:.3,t:3},fx:'aura',c:'#9a7aff',d:'攻防 +30%，持續 3 回合'}});
+Object.assign(SKM,{s_cut:{n:'影斬',pow:1.7,pierce:.3,fx:'claw',c:'#9a7aff',d:'模仿你的劍技，無視 30% 防禦'},
+  s_bolt:{n:'暗影彈',mag:1,pow:.8,h:2,fx:'orb',c:'#9a7aff',d:'模仿你的魔法，連射兩發'},
+  s_arrow:{n:'暗影箭雨',pow:.6,h:3,fx:'orb',c:'#9a7aff',d:'模仿你的箭術，連射三箭'},
+  s_light:{n:'偽聖光',mag:1,pow:1.6,fx:'beam',c:'#9a7aff',d:'扭曲的聖光'},
+  s_mirror:{n:'鏡像分身',self:{atk:.3,def:.3,t:3},fx:'aura',c:'#9a7aff',d:'攻防 +30%，持續 3 回合'}});
 const SHADOW={swordsman:['brute',['s_cut','m_dread','s_mirror']],mage:['caster',['s_bolt','m_engulf','s_mirror']],ranger:['swift',['s_arrow','s_cut','s_mirror']],cleric:['tank',['s_light','m_sap','s_mirror']]};
 const TRIAL={lv:20,gold:3000,items:{m_ore:5,m_ice:3}};
 const AFF={rage:{n:'狂暴',d:'攻擊 +40%'},shell:{n:'堅殼',d:'防禦 +80%'},regen:{n:'再生',d:'每回合回復 6% HP'},leech:{n:'吸血',d:'攻擊吸取 30% 傷害'},
@@ -950,12 +950,12 @@ if(P2){
     m_knife:{n:'飛刀',pow:.6,h:3,fx:'orb',c:'#d8d8d8',d:'連丟三把飛刀'},
     m_smoke:{n:'煙霧彈',self:{eva:35,t:2},hst:{weak:2},fx:'spore',c:'#a8a8a8',d:'迴避 +35%，主角攻擊下降'},
     m_oldoath:{n:'舊日劍誓',pow:1.8,pierce:.35,fx:'claw',c:'#e8d27a',d:'王國劍術，無視 35% 防禦'},
-    m_shieldbash:{n:'盾擊',pow:1.2,hst:{stun:1},p:.35,fx:'slam',c:'#c9c9c9',d:'35% 機率使主角暈眩'},
+    m_shieldbash:{n:'盾牌猛擊',pow:1.2,hst:{stun:1},p:.35,fx:'slam',c:'#c9c9c9',d:'35% 機率使主角暈眩'},
     m_thunderdive:{n:'雷霆俯衝',mag:1,pow:1.7,hst:{burn:2},fx:'beam',c:'#ffe45a',d:'帶電俯衝，灼燒 2 回合'},
-    m_galewing:{n:'疾風翼',self:{eva:30,crit:15,t:3},fx:'aura',c:'#cfe8ff',d:'迴避 +30%、爆擊 +15%'},
-    m_storm:{n:'人造暴風',mag:1,pow:.7,h:3,hst:{weak:2},fx:'orb',c:'#8fdcff',d:'三道暴風，主角攻擊下降'},
-    m_lightning:{n:'落雷校正',mag:1,pow:2.2,hst:{stun:1},p:.3,fx:'beam',c:'#ffe45a',d:'巨大落雷，30% 機率暈眩'},
-    m_recalib:{n:'重新校準',shield:.2,self:{def:.4,t:3},fx:'aura',c:'#ffe45a',d:'護盾 20%，防禦 +40%'}});
+    m_galewing:{n:'疾風振翼',self:{eva:30,crit:15,t:3},fx:'aura',c:'#cfe8ff',d:'迴避 +30%、爆擊 +15%'},
+    m_storm:{n:'狂風三連',mag:1,pow:.7,h:3,hst:{weak:2},fx:'orb',c:'#8fdcff',d:'三道暴風，主角攻擊下降'},
+    m_lightning:{n:'雷霆落擊',mag:1,pow:2.2,hst:{stun:1},p:.3,fx:'beam',c:'#ffe45a',d:'巨大落雷，30% 機率暈眩'},
+    m_recalib:{n:'雷電護壁',shield:.2,self:{def:.4,t:3},fx:'aura',c:'#ffe45a',d:'護盾 20%，防禦 +40%'}});
   GEAR.u_storm={n:'氣象院的懷錶',slot:'ring',t:5,lv:30,price:16000,mp:90,crit:7,uq:{cd:30,stun:8,magp:10},ud:'爆擊傷害 +30%、攻擊時 8% 機率暈眩、魔力 +10%',uniq:1};
   BOSSU.weathergolem='u_storm';
   AREAS.push({id:'road',n:'灰石街道',lv:'26–30',base:26,d:'通往王都的古老石板路。二十年沒人走，盜賊和逃兵占了驛站。',mobs:['bandit','deserter','stormhawk'],boss:'weathergolem'});
@@ -1777,6 +1777,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'3.3',d:'2026-11-18',t:'特效打磨＋怪物招式改名',b:'特效改成有過程的動畫：聚氣、出招、命中、收尾，魔法陣逐筆畫出、光柱由天劈落、護盾張開再碎裂。施放時角色會衝刺或發光。怪物 57 招都照招式名稱重新設計，並把不順的招式名稱改得更自然。'},
   {v:'3.2',d:'2026-11-18',t:'特效全面重做',b:'改成線上遊戲風格的發光特效：月牙刀光、彗星拖尾、光柱、魔法陣、雷擊、冰晶、火焰。命中時角色閃白、火花爆散、傷害數字彈跳，爆擊更有感。'},
   {v:'3.1',d:'2026-11-18',t:'技能特效重做',b:'移除科幻感的粒子特效，主角 53 招與怪物 57 招全部改成描邊手繪風、照招式名稱設計的動畫：斬擊弧光、火球、冰錐、落雷、光柱、巨鎚、天秤、捕獸夾、咬合、毒霧、藤蔓纏繞等。'},
   {v:'3.0',d:'2026-11-18',t:'全新畫風',b:'全遊戲美術換成新畫風：主角 12 職業男女全部動作、每個技能專屬姿勢、所有怪物、立繪、背景、事件、劇情圖、圖示全面重畫；新增手繪戰鬥特效。'},
@@ -2098,19 +2099,28 @@ const PFX=(()=>{let HS=0,cv,cx,P=[],Q=[],raf=0,W=0,Hh=0,t0=0,SR={x:0,y:0,w:360,h
       const g=c.createLinearGradient(0,-W,0,W);g.addColorStop(0,T0);g.addColorStop(.28,col);g.addColorStop(.5,'#ffffff');g.addColorStop(.72,col);g.addColorStop(1,T0);c.fillStyle=g;c.shadowColor=col;c.shadowBlur=W;c.fillRect(0,-W,L,W*2);c.shadowBlur=0;
       for(const [px,R] of [[0,W*1.5],[L,W*2.4]]){c.fillStyle=rg(c,px,0,R,[[0,'#ffffff'],[.35,col],[1,T0]]);c.fillRect(px-R,-R,R*2,R*2)}
       if(o.wavy){c.beginPath();for(let i=0;i<=24;i++){const xx=L*i/24;c.lineTo(xx,Math.sin(i*.8-k*20)*W*1.2)}c.strokeStyle=col;c.lineWidth=Math.max(1,W*.25);c.stroke()}})}
-  /* 天降光柱 */
-  function column(f,col,o){o=o||{};cel(o.life||.6,(c,k)=>{const [x,y]=P2(f),w=(o.w||.09)*U()*Math.sin(Math.PI*Math.min(1,k*1.1)),y0=SR.y-6,yb=y+(o.base||.12)*SR.h;if(w<1)return;ADD(c);
-      const g=c.createLinearGradient(x-w,0,x+w,0);g.addColorStop(0,T0);g.addColorStop(.3,col);g.addColorStop(.5,'#ffffff');g.addColorStop(.7,col);g.addColorStop(1,T0);c.globalAlpha=.95;c.fillStyle=g;c.shadowColor=col;c.shadowBlur=w;c.beginPath();c.moveTo(x-w*.5,y0);c.lineTo(x+w*.5,y0);c.lineTo(x+w,yb);c.lineTo(x-w,yb);c.closePath();c.fill();c.shadowBlur=0;
-      c.fillStyle=rg(c,x,yb,w*1.8,[[0,'#ffffff'],[.3,col],[1,T0]]);c.save();c.translate(x,yb);c.scale(1,.3);c.beginPath();c.arc(0,0,w*1.8,0,7);c.restore();c.fill();
-      for(let i=0;i<6;i++){const t=(k*1.8+i/6)%1,xx=x+Math.sin(i*2.4)*w*.8,yy=yb-t*(yb-y0)*.6,L=U()*.04;c.globalAlpha=Math.sin(Math.PI*t);c.beginPath();c.moveTo(xx,yy);c.lineTo(xx,yy-L);c.strokeStyle='#ffffff';c.lineWidth=Math.max(1,w*.06);c.stroke()}})}
+  /* 天降光柱：由上而下劈落，落地爆光後收束成細線 */
+  function column(f,col,o){o=o||{};cel(o.life||.6,(c,k)=>{const [x,y]=P2(f),W0=(o.w||.09)*U(),y0=SR.y-6,yb=y+(o.base||.12)*SR.h,dn=eo(k/.22),bot=y0+(yb-y0)*dn,w=W0*(k<.22?.35+.65*dn:Math.pow(1-(k-.22)/.78,.7)*(1+.12*Math.sin(k*50)));if(w<.6)return;ADD(c);
+      const g=c.createLinearGradient(x-w,0,x+w,0);g.addColorStop(0,T0);g.addColorStop(.3,col);g.addColorStop(.5,'#ffffff');g.addColorStop(.7,col);g.addColorStop(1,T0);c.fillStyle=g;c.shadowColor=col;c.shadowBlur=w;c.beginPath();c.moveTo(x-w*.45,y0);c.lineTo(x+w*.45,y0);c.lineTo(x+w,bot);c.lineTo(x-w,bot);c.closePath();c.fill();c.shadowBlur=0;
+      if(dn>=1){const kk=(k-.22)/.78,R=W0*(1.4+kk*2.2);c.globalAlpha=1-kk;c.save();c.translate(x,yb);c.scale(1,.28);c.fillStyle=rg(c,0,0,R,[[0,'#ffffff'],[.3,col],[1,T0]]);c.beginPath();c.arc(0,0,R,0,7);c.fill();c.strokeStyle=col;c.lineWidth=Math.max(1,W0*.25*(1-kk));c.beginPath();c.arc(0,0,R*1.15,0,7);c.stroke();c.restore();c.globalAlpha=1}
+      for(let i=0;i<6;i++){const t=(k*1.8+i/6)%1,xx=x+Math.sin(i*2.4)*w*.8,yy=bot-t*(bot-y0)*.6,L=U()*.04;if(yy>bot)continue;c.globalAlpha=Math.sin(Math.PI*t)*.8;c.beginPath();c.moveTo(xx,yy);c.lineTo(xx,yy-L);c.strokeStyle='#ffffff';c.lineWidth=Math.max(1,w*.06);c.stroke()}})}
   /* 閃電 */
   function zapB(f,col,o){o=o||{};let pts=null,lastK=-1;cel(o.life||.45,(c,k)=>{const [x,y]=P2(f);if(!pts||k-lastK>.12){lastK=k;pts=[];const n=10,y0=SR.y-10,sx=x+(o.dx||.04)*U();for(let i=0;i<=n;i++){const t=i/n;pts.push([sx+(x-sx)*t+(i&&i<n?(Math.random()-.5)*U()*.08:0),y0+(y-y0)*t])}}
       const vis=k<.15||(k>.22&&k<.5)||(k>.58&&k<.72);if(!vis)return;ADD(c);const w=U()*(o.w||.016);c.lineJoin='round';c.lineCap='round';c.beginPath();pts.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.shadowColor=col;c.shadowBlur=w*4;c.strokeStyle=col;c.lineWidth=w*2.2;c.stroke();c.shadowBlur=0;c.strokeStyle='#ffffff';c.lineWidth=w*.8;c.stroke()})}
-  /* 魔法陣（地面） */
-  function rune(f,col,o){o=o||{};cel(o.life||.9,(c,k)=>{const [x,y]=P2(f),gy=y+(o.gy??.13)*SR.h,R=(o.R||.14)*U()*eo(k*3.5);c.globalAlpha=k<.75?1:1-(k-.75)/.25;ADD(c);c.translate(x,gy);c.scale(1,.34);c.shadowColor=col;c.shadowBlur=12;c.strokeStyle=col;
-      c.fillStyle=rg(c,0,0,R,[[0,T0],[.7,T0],[1,col]]);c.globalAlpha*=.5;c.beginPath();c.arc(0,0,R,0,7);c.fill();c.globalAlpha*=2;c.lineWidth=Math.max(1.5,U()*.006);c.beginPath();c.arc(0,0,R,0,7);c.stroke();c.beginPath();c.arc(0,0,R*.8,0,7);c.stroke();
-      c.rotate(k*2.5);c.beginPath();for(let i=0;i<=6;i++){const a=i*2*Math.PI/3;c.lineTo(Math.cos(a)*R*.8,Math.sin(a)*R*.8)}c.stroke();c.beginPath();for(let i=0;i<=6;i++){const a=i*2*Math.PI/3+Math.PI/3;c.lineTo(Math.cos(a)*R*.8,Math.sin(a)*R*.8)}c.stroke();
-      for(let i=0;i<12;i++){const a=i/12*6.283;c.beginPath();c.moveTo(Math.cos(a)*R*.84,Math.sin(a)*R*.84);c.lineTo(Math.cos(a)*R*.96,Math.sin(a)*R*.96);c.stroke()}})}
+  /* 魔法陣：外圈逐筆畫出、符文環轉動、亮起後向上收束 */
+  function rune(f,col,o){o=o||{};cel(o.life||.9,(c,k)=>{const [x,y]=P2(f),gy=y+(o.gy??.13)*SR.h,R=(o.R||.14)*U(),dr=eo(k*2.6),out=k<.75?1:1-(k-.75)/.25;c.globalAlpha=out;ADD(c);c.translate(x,gy);c.scale(1,.34);c.shadowColor=col;c.shadowBlur=12;c.strokeStyle=col;c.lineCap='round';
+      c.save();c.globalAlpha*=.45*dr;c.fillStyle=rg(c,0,0,R,[[0,T0],[.6,T0],[1,col]]);c.beginPath();c.arc(0,0,R,0,7);c.fill();c.restore();
+      c.lineWidth=Math.max(1.5,U()*.006);c.beginPath();c.arc(0,0,R,-PI/2,-PI/2+6.283*dr);c.stroke();c.beginPath();c.arc(0,0,R*.8,PI/2,PI/2-6.283*dr,true);c.stroke();
+      c.save();c.rotate(k*2.5);const h=eo((k-.15)*3);if(h>0){c.globalAlpha*=h;for(const off of [0,PI/3]){c.beginPath();for(let i=0;i<=3;i++){const a=i*2*PI/3+off;c.lineTo(Math.cos(a)*R*.8,Math.sin(a)*R*.8)}c.stroke()}}c.restore();
+      c.save();c.rotate(-k*1.5);for(let i=0;i<16;i++){if(i/16>dr)break;const a=i/16*6.283;c.beginPath();c.moveTo(Math.cos(a)*R*.84,Math.sin(a)*R*.84);c.lineTo(Math.cos(a)*R*.96,Math.sin(a)*R*.96);c.stroke()}c.restore();
+      if(k>.6){const kk=(k-.6)/.4;c.scale(1,1/.34);const g=c.createLinearGradient(0,0,0,-U()*.25*kk);g.addColorStop(0,col);g.addColorStop(1,T0);c.globalAlpha=(1-kk)*.6;c.fillStyle=g;c.fillRect(-R*.7,-U()*.25*kk,R*1.4,U()*.25*kk)}})}
+  /* 聚氣：光環向內收束、核心變亮 */
+  function charge(f,col,o){o=o||{};cel(o.life||.32,(c,k)=>{const [x,y]=P2(f),R=(o.R||.09)*U();ADD(c);c.globalAlpha=k<.85?1:(1-k)/.15;c.shadowColor=col;c.shadowBlur=10;for(let i=0;i<2;i++){const kk=(k*1.4-i*.3);if(kk<=0||kk>=1)continue;c.beginPath();c.arc(x,y,R*(1-eo(kk))+2,0,7);c.strokeStyle=col;c.lineWidth=Math.max(1,U()*.008*kk);c.stroke()}
+      for(let i=0;i<6;i++){const a=i/6*6.283+k*2,r=R*(1.2-k);c.beginPath();c.moveTo(x+Math.cos(a)*r,y+Math.sin(a)*r);c.lineTo(x+Math.cos(a)*r*.6,y+Math.sin(a)*r*.6);c.strokeStyle='#ffffff';c.lineWidth=Math.max(1,U()*.004);c.stroke()}
+      const s=R*.55*eo(k*1.5);c.fillStyle=rg(c,x,y,s,[[0,'#ffffff'],[.4,col],[1,T0]]);c.fillRect(x-s,y-s,s*2,s*2)})}
+  /* 藤蔓：發光藤條螺旋纏上 */
+  function vine(f,col,o){o=o||{};cel(o.life||.9,(c,k)=>{const [x,y]=P2(f),R=U()*(o.R||.09),gy=y+.13*SR.h,H0=U()*.26,pr=eo(k*2.2),fd=k<.7?1:1-(k-.7)/.3;ADD(c);c.globalAlpha=fd;c.shadowColor=col;c.shadowBlur=8;c.lineCap='round';
+      for(const ph of [0,2.1,4.2]){c.beginPath();const N=40;for(let i=0;i<=N*pr;i++){const t=i/N,a=t*10+ph,sq=1-.25*eo((k-.4)*3);c.lineTo(x+Math.cos(a)*R*sq,gy-t*H0+Math.sin(a)*R*.25)}c.strokeStyle=col;c.lineWidth=Math.max(1.5,U()*.012*(1-k*.4));c.stroke();c.strokeStyle='#ffffff';c.lineWidth*=.3;c.stroke()}})}
   /* 火焰舌 */
   function flames(f,col,o){o=o||{};const n=o.n||9,sd=[...Array(n)].map(()=>[rnd2(-1,1)*(o.sp||.09),Math.random()*.35,.6+Math.random()*.6,Math.random()*6]);cel(o.life||.75,(c,k)=>{const [x,y]=P2(f),gy=y+(o.gy??.12)*SR.h;ADD(c);sd.forEach(([dx,d0,sc,ph])=>{const kk=(k-d0*.5)/.6;if(kk<=0||kk>=1)return;const h=U()*(o.h||.16)*sc*Math.sin(Math.PI*Math.min(1,kk*1.3)),w=h*.32,xx=x+dx*U(),sw=Math.sin(k*18+ph)*w*.5;
       c.globalAlpha=Math.sin(Math.PI*kk);c.fillStyle=(()=>{const g=c.createLinearGradient(0,gy,0,gy-h);g.addColorStop(0,'#ffffff');g.addColorStop(.25,'#ffe27a');g.addColorStop(.6,col);g.addColorStop(1,T0);return g})();c.beginPath();c.moveTo(xx-w,gy);c.quadraticCurveTo(xx-w*.9,gy-h*.5,xx+sw,gy-h);c.quadraticCurveTo(xx+w*.9,gy-h*.5,xx+w,gy);c.closePath();c.fill()})})}
@@ -2124,9 +2134,11 @@ const PFX=(()=>{let HS=0,cv,cx,P=[],Q=[],raf=0,W=0,Hh=0,t0=0,SR={x:0,y:0,w:360,h
   function auraUp(f,col,o){o=o||{};cel(o.life||.9,(c,k)=>{const [x,y]=P2(f),gy=y+.13*SR.h,w=U()*(o.w||.11),h=U()*.34;ADD(c);const a=Math.sin(Math.PI*Math.min(1,k*1.4));c.globalAlpha=a*.75;
       const g=c.createLinearGradient(0,gy,0,gy-h);g.addColorStop(0,col);g.addColorStop(1,T0);c.fillStyle=g;c.beginPath();c.moveTo(x-w,gy);for(let i=0;i<=8;i++){const t=i/8;c.lineTo(x-w*(1-t*.3)+Math.sin(t*9+k*14)*w*.12,gy-h*t)}for(let i=8;i>=0;i--){const t=i/8;c.lineTo(x+w*(1-t*.3)+Math.sin(t*9+k*14+2)*w*.12,gy-h*t)}c.closePath();c.fill();
       c.globalAlpha=a;for(let i=0;i<7;i++){const t=(k*1.5+i/7)%1,xx=x+Math.sin(i*2.1)*w*.85,yy=gy-t*h,L=U()*.05;c.beginPath();c.moveTo(xx,yy);c.lineTo(xx,yy-L);c.strokeStyle=i%2?'#ffffff':col;c.shadowColor=col;c.shadowBlur=6;c.lineWidth=Math.max(1,U()*.006);c.stroke()}})}
-  /* 護盾球 */
-  function bubble(f,col,o){o=o||{};cel(o.life||.9,(c,k)=>{const [x,y]=P2(f),R=(o.R||.16)*U()*(.75+eo(k*3.5)*.25);c.globalAlpha=k<.7?1:1-(k-.7)/.3;ADD(c);c.fillStyle=rg(c,x,y,R,[[0,T0],[.65,T0],[.92,col],[1,'#ffffff']]);c.beginPath();c.ellipse(x,y,R*.82,R,0,0,7);c.save();c.globalAlpha*=.8;c.fill();c.restore();
-      const sw=(k*2)%1;c.beginPath();c.ellipse(x,y,R*.82,R,0,-1.9+sw*1.6,-1.2+sw*1.6);c.strokeStyle='#ffffff';c.shadowColor=col;c.shadowBlur=10;c.lineWidth=Math.max(1.5,U()*.008);c.stroke()})}
+  /* 護盾：由中心張開、六角紋掃過、結束時碎開擴散 */
+  function bubble(f,col,o){o=o||{};cel(o.life||.9,(c,k)=>{const [x,y]=P2(f),R0=(o.R||.16)*U(),op=eo(k*3.2),end=k<.75?0:(k-.75)/.25,R=R0*(.2+op*.8)*(1+end*.35);c.globalAlpha=1-end;ADD(c);
+      c.save();c.globalAlpha*=.8;c.fillStyle=rg(c,x,y,R,[[0,T0],[.6,T0],[.92,col],[1,'#ffffff']]);c.beginPath();c.ellipse(x,y,R*.82,R,0,0,7);c.fill();c.restore();
+      c.save();c.beginPath();c.ellipse(x,y,R*.82,R,0,0,7);c.clip();const sw=-R+((k*1.6)%1)*R*2.4;c.strokeStyle=col;c.globalAlpha*=.55;c.lineWidth=1;const hs=R*.22;for(let yy=-R;yy<R;yy+=hs*.87){for(let xx=-R;xx<R;xx+=hs*1.5){const ox=x+xx+((Math.round((yy+R)/(hs*.87))%2)?hs*.75:0),oy=y+yy;const d=Math.abs(oy-y-sw);if(d>hs*1.5)continue;c.globalAlpha=(1-end)*.6*(1-d/(hs*1.5));c.beginPath();for(let i=0;i<=6;i++){const a=i*PI/3;c.lineTo(ox+Math.cos(a)*hs*.5,oy+Math.sin(a)*hs*.5)}c.stroke()}}c.restore();
+      c.beginPath();c.ellipse(x,y,R*.82,R,0,-2,-1.1);c.strokeStyle='#ffffff';c.shadowColor=col;c.shadowBlur=10;c.lineWidth=Math.max(1.5,U()*.008);c.stroke()})}
   /* 三道爪痕 */
   function claw(f,col,o){o=o||{};const n=o.n||3,ang=o.ang??.9;cel(o.life||.32,(c,k)=>{const [x,y]=P2(f),L=(o.L||.22)*U(),pr=eo(k*3.4),fd=k<.4?1:1-(k-.4)/.6;ADD(c);c.globalAlpha=fd;c.translate(x,y);c.rotate(ang);c.shadowColor=col;c.shadowBlur=10;
       for(let i=0;i<n;i++){const off=(i-(n-1)/2)*L*.2,hd=-L/2+L*pr,tl=-L/2+L*Math.max(0,pr-.7),W=L*.05;c.beginPath();c.moveTo(tl,off);c.quadraticCurveTo((tl+hd)/2,off-W*1.2-L*.06,hd,off);c.quadraticCurveTo((tl+hd)/2,off+W-L*.06,tl,off);c.fillStyle=col;c.fill();c.beginPath();c.moveTo(tl+(hd-tl)*.2,off-L*.03);c.lineTo(hd,off);c.strokeStyle='#ffffff';c.lineWidth=Math.max(1,W*.4);c.stroke()}})}
@@ -2140,6 +2152,13 @@ const PFX=(()=>{let HS=0,cv,cx,P=[],Q=[],raf=0,W=0,Hh=0,t0=0,SR={x:0,y:0,w:360,h
   /* 闇之漩渦 */
   function swirl(f,col,o){o=o||{};cel(o.life||.8,(c,k)=>{const [x,y]=P2(f),R=(o.R||.12)*U()*(1.2-eo(k*1.5)*.6);c.globalAlpha=Math.sin(Math.PI*Math.min(1,k*1.2));ADD(c);c.translate(x,y);c.scale(1,.7);c.shadowColor=col;c.shadowBlur=10;
       for(let j=0;j<3;j++){c.beginPath();for(let i=0;i<=30;i++){const t=i/30,a=t*5+j*2.09+k*9,r=R*(1-t*.85);c.lineTo(Math.cos(a)*r,Math.sin(a)*r)}c.strokeStyle=j?col:'#ffffff';c.lineWidth=Math.max(1.5,U()*.01*(1-k*.5));c.lineCap='round';c.stroke()}c.fillStyle=rg(c,0,0,R*.6,[[0,col],[1,T0]]);c.fillRect(-R,-R,R*2,R*2)})}
+  /* 角色動作：衝刺、跳起、下沉、淡出 */
+  function moveSpr(side,kf,ms){try{const sp=document.querySelector(side==='foe'?'.spr.foe .art img:not(.under)':'.spr.me .art img:not(.under)');if(sp)sp.animate(kf,{duration:ms,easing:'cubic-bezier(.3,.8,.3,1)',composite:'add'})}catch(e){}}
+  const lunge=(side,d)=>{const dx=(side==='foe'?-1:1)*(d||28);moveSpr(side,[{transform:'translate(0,0)'},{transform:`translate(${-dx*.25}px,0)`,offset:.2},{transform:`translate(${dx}px,${side==='foe'?8:-6}px)`,offset:.45},{transform:'translate(0,0)'}],460)};
+  const hop=side=>moveSpr(side,[{transform:'translateY(0)'},{transform:'translateY(-30px)',offset:.4},{transform:'translateY(0)'}],420);
+  const sink=side=>moveSpr(side,[{transform:'translateY(0)',opacity:1},{transform:'translateY(40px)',opacity:0,offset:.45},{transform:'translateY(40px)',opacity:0,offset:.6},{transform:'translateY(0)',opacity:1}],1000);
+  const ghost=side=>moveSpr(side,[{opacity:1},{opacity:.15,offset:.3},{opacity:.15,offset:.7},{opacity:1}],900);
+  const castPose=side=>moveSpr(side,[{filter:'brightness(1)'},{filter:'brightness(1.6)',offset:.4},{filter:'brightness(1)'}],500);
   /* 畫面閃色 */
   const tint=(col,life)=>scr(col,life||.15);
   /* 命中回饋：火花＋閃光＋環 */
@@ -2213,37 +2232,65 @@ const PFX=(()=>{let HS=0,cv,cx,P=[],Q=[],raf=0,W=0,Hh=0,t0=0,SR={x:0,y:0,w:360,h
   const MT={orb:(c)=>comet(FMp,H,c,.017,.3,{arc:.05}),claw:(c)=>{claw(H,c);later(100,()=>hitFx(H,c,.8))},slam:(c)=>{flash(H,c,.24,.3);shock(H,c,.28,.45,.32,{gy:.12});spark(H,c,.18,10)},
     spore:(c)=>{fog(H,c,{R:.12,a:.6});twinkle(H,c,5,{life:.8})},roar:(c)=>{multi(3,110,()=>shock(F,c,.32,.5));tint('rgba(255,60,60,.12)',.3)},aura:(c)=>auraUp(F,c),heal:(c)=>{auraUp(F,c);twinkle(F,'#ffffff',6,{rise:.12})},
     drain:(c)=>{ray(H,F,c,.016,.55,{wavy:true});later(150,()=>hitFx(H,c,.7));multi(3,90,()=>comet(H,F,c,.009,.35,{arc:rnd2(-.08,.08),hit:false}))},beam:(c)=>{ray(FMp,H,c,.03,.6);later(200,()=>hitFx(H,c,1))}};
+  const HL=[H[0],H[1]+.02],up2=(f,d)=>[f[0],f[1]-d];
   const CMX={
-    m_horn(){streak(F,H,'#ffffff',{w:.05});later(140,()=>hitFx(H,'#ffffff',1))},
-    m_rock(){multi(3,100,()=>comet(FMp,[H[0]+rnd2(-.03,.03),H[1]+rnd2(-.03,.03)],'#d8c08a',.014,.3,{arc:.12,pow:.5}))},
-    m_cleave(){cut(H,-.5,.2,'#b06cff',{dir:-1,th:.42});later(110,()=>hitFx(H,'#d8b8ff',1.1))},
-    m_bite(){bite(H,'#ff5a4a');later(150,()=>hitFx(H,'#ff8a7a',.9))},
-    m_frostfang(){bite(H,'#8fdcff');later(150,()=>{hitFx(H,'#cff2ff',.9);crystals(H,'#8fdcff',{n:3,h:.08,sp:.06,life:.5})})},
-    m_root(){crystals(H,'#8fbf5a',{n:5,h:.14,sp:.1});later(200,()=>hitFx(H,'#cfe8a0',.8))},
-    m_rootcage(){crystals(H,'#a07a4a',{n:7,h:.18,sp:.14});later(250,()=>hitFx(H,'#e0c8a0',1))},
-    m_sleep(){fog(H,'#d6a8ff',{R:.12,a:.6});twinkle(H,'#ffd8ff',6,{rise:.1})},
-    m_boulder(){comet([H[0]+.06,-.1],H,'#d8c08a',.04,.4,{lin:true,hit:()=>{flash(H,'#e8d8b8',.26,.35);shock(H,'#d8c08a',.3,.5,.32,{gy:.12});spark(H,'#fff0c8',.2,12)}})},
-    m_quake(){tint('rgba(80,60,20,.2)',.4);multi(3,120,i=>shock(H,'#d6b25a',.2+i*.1,.5,.3,{gy:.13}));later(200,()=>crystals(H,'#c9a46a',{n:6,h:.12,sp:.14}))},
-    m_icicle(){multi(3,70,()=>comet(FMp,[H[0]+rnd2(-.03,.03),H[1]+rnd2(-.03,.03)],'#8fdcff',.012,.25,{tail:10,pow:.5}))},
-    m_avalanche(){flash(H,'#e8f6ff',.3,.4);crystals(H,'#cff2ff',{n:7,h:.16,sp:.14});shock(H,'#e8f6ff',.3,.5,.32,{gy:.12})},
-    m_zero(){ray(FMp,H,'#8fdcff',.04,.7);later(250,()=>{crystals(H,'#cff2ff',{n:7,h:.16,sp:.14});tint('rgba(180,230,255,.25)',.3)})},
-    m_wingshard(){multi(6,50,()=>comet([F[0]+rnd2(-.05,.05),F[1]+rnd2(-.06,.04)],[H[0]+rnd2(-.04,.04),H[1]+rnd2(-.04,.04)],'#d8f2ff',.01,.25,{tail:8,pow:.4}))},
-    m_darkblade(){cut(H,-.4,.2,'#9a5aff',{dir:-1,th:.4});later(110,()=>hitFx(H,'#c99aff',1))},
-    m_soul(){swirl(H,'#b06cff',{R:.12});later(250,()=>multi(3,80,()=>comet(H,F,'#d8b8ff',.01,.35,{arc:rnd2(-.08,.08),hit:false})))},
-    m_hellfire(){rune(H,'#ff5a1a',{R:.15,life:.9});later(200,()=>{flames(H,'#ff4a1a',{n:12,h:.22,sp:.12});column(H,'#ff7a2a',{w:.06,life:.5})});later(350,()=>{hitFx(H,'#ffb04a',1.1);tint('rgba(255,90,20,.2)',.25)})},
-    m_end(){tint('rgba(10,0,30,.5)',.7);later(250,()=>{ray(FMp,H,'#7a3aff',.06,.8);later(250,()=>{flash(H,'#b08aff',.34,.45);shock(H,'#7a3aff',.36,.6);spark(H,'#d8b8ff',.26,16)})})},
-    m_engulf(){fog(H,'#3a1a5a',{R:.15,a:.85,n:9});swirl(H,'#7a3aaa',{R:.13})},
-    m_vanish(){fog(F,'#9a8ab8',{R:.13,a:.6});twinkle(F,'#e0d0ff',5,{life:.6})},
-    m_thunderdive(){streak(F,H,'#ffe45a',{w:.05});later(120,()=>{zapB(H,'#ffe45a');hitFx(H,'#fff3a0',1.1)})},
-    m_lightning(){tint('rgba(20,20,50,.3)',.4);later(250,()=>{zapB(H,'#ffe45a',{w:.022});flash(H,'#fff3a0',.3,.35);shock(H,'#ffe45a',.3,.5,.32,{gy:.12});tint('rgba(255,250,200,.35)',.12)})},
-    m_storm(){multi(3,140,()=>wind(H,'#8fdcff',{dir:-1,n:6}));later(300,()=>swirl(H,'#cfe8ff',{R:.14}))},
-    m_knife(){multi(3,70,i=>comet(FMp,[H[0],H[1]+(i-1)*.03],'#e8e8e8',.01,.2,{arrow:true,tail:7,pow:.4}))},
-    m_smoke(){fog(H,'#a8a8a8',{R:.14,a:.75,n:9})},
-    m_oldoath(){cut(H,-.5,.2,'#e8d27a',{dir:-1,th:.4});later(110,()=>{hitFx(H,'#fff3c0',1);column(H,'#e8d27a',{w:.03,life:.3})})},
-    m_shieldbash(){streak(F,H,'#d8d8d8',{w:.06});later(140,()=>{flash(H,'#ffffff',.22,.3);spark(H,'#e8e8e8',.17,10);shock(H,'#d8d8d8',.22,.4)})},
-    s_cut(){cut(H,-.4,.18,'#9a7aff',{dir:-1});later(110,()=>hitFx(H,'#c8b8ff',.9))},
-    s_arrow(){multi(7,50,()=>{const tx=[H[0]+rnd2(-.08,.08),H[1]+rnd2(-.02,.06)];comet([tx[0]-.07,-.1],tx,'#9a7aff',.011,.22,{arrow:true,lin:true,tail:7,pow:.4})})},
-    s_light(){column(H,'#b8a8ff',{w:.08});later(160,()=>hitFx(H,'#e0d8ff',1))},
+    m_goo(){charge(FMp,'#7fd3ff',{R:.06});later(220,()=>comet(FMp,H,'#7fd3ff',.02,.32,{arc:.12,hit:()=>{hitFx(H,'#bfe8ff',.7);fog(H,'#5ab8ff',{R:.08,a:.5,life:.6})}}))},
+    m_split(){castPose('foe');flash([F[0]-.06,F[1]],'#7fd3ff',.12,.5);flash([F[0]+.06,F[1]],'#7fd3ff',.12,.5);later(200,()=>{auraUp(F,'#7fd3ff',{life:.7});twinkle(F,'#ffffff',6,{rise:.1})})},
+    m_horn(){lunge('foe',40);later(160,()=>{streak(F,H,'#ffffff',{w:.05,life:.22});later(90,()=>hitFx(H,'#ffffff',1.1))})},
+    m_hop(){hop('foe');wind([F[0],F[1]+.1],'#cfff9a',{dir:-1,n:4})},
+    m_sneak(){ghost('foe');fog(F,'#5a5a6a',{R:.08,a:.5,life:.5});later(380,()=>{claw(H,'#ffd27a',{ang:-2.2});later(90,()=>hitFx(H,'#ffe8b0',.9))})},
+    m_rock(){castPose('foe');multi(3,110,()=>comet(FMp,[H[0]+rnd2(-.03,.03),H[1]+rnd2(-.03,.03)],'#d8c08a',.014,.32,{arc:.14,pow:.5}))},
+    m_cleave(){lunge('foe',30);charge(F,'#b06cff',{R:.08,life:.25});later(220,()=>{cut(H,PI/2-.2,.2,'#b06cff',{span:1.8,th:.45});later(110,()=>{hitFx(H,'#d8b8ff',1.1);crystals(H,'#b06cff',{n:4,h:.1,sp:.08,life:.6})})})},
+    m_rally(){castPose('foe');multi(3,120,()=>shock(F,'#ff9a4a',.3,.5));auraUp(F,'#ff9a4a',{life:.8})},
+    m_spore(){castPose('foe');multi(6,70,()=>comet([F[0]+rnd2(-.05,.05),F[1]],[H[0]+rnd2(-.05,.05),H[1]+rnd2(-.06,.04)],'#9ae05a',.008,.55,{arc:rnd2(.02,.12),tail:6,hit:false}));later(550,()=>{fog(H,'#7ac83a',{R:.12,a:.55});hitFx(H,'#cfff9a',.5)})},
+    m_sleep(){castPose('foe');fog([(F[0]+H[0])/2,(F[1]+H[1])/2],'#e0b8ff',{R:.12,a:.4,life:.7});later(300,()=>{fog(H,'#d6a8ff',{R:.12,a:.55,life:1});twinkle(H,'#ffd8ff',8,{rise:.12,life:1.1})})},
+    m_bite(){lunge('foe',36);later(150,()=>{bite(H,'#ff5a4a');later(140,()=>hitFx(H,'#ff8a7a',1))})},
+    m_howl(){tint('rgba(20,30,80,.3)',.5);castPose('foe');flash([F[0]+.08,F[1]-.2],'#fff6d0',.12,.9);multi(3,140,()=>shock(F,'#e8e0c0',.34,.6))},
+    m_root(){castPose('foe');vine(H,'#8fd05a');later(400,()=>hitFx(H,'#cfe8a0',.7))},
+    m_photo(){column(F,'#e8ff9a',{w:.07,life:.8});later(250,()=>{auraUp(F,'#9ae05a',{life:.8});twinkle(F,'#ffffff',6,{rise:.12})})},
+    m_rotmist(){castPose('foe');fog(H,'#8a4ab0',{R:.16,a:.6,n:9,life:1.1});swirl(H,'#b06cff',{R:.12,life:.9})},
+    m_rootcage(){castPose('foe');crystals(H,'#a07a4a',{n:8,h:.2,sp:.15});later(150,()=>vine(H,'#8fbf5a',{R:.11}));later(450,()=>hitFx(H,'#e0c8a0',1))},
+    m_sap(){castPose('foe');auraUp(F,'#e8b84a',{life:.9});twinkle(F,'#ffe8a0',6,{rise:.1})},
+    m_sonic(){castPose('foe');multi(4,90,i=>{const t=(i+1)/4;shock([F[0]+(H[0]-F[0])*t,F[1]+(H[1]-F[1])*t],'#d6a8ff',.06+t*.06,.35)});later(380,()=>hitFx(H,'#e8d8ff',.8))},
+    m_suck(){lunge('foe',34);later(150,()=>{bite(H,'#ff5a7a',{W:.18});later(160,()=>{hitFx(H,'#ff8aa0',.8);multi(3,80,()=>comet(H,F,'#ff5a7a',.009,.35,{arc:rnd2(-.08,.08),hit:false}))})})},
+    m_bone(){lunge('foe',30);later(170,()=>{cut(H,-.5,.18,'#f4efe0',{dir:-1});later(100,()=>hitFx(H,'#ffffff',1))})},
+    m_rebuild(){rune(F,'#e8e0c8',{R:.13,life:1});later(250,()=>{auraUp(F,'#e8e0c8',{life:.8});twinkle(F,'#ffffff',5,{rise:.1})})},
+    m_boulder(){castPose('foe');comet([H[0]+.06,-.1],H,'#d8c08a',.045,.42,{lin:true,tail:10,hit:()=>{flash(H,'#e8d8b8',.26,.35);shock(H,'#d8c08a',.32,.5,.32,{gy:.12});spark(H,'#fff0c8',.2,12);crystals(H,'#a08a6a',{n:4,h:.07,sp:.1,life:.5})}})},
+    m_petrify(){castPose('foe');bubble(F,'#c9b08a',{R:.17});crystals(F,'#c9b08a',{n:5,h:.08,sp:.1,life:.8})},
+    m_quake(){lunge('foe',40);later(200,()=>{tint('rgba(80,60,20,.2)',.4);multi(3,110,i=>shock(H,'#d6b25a',.2+i*.1,.5,.3,{gy:.13}));crystals(H,'#c9a46a',{n:7,h:.13,sp:.16});later(60,()=>hitFx(H,'#fff0c8',1.1))})},
+    m_devour(){lunge('foe',42);later(150,()=>{bite(H,'#7fd3ff',{W:.32});later(150,()=>{hitFx(H,'#bfe8ff',1.1);multi(3,80,()=>comet(H,F,'#7fd3ff',.01,.35,{arc:rnd2(-.08,.08),hit:false}))})})},
+    m_burrow(){sink('foe');fog([F[0],F[1]+.1],'#c9a46a',{R:.12,a:.65,life:.8});later(500,()=>shock([F[0],F[1]+.1],'#d6b25a',.2,.4,.3))},
+    m_frostfang(){lunge('foe',34);later(150,()=>{bite(H,'#8fdcff');later(140,()=>{hitFx(H,'#cff2ff',.9);crystals(H,'#8fdcff',{n:4,h:.09,sp:.07,life:.6})})})},
+    m_icicle(){charge(FMp,'#8fdcff',{R:.07});later(200,()=>multi(3,70,()=>comet(FMp,[H[0]+rnd2(-.03,.03),H[1]+rnd2(-.03,.03)],'#8fdcff',.012,.25,{tail:10,pow:.5})))},
+    m_fog(){castPose('foe');fog(F,'#d8f2ff',{R:.17,a:.5,n:9,life:1.1});twinkle(F,'#ffffff',6,{life:1})},
+    m_avalanche(){lunge('foe',40);later(180,()=>{flash(H,'#e8f6ff',.3,.4);crystals(H,'#cff2ff',{n:7,h:.16,sp:.14});shock(H,'#e8f6ff',.3,.5,.32,{gy:.12});hitFx(H,'#ffffff',1.1)})},
+    m_icebody(){castPose('foe');crystals(F,'#8fdcff',{n:6,h:.12,sp:.12});later(150,()=>bubble(F,'#8fdcff',{R:.17}))},
+    m_zero(){charge(FMp,'#8fdcff',{R:.1,life:.45});later(400,()=>{ray(FMp,H,'#8fdcff',.045,.75);later(250,()=>{crystals(H,'#cff2ff',{n:8,h:.18,sp:.15});hitFx(H,'#ffffff',1.1);tint('rgba(180,230,255,.3)',.3)})})},
+    m_wingshard(){castPose('foe');multi(7,45,()=>comet([F[0]+rnd2(-.06,.06),F[1]+rnd2(-.06,.04)],[H[0]+rnd2(-.05,.05),H[1]+rnd2(-.05,.05)],'#d8f2ff',.009,.26,{arrow:true,tail:8,pow:.4}))},
+    m_scale(){castPose('foe');bubble(F,'#8fdcff',{R:.16});twinkle(F,'#e8f8ff',7,{life:.9})},
+    m_darkblade(){lunge('foe',32);charge(F,'#9a5aff',{R:.07,life:.22});later(200,()=>{cut(H,-.4,.21,'#9a5aff',{dir:-1});later(110,()=>hitFx(H,'#c99aff',1.1))})},
+    m_blackshield(){castPose('foe');bubble(F,'#7a3aba',{R:.18});rune(F,'#6a3a9a',{R:.12,life:.9})},
+    m_soul(){castPose('foe');swirl(H,'#b06cff',{R:.13});later(300,()=>{hitFx(H,'#d8b8ff',.8);multi(4,80,()=>comet(H,F,'#d8b8ff',.01,.38,{arc:rnd2(-.1,.1),hit:false}))})},
+    m_vanish(){ghost('foe');fog(F,'#9a8ab8',{R:.13,a:.55});twinkle(F,'#e0d0ff',5,{life:.7})},
+    m_hellfire(){lunge('foe',36);charge(F,'#ff5a1a',{R:.08,life:.25});later(220,()=>{streak(F,H,'#ff7a2a',{w:.05,over:1.1});later(120,()=>{flames(H,'#ff4a1a',{n:12,h:.22,sp:.12});column(H,'#ff7a2a',{w:.05,life:.45});hitFx(H,'#ffb04a',1.1);tint('rgba(255,90,20,.2)',.25)})})},
+    m_pact(){rune(F,'#ff3a3a',{R:.16,life:1.1});later(300,()=>{auraUp(F,'#ff3a3a',{w:.13});tint('rgba(120,0,0,.25)',.4)})},
+    m_end(){tint('rgba(10,0,30,.5)',.8);charge(FMp,'#7a3aff',{R:.12,life:.5});later(450,()=>{ray(FMp,H,'#7a3aff',.065,.8);later(250,()=>{flash(H,'#b08aff',.34,.45);shock(H,'#7a3aff',.36,.6);spark(H,'#d8b8ff',.26,16)})})},
+    m_engulf(){castPose('foe');fog(H,'#3a1a5a',{R:.16,a:.85,n:9,life:1.1});swirl(H,'#7a3aaa',{R:.13});later(400,()=>hitFx(H,'#b08aff',.7))},
+    m_dread(){tint('rgba(60,0,0,.35)',.6);castPose('foe');auraUp(F,'#ff3a3a',{w:.14});later(150,()=>multi(3,130,()=>shock(F,'#ff4a4a',.38,.55)))},
+    s_cut(){lunge('foe',30);later(170,()=>{cut(H,-.4,.18,'#9a7aff',{dir:-1});later(110,()=>hitFx(H,'#c8b8ff',.9))})},
+    s_bolt(){charge(FMp,'#9a7aff',{R:.07});later(250,()=>comet(FMp,H,'#9a7aff',.018,.3,{arc:.05}))},
+    s_arrow(){castPose('foe');multi(8,50,()=>{const tx=[H[0]+rnd2(-.08,.08),H[1]+rnd2(-.02,.06)];comet([tx[0]-.07,-.1],tx,'#9a7aff',.011,.22,{arrow:true,lin:true,tail:7,pow:.4})})},
+    s_light(){rune(H,'#9a7aff',{R:.12,life:.7});later(250,()=>{column(H,'#b8a8ff',{w:.08});later(140,()=>hitFx(H,'#e0d8ff',1))})},
+    s_mirror(){castPose('foe');ghost('foe');flash([F[0]-.07,F[1]],'#b8a8ff',.1,.6);flash([F[0]+.07,F[1]],'#b8a8ff',.1,.6);twinkle(F,'#e0d8ff',6,{life:.8})},
+    m_knife(){castPose('foe');multi(3,80,i=>comet(FMp,[H[0],H[1]+(i-1)*.03],'#e8e8e8',.01,.2,{arrow:true,tail:7,pow:.4}))},
+    m_smoke(){castPose('foe');comet(FMp,H,'#a8a8a8',.012,.3,{arc:.1,hit:()=>fog(H,'#a8a8a8',{R:.15,a:.75,n:9,life:1.1})})},
+    m_oldoath(){lunge('foe',30);charge(F,'#e8d27a',{R:.08,life:.25});later(220,()=>{cut(H,-.5,.21,'#e8d27a',{dir:-1});later(110,()=>{hitFx(H,'#fff3c0',1.1);column(H,'#e8d27a',{w:.03,life:.35})})})},
+    m_shieldbash(){lunge('foe',44);later(160,()=>{flash(H,'#ffffff',.22,.3);spark(H,'#e8e8e8',.18,10);shock(H,'#d8d8d8',.24,.4)})},
+    m_thunderdive(){lunge('foe',50);later(160,()=>{streak(F,H,'#ffe45a',{w:.05,life:.2});later(100,()=>{zapB(H,'#ffe45a');hitFx(H,'#fff3a0',1.1)})})},
+    m_galewing(){castPose('foe');multi(3,110,()=>wind(F,'#cfe8ff',{dir:-1,n:4}));auraUp(F,'#cfe8ff',{life:.8})},
+    m_storm(){castPose('foe');multi(3,170,()=>{wind(H,'#8fdcff',{dir:-1,n:5});later(90,()=>hitFx(H,'#cfe8ff',.5))});later(200,()=>swirl(H,'#cfe8ff',{R:.14,life:.9}))},
+    m_lightning(){tint('rgba(20,20,50,.35)',.5);charge(up2(F,.25),'#ffe45a',{R:.1,life:.4});later(380,()=>{zapB(H,'#ffe45a',{w:.024});flash(H,'#fff3a0',.3,.35);shock(H,'#ffe45a',.3,.5,.32,{gy:.12});tint('rgba(255,250,200,.35)',.12)})},
+    m_recalib(){castPose('foe');multi(3,120,()=>shock(F,'#ffe45a',.2,.4));later(200,()=>bubble(F,'#ffe45a',{R:.17}))},
   };
   const CM=new Proxy({},{get:(o,id)=>{if(CMX[id])return CMX[id];const k=typeof SKM!=='undefined'&&SKM[id];if(!k)return undefined;const f=MT[k.fx];return f?()=>f(k.c||'#ff6a6a'):undefined}});
   /* 舊介面相容 */
@@ -2427,7 +2474,7 @@ const PFX=(()=>{let HS=0,cv,cx,P=[],Q=[],raf=0,W=0,Hh=0,t0=0,SR={x:0,y:0,w:360,h
   const SELF={heal:'heal_sparkle',buff:'buff_aura',shield:'shield_bubble'};
   return{
     impact,heroFxn,foeFxn,
-    me(fx){if(reduce())return;run();const k=fx.skill;if(k&&CS[k])return CS[k]();if(fx.d===0)return wind(F,'#e8f0ff',{dir:1,n:3,life:.35});if(fx.d!=null)return (CB[S_CLS()]||CB[BASEC[S_CLS()]]||CB.swordsman)();if(fx.glow)CS.heal()},
+    me(fx){if(reduce())return;run();const k=fx.skill;if(k&&CS[k]){const e=(SKA[k]||[])[0];if(e==='slash'||e==='spin')lunge('me',30);else castPose('me');return CS[k]()}if(fx.d===0)return wind(F,'#e8f0ff',{dir:1,n:3,life:.35});if(fx.d!=null){const bc=CB[S_CLS()]?S_CLS():(BASEC[S_CLS()]||'swordsman');bc==='swordsman'?lunge('me',30):castPose('me');return CB[bc]()}if(fx.glow)CS.heal()},
     foe(fx){if(reduce())return;run();if(fx.fsk){if(CM[fx.fsk])return CM[fx.fsk]();const k=SKM[fx.fsk]||{fx:'roar',c:'#ff4a4a'};return (FO[k.fx]||FO.roar)(k.c,k.h)}
       if(fx.miss)return wind([H[0]+.05,H[1]],'#ffffff',{dir:-1,n:3,life:.35});
       if(fx.d>0){claw(H,'#ff6a6a',{n:3,ang:-.9});later(90,()=>hitFx(H,'#ff9a8a',.7))}}};
