@@ -1777,6 +1777,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'2.9.1',d:'2026-11-18',t:'BOSS 戰調整',b:'對 BOSS 每次攻擊至少造成 BOSS 最大生命 2% 的固定傷害；每回合傷害上限由 12% 提高到 20%（惡夢 16%）。'},
   {v:'2.9',d:'2026-11-18',t:'設定更新',b:'「全自動」按鈕改成進入關卡後才出現。設定新增「畫面震動＋手機震動」開關，可以關掉。'},
   {v:'2.8',d:'2026-11-17',t:'全自動冒險',b:'右下角新增「全自動」按鈕：自動隨機選路、自動處理事件與祭壇、自動戰鬥；冒險結束會回城休息再出發同一地區。戰敗或金幣不夠休息時自動停止，再按一次即可關閉。'},
   {v:'2.7',d:'2026-11-17',t:'地區音樂與載入改善',b:'每個地區都有自己的探索音樂：草原、迷霧森林、廢棄礦坑、霜雪山脈、黑霧要塞、灰石街道、無盡之塔。圖片載入失敗會自動重試三次。特效改成較柔和的手繪風格。'},
@@ -1860,7 +1861,7 @@ const MEL={slime:['fire','phys'],hornrabbit:['ice'],goblin:['thunder'],goblinbos
 const elMul=(id,el)=>{const e=MEL[id];if(!e||!el)return 1;return e[0]===el?1.5:e[1]===el?.6:1};
 const basicEl=()=>({swordsman:'phys',ranger:'phys',mage:'arcane',cleric:'holy'}[S.cls]||'phys');
 /* 首領護甲：每回合傷害上限；半血時進入狂怒（護盾＋攻擊上升） */
-const capB=d=>{if(!B||B.kind!=='boss')return d;const lim=Math.round(B.max*(B.nm?.1:.12)),r=Math.max(1,Math.min(d,lim-(B.tk||0)));B.tk=(B.tk||0)+r;return r};
+const capB=d=>{if(!B||B.kind!=='boss')return d;d=Math.max(d,Math.round(B.max*.02));const lim=Math.round(B.max*(B.nm?.16:.2)),r=Math.max(1,Math.min(d,lim-(B.tk||0)));B.tk=(B.tk||0)+r;return r};
 function bossPhase(){if(B&&B.kind==='boss'&&!B.ph2&&B.hp>0&&B.hp<=B.max*.5){B.ph2=1;B.fshield=(B.fshield||0)+Math.round(B.max*.12);blog(`${B.name} 被逼入絕境，張開了護盾！`)}}
 function hitFoe(stat,pow,o){o=o||{};const s=stats();if(!o.sure&&Math.random()*100<(B.eva+fbSum('eva'))*.6)return{d:0,cr:false,miss:true};let base=clsDm()*(stat==='BOTH'?s.ATK+s.MAG:s[stat])*(1+buffSum('atk')+(s.FOCUSATK&&B.cls.focus>=rmax(5)?s.FOCUSATK/100:0))*(B.pst.weak>0?.75:1);
   const fdef=stat==='MAG'?(B.mres??B.def):stat==='BOTH'?((B.mres??B.def)+B.def)/2:B.def;const em=elMul(B.id,B.curEl);if(em!==1)B.elHit=em>1?'w':'r';let d=em*base*pow*100/(100+fdef*(1+fbSum('def'))*(1-(o.pierce||0)))*(.9+Math.random()*.2);const cr=!!o.sure||Math.random()*100<s.CRIT+(o.cr||0)+(hasP('sw1')&&B.cls.brk>=3?15:0);if(cr)d*=(s.CD+(hasP('rg3')&&B.cls.focus>=5?30:0)+s.BRKCD*B.cls.brk)/100;
