@@ -78,6 +78,7 @@ h3{font-family:var(--display);font-size:16px;color:var(--navy)}
 .tag{display:inline-block;font-size:11px;padding:0 6px;border-radius:8px;background:var(--navy);color:var(--gold);white-space:nowrap}
 .tag.red{background:var(--hp);color:#fff}.tag.ok{background:var(--exp);color:#fff}.tag.off{background:#b9b2a2;color:#fff}
 .chips{display:flex;flex-wrap:wrap;gap:5px}.chip{font-size:11px;padding:1px 7px;border-radius:9px;background:var(--panel2);border:1px solid var(--line)}
+.drops{display:flex;flex-direction:column;gap:6px;margin:6px 0 8px}.drop{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;border:1px solid currentColor;background:rgba(255,255,255,.75);position:relative;overflow:hidden;animation:dropIn .5s cubic-bezier(.2,1.6,.4,1) both}.drop.d3{color:var(--r3);box-shadow:0 0 12px rgba(180,110,255,.45)}.drop.d4{color:var(--r4);box-shadow:0 0 16px rgba(255,200,60,.6)}.drop.shn{color:#1593b3;box-shadow:0 0 14px rgba(60,200,240,.6)}.drop.shn b{color:#1593b3}.drop .grow{display:flex;flex-direction:column}.drop .sub{color:var(--sub);font-size:.85em}.drop::after{content:'';position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.55) 50%,transparent 70%);transform:translateX(-120%);animation:dropShine 1.6s .4s ease-out 2}@keyframes dropIn{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}@keyframes dropShine{to{transform:translateX(120%)}}
 .c0{color:var(--r0)}.c1{color:var(--r1)}.c2{color:var(--r2)}.c3{color:var(--r3)}.c4{color:var(--r4)}
 .ico{flex:none;width:38px;height:38px;border-radius:8px;border:2px solid currentColor;background:#fff;font-family:var(--display);font-size:17px;display:grid;place-items:center}
 .list{display:flex;flex-direction:column;gap:8px}
@@ -397,7 +398,7 @@ function toast(t){const T=$('#toast');while(T.children.length>=3)T.firstChild.re
 /* ============ 資料 ============ */
 const ATTR={STR:'力量',DEX:'敏捷',INT:'智力',VIT:'體質',LUK:'幸運'};
 const CLS={
-  swordsman:{n:'劍士',d:'站在最前面的人。血厚、防高，越打越順手。',f:'破綻：普攻與「裂甲擊」會在敵人身上堆疊破綻（最多 5 層），再用「十字裂斬」全部清算。',base:{STR:8,DEX:5,INT:3,VIT:8,LUK:4},grow:{STR:1,VIT:1},atk:'STR',basic:'ATK',adv:['knight','berserker']},
+  swordsman:{n:'劍士',d:'站在最前面的人。血厚、防高，越打越順手。',f:'破綻：普攻與「裂甲擊」會在敵人身上堆疊破綻（最多 5 層），每層讓你的攻擊 +6%；再用「十字裂斬」全部清算。',base:{STR:8,DEX:5,INT:3,VIT:8,LUK:4},grow:{STR:1,VIT:1},atk:'STR',basic:'ATK',adv:['knight','berserker']},
   mage:{n:'法師',d:'火力最高，身體最脆。靠順序取勝的人。',f:'印記：「點火」「霜針」會在敵人身上留下印記（最多 3 個），再用「引雷」全部引爆。普攻會回流少量 MP。',base:{STR:2,DEX:4,INT:10,VIT:5,LUK:5},grow:{INT:2},atk:'STR',basic:'MAG',adv:['archmage','warlock']},
   ranger:{n:'遊俠',d:'不硬碰硬，等對方露出空檔。',f:'專注：普攻、閃過攻擊都會累積專注（最多 5 層），「屏息」一箭把專注全部打出去。',base:{STR:4,DEX:10,INT:3,VIT:5,LUK:6},grow:{DEX:1,LUK:1},atk:'DEX',basic:'ATK',adv:['sniper','assassin']},
   cleric:{n:'神官',d:'打得慢，但很難倒下。',f:'信仰：治療、祈禱與普攻會累積信仰，滿 100 時神會「回應」——自動回復 25% HP 並降下聖光。',base:{STR:4,DEX:4,INT:8,VIT:8,LUK:4},grow:{INT:1,VIT:1},atk:'STR',basic:'MAG',adv:['bishop','templar']}
@@ -414,26 +415,26 @@ const ADV={
 };
 const SK={
   slash:{n:'裂甲擊',c:'swordsman',lv:1,mp:4,dmg:{s:'ATK',p:1.4},brk:2,d:'踏前一步重砍，敵人破綻 +2。'},
-  guard:{n:'招架反擊',c:'swordsman',lv:3,mp:5,counter:1,d:'擺好架勢。下次被攻擊只受 30% 傷害，並反擊 150%。'},
-  whirl:{n:'十字裂斬',c:'swordsman',lv:5,mp:8,dmg:{s:'ATK',p:1.2},fin:.6,d:'清算所有破綻，每層傷害 +60%。'},
+  guard:{n:'招架反擊',c:'swordsman',lv:1,mp:5,counter:1,d:'擺好架勢。下次被攻擊只受 30% 傷害，並反擊 150%。'},
+  whirl:{n:'十字裂斬',c:'swordsman',lv:3,mp:8,dmg:{s:'ATK',p:1.2},fin:.6,d:'清算所有破綻，每層傷害 +60%。'},
   warcry:{n:'鬥氣解放',c:'swordsman',lv:8,mp:8,buff:{atk:.35,t:3},endure:1,d:'3 回合攻擊 +35%，受到致命傷時以 1 HP 撐住一次。'},
   bash:{n:'重盾衝擊',c:'knight',lv:20,mp:12,dmg:{s:'ATK',p:2},foe:{stun:1},brk:2,d:'舉盾撞上去：暈眩 1 回合，破綻 +2。'},
   rage:{n:'捨身猛擊',c:'berserker',lv:20,mp:10,dmg:{s:'ATK',p:2.6},cost:.1,fin:.8,d:'燒掉 10% HP，清算破綻，每層傷害 +80%。'},
   fire:{n:'點火',c:'mage',lv:1,mp:5,dmg:{s:'MAG',p:1.6},foe:{burn:2},mark:'灼',d:'留下「灼」印記，灼燒 2 回合。'},
-  ice:{n:'霜針',c:'mage',lv:3,mp:7,dmg:{s:'MAG',p:1.6},foe:{weak:2},mark:'凍',d:'留下「凍」印記，敵人攻擊下降 2 回合。'},
-  barrier:{n:'薄冰鏡',c:'mage',lv:5,mp:8,shield:1.5,d:'凝出一面冰鏡，吸收傷害。'},
+  ice:{n:'霜針',c:'mage',lv:1,mp:7,dmg:{s:'MAG',p:1.6},foe:{weak:2},mark:'凍',d:'留下「凍」印記，敵人攻擊下降 2 回合。'},
+  barrier:{n:'薄冰鏡',c:'mage',lv:3,mp:8,shield:1.5,d:'凝出一面冰鏡，吸收傷害。'},
   thunder:{n:'引雷',c:'mage',lv:8,mp:12,dmg:{s:'MAG',p:1.8},det:.9,d:'引爆所有印記，每個印記傷害 +90%。'},
   meteor:{n:'墜星',c:'archmage',lv:20,mp:20,dmg:{s:'MAG',p:3},mark2:1,det:.6,d:'先留下兩個印記，再連同既有印記一起引爆，每個 +60%。'},
   drain:{n:'汲魂',c:'warlock',lv:20,mp:14,dmg:{s:'MAG',p:2.2},drain:.5,mark:'蝕',d:'傷害的 50% 轉為 HP，留下「蝕」印記。'},
   dshot:{n:'雙矢',c:'ranger',lv:1,mp:4,dmg:{s:'ATK',p:.9,h:2},focus:1,d:'連射兩箭，專注 +1。'},
-  pshot:{n:'蛇牙箭',c:'ranger',lv:3,mp:6,dmg:{s:'ATK',p:1.1},foe:{poison:3},focus:1,d:'淬毒的箭，中毒 3 回合，專注 +1。'},
-  dodge:{n:'伏身',c:'ranger',lv:5,mp:6,buff:{eva:40,t:3},d:'3 回合迴避 +40%。每次閃過攻擊，專注 +2。'},
+  pshot:{n:'蛇牙箭',c:'ranger',lv:1,mp:6,dmg:{s:'ATK',p:1.1},foe:{poison:3},focus:1,d:'淬毒的箭，中毒 3 回合，專注 +1。'},
+  dodge:{n:'伏身',c:'ranger',lv:3,mp:6,buff:{eva:40,t:3},d:'3 回合迴避 +40%。每次閃過攻擊，專注 +2。'},
   snipe:{n:'屏息',c:'ranger',lv:8,mp:10,dmg:{s:'ATK',p:1.6,cr:30},aim:.45,d:'耗盡專注，每層傷害 +45%，爆擊率 +30%。'},
   rain:{n:'驟雨',c:'sniper',lv:20,mp:16,dmg:{s:'ATK',p:.8,h:4},aim:.15,keep:1,d:'連射四箭，每層專注讓每一箭 +15%，不消耗專注。'},
   stab:{n:'影縫',c:'assassin',lv:20,mp:12,dmg:{s:'ATK',p:2,sure:1},aim:.3,d:'必定爆擊，耗盡專注，每層傷害 +30%。'},
   heal:{n:'微光',c:'cleric',lv:1,mp:6,heal:2,faith:25,d:'回復 HP，信仰 +25。'},
-  holy:{n:'審光',c:'cleric',lv:3,mp:6,dmg:{s:'MAG',p:1.5},faithAmp:1,faith:10,d:'信仰越高越痛（最多 +100%），信仰 +10。'},
-  bless:{n:'晨禱',c:'cleric',lv:5,mp:8,buff:{atk:.25,def:.25,t:4},faith:20,d:'4 回合攻防 +25%，信仰 +20。'},
+  holy:{n:'審光',c:'cleric',lv:1,mp:6,dmg:{s:'MAG',p:1.5},faithAmp:1,faith:10,d:'信仰越高越痛（最多 +100%），信仰 +10。'},
+  bless:{n:'晨禱',c:'cleric',lv:3,mp:8,buff:{atk:.25,def:.25,t:4},faith:20,d:'4 回合攻防 +25%，信仰 +20。'},
   purify:{n:'洗禮',c:'cleric',lv:8,mp:6,heal:1,cleanse:1,faith:30,d:'回復 HP、解除中毒，信仰 +30。'},
   sanct:{n:'庇護所',c:'bishop',lv:20,mp:18,heal:3,regen:3,faith:40,d:'大量回復並持續再生 3 回合，信仰 +40。'},
   judge:{n:'天秤',c:'templar',lv:20,mp:14,dmg:{s:'BOTH',p:1.8},faithSpend:1,d:'耗盡信仰，每 10 點傷害 +12%。'}
@@ -1269,7 +1270,7 @@ const gearBy=u=>S.gear.find(g=>g.u===u);
 function gearStat(g){const b=GEAR[g.id],m=(1+.2*g.r)*(1+.08*g.p),o={};for(const k in STATN)if(b[k])o[k]=Math.round(b[k]*m);return o}
 function gearAll(g){const o=gearStat(g),ad=(k,v)=>o[k]=(o[k]||0)+v;for(const x of g.sub||[])ad(x.k,x.v);if(g.sp)ad(g.sp,SPEC[g.sp].v);const u=GEAR[g.id].uq;if(u)for(const k in u)ad(k,u[k]);
   for(const gm of g.sock||[])if(gm)for(const k in ITEMS[gm].gem)ad(k,ITEMS[gm].gem[k]);return o}
-const gearName=g=>`${g.set!=null?SETS[g.set].n+'・':''}${GEAR[g.id].uniq?'「'+GEAR[g.id].n+'」':GEAR[g.id].n}${g.p?` +${g.p}`:''}`;
+const gearName=g=>`${g.sh?'✧':''}${g.set!=null?SETS[g.set].n+'・':''}${GEAR[g.id].uniq?'「'+GEAR[g.id].n+'」':GEAR[g.id].n}${g.p?` +${g.p}`:''}`;
 const gearDesc=g=>Object.entries(gearStat(g)).map(([k,v])=>fmt(k,v)).join('　')+((g.sub||[]).length?`　詞條×${g.sub.length}`:'')+(g.sp?`　【${SPEC[g.sp].n}】`:'')+(GEAR[g.id].uniq?'　專屬':'')+((g.sock||[]).length?`　孔 ${(g.sock||[]).filter(Boolean).length}/${g.sock.length}`:'');
 function gearPower(g){const o=gearAll(g),mg=CLS[S.cls].basic==='MAG',W={atk:mg?1:3,mag:mg?3:.8,def:2.5,hp:.25,mp:.25,crit:4,cd:1.5,eva:3,ls:5,atkp:mg?2:6,magp:mg?6:2,STR:mg?1.5:4,DEX:3,INT:mg?4:1.5,VIT:3,LUK:3};
   let v=0;for(const k in o)v+=o[k]*(W[k]||3);return Math.round(v)}
@@ -1296,7 +1297,11 @@ function rollSubs(t,r){return Object.keys(SUBS).sort(()=>Math.random()-.5).slice
 function addGear(id,r,set){const g={u:S.uid++,id,r,p:0,sub:rollSubs(GEAR[id].t,r),lock:false,sock:r>=4?[null,null]:r>=3?[null]:[]};if(r>=4&&!GEAR[id].uniq)g.sp=pick(Object.keys(SPEC));if(set!=null)g.set=set;S.gear.push(g);if(S.dex)S.dex.g[id]=1;return g}
 function rollRar(minR,bonus){const lu=1+Math.min(.5,(S?stats().A.LUK:0)*.004);const w=RW.map((x,i)=>i<minR?0:x*(i>=2?(bonus||1)*lu:1)),t=w.reduce((a,b)=>a+b);let r=Math.random()*t;for(let i=0;i<5;i++){if((r-=w[i])<0)return i}return 4}
 function makeGear(tier,r,hard){const sl=pick(Object.keys(SLOTS)),id=sl==='weapon'?`w_${S.cls}_${tier}`:`${SLOTP[sl]}_${tier}`;
-  const g=addGear(id,r,hard&&r>=3&&Math.random()<.4?CSET[S.cls]:r>=2&&Math.random()<.35?ASET(tier):null);if(r>=3)sys(`恭喜 ${S.name} 獲得【${gearName(g)}】！`);return g}
+  const g=addGear(id,r,hard&&r>=3&&Math.random()<.4?CSET[S.cls]:r>=2&&Math.random()<.35?ASET(tier):null);if(r>=1&&Math.random()<.05)shine(g);if(r>=3||g.sh)DROPS.push(g);if(r>=3||g.sh)sys(`恭喜 ${S.name} 獲得【${gearName(g)}】！`);return g}
+/* 閃耀裝備：多一條詞條、最高詞條 ×1.5 */
+let DROPS=[];
+function shine(g){g.sh=1;const ks=g.sub.map(x=>x.k),k=Object.keys(SUBS).filter(x=>!ks.includes(x)).sort(()=>Math.random()-.5)[0],t=GEAR[g.id].t;if(k)g.sub.push({k,v:Math.max(1,Math.round(SUBS[k](t)))});const top=g.sub.reduce((a,b)=>b.v/SUBS[b.k](t)>a.v/SUBS[a.k](t)?b:a);top.v=Math.round(top.v*1.5)}
+function dropFx(){if(!DROPS.length)return '';const h=DROPS.map(g=>`<div class="drop d${g.r}${g.sh?' shn':''}"><span class="ico c${g.r}">${gIco(g.id)}</span><span class="grow"><b class="c${g.r}">${gearName(g)}</b><span class="sub">${g.sh?'閃耀・多一條詞條、最強詞條 ×1.5':RAR[g.r].n+'裝備'}</span></span></div>`).join('');const best=Math.max(...DROPS.map(g=>g.r+(g.sh?1:0)));DROPS=[];setTimeout(()=>{try{SFX.holy(0);buzz([30,40,60])}catch(e){}},350);return `<div class="drops">${h}</div>`}
 const rollGear=(tier,minR,bonus,hard)=>makeGear(tier,rollRar(minR||0,bonus),hard);
 function dismantle(g){const d=DIS[g.r][0]+g.p*2,st=DIS[g.r][1];addItem('dust',d);if(st)addItem('stone',st);for(const gm of g.sock||[])if(gm)addItem(gm,1);if(g.r>=3&&Math.random()<.4){const gm=pick(GEMS);addItem(gm,1);toast(`分解時取得 ${ITEMS[gm].n}`)}S.gear=S.gear.filter(x=>x.u!==g.u);return [d,st]}
 function gainExp(n){
@@ -1382,7 +1387,7 @@ function vRun(){if(RUN.tower)return vTower();const a=AREAS[RUN.area],v=RUN.view,
   const pips=`<div class="pips">${RUN.nodes.map((t,i)=>`<span class="pip ${i<RUN.step||(i===RUN.step&&v.type==='res')?'done':i===RUN.step?'now':''} ${t==='boss'?'boss':''}">${t==='boss'||t==='elite'||t==='story'?'★':t?(i<=RUN.step?NODE[t]?NODE[t][0]:i+1:i+1):'⋔'}</span>`).join('')}</div>`;
   let body='';
   if(v.type==='start')body=`<div class="panel">${art('area_'+a.id,a.n)}<p>${a.d}</p><p class="sub">本次路線共 ${RUN.nodes.length} 段，終點是${RUN.nodes[RUN.nodes.length-1]==='boss'?'首領 '+MOBS[a.boss].n:'精英魔物'}。</p><button class="btn pri big" data-a="runNext">踏入${a.n}</button><button class="btn" data-a="retreat">返回</button></div>`;
-  else if(v.type==='res')body=`<div class="panel">${v.img?`<div class="duo">${art(v.img,'勝利','r34')}${v.mimg?art(v.mimg,'','r11'):''}</div>`:''}<h3>${v.title}</h3><p>${v.text}</p>${last?`<button class="btn pri big" data-a="finish">完成冒險</button>`:`<button class="btn pri big" data-a="runNext">繼續前進</button><button class="btn" data-a="retreat">撤退回城（保留戰利品）</button>`}</div>`;
+  else if(v.type==='res')body=`<div class="panel">${v.img?`<div class="duo">${art(v.img,'勝利','r34')}${v.mimg?art(v.mimg,'','r11'):''}</div>`:''}<h3>${v.title}</h3>${v.drop||''}<p>${v.text}</p>${last?`<button class="btn pri big" data-a="finish">完成冒險</button>`:`<button class="btn pri big" data-a="runNext">繼續前進</button><button class="btn" data-a="retreat">撤退回城（保留戰利品）</button>`}</div>`;
   else if(v.type==='fork')body=`<div class="panel"><h3>岔路</h3><p class="sub">前方的路分成兩條。要往哪邊走？</p><div class="fork">${v.opts.map((o,i)=>(()=>{const tg=((RUN.ftags||[])[RUN.step+1]||[])[i],T=tg&&TAGS[tg];return `<button class="btn ${T?'tagged':''}" data-a="pickFork" data-v="${i}"><i>${NODE[o][0]}</i><b>${NODE[o][1]}</b><span>${NODE[o][2]}</span><span class="risk">${NRISK[o]||''}</span>${T?`<span class="ftag">${T[0]} ${T[1]}<small>${T[2]}</small></span>`:''}</button>`})()).join('')}</div><button class="btn" data-a="retreat">撤退回城（保留戰利品）</button></div>`;
   else if(v.type==='shrine')body=`<div class="panel">${art('event_shrine','古老的祭壇')}<h3>古老的祭壇</h3><p>長滿青苔的石台上刻著三個符號。指尖碰到其中一個時，微弱的光流進了身體。</p>${v.done?`<p>${v.done}</p><button class="btn pri big" data-a="${last?'finish':'runNext'}">${last?'完成冒險':'繼續前進'}</button>`:`<div class="list">${[['atk','劍之紋','本次冒險中，攻擊與魔力 +15%'],['def','盾之紋','本次冒險中，受到的傷害大幅降低'],['luck','星之紋','本次冒險中，金幣 +30%、裝備掉落提升']].map(([k,n,d])=>`<button class="btn opt" data-a="bless" data-v="${k}"><span><b>${n}</b>　<span class="sub">${d}</span></span></button>`).join('')}</div>`}</div>`;
   else if(v.type==='shop')body=`<div class="panel">${art('event_merchant','旅行商人')}<h3>旅行商人</h3><p>背著巨大背包的商人朝你招手：「出門在外，價錢好商量！」</p><div class="list">${v.items.map(([k,pr],i)=>`<div class="item"><span class="ico c${k==='box'?3:1}">${k==='box'?ic('mat'):icon('item_'+k,ic('potion'))}</span><span class="grow"><b>${k==='box'?'神秘裝備箱':ITEMS[k].n}</b><span class="sub">${k==='box'?'隨機一件本區域裝備，精良以上':ITEMS[k].d}</span></span><button class="btn sm ${S.gold>=pr&&!(k==='box'&&v.bought.box)?'pri':''}" data-a="buyRun" data-v="${i}" ${S.gold<pr||(k==='box'&&v.bought.box)?'disabled':''}>${k==='box'&&v.bought.box?'售完':pr+' G'}</button></div>`).join('')}</div><p class="sub">持有 ${S.gold} G</p><button class="btn pri big" data-a="${last?'finish':'runNext'}">${last?'完成冒險':'繼續前進'}</button></div>`;
@@ -1539,7 +1544,7 @@ const MV={
     const can=(!b.cls||b.cls===S.cls)&&S.lv>=b.lv,cmp=!on&&cur?gearPower(g)-gearPower(cur):null,set=g.set!=null?SETS[g.set]:null,sc=set?setCounts()[g.set]||0:0,rf=reforgeCost(g),dz=DIS[g.r];
     return{t:gearName(g),b:`<div class="row"><span class="ico c${g.r}">${gIco(g.id)}</span><div class="grow"><b class="c${g.r}">${RAR[g.r].n}・${SLOTS[b.slot]}</b><div class="sub">需求 Lv.${b.lv}${b.cls?'・'+CLS[b.cls].n+'專用':''}・評分 ${gearPower(g)}${cmp!=null?` <b class="${cmp>=0?'up':'down'}">${cmp>=0?'▲':'▼'} ${Math.abs(cmp)}</b>`:''}</div></div>${g.lock?'<span class="tag">已鎖定</span>':''}</div>
      <div class="gsec"><b>主屬性${g.p?`（強化 +${g.p}）`:''}</b><div class="chips">${Object.entries(gearStat(g)).map(([k,v])=>`<span class="chip">${fmt(k,v)}</span>`).join('')}</div></div>
-     ${(g.sub||[]).length?`<div class="gsec"><b>附加詞條</b>${g.sub.map(x=>`<span class="subl c${g.r}">◆ ${fmt(x.k,x.v)}</span>`).join('')}</div>`:''}
+     ${g.sh?`<div class="gsec"><b style="color:#1593b3">✧ 閃耀</b><span class="sub">比同級裝備多一條詞條，最強的詞條 ×1.5。洗練後依然保留。</span></div>`:''}${(g.sub||[]).length?`<div class="gsec"><b>附加詞條</b>${g.sub.map(x=>`<span class="subl c${g.r}">◆ ${fmt(x.k,x.v)}</span>`).join('')}</div>`:''}
      ${GEAR[g.id].uniq?`<div class="gsec"><b class="c4">首領專屬效果</b><span class="sub">${GEAR[g.id].ud}</span></div>`:''}
      ${(g.sock||[]).length?`<div class="gsec"><b>鑲嵌孔</b>${g.sock.map((gm,i)=>gm?`<span class="subl">◆ ${ITEMS[gm].n}：${Object.entries(ITEMS[gm].gem).map(([k,v])=>fmt(k,v)).join('')}</span>`:`<span class="subl sub">◇ 空孔</span>`).join('')}${GEMS.some(x=>S.items[x])?`<div class="chips">${GEMS.filter(x=>S.items[x]).map(x=>`<button class="btn sm" data-a="sockIn" data-v="${u}|${x}">鑲入${ITEMS[x].n}×${S.items[x]}</button>`).join('')}</div><span class="sub">孔滿時會替換第一顆，舊寶石會碎掉。</span>`:'<span class="sub">寶石從首領、異變種、惡夢怪物與分解高階裝備取得。</span>'}</div>`:''}
      ${g.sp?`<div class="gsec"><b class="c4">傳說詞綴【${SPEC[g.sp].n}】</b><span class="sub">${SPEC[g.sp].d}</span></div>`:''}
@@ -1584,7 +1589,7 @@ function storyEnd(){const f=STORY.after;STORY=null;drawStory();if(f)f()}
 /* ============ 冒險流程 ============ */
 const NODE={battle:['⚔','魔物的足跡','一般戰鬥'],event:['❗','奇怪的動靜','隨機事件・屬性檢定'],chest:['✦','閃光的東西','可能有寶箱'],rest:['☘','安全的營地','回復 HP 與 MP'],
   shrine:['✧','古老的祭壇','本次冒險獲得祝福'],merchant:['⚖','旅行商人','購買補給或神秘箱'],ambush:['☠','強敵的氣息','精英戰鬥・掉寶提升'],mystery:['？','濃霧籠罩','完全未知']};
-function startRun(i,nm){const POOL=[['battle',5],['event',4],['chest',2],['rest',2],['shrine',1.5],['merchant',1.5],['ambush',1.5],['mystery',2]];
+function startRun(i,nm){DROPS=[];const POOL=[['battle',5],['event',4],['chest',2],['rest',2],['shrine',1.5],['merchant',1.5],['ambush',1.5],['mystery',2]];
   const wp=ex=>{const P=POOL.filter(p=>p[0]!==ex);let r=Math.random()*P.reduce((a,b)=>a+b[1],0);for(const p of P)if((r-=p[1])<0)return p[0];return 'battle'};
   const nodes=['battle'],forks=[null],ftags=[null];for(let k=1;k<5;k++){const x=wp(),y=wp(x);nodes.push(null);forks.push([x,y]);ftags.push([rTag(x),rTag(y)])}
   if(!nm&&S.main.acc&&S.main.ch===i&&!S.main.mid&&CH[i].mid){nodes[2]='story';forks[2]=null}
@@ -1606,7 +1611,7 @@ function runNext(){const n=RUN.step+1;if(RUN.forks&&RUN.forks[n]&&!RUN.nodes[n])
   else if(t==='merchant'){const u=12+a.base*6;RUN.view={type:'shop',items:[['pot',Math.round(ITEMS.pot.price*.7)],['pot2',Math.round(ITEMS.pot2.price*.7)],['eth',Math.round(ITEMS.eth.price*.7)],['box',u*12]],bought:{}}}
   else if(t==='chest'&&tg==='rich'&&Math.random()<.3){toast('寶箱張開了大嘴——是寶箱怪！');startBattle(pick(a.mobs),'elite',0);if(B){B.hoard=1;B.gmul=2;B.name='寶箱怪・'+B.m.n;B.log.push('👑 寶箱怪！打倒牠，寶物就是你的')}}
   else if(t==='chest'){const g=Math.round((12+a.base*6)*(1.5+Math.random())*(tg==='rich'?2:1));S.gold+=g;RUN.loot.gold+=g;let x=`你在岩縫中發現一只小寶箱，獲得 ${g} G`;
-    if(Math.random()<.5){addItem('pot',1);x+='、治療藥水'}if(Math.random()<.15){addItem('stone',1);x+='、強化石'}if(tg==='rich'||Math.random()<.15){const gg=rollGear(RUN.area,tg==='rich'?2:1);x+='、'+gearName(gg);RUN.loot.items.push(gearName(gg))}RUN.view={type:'res',title:'發現寶箱',text:x+'。'}}
+    if(Math.random()<.5){addItem('pot',1);x+='、治療藥水'}if(Math.random()<.15){addItem('stone',1);x+='、強化石'}if(tg==='rich'||Math.random()<.15){const gg=rollGear(RUN.area,tg==='rich'?2:1);x+='、'+gearName(gg);RUN.loot.items.push(gearName(gg))}RUN.view={type:'res',title:'發現寶箱',drop:dropFx(),text:x+'。'}}
   else{const sp=tg==='spring';S.hp=Math.min(s.HP,S.hp+Math.round(s.HP*(sp?1:.35)));S.mp=Math.min(s.MP,S.mp+Math.round(s.MP*(sp?1:.35)));
     const al=S.party&&S.party!=='none'&&ALLY[S.party]&&ALLY[S.party].open()?S.party:null,talk=al==='luna'?pick(['露娜望著營火：「媽媽做這盞燈的時候，說是為了讓人在霧裡找得到路。」','露娜把烤好的麵包分你一半：「別逞強。累了要說。」','露娜看著北方：「等霧散了，我想帶{你|妳}去看我們村子的麥田。」']):al==='gale'?pick(['蓋爾默默擦著那把短劍，劍柄上的名字被摸得發亮。','蓋爾：「騎士團守夜，第一個睡著的人要請全隊喝酒。……你別睡。」','蓋爾把披風丟給你：「山上的夜很冷。」']):'';
     RUN.view={type:'res',title:sp?'靈泉':'營火休息',text:sp?'清澈的泉水泛著微光。喝下一口，全身的疲憊一掃而空——HP 與 MP 全部回復！':'你找到一處安全的營地稍作休息，回復了 35% 的 HP 與 MP。'+(talk?`<br><span class="sub">${talk}</span>`:'')}}
@@ -1787,6 +1792,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'3.6',d:'2026-11-19',t:'開局兩招＋閃耀裝備',b:'四職業 Lv.1 就有兩招可選：劍士多了招架反擊、法師多了霜針、遊俠多了蛇牙箭、神官多了審光；原本 Lv.5 的招式提前到 Lv.3。劍士的破綻現在每層讓攻擊 +6%，疊越多越痛。新增 5% 機率掉落「✧閃耀」裝備：多一條詞條、最強詞條 ×1.5，洗練也不會消失。撿到史詩、傳說或閃耀裝備時，勝利畫面會跳出發光的戰利品卡片。'},
   {v:'3.5',d:'2026-11-19',t:'路線與事件改版',b:'岔路會標出危險度，還可能出現特殊標記：💎寶物守衛、💰懸賞、☠詛咒之地、👑大寶箱（小心寶箱怪）、💧靈泉、🎲命運之地。事件選項直接顯示成功率；成功有機會獲得本趟祝福，失敗可能驚動魔物開戰，大成功必掉裝備。同一趟不會遇到重複事件。'},
   {v:'3.4',d:'2026-11-18',t:'敵人行動預告',b:'所有怪物都會在頭上顯示下回合要做什麼。看到紅色⚠大招時按防禦：傷害只剩 25%，還會看穿破綻，下次攻擊 +50%。'},
   {v:'3.3',d:'2026-11-18',t:'特效打磨＋怪物招式改名',b:'特效改成有過程的動畫：聚氣、出招、命中、收尾，魔法陣逐筆畫出、光柱由天劈落、護盾張開再碎裂。施放時角色會衝刺或發光。怪物 57 招都照招式名稱重新設計，並把不順的招式名稱改得更自然。'},
@@ -1880,7 +1886,7 @@ const basicEl=()=>({swordsman:'phys',ranger:'phys',mage:'arcane',cleric:'holy'}[
 /* 首領護甲：每回合傷害上限；半血時進入狂怒（護盾＋攻擊上升） */
 const capB=d=>{if(!B||B.kind!=='boss')return d;const lim=B.max,r=Math.max(1,Math.min(d,lim-(B.tk||0)));B.tk=(B.tk||0)+r;return r};
 function bossPhase(){if(B&&B.kind==='boss'&&!B.ph2&&B.hp>0&&B.hp<=B.max*.5){B.ph2=1;B.fshield=(B.fshield||0)+Math.round(B.max*.12);blog(`${B.name} 被逼入絕境，張開了護盾！`)}}
-function hitFoe(stat,pow,o){o=o||{};const s=stats();if(!o.sure&&Math.random()*100<(B.eva+fbSum('eva'))*.6)return{d:0,cr:false,miss:true};let base=clsDm()*(B.opening?1.5:1)*(stat==='BOTH'?s.ATK+s.MAG:s[stat])*(1+buffSum('atk')+(s.FOCUSATK&&B.cls.focus>=rmax(5)?s.FOCUSATK/100:0))*(B.pst.weak>0?.75:1);
+function hitFoe(stat,pow,o){o=o||{};const s=stats();if(!o.sure&&Math.random()*100<(B.eva+fbSum('eva'))*.6)return{d:0,cr:false,miss:true};let base=clsDm()*(B.opening?1.5:1)*(S.cls==='swordsman'&&B.cls&&B.cls.brk?1+.06*B.cls.brk:1)*(stat==='BOTH'?s.ATK+s.MAG:s[stat])*(1+buffSum('atk')+(s.FOCUSATK&&B.cls.focus>=rmax(5)?s.FOCUSATK/100:0))*(B.pst.weak>0?.75:1);
   const fdef=stat==='MAG'?(B.mres??B.def):stat==='BOTH'?((B.mres??B.def)+B.def)/2:B.def;const em=elMul(B.id,B.curEl);if(em!==1)B.elHit=em>1?'w':'r';let d=em*base*pow*100/(100+fdef*(1+fbSum('def'))*(1-(o.pierce||0)))*(.9+Math.random()*.2);const cr=!!o.sure||Math.random()*100<s.CRIT+(o.cr||0)+(hasP('sw1')&&B.cls.brk>=3?15:0);if(cr)d*=(s.CD+(hasP('rg3')&&B.cls.focus>=5?30:0)+s.BRKCD*B.cls.brk)/100;
   d=capB(Math.max(1,Math.round(d)));if(B.fshield>0){const ab=Math.min(B.fshield,d);B.fshield-=ab;d-=ab}B.hp=Math.max(0,B.hp-d);bossPhase();return{d,cr}}
 function pAct(type,arg){if(!B||B.busy)return;const s=stats();
@@ -1995,7 +2001,7 @@ function spoil(){const m=B.m,L=B.L,bs=B.kind==='boss',el=B.kind==='elite',T=B.to
   if(bs||Math.random()<.06){addItem('stone',bs?2:1);got.push(bs?'強化石×2':'強化石')}
   const first=bs&&!S.cleared[RUN.area];
   {const hard=B.mut||B.nm,n=(B.hoard?1:0)+(bs?(B.nm?3:2):(B.mut?1:Math.random()<(el?.5:B.nm?.3:lk?.2:.12)?1:0));for(let i=0;i<n;i++){const g=rollGear(RUN.area,bs?(first&&!i?3:B.nm?3:2):hard?2:el?1:0,bs||hard?2:1,hard);got.push(gearName(g))}
-    if(bs&&BOSSU[B.id]&&Math.random()<(B.nm?.2:.08)){const u=addGear(BOSSU[B.id],4);got.push(gearName(u));sys(`${S.name} 取得首領專屬裝備【${GEAR[u.id].n}】！`)}
+    if(bs&&BOSSU[B.id]&&Math.random()<(B.nm?.2:.08)){const u=addGear(BOSSU[B.id],4);DROPS.push(u);got.push(gearName(u));sys(`${S.name} 取得首領專屬裝備【${GEAR[u.id].n}】！`)}
     if(bs||(B.mut&&Math.random()<.5)||(B.nm&&Math.random()<.25)){const gm=pick(GEMS);addItem(gm,1);got.push(ITEMS[gm].n)}}
   got.push(...liveDrop(bs));
   track('kill',B.id);S.st.kills++;if(S.dex)S.dex.m[B.id]=(S.dex.m[B.id]||0)+1;if(bs&&B.nm)S.st.nmboss=(S.st.nmboss||0)+1;
@@ -2007,7 +2013,7 @@ function win(){if(!B||B.hp>0)return;spoil();
   RUN.loot.gold+=T.gold;RUN.loot.exp+=T.exp;RUN.loot.items.push(...T.got);
   if(RUN.trial){S.trial=1;for(const k in TRIAL.items)addItem(k,-TRIAL.items[k]);S.gold=Math.max(0,S.gold-TRIAL.gold)}
   const ally=B.ally&&B.ally.hp>0?B.ally.n:null;
-  RUN.view={type:'res',img:HK()+'_win',mimg:bid==='shadow'?null:'mob_'+bid+'_lose',title:RUN.trial?'試煉通過':bs?'首領討伐成功':'戰鬥勝利',text:`擊敗 ${T.names.join('、')}！獲得 ${T.exp} EXP、${T.gold} G。${T.got.length?'<br>戰利品：'+T.got.join('、'):''}${ally&&Math.random()<.35?`<br><span class="sub">${ally==='露娜'?'露娜：「辛苦了。……你的背影，越來越可靠了。」':'蓋爾：「還不錯。別鬆懈。」'}</span>`:''}`};
+  RUN.view={type:'res',img:HK()+'_win',mimg:bid==='shadow'?null:'mob_'+bid+'_lose',title:RUN.trial?'試煉通過':bs?'首領討伐成功':'戰鬥勝利',drop:dropFx(),text:`擊敗 ${T.names.join('、')}！獲得 ${T.exp} EXP、${T.gold} G。${T.got.length?'<br>戰利品：'+T.got.join('、'):''}${ally&&Math.random()<.35?`<br><span class="sub">${ally==='露娜'?'露娜：「辛苦了。……你的背影，越來越可靠了。」':'蓋爾：「還不錯。別鬆懈。」'}</span>`:''}`};
   B=null;gainExp(T.exp);save();render();$('#main').scrollTop=0}
 function lose(){SFX.lose();const lid=B?B.id:null;const lost=Math.round(S.gold*.1),s=stats();S.gold-=lost;S.hp=Math.round(s.HP*.3);B=null;RUN=null;TAB='town';save();render();
   openM('msg',{t:'戰敗',b:`<div class="panel"><div class="duo">${art(HK()+'_lose','戰敗','r34')}${lid&&lid!=='shadow'?art('mob_'+lid+'_win','','r11'):''}</div><p>${you('你')}倒下了。巡邏隊把你送回晨星鎮，途中遺失了 ${lost} G。</p><p class="sub">強化裝備、分配屬性點，或先到旅店休息再出發吧。</p></div><button class="btn pri big" data-a="closeM">確定</button>`})}
@@ -2540,7 +2546,7 @@ const ACT={
   dis(u){const g=gearBy(+u);if(!g||g.lock||Object.values(S.eq).includes(g.u))return;const [d,st]=dismantle(g);toast(`分解獲得 星塵×${d}${st?`、強化石×${st}`:''}`);save();closeM();render()},
   disAll(){const eqd=Object.values(S.eq),L=S.gear.filter(g=>g.r<=1&&!g.lock&&!eqd.includes(g.u));if(!L.length){toast('沒有可分解的普通或精良裝備');return}
     let d=0,st=0;L.forEach(g=>{const r=dismantle(g);d+=r[0];st+=r[1]});toast(`分解 ${L.length} 件，獲得星塵×${d}${st?`、強化石×${st}`:''}`);save();render()},
-  reforge(u){const g=gearBy(+u);if(!canReforge(g))return;const c=reforgeCost(g);addItem('dust',-c.d);S.gold-=c.g;g.sub=rollSubs(GEAR[g.id].t,g.r);SFX.buff();toast('洗練完成，詞條已重新隨機');save();render()},
+  reforge(u){const g=gearBy(+u);if(!canReforge(g))return;const c=reforgeCost(g);addItem('dust',-c.d);S.gold-=c.g;g.sub=rollSubs(GEAR[g.id].t,g.r);if(g.sh)shine(g);SFX.buff();toast('洗練完成，詞條已重新隨機');save();render()},
   rest(){const c=S.lv*4;if(S.gold<c)return;S.gold-=c;const s=stats();S.hp=s.HP;S.mp=s.MP;toast('睡了一覺，HP 與 MP 全滿');save();closeM();render()},
   advance(k){if(S.lv<TRIAL.lv||S.adv||!S.trial)return;S.adv=k;WARM=0;const b=ADV[k].bonus;for(const a in b)S.attr[a]+=b[a];learn();const s=stats();S.hp=s.HP;S.mp=s.MP;sys(`${S.name} 轉職為【${ADV[k].n}】！`);toast(`轉職成功：${ADV[k].n}`);save();render()},
   mainAccept(){if(!chLvOk()){toast(`需要 Lv.${CHLV[S.main.ch]}`);return}const m=S.main,c=CH[m.ch];play(c.intro,SKEY(m.ch+1,'intro'),c.t+' 開場',()=>{m.acc=true;m.step=0;m.prog=0;save();render();toast('已接受主線任務')})},
