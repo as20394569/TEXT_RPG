@@ -1382,11 +1382,16 @@ function vAreas(){return `<h2>選擇冒險地點</h2>`+AREAS.map((a,i)=>{const o
   <p class="sub">${a.d}</p><div class="chips">${a.mobs.map(m=>`<span class="chip">${MOBS[m].n}</span>`).join('')}<span class="chip" style="color:var(--hp)">首領 ${MOBS[a.boss].n}${bossOn?'':'（未現身）'}</span></div>${open&&bossOn&&!S.cleared[i]&&S.lv<MOBS[a.boss].lv?`<p class="sub" style="color:var(--hp)">⚠ ${MOBS[a.boss].n} 已在深處等著（Lv ${MOBS[a.boss].lv}）。現在 Lv ${S.lv}，這趟終點會直接碰上它——不夠強就先在岔路多打幾場、換好裝備。</p>`:''}
   ${open?`<div class="row"><button class="btn pri grow" data-a="startRun" data-v="${i}">出發冒險</button>${S.cleared[i]?`<button class="btn grow" data-a="startNm" data-v="${i}" style="background:linear-gradient(#5a2a4a,#2a1430);color:#ffb3d0;border-color:#a04a7a">惡夢 Lv${AREAS[i].base+10}+</button>`:''}</div>${S.cleared[i]?'<p class="sub">惡夢模式：怪物 +10 級並帶詞綴，掉寶更好。</p>':''}`:`<button class="btn" disabled>完成${CH[i-1].t.slice(0,3)}後開放</button>`}</div>`}).join('')+vTowerCard()}
 function vTowerCard(){return towerOpen()?`<div class="panel area">${art('area_tower','無盡之塔')}<div class="row"><h3 class="grow">無盡之塔</h3><span class="tag red">挑戰</span></div><p class="sub">一層一層往上爬，看你能走多高。最高紀錄：第 ${S.tower.best||0} 層。</p><button class="btn pri" data-a="startTower">進入高塔</button></div>`:`<div class="panel area lock"><div class="row"><h3 class="grow">無盡之塔</h3></div><button class="btn" disabled>完成第三章後開放</button></div>`}
+function bossGate(a){const m=MOBS[a.boss],L=m.lv+(RUN.nm?10:0),d=L-S.lv,st=stats(),hp=S.hp/st.HP,pot=(S.items.pot||0)+(S.items.pot2||0);
+  const [c,t]=d>=3?['var(--hp)','勝算很低']:d>=1?['var(--r4)','硬仗']:d>=-2?['var(--exp)','勢均力敵']:['var(--ok,#7fdc8a)','游刃有餘'];
+  const warn=[hp<.5&&'HP 不到一半',S.mp<st.MP*.3&&'MP 見底',!pot&&'身上沒有藥水'].filter(Boolean);
+  return `<div class="panel" style="border-color:${c}">${art('mob_'+a.boss,m.n,'r11')}<h3 style="color:${c}">★ 首領前哨：${m.n}　Lv ${L}</h3><p class="sub">你 Lv ${S.lv}・HP ${S.hp}/${st.HP}・MP ${S.mp}/${st.MP}・藥水 ${pot}　→　<b style="color:${c}">${t}</b></p>${warn.length?`<p class="sub" style="color:var(--hp)">⚠ ${warn.join('、')}</p>`:''}<p class="sub">${S.cleared[RUN.area]?'打過的首領，掉寶照樣豐厚。':'撤退不會失去戰利品；輸了會掉 10% 金幣。'}</p><button class="btn pri big" data-a="bossGo">挑戰首領</button><button class="btn" data-a="retreat">撤退回城（保留戰利品）</button></div>`}
 function bossReady(i){return !!S.cleared[i]||(S.main.ch===i&&S.main.acc&&(CH[i].steps[S.main.step]||{}).type==='boss')}
 function vRun(){if(RUN.tower)return vTower();const a=AREAS[RUN.area],v=RUN.view,last=RUN.step>=RUN.nodes.length-1;
   const pips=`<div class="pips">${RUN.nodes.map((t,i)=>`<span class="pip ${i<RUN.step||(i===RUN.step&&v.type==='res')?'done':i===RUN.step?'now':''} ${t==='boss'?'boss':''}">${t==='boss'||t==='elite'||t==='story'?'★':t?(i<=RUN.step?NODE[t]?NODE[t][0]:i+1:i+1):'⋔'}</span>`).join('')}</div>`;
   let body='';
   if(v.type==='start')body=`<div class="panel">${art('area_'+a.id,a.n)}<p>${a.d}</p><p class="sub">本次路線共 ${RUN.nodes.length} 段，終點是${RUN.nodes[RUN.nodes.length-1]==='boss'?'首領 '+MOBS[a.boss].n:'精英魔物'}。</p><button class="btn pri big" data-a="runNext">踏入${a.n}</button><button class="btn" data-a="retreat">返回</button></div>`;
+  else if(v.type==='gate')body=bossGate(a);
   else if(v.type==='res')body=`<div class="panel">${v.img?`<div class="duo">${art(v.img,'勝利','r34')}${v.mimg?art(v.mimg,'','r11'):''}</div>`:''}<h3>${v.title}</h3>${v.drop||''}<p>${v.text}</p>${last?`<button class="btn pri big" data-a="finish">完成冒險</button>`:`<button class="btn pri big" data-a="runNext">繼續前進</button><button class="btn" data-a="retreat">撤退回城（保留戰利品）</button>`}</div>`;
   else if(v.type==='fork')body=`<div class="panel"><h3>岔路</h3><p class="sub">前方的路分成兩條。要往哪邊走？</p><div class="fork">${v.opts.map((o,i)=>(()=>{const tg=((RUN.ftags||[])[RUN.step+1]||[])[i],T=tg&&TAGS[tg];return `<button class="btn ${T?'tagged':''}" data-a="pickFork" data-v="${i}"><i>${NODE[o][0]}</i><b>${NODE[o][1]}</b><span>${NODE[o][2]}</span><span class="risk">${NRISK[o]||''}</span>${T?`<span class="ftag">${T[0]} ${T[1]}<small>${T[2]}</small></span>`:''}</button>`})()).join('')}</div><button class="btn" data-a="retreat">撤退回城（保留戰利品）</button></div>`;
   else if(v.type==='shrine')body=`<div class="panel">${art('event_shrine','古老的祭壇')}<h3>古老的祭壇</h3><p>長滿青苔的石台上刻著三個符號。指尖碰到其中一個時，微弱的光流進了身體。</p>${v.done?`<p>${v.done}</p><button class="btn pri big" data-a="${last?'finish':'runNext'}">${last?'完成冒險':'繼續前進'}</button>`:`<div class="list">${[['atk','劍之紋','本次冒險中，攻擊與魔力 +15%'],['def','盾之紋','本次冒險中，受到的傷害大幅降低'],['luck','星之紋','本次冒險中，金幣 +30%、裝備掉落提升']].map(([k,n,d])=>`<button class="btn opt" data-a="bless" data-v="${k}"><span><b>${n}</b>　<span class="sub">${d}</span></span></button>`).join('')}</div>`}</div>`;
@@ -1599,7 +1604,7 @@ const TAGS={hoard:['💎','寶物守衛','精英怪把守，打贏必掉裝備']
 const rTag=t=>{const r=Math.random();if(r>.45)return null;return {battle:pick(['hoard','bounty','cursed']),ambush:'bounty',event:'fate',chest:'rich',rest:'spring'}[t]||null};
 const NRISK={battle:'危險 ★　金幣・經驗',ambush:'危險 ★★　裝備 50%',event:'屬性檢定・結果不定',chest:'無危險・金幣道具',rest:'無危險・回復 35%',shrine:'無危險・本趟增益',merchant:'無危險・可購物',mystery:'完全未知'};
 const nAdds=el=>{const a=RUN.area,r=Math.random();if(el)return a>=3&&r<.5?1:0;return a>=3&&r<.2?2:a>=2&&r<.5?1:0};
-function runNext(){const n=RUN.step+1;if(RUN.forks&&RUN.forks[n]&&!RUN.nodes[n]){RUN.view={type:'fork',opts:RUN.forks[n]};save();render();$('#main').scrollTop=0;return}
+function runNext(){const n=RUN.step+1;if(RUN.nodes[n]==='boss'&&!RUN.gate&&RUN.step>=0){RUN.view={type:'gate'};save();render();$('#main').scrollTop=0;return}if(RUN.forks&&RUN.forks[n]&&!RUN.nodes[n]){RUN.view={type:'fork',opts:RUN.forks[n]};save();render();$('#main').scrollTop=0;return}
   RUN.step++;const a=AREAS[RUN.area],s=stats();let t=RUN.nodes[RUN.step];const tg=(RUN.tagAt||{})[RUN.step]||null;
   if(t==='mystery'){t=RUN.nodes[RUN.step]=pick(['battle','event','chest','ambush','merchant','shrine']);toast(`濃霧散去……是「${NODE[t][1]}」`)}
   if(t==='battle'){if(tg==='hoard'){startBattle(pick(a.mobs),'elite',nAdds(1));if(B){B.hoard=1;B.log.push('💎 牠守著一堆閃亮的東西！')}}else{startBattle(pick(a.mobs),'',nAdds());if(B&&tg==='bounty'){B.gmul=2.5;B.log.push('💰 懸賞目標！金幣 ×2.5')}if(B&&tg==='cursed'){B.atk=Math.round(B.atk*1.25);B.mag=Math.round(B.mag*1.25);B.hp=B.max=Math.round(B.max*1.3);B.xmul=2;B.name='詛咒・'+B.name;B.log.push('☠ 詛咒讓牠更強了……經驗 ×2')}}}
@@ -1792,6 +1797,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'3.8',d:'2026-11-19',t:'首領前哨＋自動戰鬥會用毒和火',b:'走到首領前會先停在「首領前哨」：顯示首領等級、你的 HP／MP／藥水和勝算，要硬闖還是帶著戰利品撤退由你決定。全自動在等級差太多或狀態太差時會先撤退練功，不再一直衝去送死掉金幣。自動戰鬥會把中毒、灼燒、虛弱、暈眩的價值算進去：遊俠會用蛇牙箭、法師更常點火，對付厚血的敵人更有效率。'},
   {v:'3.7',d:'2026-11-19',t:'遊俠專注增傷＋自動戰鬥會看預告',b:'遊俠的專注現在每層讓攻擊 +6%，「屏息」提前到 Lv.5 就能學，雙矢每箭 90%→100%：攢專注變強、什麼時候一箭打光要自己拿捏。自動戰鬥變聰明了：看到敵人下回合要出傷害招，劍士會先架招架反擊、法師會先開薄冰鏡；打首領和精英時會先上增益（伏身、晨禱、鬥氣解放）。冒險地點卡片新增提醒：首領已現身但你等級還不夠時，會先告訴你終點會碰上它。'},
   {v:'3.6',d:'2026-11-19',t:'開局兩招＋閃耀裝備',b:'四職業 Lv.1 就有兩招可選：劍士多了招架反擊、法師多了霜針、遊俠多了蛇牙箭、神官多了審光；原本 Lv.5 的招式提前到 Lv.3。劍士的破綻現在每層讓攻擊 +6%，疊越多越痛。新增 5% 機率掉落「✧閃耀」裝備：多一條詞條、最強詞條 ×1.5，洗練也不會消失。撿到史詩、傳說或閃耀裝備時，勝利畫面會跳出發光的戰利品卡片。'},
   {v:'3.5',d:'2026-11-19',t:'路線與事件改版',b:'岔路會標出危險度，還可能出現特殊標記：💎寶物守衛、💰懸賞、☠詛咒之地、👑大寶箱（小心寶箱怪）、💧靈泉、🎲命運之地。事件選項直接顯示成功率；成功有機會獲得本趟祝福，失敗可能驚動魔物開戰，大成功必掉裝備。同一趟不會遇到重複事件。'},
@@ -1990,7 +1996,10 @@ function foeTurn(){if(!B)return;B.tk=0;const s=stats();
   B.busy=!!wait;render();setTimeout(()=>{if(!B)return;B.busy=false;if(B.auto)autoAct()},wait+(B.auto?1000:0))}
 function autoAct(){if(!B||B.busy||!B.auto)return;const s=stats(),sk=mySkills().filter(k=>S.mp>=mpCost(k)&&!(SK[k].ult&&B.ultUsed));
   if(S.hp<s.HP*.4){const h=sk.find(k=>SK[k].heal);if(h)return pAct('skill',h);const p=['pot2','pot'].find(k=>S.items[k]);if(p)return pAct('item',p)}
-  const C=B.cls,est=k=>{const x=SK[k];return elMul(B.id,SKEL2[k]||'phys')*x.dmg.p*(x.dmg.h||1)*(1+(x.fin||0)*C.brk+(x.det||0)*C.marks.length+(x.aim||0)*C.focus+(x.faithAmp?Math.min(1,C.faith/100):0)+(x.faithSpend?C.faith/100*1.2:0))};
+  const C=B.cls,est=k=>{const x=SK[k];return elMul(B.id,SKEL2[k]||'phys')*x.dmg.p*(x.dmg.h||1)*(1+(x.fin||0)*C.brk+(x.det||0)*C.marks.length+(x.aim||0)*C.focus+(x.faithAmp?Math.min(1,C.faith/100):0)+(x.faithSpend?C.faith/100*1.2:0))+dotV(x)};
+  const dotV=x=>{if(!x.foe)return 0;const base=Math.max(1,x.dmg.s==='MAG'?s.MAG:s.ATK);let v=0;
+    for(const [k,f] of [['poison',.05],['burn',.04]])if(x.foe[k]&&!(B.st[k]>0))v+=Math.min(B.hp*.6,B.max*f*(B.kind==='boss'?.5:1)*x.foe[k])/base;
+    if(x.foe.weak&&!(B.st.weak>0)&&B.hp>s.ATK*3)v+=.35;if(x.foe.stun&&!(B.st.stun>0)&&B.hp>s.ATK*3)v+=.5;return v};
   if(B.chg||(B.next&&isDng(SKM[B.next])))return pAct('guard');
   /* 看預告決定：對方下回合要出傷害招就先架刀；強敵開場先上增益 */
   const nk=B.next&&SKM[B.next],hit=nk?!!nk.pow:'next' in B;
@@ -2525,7 +2534,7 @@ const ACT={
   trial(){if(S.adv||S.trial||S.lv<TRIAL.lv)return;if(S.hp<=1){toast('HP 太低，先到旅店休息');return}const sh=SHADOW[S.cls];MOBS.shadow.ty=sh[0];MOBS.shadow.sk=sh[1];
     closeM();TAB='adv';RUN={area:Math.min(4,Math.max(0,S.main.ch)),trial:true,nm:false,step:0,nodes:['boss'],loot:{gold:0,exp:0,items:[]},view:{type:'start'}};startBattle('shadow','boss');render()},
   startNm(v){if(S.hp<=1){toast('HP 太低，先到旅店休息');return}startRun(+v,true)},
-  runNext(){runNext()},retreat(){if(RUN.step<0){RUN=null;render()}else finish(false)},finish(){finish(true)},
+  runNext(){runNext()},bossGo(){if(!RUN)return;RUN.gate=1;runNext()},retreat(){if(RUN.step<0){RUN=null;render()}else finish(false)},finish(){finish(true)},
   evPick(v){evPick(+v)},
   bAtk(){pAct('atk')},bGuard(){pAct('guard')},bFlee(){pAct('flee')},bSkill(v){pAct('skill',v)},bItem(v){pAct('item',v)},
   bMenu(v){if(B.busy)return;B.menu=v;render()},
@@ -2599,7 +2608,9 @@ function faTick(){faDraw();if(!FA||!S)return;
   const st=$('#story');if(st&&!st.hidden){faClick('#story [data-a="storyPick"]',1)||faClick('#story [data-a="storyNext"]');return}
   if(MODAL){if(B&&MODAL.k!=='msg'){closeM();return}faClick('#modal .sheet-b [data-a="closeM"].pri')||faClick('#modal .x');return}
   if(B){if(!B.auto){B.auto=AUTO=true;render();setTimeout(autoAct,200)}return}
-  if(RUN){if(TAB!=='adv'){TAB='adv';render();return}faClick('#main [data-a="pickFork"]',1)||faClick('#main [data-a="evPick"]',1)||faClick('#main [data-a="evFight"]')||faClick('#main [data-a="bless"]',1)||faClick('#main [data-a="runNext"]')||faClick('#main [data-a="towerNext"]')||faClick('#main [data-a="finish"]');return}
+  if(RUN){if(TAB!=='adv'){TAB='adv';render();return}
+    if(RUN.view&&RUN.view.type==='gate'){const L=MOBS[AREAS[RUN.area].boss].lv+(RUN.nm?10:0),st=stats();if((!S.cleared[RUN.area]&&S.lv<L-1)||(S.hp<st.HP*.35&&!S.items.pot&&!S.items.pot2)){toast('全自動：首領太強，先撤退練功');faClick('#main [data-a="retreat"]')}else faClick('#main [data-a="bossGo"]');return}
+    faClick('#main [data-a="pickFork"]',1)||faClick('#main [data-a="evPick"]',1)||faClick('#main [data-a="evFight"]')||faClick('#main [data-a="bless"]',1)||faClick('#main [data-a="runNext"]')||faClick('#main [data-a="towerNext"]')||faClick('#main [data-a="finish"]');return}
   /* 回城：休息後重新出發同一地區 */
   const s=stats();if(S.hp<s.HP*.7||S.mp<s.MP*.5){const c=S.lv*4;if(S.gold<c){faStop('金幣不足以休息，全自動停止');return}ACT.rest();return}
   if(FA.tower){faStop('高塔挑戰結束');return}
