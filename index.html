@@ -530,13 +530,13 @@ const PCT=new Set(['brkcd','detamp','focusatk','answer','mpp','mpreg','healp','f
 const fmt=(k,v)=>`${STATN[k]} +${v}${PCT.has(k)?'%':''}`;
 const GEAR={};
 const TLV=[1,5,10,15,20,26],TPRICE=[60,300,900,2200,5000,9000];
-const WN={swordsman:['鐵劍','鋼刃長劍','秘銀大劍','霜牙劍','弒魔聖劍','雷霆王劍'],mage:['橡木杖','水晶杖','符文法杖','冰魄杖','星辰權杖','天候權杖'],ranger:['獵弓','長弓','精靈弓','風雪弩','蒼穹神弓','雷鷹長弓'],cleric:['木槌','祈禱錘','聖銀戰錘','霜輝聖錘','天使之證','白塔聖錘']};
+const WN={swordsman:['鐵劍','鋼刃長劍','秘銀大劍','霜牙劍','弒魔聖劍','雷霆王劍'],mage:['橡木杖','水晶杖','符文法杖','冰魄杖','星辰權杖','雷霆權杖'],ranger:['獵弓','長弓','精靈弓','霜風長弓','蒼穹神弓','雷鷹長弓'],cleric:['祭司短槌','祈禱戰錘','聖銀戰錘','霜輝聖錘','天使聖錘','白塔聖錘']};
 for(const c in WN)WN[c].forEach((n,i)=>{const v=5+i*9;GEAR[`w_${c}_${i}`]=Object.assign({n,slot:'weapon',cls:c,t:i,lv:TLV[i],price:TPRICE[i]},c==='mage'?{mag:v}:c==='cleric'?{atk:Math.round(v*.6),mag:Math.round(v*.85)}:{atk:v})});
 const ARMOR={head:[['皮帽','鐵盔','秘銀頭冠','霜紋盔','龍角冠','白塔頭盔'],i=>({def:2+i*4,hp:8+i*20}),.6],
   body:[['旅人布衣','硬皮甲','鎖子甲','霜紋鎧','龍鱗聖甲','王都近衛鎧'],i=>({def:3+i*7,hp:10+i*30}),.8],
-  feet:[['草鞋','皮靴','疾風靴','雪原長靴','天馬之靴','驛馬長靴'],i=>({def:1+i*3,eva:1+i}),.5],
-  ring:[['木紋戒指','銀戒','礦晶戒','霜華戒','魔眼戒','雷紋戒'],i=>({mp:8+i*12,crit:1+i}),.6],
-  neck:[['狼牙項鍊','護身符','礦晶墜飾','冰心墜鍊','誓約之鍊','王家徽鍊'],i=>({hp:15+i*35,cd:5+i*5}),.7]};
+  feet:[['草鞋','皮靴','疾風靴','雪原長靴','天馬之靴','雷步戰靴'],i=>({def:1+i*3,eva:1+i}),.5],
+  ring:[['橡木指環','銀戒','岩晶戒','霜華戒','魔眼戒','雷紋戒'],i=>({mp:8+i*12,crit:1+i}),.6],
+  neck:[['黑狼牙項鍊','護身符','岩晶墜飾','冰心墜鍊','誓約之鍊','王家徽鍊'],i=>({hp:15+i*35,cd:5+i*5}),.7]};
 for(const sl in ARMOR){const [ns,f,pm]=ARMOR[sl];ns.forEach((n,i)=>GEAR[SLOTP[sl]+'_'+i]=Object.assign({n,slot:sl,t:i,lv:TLV[i],price:Math.round(TPRICE[i]*pm)},f(i)))}
 /* 附加詞條：數值依裝備階級成長 */
 const SUBS={atk:t=>2+t*3,mag:t=>2+t*3,def:t=>2+t*3,hp:t=>15+t*25,mp:t=>8+t*10,crit:t=>2+t,cd:t=>5+t*3,eva:t=>1+t,ls:t=>2+t,atkp:t=>3+Math.round(t*1.5),magp:t=>3+Math.round(t*1.5),STR:t=>1+t,DEX:t=>1+t,INT:t=>1+t,VIT:t=>1+t,LUK:t=>1+t};
@@ -557,11 +557,11 @@ const SETS=[
 const CSET={swordsman:5,mage:6,ranger:7,cleric:8};
 /* 首領專屬傳說裝備 */
 Object.assign(GEAR,{
-  u_gob:{n:'黑晶護符',slot:'neck',t:0,lv:5,price:800,hp:60,crit:5,uq:{resmax:1},ud:'職業資源上限 +1（破綻、印記、專注）',uniq:1},
-  u_tree:{n:'樹王之心',slot:'ring',t:1,lv:10,price:2000,mp:40,hp:80,uq:{regen:4},ud:'每回合回復 4% HP',uniq:1},
-  u_worm:{n:'噬燈之牙',slot:'neck',t:2,lv:15,price:4000,hp:150,cd:20,uq:{ls:8,burn:15},ud:'吸血 +8%，攻擊時 15% 機率灼燒',uniq:1},
-  u_dragon:{n:'冰龍之鱗',slot:'body',t:3,lv:20,price:7000,def:45,hp:260,uq:{guard:20,shield:10},ud:'受擊 20% 機率傷害減半，開場護盾 10%',uniq:1},
-  u_zenos:{n:'術士的禮冠',slot:'head',t:4,lv:25,price:12000,def:30,hp:220,uq:{cd:40,resmax:1,atkp:8,magp:8},ud:'爆擊傷害 +40%、資源上限 +1、攻擊與魔力 +8%',uniq:1}});
+  u_gob:{n:'戰酋黑晶護符',slot:'neck',t:0,lv:5,price:800,hp:60,crit:5,uq:{resmax:1},ud:'職業資源上限 +1（破綻、印記、專注）',uniq:1},
+  u_tree:{n:'腐根樹王之心',slot:'ring',t:1,lv:10,price:2000,mp:40,hp:80,uq:{regen:4},ud:'每回合回復 4% HP',uniq:1},
+  u_worm:{n:'鑽岩巨顎',slot:'neck',t:2,lv:15,price:4000,hp:150,cd:20,uq:{ls:8,burn:15},ud:'吸血 +8%，攻擊時 15% 機率灼燒',uniq:1},
+  u_dragon:{n:'凜冬龍鱗鎧',slot:'body',t:3,lv:20,price:7000,def:45,hp:260,uq:{guard:20,shield:10},ud:'受擊 20% 機率傷害減半，開場護盾 10%',uniq:1},
+  u_zenos:{n:'黑霧魔冠',slot:'head',t:4,lv:25,price:12000,def:30,hp:220,uq:{cd:40,resmax:1,atkp:8,magp:8},ud:'爆擊傷害 +40%、資源上限 +1、攻擊與魔力 +8%',uniq:1}});
 const BOSSU={goblinboss:'u_gob',treeking:'u_tree',worm:'u_worm',icedragon:'u_dragon',zenos:'u_zenos'};
 const GEMS=['gem_r','gem_b','gem_g','gem_y','gem_w'];
 const RW=[55,30,12,2.6,.4];
@@ -580,7 +580,7 @@ const ITEMS={
   gem_y:{n:'黃玉',d:'鑲嵌寶石：爆擊率 +4%',gem:{crit:4},sell:60,mat:1},
   gem_w:{n:'月石',d:'鑲嵌寶石：迴避 +3%',gem:{eva:3},sell:60,mat:1},
   m_gel:{n:'史萊姆凝膠',d:'黏稠的素材',sell:8,mat:1},
-  m_fang:{n:'森狼之牙',d:'鋒利的獸牙',sell:20,mat:1},
+  m_fang:{n:'黑狼之牙',d:'鋒利的獸牙',sell:20,mat:1},
   m_ore:{n:'魔像礦石',d:'含魔力的礦石',sell:45,mat:1},
   m_ice:{n:'永凍冰晶',d:'不會融化的結晶',sell:80,mat:1},
   m_dark:{n:'蝕霧碎片',d:'散發不祥氣息',sell:130,mat:1}
@@ -1945,6 +1945,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'6.0',d:'2026-11-19',t:'裝備改名',b:'首領專屬裝備改成符合新首領名稱：戰酋黑晶護符、腐根樹王之心、鑽岩巨顎、凜冬龍鱗鎧、黑霧魔冠。其他不合理的名稱也一併修正：雷霆權杖、霜風長弓、天使聖錘、雷步戰靴、祭司短槌、祈禱戰錘、黑狼牙項鍊、岩晶墜飾、岩晶戒、橡木指環、黑狼之牙。已持有的裝備會自動顯示新名稱。'},
   {v:'5.9',d:'2026-11-19',t:'狀態實體特效',b:'中毒會冒出綠色毒泡、燃燒會有火焰與火星往上竄、流血會滴落在地上、冰凍會被冰殼包住、暈眩頭上轉星星、弱化往下沉的紫色箭頭、再生飄綠色十字，角色身上也會泛出對應顏色的光。怪物情報裡的印記改成圖示。'},
   {v:'5.8',d:'2026-11-19',t:'戰鬥畫面精簡',b:'怪物資訊框只留名稱、血條與下回合預告；點怪物圖像或資訊框就能看完整數值（攻防、弱點、韌性爆抗、狀態），查看時戰鬥自動暫停，關閉後繼續。'},
   {v:'5.7',d:'2026-11-19',t:'怪物韌性與爆抗',b:'爆擊率與爆擊傷害維持原本的強度；改為讓怪物擁有「韌性」（降低你的爆擊率）與「爆抗」（降低爆擊額外傷害），越後面的地圖、精英、首領、惡夢與強敵化的魔物越高，戰鬥畫面可以看到數值。'},
