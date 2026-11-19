@@ -95,6 +95,7 @@
 
 ## 待辦
 - **新魔物 10 種正式插畫**（2026-11-19 新增，目前用同系魔物改色 `MVAR` 頂替）：mob_bogslime、mob_sparkrabbit、mob_soulshroom、mob_shadewolf、mob_lavabat、mob_crystalgolem、mob_blizzardwolf、mob_stormsprite、mob_bloodknight、mob_voidwraith（各要待機、_atk、_hurt、_low、_lose，512 透明、面向左）。名稱與技能見 `MVAR`。圖到位後程式會自動改用正式圖、不再套色。優先順序在站姿與拿掉圍巾之後。
+- 魔物專屬裝備 10 件圖示（icon_x_bog… icon_x_void，128 方形，與現有裝備圖示同風格），目前用部位預設圖示。
 - **裝備欄站姿立繪**（2026-11-19 已派給 Codex）：`class_<職業>_<m|f>_stand.png` ×24（12 職業×男女），正面放鬆站姿、武器收好。到圖後照審圖標準檢查（武器要有支撐、手腳數量、全身不裁切），合格轉 600×800 webp 放 `art/`，跑 build_list.py、sw.js 版本 +1。程式已寫好：`dollHtml()` 有 `_stand` 圖就用，沒有就用原立繪。
 - 裝備：稀有詞綴、首領寶物堆三選一（`BBOX`、`bossBox`、`RUN.view.box`）已上線；全自動不換裝，詞綴實戰強度待觀察。可觀察封印寶箱 35% 是否太低。
 - 首領模擬（無裝備、點數全加主屬＋VIT，哥布林隊長 Lv5）：劍士 Lv4 約 5/6 勝；v3.7 後法師 Lv5 約 5/6、遊俠 Lv4–5 約 1/2–2/3。持續觀察。

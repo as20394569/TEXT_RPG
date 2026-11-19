@@ -685,6 +685,20 @@ const MVAR={
   bloodknight:{n:'血誓騎士',lv:23,ty:'brute',base:'darkknight',f:'hue-rotate(320deg) saturate(2.2)',sk:['m_darkblade','m_pact'],el:['holy']},
   voidwraith:{n:'虛無幽魂',lv:24,ty:'caster',base:'phantom',f:'hue-rotate(140deg) saturate(1.6)',hpM:.85,sk:['m_soul','m_engulf'],el:['holy']}};
 for(const k in MVAR){const v=MVAR[k];MOBS[k]={n:v.n,lv:v.lv,ty:v.ty,hpM:v.hpM,sk:v.sk,mat:MOBS[v.base].mat,fly:MOBS[v.base].fly}}
+/* 魔物專屬掉落（史詩・專屬效果） */
+Object.assign(GEAR,{
+  x_bog:{n:'毒沼凝晶戒',slot:'ring',t:0,lv:3,price:600,mp:20,uq:{regen:2,thorn:10},ud:'每回合回復 2% HP，被擊中時反彈 10% 傷害',uniq:1},
+  x_spark:{n:'雷角疾靴',slot:'feet',t:0,lv:4,price:700,def:6,eva:4,uq:{gale:1,eva:3},ud:'每場第一擊必中且爆擊，迴避 +3%',uniq:1},
+  x_soul:{n:'噬魂菇冠',slot:'head',t:1,lv:7,price:1600,def:10,mp:40,uq:{mpreg:3,magp:6},ud:'每回合回復 3 MP，魔力 +6%',uniq:1},
+  x_shade:{n:'幽影狼皮甲',slot:'body',t:1,lv:9,price:1900,def:20,hp:60,uq:{eva:6,double:10},ud:'迴避 +6%，普攻 10% 機率追加一擊',uniq:1},
+  x_lava:{n:'熔岩蝠翼墜',slot:'neck',t:2,lv:12,price:3200,hp:120,cd:15,uq:{burn:20,ls:4},ud:'攻擊時 20% 機率灼燒，吸血 +4%',uniq:1},
+  x_crystal:{n:'水晶核心',slot:'ring',t:2,lv:14,price:3600,mp:50,crit:4,uq:{shield:12,defp:8},ud:'開場護盾 12%，防禦 +8%',uniq:1},
+  x_blizzard:{n:'暴雪狼牙鍊',slot:'neck',t:3,lv:17,price:5600,hp:180,cd:20,uq:{stun:8,crit:5},ud:'攻擊時 8% 機率暈眩，爆擊率 +5%',uniq:1},
+  x_storm:{n:'雪暴精靈之冠',slot:'head',t:3,lv:19,price:6000,def:24,hp:150,uq:{mpcut:15,magp:10},ud:'技能 MP 消耗 -15%，魔力 +10%',uniq:1},
+  x_blood:{n:'血誓戰靴',slot:'feet',t:4,lv:23,price:9000,def:18,eva:5,uq:{back:35,reap:8},ud:'HP 低於 35% 時傷害 +35%，擊倒敵人回復 8% HP／MP',uniq:1},
+  x_void:{n:'虛無幽魂斗篷',slot:'body',t:4,lv:24,price:9600,def:50,hp:300,uq:{guard:18,hpp:8},ud:'受擊 18% 機率傷害減半，HP +8%',uniq:1}});
+for(const k in GEAR)if(k.startsWith('x_'))GEAR[k].mx=1;
+const MDROP={bogslime:'x_bog',sparkrabbit:'x_spark',soulshroom:'x_soul',shadewolf:'x_shade',lavabat:'x_lava',crystalgolem:'x_crystal',blizzardwolf:'x_blizzard',stormsprite:'x_storm',bloodknight:'x_blood',voidwraith:'x_void'};
 const mobBase=id=>MVAR[id]?MVAR[id].base:id;
 const AREAS=[
   {id:'plain',n:'微風草原',lv:'1–5',base:1,d:'晨星鎮外的遼闊草原，新手冒險者的起點。',mobs:['slime','hornrabbit','goblin','bogslime','sparkrabbit'],boss:'goblinboss'},
@@ -1301,7 +1315,7 @@ const xpPen=L=>{const d=S.lv-L-5;return d>0?Math.max(.2,1-d*.15):1};
 const clsName=()=>S.adv?ADV[S.adv].n:CLS[S.cls].n;
 const gearBy=u=>S.gear.find(g=>g.u===u);
 const tierCap=()=>S&&S.main&&!S.main.done?Math.max(0,S.main.ch):99,sealed=g=>GEAR[g.id].t>tierCap();
-function gearStat(g){const b=GEAR[g.id],m=(1+.2*g.r)*(1+.08*g.p)*(g.q||1)*([1.4,1.2][b.uniq?9:b.t]||1)*(sealed(g)?Math.pow(.65,b.t-tierCap()):1),o={};for(const k in STATN)if(b[k])o[k]=Math.round(b[k]*m);return o}
+function gearStat(g){const b=GEAR[g.id],m=(b.mx?.6:1)*(1+.2*g.r)*(1+.08*g.p)*(g.q||1)*([1.4,1.2][b.uniq?9:b.t]||1)*(sealed(g)?Math.pow(.65,b.t-tierCap()):1),o={};for(const k in STATN)if(b[k])o[k]=Math.round(b[k]*m);return o}
 const specV=g=>{const v=SPEC[g.sp].v;return v<=1?v:Math.max(1,Math.round(v*Math.min(1,.5+.1*(GEAR[g.id].t||0))))},specD=g=>{const x=SPEC[g.sp];return x.v<=1?x.d:x.d.replace(String(x.v),String(specV(g)))};
 function gearAll(g){const o=gearStat(g),sl=sealed(g),sm=sl?Math.pow(.65,GEAR[g.id].t-tierCap()):1,ad=(k,v)=>o[k]=(o[k]||0)+v;for(const x of g.sub||[])ad(x.k,Math.max(1,Math.round(x.v*sm)));if(g.sp&&!sl)ad(g.sp,specV(g));const u=GEAR[g.id].uq;if(u&&!sl)for(const k in u)ad(k,u[k]);
   for(const gm of g.sock||[])if(gm)for(const k in ITEMS[gm].gem)ad(k,ITEMS[gm].gem[k]);return o}
@@ -1679,7 +1693,7 @@ const MV={
       <h3>取得裝備 ${R.gs.length} 件</h3><div class="list">${best.map(g=>`<button class="item" data-a="openGear" data-v="${g.u}"><span class="ico c${g.r}">${gIco(g.id)}</span><span class="grow"><b class="c${g.r}">${gearName(g)}</b><span class="sub">${RAR[g.r].n}・${SLOTS[GEAR[g.id].slot]}</span></span></button>`).join('')||'<p class="empty">這次沒有撿到裝備</p>'}${R.gs.length>12?`<p class="sub">其餘 ${R.gs.length-12} 件已放進背包</p>`:''}</div></div><button class="btn pri big" data-a="closeM">收下</button>`}},
   foe(){if(!B)return{t:'怪物情報',b:'<p class="empty">目前不在戰鬥中</p>'};const m=B.m,e=MEL[B.id];
     const C=B.cls,stc=[...B.aff.map(x=>`<span class="chip" style="color:#fff;background:#7a2a4a">${AFF[x].n}</span>`),...B.fb.map(b=>`<span class="chip">${b.n} ${b.t}</span>`),B.fshield>0?`<span class="chip">盾 ${B.fshield}</span>`:'',C.brk?`<span class="chip" style="color:var(--hp)">破綻 ${C.brk}</span>`:'',C.marks.length?`<span class="chip">印記 ${C.marks.map(m=>`<span class="mkc m${m}">${m}</span>`).join('')}</span>`:'',`<span class="chip">韌性 ${B.tough||0}・爆抗 ${Math.round((B.cdr||0)*100)}%</span>`,...Object.keys(B.st).filter(k=>B.st[k]>0).map(k=>`<span class="chip">${FOE[k]} ${B.st[k]}</span>`)].join('');
-    return{t:B.name+'（暫停中）',b:`<p class="sub" style="text-align:center">戰鬥已暫停，關閉後繼續</p><div class="chips">${stc}</div><div class="panel"><div class="row"><div style="width:96px;flex:none">${art('mob_'+B.id,m.n,'r11')}</div><div class="grow"><b>Lv${B.L}　${MTY[m.ty].n}${B.kind==='boss'?'　<span class="tag red">首領</span>':''}</b>
+    return{t:B.name+'（暫停中）',b:`<p class="sub" style="text-align:center">戰鬥已暫停，關閉後繼續</p>${MDROP[B.id]?`<div class="gsec"><b class="c3">專屬掉落：${GEAR[MDROP[B.id]].n}</b><span class="sub">${GEAR[MDROP[B.id]].ud}</span></div>`:''}<div class="chips">${stc}</div><div class="panel"><div class="row"><div style="width:96px;flex:none">${art('mob_'+B.id,m.n,'r11')}</div><div class="grow"><b>Lv${B.L}　${MTY[m.ty].n}${B.kind==='boss'?'　<span class="tag red">首領</span>':''}</b>
       <div class="sub">HP ${B.hp}/${B.max}　攻擊 ${B.atk}　魔力 ${B.mag}　防禦 ${B.def}　魔抗 ${B.mres??B.def}</div>
       ${e?`<div class="sub">弱點：<b style="color:#ffd34a">${ELN[e[0]]}</b>（傷害 ×1.5）${e[1]?`　抗性：<b>${ELN[e[1]]}</b>（傷害 ×0.6）`:''}</div>`:''}
       <div class="sub">${{tank:'防禦高，用魔法打比較痛',caster:'魔抗高，用物理打比較痛',brute:'防禦略高於魔抗',swift:'迴避高，物理魔法都可以'}[m.ty]}</div></div></div></div>
@@ -1971,6 +1985,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'6.9',d:'2026-11-19',t:'魔物專屬裝備',b:'10 種新魔物各有一件史詩級專屬裝備，帶有獨特效果：毒沼凝晶戒、雷角疾靴、噬魂菇冠、幽影狼皮甲、熔岩蝠翼墜、水晶核心、暴雪狼牙鍊、雪暴精靈之冠、血誓戰靴、虛無幽魂斗篷。一般 4%、精英 12%、寶藏魔物 30%、徘徊強敵 50% 掉落；點魔物圖像可看牠掉什麼。'},
   {v:'6.8',d:'2026-11-19',t:'新魔物與稀有遭遇',b:'每張地圖新增 2 種魔物（毒沼史萊姆、雷角野兔、噬魂紫菇、幽影狼、熔岩蝙蝠、水晶魔像、暴雪狼、雪暴精靈、血誓騎士、虛無幽魂），各有不同技能與弱點。冒險中可能遇到閃閃發亮的「寶藏魔物」（3 回合內打倒才拿得到大量金幣與裝備）和危險的「徘徊強敵」（強大但掉落豐厚）。'},
   {v:'6.7',d:'2026-11-19',t:'裝備隨機性提升',b:'新掉落的裝備多了「品質」：主屬性在 85%～125% 之間隨機，3% 機率出現 130%～140% 的【完美】裝備；附加詞條數值浮動加大（70%～130%）；稀有以上有 20% 機率多一條詞條。同名同稀有度的裝備也會有明顯差異，值得多刷幾件挑最好的。'},
   {v:'6.6',d:'2026-11-19',t:'裝備封印',b:'比主線進度更遠的地區裝備會暫時「封印」：屬性依超前的階數降低，稀有詞綴與首領專屬效果暫時無效。裝備不會消失，推進主線到該地區就自動完全解除。已經在無盡之塔拿到高階裝備的冒險者也適用。之前因為在塔裡打倒首領而被誤標「已通關」的地區會自動恢復成正確的主線進度。'},
@@ -2240,6 +2255,7 @@ function spoil(){const m=B.m,L=B.L,bs=B.kind==='boss',el=B.kind==='elite',T=B.to
   if(bs||Math.random()<.06){addItem('stone',bs?2:1);got.push(bs?'強化石×2':'強化石')}
   const first=bs&&!S.cleared[RUN.area];
   {const tw=RUN.tower,gt=tw?Math.min(RUN.area,S.main.ch):RUN.area,hard=B.mut||B.nm,n=(FA&&!bs&&!B.hoard&&Math.random()<.5)?0:(B.hoard?1:0)+(bs?(tw?1:B.nm?3:2):(B.mut?1:Math.random()<(el?.5:B.nm?.3:lk?.2:.12)*(tw?.6:1)?1:0));for(let i=0;i<n;i++){const g=rollGear(gt,bs?(tw?1:first&&!i?3:B.nm?3:2):hard?2:el?1:0,bs||hard?(tw?1.3:2):1,hard);got.push(gearName(g))}if(tw&&RUN.area>S.main.ch&&Math.random()<.5){addItem('stone',1);got.push('強化石')}
+    if(MDROP[B.id]&&Math.random()<(B.wander?.5:B.treasure?.3:B.kind==='elite'?.12:B.nm?.1:.04)*(FA?.5:1)){const u=addGear(MDROP[B.id],3);DROPS.push(u);got.push(gearName(u));sys(`${S.name} 取得魔物專屬裝備【${GEAR[u.id].n}】！`)}
     if(bs&&BOSSU[B.id]&&(!RUN.tower||S.cleared[AREAS.findIndex(a=>a.boss===B.id)])&&Math.random()<(RUN.tower?.03:B.nm?.2:.08)){const u=addGear(BOSSU[B.id],4);DROPS.push(u);got.push(gearName(u));sys(`${S.name} 取得首領專屬裝備【${GEAR[u.id].n}】！`)}
     if(bs||(B.mut&&Math.random()<.5)||(B.nm&&Math.random()<.25)){const gm=pick(GEMS);addItem(gm,1);got.push(ITEMS[gm].n)}}
   got.push(...liveDrop(bs));
