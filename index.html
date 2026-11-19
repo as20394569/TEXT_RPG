@@ -1164,7 +1164,7 @@ function newGame(name,cls,sex){
   learn(true);const s=stats();S.hp=s.HP;S.mp=s.MP;checkDaily();save();
 }
 /* 舊存檔升級：三格裝備 → 六格、四階稀有度 → 五階 */
-function migrate(){if(!S)return;if(!S.pid)S.pid=Math.random().toString(36).slice(2,10);dexInit();if(!S.tut){S.tut={};if(S.lv>=5)for(const k in TIPS)if(k!=='tower'&&k!=='ally'&&k!=='adv20')S.tut[k]=1}if(!S.nst)S.nst={};if(S.gem){S.gold+=S.gem*5;S.gem=0}for(const g of S.gear||[])if(!g.sock)g.sock=g.r>=4?[null,null]:g.r>=3?[null]:[];if(!S.sex)S.sex='m';if(!S.flags)S.flags={};if(S.bond==null)S.bond=0;if((S.v||1)>=2)return;
+function migrate(){if(!S)return;try{if(S.cleared&&S.main&&!S.main.done&&!S.fixTowerClr){for(const k in S.cleared){const i=+k,bi=(CH[i]&&CH[i].steps||[]).findIndex(x=>x.type==='boss'),ok=S.main.ch>i||(S.main.ch===i&&bi>=0&&S.main.step>bi);if(!ok)delete S.cleared[k]}S.fixTowerClr=1}}catch(e){}if(!S.pid)S.pid=Math.random().toString(36).slice(2,10);dexInit();if(!S.tut){S.tut={};if(S.lv>=5)for(const k in TIPS)if(k!=='tower'&&k!=='ally'&&k!=='adv20')S.tut[k]=1}if(!S.nst)S.nst={};if(S.gem){S.gold+=S.gem*5;S.gem=0}for(const g of S.gear||[])if(!g.sock)g.sock=g.r>=4?[null,null]:g.r>=3?[null]:[];if(!S.sex)S.sex='m';if(!S.flags)S.flags={};if(S.bond==null)S.bond=0;if((S.v||1)>=2)return;
   const om=[0,1,3,4];
   for(const g of S.gear){if(g.id.startsWith('c_'))g.id='r_'+g.id.slice(2);g.r=om[g.r]??g.r;
     if(GEAR[g.id]){if(!g.sub)g.sub=rollSubs(GEAR[g.id].t,g.r);if(g.r>=4&&!g.sp)g.sp=pick(Object.keys(SPEC))}g.lock=!!g.lock}
@@ -1955,7 +1955,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
-  {v:'6.6',d:'2026-11-19',t:'裝備封印',b:'比主線進度更遠的地區裝備會暫時「封印」：屬性依超前的階數降低，稀有詞綴與首領專屬效果暫時無效。裝備不會消失，推進主線到該地區就自動完全解除。已經在無盡之塔拿到高階裝備的冒險者也適用。'},
+  {v:'6.6',d:'2026-11-19',t:'裝備封印',b:'比主線進度更遠的地區裝備會暫時「封印」：屬性依超前的階數降低，稀有詞綴與首領專屬效果暫時無效。裝備不會消失，推進主線到該地區就自動完全解除。已經在無盡之塔拿到高階裝備的冒險者也適用。之前因為在塔裡打倒首領而被誤標「已通關」的地區會自動恢復成正確的主線進度。'},
   {v:'6.5',d:'2026-11-19',t:'無盡之塔掉落調整',b:'無盡之塔掉落的裝備階級不再超過主線進度；塔內首領改為掉 1 件精良以上裝備（原本 2 件稀有以上），一般魔物掉落率降低；首領專屬傳說要先在主線擊敗該首領才會在塔裡掉落，機率 3%。超出主線進度的樓層改為有機會掉強化石。修正在塔裡打倒首領會被誤算成主線通關的問題。'},
   {v:'6.4',d:'2026-11-19',t:'裝備平衡',b:'前期裝備主屬性提升（第 1 階 +40%、第 2 階 +20%），普通與精良在前期更有用；附加詞條的數值浮動變小，比較不會抽到很爛的詞條；稀有詞綴的效果改為依裝備階級成長（第 1 階 50%，第 6 階滿值），避免低階傳說一件打天下。爆擊與爆傷詞條維持不變。'},
   {v:'6.3',d:'2026-11-19',t:'背包篩選升級',b:'裝備頁可以依部位（武器、頭盔、鎧甲、鞋子、戒指、項鍊）、稀有度（精良以上～傳說）篩選，並可只看「▲更強」、套裝、詞綴／閃耀／專屬裝備；排序可選戰力、稀有度、等級、最新。設定會記住。'},
