@@ -343,12 +343,14 @@ input,textarea{font:inherit;width:100%;padding:8px 10px;border:2px solid var(--l
 .fadice{position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;background:rgba(10,20,40,.45);pointer-events:none}.fd-box{background:#fffaf0;border:3px solid #e0a020;border-radius:16px;padding:14px 22px;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.35)}.fd-t{font-weight:800;color:#8a5a00;margin-bottom:6px}.fd-die{width:72px;height:72px;margin:4px auto 8px;border-radius:14px;background:linear-gradient(145deg,#ffffff,#e8e0d0);border:2px solid #b08a50;display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:900;color:#c0262d;transition:transform .08s}.fd-die.done{animation:fdpop .4s}.fd-r{font-size:13px;color:#5a4a3a}@keyframes fdpop{0%{transform:scale(1.5)}60%{transform:scale(.9)}100%{transform:scale(1)}}.fd-pick{outline:3px solid #e0a020;outline-offset:2px}
 .idlep{border:2px solid #7fa8d8}.idlep.on{border-color:#e0a020;background:linear-gradient(180deg,#fffbe8,#fff)}.idle-t{font-size:34px;font-weight:900;text-align:center;letter-spacing:2px;color:#1a3a6a;font-variant-numeric:tabular-nums}.idle-g{text-align:center;font-size:13px;margin:4px 0 6px}.idle-res .ir-h{text-align:center;font-weight:800;font-size:16px;margin-bottom:6px}
 .doll{display:grid;grid-template-columns:1fr 1.25fr 1fr;gap:8px;align-items:center}.doll .dcol{display:flex;flex-direction:column;gap:8px}.doll .dmid{position:relative;border-radius:14px;background:radial-gradient(ellipse at 50% 70%,#e8f0ff,#c8d8f0);min-height:230px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden}.doll .dmid .art{width:100%}.dslot{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 4px;border-radius:12px;border:2px solid #c8b890;background:#fffaf0;font:inherit;color:inherit;cursor:pointer;min-height:84px;justify-content:center}.dslot .ico{width:44px;height:44px}.dslot b{font-size:11px;line-height:1.2;text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dslot small{font-size:10px;color:#8a7a6a}.dslot.empty{border-style:dashed;opacity:.75}.dslot.r1{border-color:#4caf50}.dslot.r2{border-color:#3a7bd5}.dslot.r3{border-color:#9b59b6}.dslot.r4{border-color:#e0a020;box-shadow:0 0 8px rgba(224,160,32,.5)}.dslot .pl{font-size:10px;color:#c0262d;font-weight:700}
+#bcast{display:flex;align-items:center;gap:6px;padding:6px 8px;background:linear-gradient(90deg,#c0262d,#e0602a);color:#fff;font-size:12px;box-shadow:0 2px 6px rgba(0,0,0,.25);position:relative;z-index:6}#bcast[hidden]{display:none}#bcast.bc-in{animation:bcIn .5s ease-out}@keyframes bcIn{from{transform:translateY(-100%);opacity:0}to{transform:none;opacity:1}}.bc-ic{flex:none;font-size:16px;animation:bcShake 1.2s infinite}@keyframes bcShake{0%,100%{transform:rotate(0)}10%{transform:rotate(-15deg)}20%{transform:rotate(12deg)}30%{transform:rotate(0)}}.bc-m{flex:1;overflow:hidden;white-space:nowrap}.bc-t{display:inline-block;padding-left:100%;animation:bcScroll 18s linear infinite}@keyframes bcScroll{to{transform:translateX(-100%)}}.bc-b{flex:none;background:#fff;color:#c0262d;border:0;border-radius:8px;padding:3px 8px;font-weight:800;font-size:12px}.bc-x{flex:none;background:transparent;border:0;color:#fff;font-size:14px;padding:0 2px}
 </style>
 </head>
 <body>
 <div id="app" class="pre">
   <header id="hud"></header>
   <div id="chat"></div>
+  <div id="bcast" hidden></div>
   <main id="main"></main>
   <nav id="nav"></nav>
   <div id="tip" hidden></div>
@@ -1343,6 +1345,12 @@ const mainReady=()=>S.main.acc&&S.main.ch<CH.length&&S.main.step>=CH[S.main.ch].
 const questDot=()=>(typeof NST!=='undefined'&&nstDot())||mainReady()||(!S.main.acc&&S.main.ch<CH.length&&chLvOk())||SQ.some(q=>S.side[q.id]&&!S.side[q.id].done&&sqProg(q)>=q.c);
 
 /* ============ 頻道 ============ */
+/* 更新廣播 */
+let BCAST=null;
+function bcast(html,act){BCAST={html,act};const el=$('#bcast');if(el){el.innerHTML=`<span class="bc-ic">📢</span><div class="bc-m"><span class="bc-t">${html}</span></div>${act?`<button class="bc-b" data-a="${act.a}">${act.l}</button>`:''}<button class="bc-x" data-a="bcClose">✕</button>`;el.hidden=false;el.classList.remove('bc-in');void el.offsetWidth;el.classList.add('bc-in')}}
+function bcastCheckSeen(){if(!S)return;const v=NEWS[0].v;if(S.seenVer!==v){const n=NEWS[0];bcast(`<b>系統廣播</b>　遊戲已更新至 <b>v${v}</b>：${n.t}　—　${n.b}`,{a:'bcNews',l:'看公告'});sys(`遊戲已更新至 v${v}：${n.t}`)}}
+async function bcastPoll(){try{const r=await fetch('index.html?v='+Date.now(),{cache:'no-store'});const t=await r.text(),m=t.match(/\{v:'([\d.]+)',d:'[^']*',t:'([^']*)'/);if(m&&parseFloat(m[1])>parseFloat(NEWS[0].v)&&(!BCAST||!BCAST.newv||BCAST.newv!==m[1])){bcast(`<b>系統廣播</b>　新版本 <b>v${m[1]}</b>「${esc(m[2])}」已推出！重新整理即可更新`,{a:'bcReload',l:'立即更新'});BCAST.newv=m[1];sys(`新版本 v${m[1]} 已推出`)}}catch(e){}}
+setInterval(bcastPoll,3*60e3);setTimeout(bcastPoll,20e3);
 function sys(t){CHATQ.push(`<span><b class="sys">[系統]</b> ${esc(t)}</span>`)}
 function chatTick(){if(!S)return;const el=$('#chat');
   if(CHATQ.length)el.innerHTML=CHATQ.shift();else if(!el.innerHTML)el.innerHTML='<span><b class="sys">[系統]</b> 歡迎來到晨星鎮，祝你冒險愉快。</span>'}
@@ -1536,7 +1544,7 @@ function vQuest(){
   return `<h2>任務</h2>${tabs}<div class="panel"><div class="list">${body}</div></div>`}
 
 /* ============ 浮層 ============ */
-function openM(k,v){MODAL={k,v};drawModal()}
+function openM(k,v){MODAL={k,v};if(k==='news'&&S){S.seenVer=NEWS[0].v;const el=$('#bcast');if(el&&BCAST&&!BCAST.newv)el.hidden=true}drawModal()}
 function closeM(){MODAL=null;drawModal()}
 function drawModal(){setTimeout(()=>{try{tipCheck()}catch(e){}},60);const el=$('#modal');if(!MODAL){el.hidden=true;el.innerHTML='';return}
   const r=MV[MODAL.k](MODAL.v),old=el.querySelector('.sheet-b'),keep=old?old.scrollTop:0;el.hidden=false;
@@ -1839,6 +1847,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'5.0',d:'2026-11-19',t:'更新廣播',b:'遊戲更新後，畫面上方會出現跑馬燈系統廣播告訴你更新了什麼；遊玩中有新版本推出時，也會即時廣播並提供「立即更新」按鈕。'},
   {v:'4.9',d:'2026-11-19',t:'背景掛機＋人物裝備欄',b:'冒險頁新增「背景掛機」：選地圖後角色自動打怪，關掉遊戲也會累積（最多 12 小時），隨時結束並看結算畫面。角色與背包的裝備改成人物立繪兩側分部位擺放，點部位就能看裝備詳細資料。'},
   {v:'4.8',d:'2026-11-19',t:'斬殺線：看準時機收尾',b:'敵人血量掉到一擊就能收掉時，敵方狀態列會亮出「🗡 普攻可斬殺」或「🗡 技能可斬殺」，提醒你這回合不必再架刀防守，直接出手結束戰鬥（多隻敵人同時在場時不顯示）。自動戰鬥也學會了：能一擊收掉就用最省 MP 的招式直接斬殺；對方攻擊不痛、下回合就能打完時，不再浪費回合招架。實測全自動劍士防守回合從約 45% 降到約 27%。'},
   {v:'4.7',d:'2026-11-19',t:'全自動放慢＋命運骰子',b:'全自動速度放慢一半，方便觀戰；遇到岔路、事件或劇情抉擇時再放慢，並擲出命運骰子：1～3 走左邊、4～6 走右邊。'},
@@ -2661,6 +2670,9 @@ const ACT={
   openGear(v){openM('gear',+v)},
   sign(){checkDaily();if(S.daily.sign)return;S.daily.sign=true;S.gold+=300;addItem('pot',2);toast('簽到成功：300 G、治療藥水×2');save();render()},
   idleSel(v){IDLESEL=+v;render()},
+  bcClose(){const el=$('#bcast');if(el)el.hidden=true;if(S){S.seenVer=NEWS[0].v;save()}},
+  bcNews(){ACT.bcClose();openM('news')},
+  bcReload(){try{navigator.serviceWorker&&navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.update()))}catch(e){}setTimeout(()=>location.reload(),300)},
   bagSlot(v){BAGTAB='gear';BAGF=v==='weapon'?'weapon':['ring','neck'].includes(v)?'acc':'armor';ACT.tab('bag')},
   idleStart(){if(RUN||B){toast('冒險中不能掛機');return}if(FA)faStop();S.idle={area:IDLESEL,start:Date.now()};save();toast(`開始在 ${AREAS[IDLESEL].n} 掛機`);render()},
   idleEnd(){if(!S.idle)return;const c=idleCalc();if(c.ms<60e3&&!confirm('掛機不到 1 分鐘，幾乎沒有收穫，確定結束？'))return;idleSettle();render()},
@@ -2765,7 +2777,7 @@ document.body.classList.toggle('noshake',SHAKEOFF);
 
 /* ============ 啟動 ============ */
 load();if(S){migrate();checkDaily();learn(true)}
-render();chatTick();setInterval(chatTick,4000);
+render();chatTick();setInterval(chatTick,4000);setTimeout(bcastCheckSeen,1200);
 </script>
 <script>if('serviceWorker' in navigator&&/github\.io$/.test(location.hostname))navigator.serviceWorker.register('sw.js').catch(()=>{})</script>
 </body>
