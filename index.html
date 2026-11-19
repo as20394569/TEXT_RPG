@@ -1602,7 +1602,7 @@ function vBag(){
     const gs=S.gear.filter(g=>!F||F.includes(GEAR[g.id].slot)).sort((a,b)=>(eqd.includes(b.u)-eqd.includes(a.u))||gearPower(b)-gearPower(a));
     const up=g=>{const b=GEAR[g.id];if(eqd.includes(g.u)||(b.cls&&b.cls!==S.cls)||S.lv<b.lv)return false;const c=gearBy(S.eq[b.slot]);return !c||gearPower(g)>gearPower(c)};
     body=`<div class="fchips">${[['all','全部'],['weapon','武器'],['armor','防具'],['acc','飾品']].map(([k,n])=>`<button class="${BAGF===k?'on':''}" data-a="gearF" data-v="${k}">${n}</button>`).join('')}<span class="sub" style="margin-left:auto">共 ${S.gear.length} 件</span></div>
-      <button class="btn sm" data-a="disAll">一鍵分解普通、精良（未鎖定）</button>`+
+      <div class="row" style="gap:6px;flex-wrap:wrap"><button class="btn sm" data-a="disAll">一鍵分解普通、精良</button><button class="btn sm" data-a="sellAll" data-v="1">一鍵販售普通、精良</button><button class="btn sm" data-a="sellAll" data-v="2">一鍵販售稀有以下</button></div><p class="sub" style="margin:2px 0">鎖定與裝備中的不會被處理。</p>`+
       (gs.map(g=>`<button class="item" data-a="openGear" data-v="${g.u}"><span class="ico c${g.r}">${gIco(g.id)}</span><span class="grow"><b class="c${g.r}">${gearName(g)}</b><span class="sub">${gearDesc(g)}</span></span>${eqd.includes(g.u)?'<span class="tag ok">裝備中</span>':up(g)?'<span class="tag upt">▲ 更強</span>':''}${g.lock?'<span class="tag off">鎖</span>':''}</button>`).join('')||'<p class="empty">沒有裝備</p>')}
   else{const ks=Object.keys(S.items).filter(k=>BAGTAB==='use'?ITEMS[k].use:ITEMS[k].mat);
     body=ks.map(k=>`<div class="item"><span class="ico c0">${icon('item_'+k,ic(BAGTAB==='use'?'potion':'mat'))}</span><span class="grow"><b>${ITEMS[k].n} ×${S.items[k]}</b><span class="sub">${ITEMS[k].d}</span></span>${ITEMS[k].use?`<button class="btn sm" data-a="useItem" data-v="${k}">使用</button>`:''}<button class="btn sm" data-a="sellItem" data-v="${k}">賣 ${sellPrice(k)}G</button></div>`).join('')||'<p class="empty">空空如也</p>'}
@@ -1945,6 +1945,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'6.1',d:'2026-11-19',t:'一鍵販售',b:'背包裝備頁新增「一鍵販售普通、精良」與「一鍵販售稀有以下」，鎖定、裝備中、閃耀與帶稀有詞綴的裝備都會保留。'},
   {v:'6.0',d:'2026-11-19',t:'裝備改名',b:'首領專屬裝備改成符合新首領名稱：戰酋黑晶護符、腐根樹王之心、鑽岩巨顎、凜冬龍鱗鎧、黑霧魔冠。其他不合理的名稱也一併修正：雷霆權杖、霜風長弓、天使聖錘、雷步戰靴、祭司短槌、祈禱戰錘、黑狼牙項鍊、岩晶墜飾、岩晶戒、橡木指環、黑狼之牙。已持有的裝備會自動顯示新名稱。'},
   {v:'5.9',d:'2026-11-19',t:'狀態實體特效',b:'中毒會冒出綠色毒泡、燃燒會有火焰與火星往上竄、流血會滴落在地上、冰凍會被冰殼包住、暈眩頭上轉星星、弱化往下沉的紫色箭頭、再生飄綠色十字，角色身上也會泛出對應顏色的光。怪物情報裡的印記改成圖示。'},
   {v:'5.8',d:'2026-11-19',t:'戰鬥畫面精簡',b:'怪物資訊框只留名稱、血條與下回合預告；點怪物圖像或資訊框就能看完整數值（攻防、弱點、韌性爆抗、狀態），查看時戰鬥自動暫停，關閉後繼續。'},
@@ -2846,6 +2847,7 @@ const ACT={
   sellItem(k){addItem(k,-1);S.gold+=sellPrice(k);save();render()},
   equip(u){const g=gearBy(+u);S.eq[GEAR[g.id].slot]=g.u;toast(`裝備了 ${gearName(g)}`);save();closeM();render()},
   unequip(sl){S.eq[sl]=null;save();closeM();render()},
+  sellAll(v){const mx=+v||1,eqd=Object.values(S.eq),L=S.gear.filter(g=>g.r<=mx&&!g.lock&&!eqd.includes(g.u)&&!g.sh&&!g.sp);if(!L.length){toast('沒有可販售的裝備');return}const sum=L.reduce((a,g)=>a+gearSell(g),0);if(!confirm(`販售 ${L.length} 件${mx>=2?'稀有以下':'普通、精良'}裝備，共 ${sum} G？（閃耀與稀有詞綴裝備會保留）`))return;const ids=new Set(L.map(g=>g.u));S.gear=S.gear.filter(g=>!ids.has(g.u));S.gold+=sum;toast(`販售 ${L.length} 件，獲得 ${sum} G`);save();render()},
   sellGear(u){const g=gearBy(+u);S.gold+=gearSell(g);S.gear=S.gear.filter(x=>x.u!==g.u);toast(`出售獲得 ${gearSell(g)} G`);save();closeM();render()},
   buyItem(k){if(S.gold<ITEMS[k].price)return;S.gold-=ITEMS[k].price;addItem(k,1);save();render()},
   buyGear(id){if(S.gold<GEAR[id].price)return;S.gold-=GEAR[id].price;addGear(id,0);toast(`購買了 ${GEAR[id].n}，已放入背包`);save();render()},
