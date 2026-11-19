@@ -565,6 +565,7 @@ Object.assign(GEAR,{
   u_zenos:{n:'黑霧魔冠',slot:'head',t:4,lv:25,price:12000,def:30,hp:220,uq:{cd:40,resmax:1,atkp:8,magp:8},ud:'爆擊傷害 +40%、資源上限 +1、攻擊與魔力 +8%',uniq:1}});
 const BOSSU={goblinboss:'u_gob',treeking:'u_tree',worm:'u_worm',icedragon:'u_dragon',zenos:'u_zenos'};
 const GEMS=['gem_r','gem_b','gem_g','gem_y','gem_w'];
+const BGEM={goblinboss:'gem_r',treeking:'gem_g',worm:'gem_y',icedragon:'gem_w',zenos:'gem_b'};
 const RW=[55,30,12,2.6,.4];
 const DIS=[[1,0],[3,0],[8,0],[20,1],[50,2]];
 const ITEMS={
@@ -1694,7 +1695,7 @@ const MV={
       <h3>取得裝備 ${R.gs.length} 件</h3><div class="list">${best.map(g=>`<button class="item" data-a="openGear" data-v="${g.u}"><span class="ico c${g.r}">${gIco(g.id)}</span><span class="grow"><b class="c${g.r}">${gearName(g)}</b><span class="sub">${RAR[g.r].n}・${SLOTS[GEAR[g.id].slot]}</span></span></button>`).join('')||'<p class="empty">這次沒有撿到裝備</p>'}${R.gs.length>12?`<p class="sub">其餘 ${R.gs.length-12} 件已放進背包</p>`:''}</div></div><button class="btn pri big" data-a="closeM">收下</button>`}},
   foe(){if(!B)return{t:'怪物情報',b:'<p class="empty">目前不在戰鬥中</p>'};const m=B.m,e=MEL[B.id];
     const C=B.cls,stc=[...B.aff.map(x=>`<span class="chip" style="color:#fff;background:#7a2a4a">${AFF[x].n}</span>`),...B.fb.map(b=>`<span class="chip">${b.n} ${b.t}</span>`),B.fshield>0?`<span class="chip">盾 ${B.fshield}</span>`:'',C.brk?`<span class="chip" style="color:var(--hp)">破綻 ${C.brk}</span>`:'',C.marks.length?`<span class="chip">印記 ${C.marks.map(m=>`<span class="mkc m${m}">${m}</span>`).join('')}</span>`:'',`<span class="chip">韌性 ${B.tough||0}・爆抗 ${Math.round((B.cdr||0)*100)}%</span>`,...Object.keys(B.st).filter(k=>B.st[k]>0).map(k=>`<span class="chip">${FOE[k]} ${B.st[k]}</span>`)].join('');
-    return{t:B.name+'（暫停中）',b:`<p class="sub" style="text-align:center">戰鬥已暫停，關閉後繼續</p>${MDROP[B.id]?`<div class="gsec"><b class="c3">專屬掉落：${GEAR[MDROP[B.id]].n}</b><span class="sub">${GEAR[MDROP[B.id]].ud}</span></div>`:''}<div class="chips">${stc}</div><div class="panel"><div class="row"><div style="width:96px;flex:none">${art('mob_'+B.id,m.n,'r11')}</div><div class="grow"><b>Lv${B.L}　${MTY[m.ty].n}${B.kind==='boss'?'　<span class="tag red">首領</span>':''}</b>
+    return{t:B.name+'（暫停中）',b:`<p class="sub" style="text-align:center">戰鬥已暫停，關閉後繼續</p>${B.kind==='boss'?`<div class="gsec"><b class="c3">寶石掉落：${BGEM[B.id]?ITEMS[BGEM[B.id]].n+'（'+ITEMS[BGEM[B.id]].d.replace('鑲嵌寶石：','')+'）':'五種寶石隨機'}</b></div>`:''}${MDROP[B.id]?`<div class="gsec"><b class="c3">專屬掉落：${GEAR[MDROP[B.id]].n}</b><span class="sub">${GEAR[MDROP[B.id]].ud}</span></div>`:''}<div class="chips">${stc}</div><div class="panel"><div class="row"><div style="width:96px;flex:none">${art('mob_'+B.id,m.n,'r11')}</div><div class="grow"><b>Lv${B.L}　${MTY[m.ty].n}${B.kind==='boss'?'　<span class="tag red">首領</span>':''}</b>
       <div class="sub">HP ${B.hp}/${B.max}　攻擊 ${B.atk}　魔力 ${B.mag}　防禦 ${B.def}　魔抗 ${B.mres??B.def}</div>
       ${e?`<div class="sub">弱點：<b style="color:#ffd34a">${ELN[e[0]]}</b>（傷害 ×1.5）${e[1]?`　抗性：<b>${ELN[e[1]]}</b>（傷害 ×0.6）`:''}</div>`:''}
       <div class="sub">${{tank:'防禦高，用魔法打比較痛',caster:'魔抗高，用物理打比較痛',brute:'防禦略高於魔抗',swift:'迴避高，物理魔法都可以'}[m.ty]}</div></div></div></div>
@@ -1736,7 +1737,7 @@ const MV={
      <div class="gsec"><b>主屬性${g.p?`（強化 +${g.p}）`:''}</b><div class="chips">${Object.entries(gearStat(g)).map(([k,v])=>`<span class="chip">${fmt(k,v)}</span>`).join('')}</div></div>
      ${g.sh?`<div class="gsec"><b style="color:#1593b3">✧ 閃耀</b><span class="sub">比同級裝備多一條詞條，最強的詞條 ×1.5。洗練後依然保留。</span></div>`:''}${(g.sub||[]).length?`<div class="gsec"><b>附加詞條</b>${g.sub.map(x=>`<span class="subl c${g.r}">◆ ${fmt(x.k,x.v)}</span>`).join('')}</div>`:''}
      ${GEAR[g.id].uniq?`<div class="gsec"><b class="c4">首領專屬效果</b><span class="sub">${GEAR[g.id].ud}</span></div>`:''}
-     ${(g.sock||[]).length?`<div class="gsec"><b>鑲嵌孔</b>${g.sock.map((gm,i)=>gm?`<span class="subl">◆ ${ITEMS[gm].n}：${Object.entries(ITEMS[gm].gem).map(([k,v])=>fmt(k,v)).join('')}</span>`:`<span class="subl sub">◇ 空孔</span>`).join('')}${GEMS.some(x=>S.items[x])?`<div class="chips">${GEMS.filter(x=>S.items[x]).map(x=>`<button class="btn sm" data-a="sockIn" data-v="${u}|${x}">鑲入${ITEMS[x].n}×${S.items[x]}</button>`).join('')}</div><span class="sub">孔滿時會替換第一顆，舊寶石會碎掉。</span>`:'<span class="sub">寶石只有首領會掉落（惡夢首領有機會多掉一顆）。</span>'}</div>`:''}
+     ${(g.sock||[]).length?`<div class="gsec"><b>鑲嵌孔</b>${g.sock.map((gm,i)=>gm?`<span class="subl">◆ ${ITEMS[gm].n}：${Object.entries(ITEMS[gm].gem).map(([k,v])=>fmt(k,v)).join('')}</span>`:`<span class="subl sub">◇ 空孔</span>`).join('')}${GEMS.some(x=>S.items[x])?`<div class="chips">${GEMS.filter(x=>S.items[x]).map(x=>`<button class="btn sm" data-a="sockIn" data-v="${u}|${x}">鑲入${ITEMS[x].n}×${S.items[x]}</button>`).join('')}</div><span class="sub">孔滿時會替換第一顆，舊寶石會碎掉。</span>`:'<span class="sub">寶石只有首領會掉落：哥布林戰酋＝紅玉、腐根樹王＝翠玉、鑽岩巨蟲＝黃玉、凜冬霜龍＝月石、黑霧大術士澤諾斯＝藍玉，第二部首領隨機。</span>'}</div>`:''}
      ${g.sp?`<div class="gsec"><b class="c4">${g.r>=4?'傳說':'稀有'}詞綴【${SPEC[g.sp].n}】</b><span class="sub">${specD(g)}${specV(g)<SPEC[g.sp].v?`（第 ${GEAR[g.id].t+1} 階，滿階為 ${SPEC[g.sp].v}）`:''}</span></div>`:''}
      ${set?`<div class="gsec"><b>${set.n}套裝（已裝備 ${sc} 件）</b><span class="sub ${sc>=2?'son':''}">2 件：${set.d2}</span><span class="sub ${sc>=4?'son':''}">4 件：${set.d4}</span></div>`:''}
      ${!on&&cur?`<p class="sub">目前裝備：<b class="c${cur.r}">${gearName(cur)}</b>（評分 ${gearPower(cur)}）</p>`:''}
@@ -1985,6 +1986,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'7.3',d:'2026-11-19',t:'首領寶石分類',b:'每位首領固定掉一種寶石：哥布林戰酋＝紅玉（攻擊）、腐根樹王＝翠玉（HP）、鑽岩巨蟲＝黃玉（爆擊）、凜冬霜龍＝月石（迴避）、黑霧大術士澤諾斯＝藍玉（魔力）；第二部首領隨機掉落五種之一。點首領圖像可查看。'},
   {v:'7.2',d:'2026-11-19',t:'寶石改為首領限定',b:'鑲嵌寶石改為只有首領會掉落：主線首領必掉 1 顆、惡夢首領有機會 2 顆、無盡之塔首領 30%。合成、分解、異變種、惡夢小怪不再產出寶石。已持有與已鑲嵌的寶石全部回收，每顆補償 120 G。'},
   {v:'7.1',d:'2026-11-19',t:'掛機時也能冒險',b:'背景掛機期間可以照常出發冒險、挑戰無盡之塔、開全自動，掛機收益會繼續累積，不用再先結束掛機。'},
   {v:'7.0',d:'2026-11-19',t:'裂甲擊破甲、新站姿立繪',b:'劍士的「裂甲擊」現在會劈開護甲，無視物理抗性（史萊姆、幽靈這類不怕刀砍的魔物，改用裂甲擊就能打出正常傷害，命中時跳出「裂甲！」）。角色頁裝備欄的站姿立繪全部 12 職業男女到齊；劍士全套戰鬥圖換成新版。'},
@@ -2260,7 +2262,7 @@ function spoil(){const m=B.m,L=B.L,bs=B.kind==='boss',el=B.kind==='elite',T=B.to
   {const tw=RUN.tower,gt=tw?Math.min(RUN.area,S.main.ch):RUN.area,hard=B.mut||B.nm,hd=B.hoard?1:0,n=(FA&&!bs&&!B.hoard&&Math.random()<.5)?0:hd+(bs?(Math.random()<(tw?.3:B.nm?.6:.4)?1:0)+(!tw&&B.nm&&Math.random()<.3?1:0):(B.mut?1:Math.random()<(el?.5:B.nm?.3:lk?.2:.12)*(tw?.6:1)?1:0));for(let i=0;i<n;i++){const g=rollGear(gt,bs?(tw?1:B.nm?3:2):hard?2:el?1:0,bs||hard?(tw?1.3:2):1,hard);if(i<hd||(B.mut&&!bs))minG(g);got.push(gearName(g))}if(tw&&RUN.area>S.main.ch&&Math.random()<.5){addItem('stone',1);got.push('強化石')}
     if(MDROP[B.id]&&Math.random()<(B.wander?.5:B.treasure?.3:B.kind==='elite'?.12:B.nm?.1:.04)*(FA?.5:1)){const u=addGear(MDROP[B.id],3);DROPS.push(u);got.push(gearName(u));sys(`${S.name} 取得魔物專屬裝備【${GEAR[u.id].n}】！`)}
     if(bs&&BOSSU[B.id]&&(!RUN.tower||S.cleared[AREAS.findIndex(a=>a.boss===B.id)])&&Math.random()<(RUN.tower?.03:B.nm?.2:.08)){const u=addGear(BOSSU[B.id],4);DROPS.push(u);got.push(gearName(u));sys(`${S.name} 取得首領專屬裝備【${GEAR[u.id].n}】！`)}
-    if(bs&&Math.random()<(RUN.tower?.3:1)){const n=1+(B.nm&&Math.random()<.5?1:0);for(let i=0;i<n;i++){const gm=pick(GEMS);addItem(gm,1);got.push(ITEMS[gm].n)}}}
+    if(bs&&Math.random()<(RUN.tower?.3:1)){const n=1+(B.nm&&Math.random()<.5?1:0);for(let i=0;i<n;i++){const gm=BGEM[B.id]||pick(GEMS);addItem(gm,1);got.push(ITEMS[gm].n)}}}
   got.push(...liveDrop(bs));
   track('kill',B.id);S.st.kills++;if(S.dex)S.dex.m[B.id]=(S.dex.m[B.id]||0)+1;if(bs&&B.nm)S.st.nmboss=(S.st.nmboss||0)+1;
   if(bs&&!RUN.trial&&!RUN.tower){S.cleared[RUN.area]=1;track('boss',B.id);sys(`${S.name} 討伐了首領【${m.n}】！`)}}
