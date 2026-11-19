@@ -1,5 +1,8 @@
 # 蒼藍誓約 Online — 開發筆記（自動排程必讀）
 
+## ⚠ 目前停服維修中（2026-11-19 起，製作人指定）
+`maint.json` 的 `on` 保持 `true`，**排程不可自行改成 false**，開服由製作人決定。維修期間排程照常開發、測試、畫圖、push，但不要對玩家發公告以外的訊息。
+
 ## 製作人已確立的方向
 - 直式手機網頁日式 JRPG，線上遊戲風格（像早期日系 MMO 的單人版）。單檔 `index.html`，美術在 `art/`（`art/list.json` 由 `build_list.py` 產生）。
 - 部署：GitHub `as20394569/TEXT_RPG` 的 main，Pages：https://as20394569.github.io/TEXT_RPG/

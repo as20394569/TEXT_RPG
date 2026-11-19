@@ -349,6 +349,7 @@ input,textarea{font:inherit;width:100%;padding:8px 10px;border:2px solid var(--l
 .spr.s-poison .art img{filter:drop-shadow(0 0 6px rgba(120,220,80,.9)) hue-rotate(40deg) saturate(1.2)}.spr.s-burn .art img{filter:drop-shadow(0 0 7px rgba(255,120,30,.9)) sepia(.25)}.spr.s-stun .art img{filter:drop-shadow(0 0 5px rgba(255,228,90,.8)) grayscale(.3)}.spr.s-freeze .art img{filter:drop-shadow(0 0 8px rgba(140,210,255,1)) saturate(.5) brightness(1.15) hue-rotate(160deg)}.spr.s-bleed .art img{filter:drop-shadow(0 0 5px rgba(200,20,40,.8))}.spr.s-weak .art img{filter:drop-shadow(0 0 6px rgba(150,90,255,.8)) brightness(.85)}.spr.s-regen .art img{filter:drop-shadow(0 0 6px rgba(120,230,140,.9))}
 .mkc{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;color:#fff;font-weight:900;font-size:12px;margin-right:2px;box-shadow:0 0 6px currentColor}.mkc.m灼{background:radial-gradient(#ffcf5a,#ff5a1a)}.mkc.m凍{background:radial-gradient(#e0f8ff,#3aa0e0)}.mkc.m蝕{background:radial-gradient(#d8b8ff,#6a2aaa)}.mkc.m奧{background:radial-gradient(#e8d0ff,#8a4ae0)}.mkc.m星{background:radial-gradient(#fff6c0,#e0a020)}
 .spr.gold{filter:sepia(1) saturate(4) hue-rotate(-10deg) brightness(1.2) drop-shadow(0 0 10px #ffd34a)}.spr.gold .art img.unused{filter:sepia(1) saturate(4) hue-rotate(-10deg) brightness(1.2) drop-shadow(0 0 10px #ffd34a)!important;animation:goldGlow 1s infinite alternate}@keyframes goldGlow{to{filter:sepia(1) saturate(5) hue-rotate(-10deg) brightness(1.45) drop-shadow(0 0 18px #ffe27a)}}.spr.wander{filter:drop-shadow(0 0 12px #ff2a2a) brightness(.9) contrast(1.2)!important}.spr.wander .plat{background:radial-gradient(rgba(255,40,40,.5),transparent 70%)}
+#maint{position:fixed;inset:0;z-index:999;background:rgba(14,24,44,.92);display:flex;align-items:center;justify-content:center;padding:20px}#maint .mt-box{background:#fffaf0;border:3px solid #e0a020;border-radius:16px;padding:22px 20px;text-align:center;max-width:340px}#maint .mt-ic{font-size:44px}#maint h2{margin:6px 0 10px}#maint p{margin:6px 0}
 </style>
 </head>
 <body>
@@ -1471,6 +1472,12 @@ const FORKL={luna:['左邊好像有水聲……我猜啦。','測霧燈偏藍，
 function forkTalk(){const L=withLuna();const t=pick(L?FORKL.luna:FORKL.me);return `<p class="ftalk"><b>${L?'露娜':esc(S.name)}</b>${L?'「':''}${you(tx(t))}${L?'」':''}</p>`}
 
 /* ============ 頻道 ============ */
+/* 停服維修：maint.json 的 on 為 true 時封鎖遊戲 */
+let MAINT=false;
+async function maintCheck(){try{const r=await fetch('maint.json?'+Date.now(),{cache:'no-store'});const j=await r.json();const on=!!(j&&j.on);if(on!==MAINT){MAINT=on;maintDraw(j)}}catch(e){}}
+function maintDraw(j){let el=document.getElementById('maint');if(!MAINT){if(el)el.remove();return}try{if(S)save();if(FA)faStop()}catch(e){}if(!el){el=document.createElement('div');el.id='maint';document.body.appendChild(el)}
+  el.innerHTML=`<div class="mt-box"><div class="mt-ic">🔧</div><h2>停服維修中</h2><p>${esc((j&&j.msg)||'蒼藍誓約 Online 正在進行維修，開服時間另行公告。')}</p><p class="sub">你的存檔已安全保存，維修期間不會有任何變動。</p><button class="btn" onclick="location.reload()">重新整理</button></div>`}
+setInterval(maintCheck,60e3);maintCheck();
 /* 更新廣播 */
 let BCAST=null;
 function bcast(html,act){BCAST={html,act};const el=$('#bcast');if(el){el.innerHTML=`<span class="bc-ic">📢</span><div class="bc-m"><span class="bc-t">${html}</span></div>${act?`<button class="bc-b" data-a="${act.a}">${act.l}</button>`:''}<button class="bc-x" data-a="bcClose">✕</button>`;el.hidden=false;el.classList.remove('bc-in');void el.offsetWidth;el.classList.add('bc-in')}}
