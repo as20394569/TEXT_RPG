@@ -1919,7 +1919,7 @@ function towerNext(){const f=++RUN.floor;RUN.area=Math.floor((f-1)/5)%5;RUN.tlv=
   if(f%5===0)startBattle(a.boss,'boss');else startBattle(pick(a.mobs),f%3===0?'elite':'',f>=8?(Math.random()<.4?1:0)+(f>=20&&Math.random()<.3?1:0):0);
   render();$('#main').scrollTop=0}
 function vTower(){const v=RUN.view,f=RUN.floor;let body='';
-  if(v.type==='tstart')body=`<div class="panel">${art('area_tower','無盡之塔')}<h3>無盡之塔</h3><p>古王國留下的高塔。每一層都會映出大陸各地的幻影，越往上，魔物越強。</p><p class="sub">每 5 層換一個地區的幻影，第 5 層是該地區首領；突破首領後回復 30% HP／MP。倒下會被送回城鎮。目前最高紀錄：第 ${S.tower.best} 層</p><button class="btn pri big" data-a="towerNext">從第 1 層開始</button><button class="btn" data-a="retreat">返回</button></div>`;
+  if(v.type==='tstart')body=`<div class="panel">${art('area_tower','無盡之塔')}<h3>無盡之塔</h3><p>古王國留下的高塔。每一層都會映出大陸各地的幻影，越往上，魔物越強。</p><p class="sub">每 5 層換一個地區的幻影，第 5 層是該地區首領；突破首領後回復 30% HP／MP。倒下會被送回城鎮。目前最高紀錄：第 ${S.tower.best} 層</p><p class="sub">⚠ 塔裡掉落的裝備階級不會超過你主線推進到的地區（目前最高：${AREAS[Math.min(S.main.ch,AREAS.length-1)].n}），首領專屬裝備要先在主線打倒該首領才會掉落。</p><button class="btn pri big" data-a="towerNext">從第 1 層開始</button><button class="btn" data-a="retreat">返回</button></div>`;
   else{if(f>S.tower.best){S.tower.best=f;save()}
     body=`<div class="panel">${v.img?`<div class="duo">${art(v.img,'勝利','r34')}${v.mimg?art(v.mimg,'','r11'):''}</div>`:''}<h3>第 ${f} 層突破</h3><p>${v.text}</p>
     <button class="btn pri big" data-a="towerNext">前往第 ${f+1} 層${(f+1)%5===0?'（首領）':''}</button><button class="btn" data-a="finish">離開高塔（保留戰利品）</button></div>`}
@@ -1954,6 +1954,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'6.5',d:'2026-11-19',t:'無盡之塔掉落調整',b:'無盡之塔掉落的裝備階級不再超過主線進度；塔內首領改為掉 1 件精良以上裝備（原本 2 件稀有以上），一般魔物掉落率降低；首領專屬傳說要先在主線擊敗該首領才會在塔裡掉落，機率 3%。超出主線進度的樓層改為有機會掉強化石。修正在塔裡打倒首領會被誤算成主線通關的問題。'},
   {v:'6.4',d:'2026-11-19',t:'裝備平衡',b:'前期裝備主屬性提升（第 1 階 +40%、第 2 階 +20%），普通與精良在前期更有用；附加詞條的數值浮動變小，比較不會抽到很爛的詞條；稀有詞綴的效果改為依裝備階級成長（第 1 階 50%，第 6 階滿值），避免低階傳說一件打天下。爆擊與爆傷詞條維持不變。'},
   {v:'6.3',d:'2026-11-19',t:'背包篩選升級',b:'裝備頁可以依部位（武器、頭盔、鎧甲、鞋子、戒指、項鍊）、稀有度（精良以上～傳說）篩選，並可只看「▲更強」、套裝、詞綴／閃耀／專屬裝備；排序可選戰力、稀有度、等級、最新。設定會記住。'},
   {v:'6.2',d:'2026-11-19',t:'懸賞情報＋新圖',b:'旅行商人開始兜售「懸賞情報」：花一筆金幣，下一場普通戰鬥就會遇上守寶的精英魔物——更危險，但打倒必掉裝備、金幣 ×2。要不要賭，看你的血量和藥水。神射手、聖殿騎士（女）、主教共 5 張動作圖重畫上線（弓弦、握杖修正、拿掉多餘特效）。'},
@@ -2215,12 +2216,12 @@ function spoil(){const m=B.m,L=B.L,bs=B.kind==='boss',el=B.kind==='elite',T=B.to
   if(Math.random()<.12){addItem('pot',1);got.push('治療藥水')}
   if(bs||Math.random()<.06){addItem('stone',bs?2:1);got.push(bs?'強化石×2':'強化石')}
   const first=bs&&!S.cleared[RUN.area];
-  {const hard=B.mut||B.nm,n=(FA&&!bs&&!B.hoard&&Math.random()<.5)?0:(B.hoard?1:0)+(bs?(B.nm?3:2):(B.mut?1:Math.random()<(el?.5:B.nm?.3:lk?.2:.12)?1:0));for(let i=0;i<n;i++){const g=rollGear(RUN.area,bs?(first&&!i?3:B.nm?3:2):hard?2:el?1:0,bs||hard?2:1,hard);got.push(gearName(g))}
-    if(bs&&BOSSU[B.id]&&Math.random()<(B.nm?.2:.08)){const u=addGear(BOSSU[B.id],4);DROPS.push(u);got.push(gearName(u));sys(`${S.name} 取得首領專屬裝備【${GEAR[u.id].n}】！`)}
+  {const tw=RUN.tower,gt=tw?Math.min(RUN.area,S.main.ch):RUN.area,hard=B.mut||B.nm,n=(FA&&!bs&&!B.hoard&&Math.random()<.5)?0:(B.hoard?1:0)+(bs?(tw?1:B.nm?3:2):(B.mut?1:Math.random()<(el?.5:B.nm?.3:lk?.2:.12)*(tw?.6:1)?1:0));for(let i=0;i<n;i++){const g=rollGear(gt,bs?(tw?1:first&&!i?3:B.nm?3:2):hard?2:el?1:0,bs||hard?(tw?1.3:2):1,hard);got.push(gearName(g))}if(tw&&RUN.area>S.main.ch&&Math.random()<.5){addItem('stone',1);got.push('強化石')}
+    if(bs&&BOSSU[B.id]&&(!RUN.tower||S.cleared[AREAS.findIndex(a=>a.boss===B.id)])&&Math.random()<(RUN.tower?.03:B.nm?.2:.08)){const u=addGear(BOSSU[B.id],4);DROPS.push(u);got.push(gearName(u));sys(`${S.name} 取得首領專屬裝備【${GEAR[u.id].n}】！`)}
     if(bs||(B.mut&&Math.random()<.5)||(B.nm&&Math.random()<.25)){const gm=pick(GEMS);addItem(gm,1);got.push(ITEMS[gm].n)}}
   got.push(...liveDrop(bs));
   track('kill',B.id);S.st.kills++;if(S.dex)S.dex.m[B.id]=(S.dex.m[B.id]||0)+1;if(bs&&B.nm)S.st.nmboss=(S.st.nmboss||0)+1;
-  if(bs&&!RUN.trial){S.cleared[RUN.area]=1;track('boss',B.id);sys(`${S.name} 討伐了首領【${m.n}】！`)}}
+  if(bs&&!RUN.trial&&!RUN.tower){S.cleared[RUN.area]=1;track('boss',B.id);sys(`${S.name} 討伐了首領【${m.n}】！`)}}
 function win(){if(!B||B.hp>0)return;spoil();try{talk('win')}catch(e){}{const s=stats();if(s.REAP&&S.hp>0){const h=Math.round(s.HP*s.REAP/100),m=Math.round(s.MP*s.REAP/100);S.hp=Math.min(s.HP,S.hp+h);S.mp=Math.min(s.MP,S.mp+m);B.rp=`【收割】回復 ${h} HP、${m} MP`;B.log.push(B.rp)}}
   const nx=(B.adds||[]).findIndex(f=>f.hp>0);
   if(nx>=0){const dn=B.name;swapFoe(nx);B.adds=B.adds.filter(f=>f.hp>0);B.log.push(`${dn} 倒下了！${B.name} 衝了上來`);B.fx=null;B.busy=true;B.intro=true;render();setTimeout(foeTurn,900);return}
