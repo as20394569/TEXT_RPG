@@ -96,6 +96,7 @@
 
 ## 待辦
 - **新魔物 10 種正式插畫**（2026-11-19 新增，目前用同系魔物改色 `MVAR` 頂替）：mob_bogslime、mob_sparkrabbit、mob_soulshroom、mob_shadewolf、mob_lavabat、mob_crystalgolem、mob_blizzardwolf、mob_stormsprite、mob_bloodknight、mob_voidwraith（各要待機、_atk、_hurt、_low、_lose，512 透明、面向左）。名稱與技能見 `MVAR`。圖到位後程式會自動改用正式圖、不再套色。優先順序在站姿與拿掉圍巾之後。
+- 區域領主 5 位正式插畫（mob_rabbitking、mob_moonwolf、mob_foreman、mob_giantking、mob_mistgeneral，各待機、_atk、_hurt、_low、_lose，首領級體型、面向左），目前用改色頂替。
 - 魔物專屬裝備 10 件圖示（icon_x_bog… icon_x_void，128 方形，與現有裝備圖示同風格），目前用部位預設圖示。
 - **拿掉圍巾下一批：法師 mage 男女 30 張**＋templar_m_sk_heal 拿掉腰間書（v7.0 排程要派時，Codex 輸入框已有一段非使用者確認的草稿，內容正是這批，依規定沒覆蓋；下次看 Codex 是否已在畫，沒有就派）。之後 ranger → cleric → 其餘進階職業。
 - 裝備：稀有詞綴、首領寶物堆三選一（`BBOX`、`bossBox`、`RUN.view.box`）已上線；全自動不換裝，詞綴實戰強度待觀察。可觀察封印寶箱 35% 是否太低。

@@ -565,7 +565,7 @@ Object.assign(GEAR,{
   u_zenos:{n:'黑霧魔冠',slot:'head',t:4,lv:25,price:12000,def:30,hp:220,uq:{cd:40,resmax:1,atkp:8,magp:8},ud:'爆擊傷害 +40%、資源上限 +1、攻擊與魔力 +8%',uniq:1}});
 const BOSSU={goblinboss:'u_gob',treeking:'u_tree',worm:'u_worm',icedragon:'u_dragon',zenos:'u_zenos'};
 const GEMS=['gem_r','gem_b','gem_g','gem_y','gem_w'];
-const BGEM={goblinboss:'gem_r',treeking:'gem_g',worm:'gem_y',icedragon:'gem_w',zenos:'gem_b'};
+const BGEM={goblinboss:'gem_r',treeking:'gem_g',worm:'gem_y',icedragon:'gem_w',zenos:'gem_b',rabbitking:'gem_y',moonwolf:'gem_w',foreman:'gem_r',giantking:'gem_g',mistgeneral:'gem_b'};
 const RW=[55,30,12,2.6,.4];
 const DIS=[[1,0],[3,0],[8,0],[20,1],[50,2]];
 const ITEMS={
@@ -685,7 +685,14 @@ const MVAR={
   stormsprite:{n:'雪暴精靈',lv:19,ty:'caster',base:'icesprite',f:'hue-rotate(60deg) saturate(1.2)',sk:['m_icicle','m_storm'],el:['fire']},
   bloodknight:{n:'血誓騎士',lv:23,ty:'brute',base:'darkknight',f:'hue-rotate(320deg) saturate(2.2)',sk:['m_darkblade','m_pact'],el:['holy']},
   voidwraith:{n:'虛無幽魂',lv:24,ty:'caster',base:'phantom',f:'hue-rotate(140deg) saturate(1.6)',hpM:.85,sk:['m_soul','m_engulf'],el:['holy']}};
-for(const k in MVAR){const v=MVAR[k];MOBS[k]={n:v.n,lv:v.lv,ty:v.ty,hpM:v.hpM,sk:v.sk,mat:MOBS[v.base].mat,fly:MOBS[v.base].fly}}
+Object.assign(MVAR,{
+  rabbitking:{n:'巨角兔王',lv:6,ty:'brute',base:'hornrabbit',f:'sepia(.6) saturate(2) hue-rotate(-20deg) contrast(1.1)',boss:1,hpM:1.1,sk:['m_horn','m_quake','m_rally'],el:['ice']},
+  moonwolf:{n:'月牙狼王',lv:11,ty:'swift',base:'wolf',f:'brightness(1.3) saturate(.3) hue-rotate(180deg)',boss:1,sk:['m_bite','m_howl','m_vanish'],el:['fire']},
+  foreman:{n:'白骨礦工頭',lv:16,ty:'brute',base:'skeleton',f:'sepia(.8) saturate(1.5) brightness(1.1)',boss:1,hpM:1.15,sk:['m_bone','m_boulder','m_rebuild'],el:['holy']},
+  giantking:{n:'冰川巨人王',lv:21,ty:'brute',base:'frostgiant',f:'hue-rotate(200deg) saturate(1.6) brightness(.9)',boss:1,hpM:1.25,sk:['m_avalanche','m_zero','m_icebody'],el:['fire']},
+  mistgeneral:{n:'黑霧將軍',lv:26,ty:'brute',base:'darkknight',f:'brightness(.7) contrast(1.3) saturate(1.4) hue-rotate(250deg)',boss:1,hpM:1.2,sk:['m_darkblade','m_blackshield','m_dread'],el:['holy']}});
+for(const k in MVAR){const v=MVAR[k];MOBS[k]={n:v.n,lv:v.lv,ty:v.ty,hpM:v.hpM,sk:v.sk,mat:MOBS[v.base].mat,fly:MOBS[v.base].fly,boss:v.boss,field:v.boss}}
+const LORD=['rabbitking','moonwolf','foreman','giantking','mistgeneral'];
 /* 魔物專屬掉落（史詩・專屬效果） */
 Object.assign(GEAR,{
   x_bog:{n:'毒沼凝晶戒',slot:'ring',t:0,lv:3,price:600,mp:20,uq:{regen:2,thorn:10},ud:'每回合回復 2% HP，被擊中時反彈 10% 傷害',uniq:1},
@@ -1737,7 +1744,7 @@ const MV={
      <div class="gsec"><b>主屬性${g.p?`（強化 +${g.p}）`:''}</b><div class="chips">${Object.entries(gearStat(g)).map(([k,v])=>`<span class="chip">${fmt(k,v)}</span>`).join('')}</div></div>
      ${g.sh?`<div class="gsec"><b style="color:#1593b3">✧ 閃耀</b><span class="sub">比同級裝備多一條詞條，最強的詞條 ×1.5。洗練後依然保留。</span></div>`:''}${(g.sub||[]).length?`<div class="gsec"><b>附加詞條</b>${g.sub.map(x=>`<span class="subl c${g.r}">◆ ${fmt(x.k,x.v)}</span>`).join('')}</div>`:''}
      ${GEAR[g.id].uniq?`<div class="gsec"><b class="c4">首領專屬效果</b><span class="sub">${GEAR[g.id].ud}</span></div>`:''}
-     ${(g.sock||[]).length?`<div class="gsec"><b>鑲嵌孔</b>${g.sock.map((gm,i)=>gm?`<span class="subl">◆ ${ITEMS[gm].n}：${Object.entries(ITEMS[gm].gem).map(([k,v])=>fmt(k,v)).join('')}</span>`:`<span class="subl sub">◇ 空孔</span>`).join('')}${GEMS.some(x=>S.items[x])?`<div class="chips">${GEMS.filter(x=>S.items[x]).map(x=>`<button class="btn sm" data-a="sockIn" data-v="${u}|${x}">鑲入${ITEMS[x].n}×${S.items[x]}</button>`).join('')}</div><span class="sub">孔滿時會替換第一顆，舊寶石會碎掉。</span>`:'<span class="sub">寶石只有首領會掉落：哥布林戰酋＝紅玉、腐根樹王＝翠玉、鑽岩巨蟲＝黃玉、凜冬霜龍＝月石、黑霧大術士澤諾斯＝藍玉，第二部首領隨機。</span>'}</div>`:''}
+     ${(g.sock||[]).length?`<div class="gsec"><b>鑲嵌孔</b>${g.sock.map((gm,i)=>gm?`<span class="subl">◆ ${ITEMS[gm].n}：${Object.entries(ITEMS[gm].gem).map(([k,v])=>fmt(k,v)).join('')}</span>`:`<span class="subl sub">◇ 空孔</span>`).join('')}${GEMS.some(x=>S.items[x])?`<div class="chips">${GEMS.filter(x=>S.items[x]).map(x=>`<button class="btn sm" data-a="sockIn" data-v="${u}|${x}">鑲入${ITEMS[x].n}×${S.items[x]}</button>`).join('')}</div><span class="sub">孔滿時會替換第一顆，舊寶石會碎掉。</span>`:'<span class="sub">寶石只有首領會掉落：主線首領與區域領主各有固定寶石，點首領圖像可查看。</span>'}</div>`:''}
      ${g.sp?`<div class="gsec"><b class="c4">${g.r>=4?'傳說':'稀有'}詞綴【${SPEC[g.sp].n}】</b><span class="sub">${specD(g)}${specV(g)<SPEC[g.sp].v?`（第 ${GEAR[g.id].t+1} 階，滿階為 ${SPEC[g.sp].v}）`:''}</span></div>`:''}
      ${set?`<div class="gsec"><b>${set.n}套裝（已裝備 ${sc} 件）</b><span class="sub ${sc>=2?'son':''}">2 件：${set.d2}</span><span class="sub ${sc>=4?'son':''}">4 件：${set.d4}</span></div>`:''}
      ${!on&&cur?`<p class="sub">目前裝備：<b class="c${cur.r}">${gearName(cur)}</b>（評分 ${gearPower(cur)}）</p>`:''}
@@ -1786,14 +1793,15 @@ function startRun(i,nm){DROPS=[];const POOL=[['battle',5],['event',4],['chest',2
   if(!nm&&S.main.acc&&S.main.ch===i&&!S.main.mid&&CH[i].mid){nodes[2]='story';forks[2]=null}
   nodes.push(nm||bossReady(i)?'boss':'elite');forks.push(null);
   RUN={area:i,nm:!!nm,step:-1,nodes,forks,ftags,tagAt:{},bless:null,loot:{gold:0,exp:0,items:[]},view:{type:'start'}};render();$('#main').scrollTop=0}
-const TAGS={hoard:['💎','寶物守衛','精英怪把守，打贏必掉裝備'],bounty:['💰','懸賞目標','金幣 ×2.5'],fate:['🎲','命運之地','檢定獎勵加倍，失敗代價也更重'],rich:['👑','大寶箱','金幣加倍、必有裝備……據說有寶箱怪'],spring:['💧','靈泉','HP・MP 全回復'],cursed:['☠','詛咒之地','怪物更強，經驗 ×2']};
-const rTag=t=>{const r=Math.random();if(r>.45)return null;return {battle:pick(['hoard','bounty','cursed']),ambush:'bounty',event:'fate',chest:'rich',rest:'spring'}[t]||null};
+const TAGS={lord:['👹','領主巢穴','區域領主盤踞，強大但會掉寶石與好裝備'],hoard:['💎','寶物守衛','精英怪把守，打贏必掉裝備'],bounty:['💰','懸賞目標','金幣 ×2.5'],fate:['🎲','命運之地','檢定獎勵加倍，失敗代價也更重'],rich:['👑','大寶箱','金幣加倍、必有裝備……據說有寶箱怪'],spring:['💧','靈泉','HP・MP 全回復'],cursed:['☠','詛咒之地','怪物更強，經驗 ×2']};
+const rTag=t=>{const r=Math.random();if(t==='battle'&&r<.08)return 'lord';if(r>.45)return null;return {battle:pick(['hoard','bounty','cursed']),ambush:'bounty',event:'fate',chest:'rich',rest:'spring'}[t]||null};
 const NRISK={battle:'危險 ★　金幣・經驗',ambush:'危險 ★★　裝備 50%',event:'屬性檢定・結果不定',chest:'無危險・金幣道具',rest:'無危險・回復 35%',shrine:'無危險・本趟增益',merchant:'無危險・補給／懸賞情報',mystery:'完全未知'};
 const nAdds=el=>{const a=RUN.area,r=Math.random();if(el)return a>=3&&r<.5?1:0;return a>=3&&r<.2?2:a>=2&&r<.5?1:0};
 function runNext(){const n=RUN.step+1;if(RUN.nodes[n]==='boss'&&!RUN.gate&&RUN.step>=0){RUN.view={type:'gate'};save();render();$('#main').scrollTop=0;return}if(RUN.forks&&RUN.forks[n]&&!RUN.nodes[n]){RUN.view={type:'fork',opts:RUN.forks[n]};save();render();$('#main').scrollTop=0;return}
   RUN.step++;const a=AREAS[RUN.area],s=stats();let t=RUN.nodes[RUN.step];const tg=(RUN.tagAt||{})[RUN.step]||null;
   if(t==='mystery'){t=RUN.nodes[RUN.step]=pick(['battle','event','chest','ambush','merchant','shrine']);toast(`濃霧散去……是「${NODE[t][1]}」`)}
-  if(t==='battle'&&RUN.hunt&&tg!=='hoard'){RUN.hunt=0;startBattle(pick(a.mobs),'elite',nAdds(1));if(B){B.hoard=1;B.gmul=2;B.name='懸賞・'+B.m.n;B.log.push('📜 情報沒錯，就是牠！打倒牠必掉裝備、金幣 ×2')}}
+  if(t==='battle'&&tg==='lord'&&LORD[RUN.area]){startBattle(LORD[RUN.area],'',0);if(B)B.log.push('👹 區域領主現身！')}
+  else if(t==='battle'&&RUN.hunt&&tg!=='hoard'){RUN.hunt=0;startBattle(pick(a.mobs),'elite',nAdds(1));if(B){B.hoard=1;B.gmul=2;B.name='懸賞・'+B.m.n;B.log.push('📜 情報沒錯，就是牠！打倒牠必掉裝備、金幣 ×2')}}
   else if(t==='battle'){if(tg==='hoard'){startBattle(pick(a.mobs),'elite',nAdds(1));if(B){B.hoard=1;B.log.push('💎 牠守著一堆閃亮的東西！')}}else{startBattle(pick(a.mobs),'',nAdds());if(B&&!tg)rareFoe();if(B&&tg==='bounty'){B.gmul=2.5;B.log.push('💰 懸賞目標！金幣 ×2.5')}if(B&&tg==='cursed'){B.atk=Math.round(B.atk*1.25);B.mag=Math.round(B.mag*1.25);B.hp=B.max=Math.round(B.max*1.3);B.xmul=2;B.name='詛咒・'+B.name;B.log.push('☠ 詛咒讓牠更強了……經驗 ×2')}}}
   else if(t==='elite'||t==='ambush'){startBattle(pick(a.mobs),'elite',nAdds(1));if(B&&tg==='bounty'){B.gmul=2.5;B.log.push('💰 懸賞目標！金幣 ×2.5')}}
   else if(t==='boss'){const i=RUN.area;if(!RUN.nm&&S.main.acc&&S.main.ch===i&&!S.main.pre&&CH[i].pre){play(CH[i].pre,`story_ch${i+1}_pre`,a.n,()=>{S.main.pre=true;save();startBattle(a.boss,'boss');render()});return}startBattle(a.boss,'boss')}
@@ -1986,6 +1994,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'7.4',d:'2026-11-19',t:'區域領主',b:'每張地圖新增一位區域領主：巨角兔王、月牙狼王、白骨礦工頭、冰川巨人王、黑霧將軍。岔路上出現「👹 領主巢穴」時才會遇到，首領級強度，每位固定掉落一種寶石（黃玉、月石、紅玉、翠玉、藍玉），也有機會掉裝備。'},
   {v:'7.3',d:'2026-11-19',t:'首領寶石分類',b:'每位首領固定掉一種寶石：哥布林戰酋＝紅玉（攻擊）、腐根樹王＝翠玉（HP）、鑽岩巨蟲＝黃玉（爆擊）、凜冬霜龍＝月石（迴避）、黑霧大術士澤諾斯＝藍玉（魔力）；第二部首領隨機掉落五種之一。點首領圖像可查看。'},
   {v:'7.2',d:'2026-11-19',t:'寶石改為首領限定',b:'鑲嵌寶石改為只有首領會掉落：主線首領必掉 1 顆、惡夢首領有機會 2 顆、無盡之塔首領 30%。合成、分解、異變種、惡夢小怪不再產出寶石。已持有與已鑲嵌的寶石全部回收，每顆補償 120 G。'},
   {v:'7.1',d:'2026-11-19',t:'掛機時也能冒險',b:'背景掛機期間可以照常出發冒險、挑戰無盡之塔、開全自動，掛機收益會繼續累積，不用再先結束掛機。'},
@@ -2258,14 +2267,14 @@ function spoil(){const m=B.m,L=B.L,bs=B.kind==='boss',el=B.kind==='elite',T=B.to
   if(m.mat&&Math.random()<.6){addItem(m.mat,1);got.push(ITEMS[m.mat].n)}
   if(Math.random()<.12){addItem('pot',1);got.push('治療藥水')}
   if(bs||Math.random()<.06){addItem('stone',bs?2:1);got.push(bs?'強化石×2':'強化石')}
-  const first=bs&&!S.cleared[RUN.area];
+  const fld=!!m.field;const first=bs&&!fld&&!S.cleared[RUN.area];
   {const tw=RUN.tower,gt=tw?Math.min(RUN.area,S.main.ch):RUN.area,hard=B.mut||B.nm,hd=B.hoard?1:0,n=(FA&&!bs&&!B.hoard&&Math.random()<.5)?0:hd+(bs?(Math.random()<(tw?.3:B.nm?.6:.4)?1:0)+(!tw&&B.nm&&Math.random()<.3?1:0):(B.mut?1:Math.random()<(el?.5:B.nm?.3:lk?.2:.12)*(tw?.6:1)?1:0));for(let i=0;i<n;i++){const g=rollGear(gt,bs?(tw?1:B.nm?3:2):hard?2:el?1:0,bs||hard?(tw?1.3:2):1,hard);if(i<hd||(B.mut&&!bs))minG(g);got.push(gearName(g))}if(tw&&RUN.area>S.main.ch&&Math.random()<.5){addItem('stone',1);got.push('強化石')}
     if(MDROP[B.id]&&Math.random()<(B.wander?.5:B.treasure?.3:B.kind==='elite'?.12:B.nm?.1:.04)*(FA?.5:1)){const u=addGear(MDROP[B.id],3);DROPS.push(u);got.push(gearName(u));sys(`${S.name} 取得魔物專屬裝備【${GEAR[u.id].n}】！`)}
     if(bs&&BOSSU[B.id]&&(!RUN.tower||S.cleared[AREAS.findIndex(a=>a.boss===B.id)])&&Math.random()<(RUN.tower?.03:B.nm?.2:.08)){const u=addGear(BOSSU[B.id],4);DROPS.push(u);got.push(gearName(u));sys(`${S.name} 取得首領專屬裝備【${GEAR[u.id].n}】！`)}
     if(bs&&Math.random()<(RUN.tower?.3:1)){const n=1+(B.nm&&Math.random()<.5?1:0);for(let i=0;i<n;i++){const gm=BGEM[B.id]||pick(GEMS);addItem(gm,1);got.push(ITEMS[gm].n)}}}
   got.push(...liveDrop(bs));
   track('kill',B.id);S.st.kills++;if(S.dex)S.dex.m[B.id]=(S.dex.m[B.id]||0)+1;if(bs&&B.nm)S.st.nmboss=(S.st.nmboss||0)+1;
-  if(bs&&!RUN.trial&&!RUN.tower){S.cleared[RUN.area]=1;track('boss',B.id);sys(`${S.name} 討伐了首領【${m.n}】！`)}}
+  if(bs&&!fld&&!RUN.trial&&!RUN.tower){S.cleared[RUN.area]=1;track('boss',B.id);sys(`${S.name} 討伐了首領【${m.n}】！`)}}
 function win(){if(!B||B.hp>0)return;spoil();try{talk('win')}catch(e){}{const s=stats();if(s.REAP&&S.hp>0){const h=Math.round(s.HP*s.REAP/100),m=Math.round(s.MP*s.REAP/100);S.hp=Math.min(s.HP,S.hp+h);S.mp=Math.min(s.MP,S.mp+m);B.rp=`【收割】回復 ${h} HP、${m} MP`;B.log.push(B.rp)}}
   const nx=(B.adds||[]).findIndex(f=>f.hp>0);
   if(nx>=0){const dn=B.name;swapFoe(nx);B.adds=B.adds.filter(f=>f.hp>0);B.log.push(`${dn} 倒下了！${B.name} 衝了上來`);B.fx=null;B.busy=true;B.intro=true;render();setTimeout(foeTurn,900);return}
@@ -2274,7 +2283,7 @@ function win(){if(!B||B.hp>0)return;spoil();try{talk('win')}catch(e){}{const s=s
   if(RUN.trial){S.trial=1;for(const k in TRIAL.items)addItem(k,-TRIAL.items[k]);S.gold=Math.max(0,S.gold-TRIAL.gold)}
   const ally=B.ally&&B.ally.hp>0?B.ally.n:null;
   RUN.view={type:'res',img:HK()+'_win',mimg:bid==='shadow'?null:'mob_'+bid+'_lose',title:RUN.trial?'試煉通過':bs?'首領討伐成功':'戰鬥勝利',drop:dropFx(),text:`擊敗 ${T.names.join('、')}！獲得 ${T.exp} EXP、${T.gold} G。${T.got.length?'<br>戰利品：'+T.got.join('、'):''}${B.rp?'<br><span class="sub">'+B.rp+'</span>':''}${ally&&Math.random()<.35?`<br><span class="sub">${ally==='露娜'?'露娜：「辛苦了。……你的背影，越來越可靠了。」':'蓋爾：「還不錯。別鬆懈。」'}</span>`:''}`};
-  if(bs&&!RUN.trial&&!RUN.tower){RUN.view.box=1;RUN.view.boxL=MOBS[bid]?MOBS[bid].lv+(RUN.nm?10:0):S.lv}
+  if(bs&&!(MOBS[bid]&&MOBS[bid].field)&&!RUN.trial&&!RUN.tower){RUN.view.box=1;RUN.view.boxL=MOBS[bid]?MOBS[bid].lv+(RUN.nm?10:0):S.lv}
   B=null;gainExp(T.exp);save();render();$('#main').scrollTop=0}
 function lose(){SFX.lose();const lid=B?B.id:null;const lost=Math.round(S.gold*.1),s=stats();S.gold-=lost;S.hp=Math.round(s.HP*.3);B=null;RUN=null;TAB='town';save();render();
   openM('msg',{t:'戰敗',b:`<div class="panel"><div class="duo">${art(HK()+'_lose','戰敗','r34')}${lid&&lid!=='shadow'?art('mob_'+lid+'_win','','r11'):''}</div><p>${you('你')}倒下了。巡邏隊把你送回晨星鎮，途中遺失了 ${lost} G。</p><p class="sub">強化裝備、分配屬性點，或先到旅店休息再出發吧。</p></div><button class="btn pri big" data-a="closeM">確定</button>`})}
