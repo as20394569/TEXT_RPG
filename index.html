@@ -389,6 +389,8 @@ function art(key,label,r='r169',extra='',under){if(key&&/^npc_\w+$/.test(key))ke
 const ALT=k=>{if(!k)return null;{const m=k.match(/^portrait_(npc_\w+?)(?:_(smile|serious))?$/);if(m)return m[2]?`portrait_${m[1]}`:null}{const m=k.match(/^portrait_(\w+?)_([mf])(?:_(smile|serious))?$/);if(m){return m[3]?`portrait_${m[1]}_${m[2]}`:`class_${m[1]}_${m[2]}`}}{const m=k.match(/^(story_ch\d_\w+?_[mf])_(\w+)$/);if(m){const a=m[2];if(ADV[a]){const base=Object.keys(CLS).find(c=>(CLS[c].adv||[]).includes(a));return base&&base!=='swordsman'?m[1]+'_'+base:m[1]}return m[1]}}{const q=k.match(/^(class_\w+?_[mf])_sk_(\w+)$/);if(q)return q[1]+(SKA[q[2]]&&['heal','buff','shield'].includes(SKA[q[2]][0])?'_cast':'_skill')}let m=k.match(/^(.*)_(hurt|low|win|lose|atk|skill|cast)$/);if(m)return m[1];m=k.match(/^ally_(\w+)$/);if(m)return 'portrait_npc_'+m[1];if(/^event_/.test(k))return 'area_'+AREAS[RUN?RUN.area:0].id;m=k.match(/^(.*)_(m|f)$/);if(m)return m[1];m=k.match(/^story_ch(\d)_(mid|pre)$/);return m?'area_'+AREAS[+m[1]-1].id:null};
 /* 小圖示：有插畫就蓋在線條圖示上 */
 const icon=(key,fb)=>(key&&/^npc_\w+$/.test(key)&&(key='portrait_'+key),key in ATL)?`${fb}<i class="ii at" style="background-position:${(ATL[key]%ATC)/(ATC-1)*100}% ${Math.floor(ATL[key]/ATC)/(ATR-1)*100}%"></i>`:`${fb}${MISS.has(key)||!hasArt(key)?'':`<img class="ii" src="art/${key}.webp" alt=""${key.startsWith('portrait_')?' style="object-fit:cover;object-position:50% 12%"':''} onerror="reTry(this,'${key}')||(MISS.add('${key}'),this.remove())">`}`;
+/* 爆擊與爆傷遞減：堆太高效益會變低 */
+const softCrit=x=>Math.round(Math.min(55,x<=30?x:30+(x-30)*.5)),softCd=x=>Math.round(Math.min(280,x<=200?x:200+(x-200)*.4));
 const gIco=id=>icon('icon_'+id,SLOTCH[GEAR[id].slot]);
 let ARTSET=null;try{fetch('art/list.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(a=>{if(a){ARTSET=new Set(a);try{render()}catch(e){}}}).catch(()=>{})}catch(e){}
 const hasArt=k=>!ARTSET||ARTSET.has(k);
@@ -1297,7 +1299,7 @@ function gearTotals(){const e={},add=o=>{for(const k in o)e[k]=(e[k]||0)+o[k]};
   for(const id in PASS)if(PASS[id].st&&hasP(id))add(PASS[id].st);return e}
 function stats(){const e=gearTotals(),a={},c=CLS[S.cls],v=k=>e[k]||0,p=k=>1+v(k)/100;for(const k in ATTR)a[k]=S.attr[k]+v(k);
   return{HP:Math.round((60+a.VIT*14+S.lv*8+v('hp'))*p('hpp')),MP:Math.round((20+a.INT*5+S.lv*3+v('mp'))*p('mpp')),ATK:Math.round((a[c.atk]*2+v('atk'))*p('atkp')),MAG:Math.round((a.INT*2.2+v('mag'))*p('magp')),
-    DEF:Math.round((a.VIT*1.4+v('def'))*p('defp')),CRIT:Math.min(75,Math.round(5+a.LUK*.6+a.DEX*.2+v('crit'))),CD:150+Math.round(a.LUK*.8)+v('cd'),EVA:Math.min(45,Math.round(a.DEX*.6+v('eva'))),
+    DEF:Math.round((a.VIT*1.4+v('def'))*p('defp')),CRIT:softCrit(5+a.LUK*.6+a.DEX*.2+v('crit')),CD:softCd(150+Math.round(a.LUK*.8)+v('cd')),EVA:Math.min(45,Math.round(a.DEX*.6+v('eva'))),
     LS:v('ls'),REGEN:v('regen')+Math.min(3,a.VIT*.03),MPCUT:Math.min(50,Math.round(v('mpcut')+Math.min(20,a.INT*.15))),BURN:v('burn'),DOUBLE:v('double')+Math.min(20,Math.round(a.DEX*.15)),STUN:v('stun'),GUARD:v('guard'),SHIELD:v('shield'),BACK:Math.min(60,v('back')),THORN:Math.min(50,v('thorn')),GALE:v('gale'),REAP:Math.min(25,v('reap')),MPREG:v('mpreg'),RESMAX:v('resmax'),BRKCD:v('brkcd'),DETAMP:v('detamp'),FOCUSATK:v('focusatk'),ANSWER:v('answer'),HEALP:v('healp'),FAITHG:v('faithg'),A:a}}
 function power(){const s=stats();return Math.round(s.HP/4+s.MP/4+s.ATK*3+s.MAG*3+s.DEF*2.5+s.CRIT*4+(s.CD-150)*1.5+s.EVA*3+s.LS*5+(s.BURN+s.DOUBLE+s.STUN+s.GUARD+s.SHIELD+s.BACK+s.THORN+s.REAP)*3+s.GALE*40)}
 const baseAttr=()=>{const a=Object.assign({},CLS[S.cls].base),g=CLS[S.cls].grow;for(const k in g)a[k]+=g[k]*(S.lv-1);if(S.adv){const b=ADV[S.adv].bonus;for(const k in b)a[k]+=b[k]}return a};
@@ -1942,6 +1944,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'5.7',d:'2026-11-19',t:'爆擊平衡',b:'爆擊率超過 30% 後效益減半（上限 55%），爆擊傷害超過 200% 後效益降為 40%（上限 280%）。精英怪受到的爆擊加成 -15%、首領 -30%。堆滿爆擊仍然很強，但不會再秒殺一切。'},
   {v:'5.6',d:'2026-11-19',t:'排行榜可看玩家裝備',b:'點排行榜上的玩家，就能看到他的角色立繪、六個部位的裝備與能力值。修正重新整理後會被當成新玩家的問題。'},
   {v:'5.5',d:'2026-11-19',t:'線上戰力排行榜',b:'排行榜開始連線真實玩家：遊戲每 5 分鐘自動上傳你的戰力，榜上標「玩家」的都是真人。伺服器暫時連不上時，會自動改回顯示 NPC 與好友戰力碼。'},
   {v:'5.4',d:'2026-11-19',t:'強敵化',b:'裝備太強、可以一招秒殺魔物時，魔物會「強敵化」：血量與攻擊依你的實力提升，同時給更多經驗與金幣。前期與正常裝備時不受影響。'},
@@ -2067,7 +2070,7 @@ const basicEl=()=>({swordsman:'phys',ranger:'phys',mage:'arcane',cleric:'holy'}[
 const capB=d=>{if(!B||B.kind!=='boss')return d;const lim=B.max,r=Math.max(1,Math.min(d,lim-(B.tk||0)));B.tk=(B.tk||0)+r;return r};
 function bossPhase(){if(B&&B.kind==='boss'&&!B.ph2&&B.hp>0&&B.hp<=B.max*.5){B.ph2=1;B.fshield=(B.fshield||0)+Math.round(B.max*.12);blog(`${B.name} 被逼入絕境，張開了護盾！`)}}
 function hitFoe(stat,pow,o){o=o||{};const s=stats();if(s.GALE&&!B.gale){B.gale=1;o=Object.assign({},o,{sure:1});B.log.push('【疾風】先發制人！')}if(!o.sure&&Math.random()*100<(B.eva+fbSum('eva'))*.6)return{d:0,cr:false,miss:true};let base=clsDm()*(B.opening?1.5:1)*(S.cls==='swordsman'&&B.cls&&B.cls.brk?1+.06*B.cls.brk:1)*(S.cls==='ranger'&&B.cls&&B.cls.focus?1+.06*B.cls.focus:1)*(stat==='BOTH'?s.ATK+s.MAG:s[stat])*(1+buffSum('atk')+(s.FOCUSATK&&B.cls.focus>=rmax(5)?s.FOCUSATK/100:0))*(B.pst.weak>0?.75:1)*(s.BACK&&S.hp<s.HP*.35?1+s.BACK/100:1);
-  const fdef=stat==='MAG'?(B.mres??B.def):stat==='BOTH'?((B.mres??B.def)+B.def)/2:B.def;const em=elMul(B.id,B.curEl);if(em!==1)B.elHit=em>1?'w':'r';let d=em*base*pow*100/(100+fdef*(1+fbSum('def'))*(1-(o.pierce||0)))*(.9+Math.random()*.2);const cr=!!o.sure||Math.random()*100<s.CRIT+(o.cr||0)+(hasP('sw1')&&B.cls.brk>=3?15:0);if(cr)d*=(s.CD+(hasP('rg3')&&B.cls.focus>=5?30:0)+s.BRKCD*B.cls.brk)/100;
+  const fdef=stat==='MAG'?(B.mres??B.def):stat==='BOTH'?((B.mres??B.def)+B.def)/2:B.def;const em=elMul(B.id,B.curEl);if(em!==1)B.elHit=em>1?'w':'r';let d=em*base*pow*100/(100+fdef*(1+fbSum('def'))*(1-(o.pierce||0)))*(.9+Math.random()*.2);const cr=!!o.sure||Math.random()*100<s.CRIT+(o.cr||0)+(hasP('sw1')&&B.cls.brk>=3?15:0);if(cr){const cdm=(s.CD+(hasP('rg3')&&B.cls.focus>=5?30:0)+s.BRKCD*B.cls.brk)/100;d*=1+(cdm-1)*(B.kind==='boss'?.7:B.kind==='elite'?.85:1)}
   d=capB(Math.max(1,Math.round(d)));if(B.fshield>0){const ab=Math.min(B.fshield,d);B.fshield-=ab;d-=ab}B.hp=Math.max(0,B.hp-d);bossPhase();return{d,cr}}
 function pAct(type,arg){if(!B||B.busy)return;const s=stats();
   if(type==='skill'&&S.mp<mpCost(arg)){toast('MP 不足');return}
