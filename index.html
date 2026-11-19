@@ -1286,12 +1286,12 @@ const xpPen=L=>{const d=S.lv-L-5;return d>0?Math.max(.2,1-d*.15):1};
 const clsName=()=>S.adv?ADV[S.adv].n:CLS[S.cls].n;
 const gearBy=u=>S.gear.find(g=>g.u===u);
 const tierCap=()=>S&&S.main&&!S.main.done?Math.max(0,S.main.ch):99,sealed=g=>GEAR[g.id].t>tierCap();
-function gearStat(g){const b=GEAR[g.id],m=(1+.2*g.r)*(1+.08*g.p)*([1.4,1.2][b.uniq?9:b.t]||1)*(sealed(g)?Math.pow(.65,b.t-tierCap()):1),o={};for(const k in STATN)if(b[k])o[k]=Math.round(b[k]*m);return o}
+function gearStat(g){const b=GEAR[g.id],m=(1+.2*g.r)*(1+.08*g.p)*(g.q||1)*([1.4,1.2][b.uniq?9:b.t]||1)*(sealed(g)?Math.pow(.65,b.t-tierCap()):1),o={};for(const k in STATN)if(b[k])o[k]=Math.round(b[k]*m);return o}
 const specV=g=>{const v=SPEC[g.sp].v;return v<=1?v:Math.max(1,Math.round(v*Math.min(1,.5+.1*(GEAR[g.id].t||0))))},specD=g=>{const x=SPEC[g.sp];return x.v<=1?x.d:x.d.replace(String(x.v),String(specV(g)))};
 function gearAll(g){const o=gearStat(g),sl=sealed(g),sm=sl?Math.pow(.65,GEAR[g.id].t-tierCap()):1,ad=(k,v)=>o[k]=(o[k]||0)+v;for(const x of g.sub||[])ad(x.k,Math.max(1,Math.round(x.v*sm)));if(g.sp&&!sl)ad(g.sp,specV(g));const u=GEAR[g.id].uq;if(u&&!sl)for(const k in u)ad(k,u[k]);
   for(const gm of g.sock||[])if(gm)for(const k in ITEMS[gm].gem)ad(k,ITEMS[gm].gem[k]);return o}
 const gearName=g=>`${g.sh?'✧':''}${g.set!=null?SETS[g.set].n+'・':''}${GEAR[g.id].uniq?'「'+GEAR[g.id].n+'」':GEAR[g.id].n}${g.p?` +${g.p}`:''}`;
-const gearDesc=g=>Object.entries(gearStat(g)).map(([k,v])=>fmt(k,v)).join('　')+((g.sub||[]).length?`　詞條×${g.sub.length}`:'')+(g.sp?`　【${SPEC[g.sp].n}】`:'')+(GEAR[g.id].uniq?'　專屬':'')+((g.sock||[]).length?`　孔 ${(g.sock||[]).filter(Boolean).length}/${g.sock.length}`:'');
+const gearDesc=g=>(g.q>=1.3?'【完美】':'')+Object.entries(gearStat(g)).map(([k,v])=>fmt(k,v)).join('　')+((g.sub||[]).length?`　詞條×${g.sub.length}`:'')+(g.sp?`　【${SPEC[g.sp].n}】`:'')+(GEAR[g.id].uniq?'　專屬':'')+((g.sock||[]).length?`　孔 ${(g.sock||[]).filter(Boolean).length}/${g.sock.length}`:'');
 function gearPower(g){const o=gearAll(g),mg=CLS[S.cls].basic==='MAG',W={atk:mg?1:3,mag:mg?3:.8,def:2.5,hp:.25,mp:.25,crit:4,cd:1.5,eva:3,ls:5,atkp:mg?2:6,magp:mg?6:2,STR:mg?1.5:4,DEX:3,INT:mg?4:1.5,VIT:3,LUK:3};
   let v=0;for(const k in o)v+=o[k]*(W[k]||3);return Math.round(v)}
 function setCounts(){const c={};for(const sl in SLOTS){const g=gearBy(S.eq[sl]);if(g&&g.set!=null)c[g.set]=(c[g.set]||0)+1}return c}
@@ -1313,8 +1313,9 @@ function clamp(){const s=stats();S.hp=Math.min(S.hp,s.HP);S.mp=Math.min(S.mp,s.M
 function mySkills(){return Object.keys(SK).filter(k=>(SK[k].c===S.cls||SK[k].c===S.adv)&&S.lv>=SK[k].lv)}
 function learn(quiet){for(const k of mySkills())if(!S.skl[k]){S.skl[k]=1;if(!quiet)toast(`習得技能【${SK[k].n}】`)}}
 function addItem(id,n){S.items[id]=(S.items[id]||0)+n;if(S.items[id]<=0)delete S.items[id]}
-function rollSubs(t,r){return Object.keys(SUBS).sort(()=>Math.random()-.5).slice(0,Math.min(4,r)).map(k=>({k,v:Math.max(1,Math.round(SUBS[k](t)*(.8+Math.random()*.25)))}))}
-function addGear(id,r,set){const g={u:S.uid++,id,r,p:0,sub:rollSubs(GEAR[id].t,r),lock:false,sock:r>=4?[null,null]:r>=3?[null]:[]};if(r>=4&&!GEAR[id].uniq)g.sp=pick(Object.keys(SPEC));if(set!=null)g.set=set;S.gear.push(g);if(S.dex)S.dex.g[id]=1;return g}
+function rollSubs(t,r){return Object.keys(SUBS).sort(()=>Math.random()-.5).slice(0,Math.min(5,r)).map(k=>({k,v:Math.max(1,Math.round(SUBS[k](t)*(.7+Math.random()*.6)))}))}
+function rollQ(){const x=Math.random();return x<.03?+(1.3+Math.random()*.1).toFixed(2):+(0.85+Math.random()*.4).toFixed(2)}
+function addGear(id,r,set){const g={u:S.uid++,id,r,p:0,q:GEAR[id].uniq?1:rollQ(),sub:rollSubs(GEAR[id].t,r+(r>=2&&Math.random()<.2?1:0)),lock:false,sock:r>=4?[null,null]:r>=3?[null]:[]};if(r>=4&&!GEAR[id].uniq)g.sp=pick(Object.keys(SPEC));if(set!=null)g.set=set;S.gear.push(g);if(S.dex)S.dex.g[id]=1;return g}
 function rollRar(minR,bonus){const lu=1+Math.min(.5,(S?stats().A.LUK:0)*.004);const w=RW.map((x,i)=>i<minR?0:x*(i>=2?(bonus||1)*lu:1)),t=w.reduce((a,b)=>a+b);let r=Math.random()*t;for(let i=0;i<5;i++){if((r-=w[i])<0)return i}return 4}
 function makeGear(tier,r,hard){const sl=pick(Object.keys(SLOTS)),id=sl==='weapon'?`w_${S.cls}_${tier}`:`${SLOTP[sl]}_${tier}`;
   const g=addGear(id,r,hard&&r>=3&&Math.random()<.4?CSET[S.cls]:r>=2&&Math.random()<.35?ASET(tier):null);if(r>=1&&Math.random()<.05)shine(g);if((r===2||r===3)&&!g.sp&&!GEAR[id].uniq&&Math.random()<.06)g.sp=pick(Object.keys(SPEC));if(r>=3||g.sh||g.sp)DROPS.push(g);if(r>=3||g.sh||g.sp)sys(`恭喜 ${S.name} 獲得【${gearName(g)}】！`);return g}
@@ -1701,7 +1702,7 @@ const MV={
       <p class="sub">${online?`🟢 線上排行榜・共 ${P.length} 位玩家。點玩家可查看裝備，你的戰力每 5 分鐘自動上傳。`:'⚪ 排行榜伺服器暫時連不上，稍後再試。'}</p>`}},
   gear(u){const g=gearBy(u);if(!g)return{t:'裝備',b:'<p class="empty">這件裝備已不存在</p>'};const b=GEAR[g.id],on=S.eq[b.slot]===u,cur=gearBy(S.eq[b.slot]);
     const can=(!b.cls||b.cls===S.cls)&&S.lv>=b.lv,cmp=!on&&cur?gearPower(g)-gearPower(cur):null,set=g.set!=null?SETS[g.set]:null,sc=set?setCounts()[g.set]||0:0,rf=reforgeCost(g),dz=DIS[g.r];
-    return{t:gearName(g),b:`<div class="row"><span class="ico c${g.r}">${gIco(g.id)}</span><div class="grow"><b class="c${g.r}">${RAR[g.r].n}・${SLOTS[b.slot]}</b><div class="sub">需求 Lv.${b.lv}${b.cls?'・'+CLS[b.cls].n+'專用':''}・評分 ${gearPower(g)}${cmp!=null?` <b class="${cmp>=0?'up':'down'}">${cmp>=0?'▲':'▼'} ${Math.abs(cmp)}</b>`:''}</div></div>${g.lock?'<span class="tag">已鎖定</span>':''}</div>${sealed(g)?`<div class="gsec" style="border-color:#c0262d"><b style="color:#c0262d">🔒 封印中</b><span class="sub">這件裝備來自比主線進度更遠的地區，能力被封印（屬性降低、稀有詞綴與專屬效果暫時無效）。推進主線到「${AREAS[Math.min(b.t,AREAS.length-1)].n}」就會完全解除。</span></div>`:''}
+    return{t:gearName(g),b:`<div class="row"><span class="ico c${g.r}">${gIco(g.id)}</span><div class="grow"><b class="c${g.r}">${RAR[g.r].n}・${SLOTS[b.slot]}</b><div class="sub">需求 Lv.${b.lv}${b.cls?'・'+CLS[b.cls].n+'專用':''}・評分 ${gearPower(g)}${g.q&&g.q!==1?`・品質 <b style="color:${g.q>=1.3?'#e0a020':g.q>=1.1?'#2a7a2a':g.q<.95?'#a05a3a':'inherit'}">${Math.round(g.q*100)}%${g.q>=1.3?' 完美':''}</b>`:''}${cmp!=null?` <b class="${cmp>=0?'up':'down'}">${cmp>=0?'▲':'▼'} ${Math.abs(cmp)}</b>`:''}</div></div>${g.lock?'<span class="tag">已鎖定</span>':''}</div>${sealed(g)?`<div class="gsec" style="border-color:#c0262d"><b style="color:#c0262d">🔒 封印中</b><span class="sub">這件裝備來自比主線進度更遠的地區，能力被封印（屬性降低、稀有詞綴與專屬效果暫時無效）。推進主線到「${AREAS[Math.min(b.t,AREAS.length-1)].n}」就會完全解除。</span></div>`:''}
      <div class="gsec"><b>主屬性${g.p?`（強化 +${g.p}）`:''}</b><div class="chips">${Object.entries(gearStat(g)).map(([k,v])=>`<span class="chip">${fmt(k,v)}</span>`).join('')}</div></div>
      ${g.sh?`<div class="gsec"><b style="color:#1593b3">✧ 閃耀</b><span class="sub">比同級裝備多一條詞條，最強的詞條 ×1.5。洗練後依然保留。</span></div>`:''}${(g.sub||[]).length?`<div class="gsec"><b>附加詞條</b>${g.sub.map(x=>`<span class="subl c${g.r}">◆ ${fmt(x.k,x.v)}</span>`).join('')}</div>`:''}
      ${GEAR[g.id].uniq?`<div class="gsec"><b class="c4">首領專屬效果</b><span class="sub">${GEAR[g.id].ud}</span></div>`:''}
@@ -1955,6 +1956,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'6.7',d:'2026-11-19',t:'裝備隨機性提升',b:'新掉落的裝備多了「品質」：主屬性在 85%～125% 之間隨機，3% 機率出現 130%～140% 的【完美】裝備；附加詞條數值浮動加大（70%～130%）；稀有以上有 20% 機率多一條詞條。同名同稀有度的裝備也會有明顯差異，值得多刷幾件挑最好的。'},
   {v:'6.6',d:'2026-11-19',t:'裝備封印',b:'比主線進度更遠的地區裝備會暫時「封印」：屬性依超前的階數降低，稀有詞綴與首領專屬效果暫時無效。裝備不會消失，推進主線到該地區就自動完全解除。已經在無盡之塔拿到高階裝備的冒險者也適用。之前因為在塔裡打倒首領而被誤標「已通關」的地區會自動恢復成正確的主線進度。'},
   {v:'6.5',d:'2026-11-19',t:'無盡之塔掉落調整',b:'無盡之塔掉落的裝備階級不再超過主線進度；塔內首領改為掉 1 件精良以上裝備（原本 2 件稀有以上），一般魔物掉落率降低；首領專屬傳說要先在主線擊敗該首領才會在塔裡掉落，機率 3%。超出主線進度的樓層改為有機會掉強化石。修正在塔裡打倒首領會被誤算成主線通關的問題。'},
   {v:'6.4',d:'2026-11-19',t:'裝備平衡',b:'前期裝備主屬性提升（第 1 階 +40%、第 2 階 +20%），普通與精良在前期更有用；附加詞條的數值浮動變小，比較不會抽到很爛的詞條；稀有詞綴的效果改為依裝備階級成長（第 1 階 50%，第 6 階滿值），避免低階傳說一件打天下。爆擊與爆傷詞條維持不變。'},
