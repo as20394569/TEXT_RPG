@@ -1285,8 +1285,9 @@ const CHLV=[1,7,13,19,24,26];const chLvOk=()=>S.lv>=(CHLV[S.main.ch]||1);
 const xpPen=L=>{const d=S.lv-L-5;return d>0?Math.max(.2,1-d*.15):1};
 const clsName=()=>S.adv?ADV[S.adv].n:CLS[S.cls].n;
 const gearBy=u=>S.gear.find(g=>g.u===u);
-function gearStat(g){const b=GEAR[g.id],m=(1+.2*g.r)*(1+.08*g.p),o={};for(const k in STATN)if(b[k])o[k]=Math.round(b[k]*m);return o}
-function gearAll(g){const o=gearStat(g),ad=(k,v)=>o[k]=(o[k]||0)+v;for(const x of g.sub||[])ad(x.k,x.v);if(g.sp)ad(g.sp,SPEC[g.sp].v);const u=GEAR[g.id].uq;if(u)for(const k in u)ad(k,u[k]);
+function gearStat(g){const b=GEAR[g.id],m=(1+.2*g.r)*(1+.08*g.p)*([1.4,1.2][b.uniq?9:b.t]||1),o={};for(const k in STATN)if(b[k])o[k]=Math.round(b[k]*m);return o}
+const specV=g=>{const v=SPEC[g.sp].v;return v<=1?v:Math.max(1,Math.round(v*Math.min(1,.5+.1*(GEAR[g.id].t||0))))},specD=g=>{const x=SPEC[g.sp];return x.v<=1?x.d:x.d.replace(String(x.v),String(specV(g)))};
+function gearAll(g){const o=gearStat(g),ad=(k,v)=>o[k]=(o[k]||0)+v;for(const x of g.sub||[])ad(x.k,x.v);if(g.sp)ad(g.sp,specV(g));const u=GEAR[g.id].uq;if(u)for(const k in u)ad(k,u[k]);
   for(const gm of g.sock||[])if(gm)for(const k in ITEMS[gm].gem)ad(k,ITEMS[gm].gem[k]);return o}
 const gearName=g=>`${g.sh?'✧':''}${g.set!=null?SETS[g.set].n+'・':''}${GEAR[g.id].uniq?'「'+GEAR[g.id].n+'」':GEAR[g.id].n}${g.p?` +${g.p}`:''}`;
 const gearDesc=g=>Object.entries(gearStat(g)).map(([k,v])=>fmt(k,v)).join('　')+((g.sub||[]).length?`　詞條×${g.sub.length}`:'')+(g.sp?`　【${SPEC[g.sp].n}】`:'')+(GEAR[g.id].uniq?'　專屬':'')+((g.sock||[]).length?`　孔 ${(g.sock||[]).filter(Boolean).length}/${g.sock.length}`:'');
@@ -1311,7 +1312,7 @@ function clamp(){const s=stats();S.hp=Math.min(S.hp,s.HP);S.mp=Math.min(S.mp,s.M
 function mySkills(){return Object.keys(SK).filter(k=>(SK[k].c===S.cls||SK[k].c===S.adv)&&S.lv>=SK[k].lv)}
 function learn(quiet){for(const k of mySkills())if(!S.skl[k]){S.skl[k]=1;if(!quiet)toast(`習得技能【${SK[k].n}】`)}}
 function addItem(id,n){S.items[id]=(S.items[id]||0)+n;if(S.items[id]<=0)delete S.items[id]}
-function rollSubs(t,r){return Object.keys(SUBS).sort(()=>Math.random()-.5).slice(0,Math.min(4,r)).map(k=>({k,v:Math.max(1,Math.round(SUBS[k](t)*(.7+Math.random()*.3)))}))}
+function rollSubs(t,r){return Object.keys(SUBS).sort(()=>Math.random()-.5).slice(0,Math.min(4,r)).map(k=>({k,v:Math.max(1,Math.round(SUBS[k](t)*(.8+Math.random()*.25)))}))}
 function addGear(id,r,set){const g={u:S.uid++,id,r,p:0,sub:rollSubs(GEAR[id].t,r),lock:false,sock:r>=4?[null,null]:r>=3?[null]:[]};if(r>=4&&!GEAR[id].uniq)g.sp=pick(Object.keys(SPEC));if(set!=null)g.set=set;S.gear.push(g);if(S.dex)S.dex.g[id]=1;return g}
 function rollRar(minR,bonus){const lu=1+Math.min(.5,(S?stats().A.LUK:0)*.004);const w=RW.map((x,i)=>i<minR?0:x*(i>=2?(bonus||1)*lu:1)),t=w.reduce((a,b)=>a+b);let r=Math.random()*t;for(let i=0;i<5;i++){if((r-=w[i])<0)return i}return 4}
 function makeGear(tier,r,hard){const sl=pick(Object.keys(SLOTS)),id=sl==='weapon'?`w_${S.cls}_${tier}`:`${SLOTP[sl]}_${tier}`;
@@ -1319,7 +1320,7 @@ function makeGear(tier,r,hard){const sl=pick(Object.keys(SLOTS)),id=sl==='weapon
 /* 閃耀裝備：多一條詞條、最高詞條 ×1.5 */
 let DROPS=[];
 function shine(g){g.sh=1;const ks=g.sub.map(x=>x.k),k=Object.keys(SUBS).filter(x=>!ks.includes(x)).sort(()=>Math.random()-.5)[0],t=GEAR[g.id].t;if(k)g.sub.push({k,v:Math.max(1,Math.round(SUBS[k](t)))});const top=g.sub.reduce((a,b)=>b.v/SUBS[b.k](t)>a.v/SUBS[a.k](t)?b:a);top.v=Math.round(top.v*1.5)}
-function dropFx(){if(!DROPS.length)return '';const h=DROPS.map(g=>`<div class="drop d${g.r}${g.sh?' shn':''}"><span class="ico c${g.r}">${gIco(g.id)}</span><span class="grow"><b class="c${g.r}">${gearName(g)}</b><span class="sub">${g.sh?'閃耀・多一條詞條、最強詞條 ×1.5':g.sp&&g.r<4?`稀有詞綴【${SPEC[g.sp].n}】${SPEC[g.sp].d}`:RAR[g.r].n+'裝備'}</span></span></div>`).join('');const best=Math.max(...DROPS.map(g=>g.r+(g.sh?1:0)));DROPS=[];setTimeout(()=>{try{SFX.holy(0);buzz([30,40,60])}catch(e){}},350);return `<div class="drops">${h}</div>`}
+function dropFx(){if(!DROPS.length)return '';const h=DROPS.map(g=>`<div class="drop d${g.r}${g.sh?' shn':''}"><span class="ico c${g.r}">${gIco(g.id)}</span><span class="grow"><b class="c${g.r}">${gearName(g)}</b><span class="sub">${g.sh?'閃耀・多一條詞條、最強詞條 ×1.5':g.sp&&g.r<4?`稀有詞綴【${SPEC[g.sp].n}】${specD(g)}`:RAR[g.r].n+'裝備'}</span></span></div>`).join('');const best=Math.max(...DROPS.map(g=>g.r+(g.sh?1:0)));DROPS=[];setTimeout(()=>{try{SFX.holy(0);buzz([30,40,60])}catch(e){}},350);return `<div class="drops">${h}</div>`}
 const rollGear=(tier,minR,bonus,hard)=>makeGear(tier,rollRar(minR||0,bonus),hard);
 function dismantle(g){const d=DIS[g.r][0]+g.p*2,st=DIS[g.r][1];addItem('dust',d);if(st)addItem('stone',st);for(const gm of g.sock||[])if(gm)addItem(gm,1);if(g.r>=3&&Math.random()<.4){const gm=pick(GEMS);addItem(gm,1);toast(`分解時取得 ${ITEMS[gm].n}`)}S.gear=S.gear.filter(x=>x.u!==g.u);return [d,st]}
 function gainExp(n){
@@ -1704,7 +1705,7 @@ const MV={
      ${g.sh?`<div class="gsec"><b style="color:#1593b3">✧ 閃耀</b><span class="sub">比同級裝備多一條詞條，最強的詞條 ×1.5。洗練後依然保留。</span></div>`:''}${(g.sub||[]).length?`<div class="gsec"><b>附加詞條</b>${g.sub.map(x=>`<span class="subl c${g.r}">◆ ${fmt(x.k,x.v)}</span>`).join('')}</div>`:''}
      ${GEAR[g.id].uniq?`<div class="gsec"><b class="c4">首領專屬效果</b><span class="sub">${GEAR[g.id].ud}</span></div>`:''}
      ${(g.sock||[]).length?`<div class="gsec"><b>鑲嵌孔</b>${g.sock.map((gm,i)=>gm?`<span class="subl">◆ ${ITEMS[gm].n}：${Object.entries(ITEMS[gm].gem).map(([k,v])=>fmt(k,v)).join('')}</span>`:`<span class="subl sub">◇ 空孔</span>`).join('')}${GEMS.some(x=>S.items[x])?`<div class="chips">${GEMS.filter(x=>S.items[x]).map(x=>`<button class="btn sm" data-a="sockIn" data-v="${u}|${x}">鑲入${ITEMS[x].n}×${S.items[x]}</button>`).join('')}</div><span class="sub">孔滿時會替換第一顆，舊寶石會碎掉。</span>`:'<span class="sub">寶石從首領、異變種、惡夢怪物與分解高階裝備取得。</span>'}</div>`:''}
-     ${g.sp?`<div class="gsec"><b class="c4">${g.r>=4?'傳說':'稀有'}詞綴【${SPEC[g.sp].n}】</b><span class="sub">${SPEC[g.sp].d}</span></div>`:''}
+     ${g.sp?`<div class="gsec"><b class="c4">${g.r>=4?'傳說':'稀有'}詞綴【${SPEC[g.sp].n}】</b><span class="sub">${specD(g)}${specV(g)<SPEC[g.sp].v?`（第 ${GEAR[g.id].t+1} 階，滿階為 ${SPEC[g.sp].v}）`:''}</span></div>`:''}
      ${set?`<div class="gsec"><b>${set.n}套裝（已裝備 ${sc} 件）</b><span class="sub ${sc>=2?'son':''}">2 件：${set.d2}</span><span class="sub ${sc>=4?'son':''}">4 件：${set.d4}</span></div>`:''}
      ${!on&&cur?`<p class="sub">目前裝備：<b class="c${cur.r}">${gearName(cur)}</b>（評分 ${gearPower(cur)}）</p>`:''}
      ${on?`<button class="btn big" data-a="unequip" data-v="${b.slot}">卸下</button>`:`<button class="btn pri big" data-a="equip" data-v="${u}" ${can?'':'disabled'}>${can?'裝備':'等級或職業不符'}</button>`}
@@ -1953,6 +1954,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'6.4',d:'2026-11-19',t:'裝備平衡',b:'前期裝備主屬性提升（第 1 階 +40%、第 2 階 +20%），普通與精良在前期更有用；附加詞條的數值浮動變小，比較不會抽到很爛的詞條；稀有詞綴的效果改為依裝備階級成長（第 1 階 50%，第 6 階滿值），避免低階傳說一件打天下。爆擊與爆傷詞條維持不變。'},
   {v:'6.3',d:'2026-11-19',t:'背包篩選升級',b:'裝備頁可以依部位（武器、頭盔、鎧甲、鞋子、戒指、項鍊）、稀有度（精良以上～傳說）篩選，並可只看「▲更強」、套裝、詞綴／閃耀／專屬裝備；排序可選戰力、稀有度、等級、最新。設定會記住。'},
   {v:'6.2',d:'2026-11-19',t:'懸賞情報＋新圖',b:'旅行商人開始兜售「懸賞情報」：花一筆金幣，下一場普通戰鬥就會遇上守寶的精英魔物——更危險，但打倒必掉裝備、金幣 ×2。要不要賭，看你的血量和藥水。神射手、聖殿騎士（女）、主教共 5 張動作圖重畫上線（弓弦、握杖修正、拿掉多餘特效）。'},
   {v:'6.1',d:'2026-11-19',t:'一鍵販售',b:'背包裝備頁新增「一鍵販售普通、精良」與「一鍵販售稀有以下」，鎖定、裝備中、閃耀與帶稀有詞綴的裝備都會保留。'},
