@@ -309,7 +309,7 @@ input,textarea{font:inherit;width:100%;padding:8px 10px;border:2px solid var(--l
 .cmd .btn .bi{width:26px;height:26px;object-fit:contain;vertical-align:middle;margin-right:4px}i.bi.at{display:inline-block;background:url(art/atlas_ui.webp) no-repeat;background-size:1200% 1200%}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 /* 隊友與多隻魔物 */
-.ally{position:absolute;left:35%;top:52%;width:13%;z-index:3}
+.ally{position:absolute;left:29%;top:38%;width:21%;z-index:1;filter:drop-shadow(0 3px 2px rgba(0,0,0,.25))}.ally .art{border-radius:10px}
 .ally .art{border:2px solid var(--gold);border-radius:8px;background:rgba(20,30,60,.35)}
 .ally .art img{object-position:50% 10%}
 .ally .bbar{height:5px;margin-top:2px}
@@ -1131,9 +1131,17 @@ const NST=[
   a:[['巴爾德','喲，欠錢的總算上門了。'],['蓋爾','……我是來付尾款的。'],['巴爾德','拿去。錢先欠著，用一輩子還。'],['蓋爾','（握住劍柄）……比我記得的還輕。'],['巴爾德','是你變壯了。……歡迎回來，小子。'],['蓋爾','{name}。從今天起，讓我跟著你們。這次，我想用這把劍保護別人回家。'],['旁白','鐵匠舖的牆上空出一個位置。那把劍，終於跟著它的主人走了。']],
   rw:{exp:2000,items:{pot2:5}}}
 ];
+/* 露娜的職業：燈術士 */
+const LUNASK={
+  bolt:{n:'燈火彈',d:'普通攻擊，射出一顆小小的燈火。',ok:()=>true,say:''},
+  flame:{n:'蒼焰',d:'每 3 回合一次，強力火焰攻擊，40% 灼燒。',ok:()=>true,say:'燒起來吧！'},
+  heal:{n:'照路之光',d:'你的 HP 低於 45% 時治療你（冷卻 3 回合）。',ok:()=>true,say:'撐住！'},
+  ward:{n:'守燈結界',d:'看到敵人準備大招時，替你展開結界，下一次傷害 -40%（冷卻 4 回合）。',ok:()=>S.main.ch>=2||(S.bond||0)>=3,say:'躲到燈後面！',need:'第 3 章或羈絆 3'},
+  clear:{n:'霧散之光',d:'敵人身上有增益或你中毒、灼燒時，削弱敵人 2 回合（冷卻 4 回合）。',ok:()=>S.main.ch>=3,say:'霧，散開！',need:'第 4 章'},
+  oath:{n:'誓約之燈',d:'奧義・每場一次。首領戰或敵人半血後發動，巨大傷害並治療你 15%。',ok:()=>(S.bond||0)>=6,say:'這盞燈，絕不熄滅！',need:'羈絆 6'}};
 /* 同行夥伴 */
 const ALLY={
-  luna:{n:'露娜',img:'npc_luna',d:'研究黑霧的少女。用測霧燈的蒼焰攻擊，隊伍危急時替你治療。',role:'治療・魔法',open:()=>S.main.ch>=1},
+  luna:{n:'露娜',img:'npc_luna',d:'研究黑霧的少女。職業【燈術士】：用測霧燈的蒼焰攻擊，替你治療、展開結界、驅散霧氣。',role:'燈術士',open:()=>S.main.ch>=1},
   gale:{n:'蓋爾',img:'npc_gale',d:'前王國騎士團的王牌。重擊敵人，並時常替你擋下攻擊。',role:'坦克・物理',open:()=>!!S.flags.galeBack}};
 
 const DAILY=[{k:'kill',c:10,n:'擊敗 10 隻魔物',rw:{gold:300,items:{stone:1}}},{k:'run',c:2,n:'完成 2 次冒險',rw:{gold:300,items:{dust:3}}},{k:'enh',c:1,n:'強化裝備 1 次',rw:{gold:200,items:{stone:1}}}];
@@ -1424,7 +1432,7 @@ function chatTick(){if(!S)return;const el=$('#chat');
 /* ============ 畫面 ============ */
 function bar(k,v,m,cls=''){return `<div class="bar ${k} ${cls}"><i style="width:${Math.max(0,Math.min(100,v/m*100))}%"></i><span>${k.toUpperCase()} ${v}/${m}</span></div>`}
 let WARM=0;function warm(){if(WARM||!S)return;WARM=1;try{preload(['','_hurt','_low','_win','_lose','_atk','_skill','_cast'].map(x=>HK()+x));preload(mySkills().map(k=>HK()+'_sk_'+k));preload([PKEY(),PKEY('smile'),PKEY('serious')]);const n=Math.min(S.main.ch,CH.length-1);preload([SKEY(n+1,'intro'),SKEY(n+1,'mid'),SKEY(n+1,'outro'),'atlas_ui','town_bg',...AREAS.map(a=>'area_'+a.id),...[...AREAS[n].mobs,AREAS[n].boss].flatMap(m=>['','_atk','_hurt','_low','_lose'].map(x=>'mob_'+m+x)),'portrait_npc_luna','portrait_npc_ria','battle_'+AREAS[n].id])}catch(e){}}
-function render(){try{bgmAuto()}catch(e){}setTimeout(()=>{try{PFX.marks(B&&B.hp>0?B.cls.marks:[])}catch(e){}},280);if(!WARM)setTimeout(warm,400);setTimeout(()=>{try{tipCheck()}catch(e){}},60);
+function render(){try{bgmAuto()}catch(e){}if(!B)document.querySelectorAll('.spb').forEach(e=>e.remove());setTimeout(()=>{try{PFX.marks(B&&B.hp>0?B.cls.marks:[])}catch(e){}},280);if(!WARM)setTimeout(warm,400);setTimeout(()=>{try{tipCheck()}catch(e){}},60);
   const app=$('#app');
   if(!S){app.className='pre';$('#main').innerHTML=vTitle();return}
   app.className='';clamp();const s=stats();
@@ -1573,7 +1581,7 @@ function vChar(){const s=stats(),sc=setCounts();
    <p class="sub">下一級還需 ${Math.max(0,need(S.lv)-S.exp)} EXP</p></div></div></div>
   <div class="panel"><h3>職業特色</h3><p class="sub">${CLS[S.cls].f}</p>${Object.keys(PASS).filter(id=>PASS[id].c===S.cls||PASS[id].c===S.adv).map(id=>`<span class="subl row ${hasP(id)?'':'sub'}" style="gap:6px"><span class="ico c4" style="width:30px;height:30px">${icon('pass_'+id,ic('skill'))}</span><span class="grow">被動【${PASS[id].n}】Lv.${PASS[id].lv}：${PASS[id].d}</span></span>`).join('')}${S.adv?`<p class="sub">${ADV[S.adv].n}：${ADV[S.adv].d}</p>`:''}</div>
   <div class="panel"><h3>屬性　<span class="tag ${S.pts?'red':'off'}">可用 ${S.pts} 點</span><button class="btn sm" style="float:right" data-a="respec">重置（${respecCost()} G）</button></h3>${Object.keys(ATTR).map(k=>`<div class="attr"><span>${ATTR[k]}<span class="sub">　${{STR:'物理攻擊',DEX:'迴避・爆擊・連擊',INT:'魔力・MP・技能省 MP',VIT:'HP・防禦・每回合回血',LUK:'爆擊・爆傷・掉寶・金幣'}[k]}</span></span><b>${S.attr[k]}${s.A[k]>S.attr[k]?`<small class="up">+${s.A[k]-S.attr[k]}</small>`:''}</b><button class="btn sm" data-a="addPt" data-v="${k}" ${S.pts?'':'disabled'}>＋</button></div>`).join('')}</div>
-  ${Object.keys(ALLY).some(k=>ALLY[k].open())?`<div class="panel"><h3>同行夥伴</h3><div class="party">${[...Object.keys(ALLY).filter(k=>ALLY[k].open()),'none'].map(k=>`<button class="btn ${(S.party||'none')===k?'on':''}" data-a="setParty" data-v="${k}">${k==='none'?'<b>獨自冒險</b><span class="sub">不帶夥伴</span>':`${art(ALLY[k].img,ALLY[k].n,'r11','mini')}<b>${ALLY[k].n}</b><span class="sub">${ALLY[k].role}</span>`}</button>`).join('')}</div><p class="sub">${S.party&&S.party!=='none'?ALLY[S.party].d+(S.party==='luna'?'　羈絆越深，露娜越強。':''):'不帶夥伴時，所有戰鬥都靠自己。'}</p></div>`:''}
+  ${Object.keys(ALLY).some(k=>ALLY[k].open())?`<div class="panel"><h3>同行夥伴</h3><div class="party">${[...Object.keys(ALLY).filter(k=>ALLY[k].open()),'none'].map(k=>`<button class="btn ${(S.party||'none')===k?'on':''}" data-a="setParty" data-v="${k}">${k==='none'?'<b>獨自冒險</b><span class="sub">不帶夥伴</span>':`${art(ALLY[k].img,ALLY[k].n,'r11','mini')}<b>${ALLY[k].n}</b><span class="sub">${ALLY[k].role}</span>`}</button>`).join('')}</div><p class="sub">${S.party&&S.party!=='none'?ALLY[S.party].d+(S.party==='luna'?'　羈絆越深，露娜越強。':''):'不帶夥伴時，所有戰鬥都靠自己。'}</p>${S.party==='luna'?`<div class="gsec"><b>露娜・燈術士　羈絆 ${Math.floor(S.bond||0)}</b>${Object.values(LUNASK).map(k=>`<span class="sub ${k.ok()?'son':''}">${k.ok()?'◆':'◇'} 【${k.n}】${k.d}${k.ok()?'':`（解鎖：${k.need}）`}</span>`).join('')}</div>`:''}</div>`:''}
   <div class="panel"><h3>裝備</h3>${eq}<p class="sub" style="text-align:center">點部位查看裝備詳細資料</p>${setHtml}</div>
   <div class="panel"><h3>技能　<span class="tag ${S.sp?'red':'off'}">技能點 ${S.sp}</span></h3><div class="list">${sk}</div>${nxt?`<div class="chips">${nxt}</div>`:''}</div>`}
 function vBag(){
@@ -1794,10 +1802,13 @@ function mkAlly(){if(!S.party||!ALLY[S.party]||!ALLY[S.party].open())return null
                          :{id:'gale',n:'蓋爾',max:Math.round(s.HP*1.05),pw:pw*.62,def:s.DEF*1.1,cd:0}}
 function allyAct(){const A=B.ally;if(!A||A.hp<=0||B.allyTurn===B.turn||B.hp<=0)return;B.allyTurn=B.turn;const s=stats();A.cd=Math.max(0,A.cd-1);
   const hit=(p,nm)=>{let d=A.pw*p*100/(100+B.def*(1+fbSum('def')))*(.9+Math.random()*.2);d=capB(Math.max(1,Math.round(d)));if(B.fshield>0){const ab=Math.min(B.fshield,d);B.fshield-=ab;d-=ab}B.hp=Math.max(0,B.hp-d);bossPhase();B.allyD=d;blog(`${A.n}${nm}，造成 ${d} 傷害`)};
-  if(A.id==='luna'){
-    if(S.hp<s.HP*.45&&!A.cd){const h=Math.round(s.HP*A.heal);S.hp=Math.min(s.HP,S.hp+h);A.cd=3;B.allyH=h;blog(`露娜舉起提燈：「撐住！」為你回復 ${h} HP`)}
-    else if(B.turn%4===0){hit(1.6,'點燃燈火，【蒼焰】直擊');if(B.hp>0&&Math.random()<.4){B.st.burn=2;blog(`${B.name} 被蒼焰灼燒`)}}
-    else hit(1,'的燈火彈');}
+  if(A.id==='luna'){A.cd2=Math.max(0,(A.cd2||0)-1);A.cd3=Math.max(0,(A.cd3||0)-1);const has=k=>LUNASK[k].ok(),say=k=>{try{setTimeout(()=>bub('luna',`【${LUNASK[k].n}】${LUNASK[k].say}`),200);setTimeout(()=>PFX.ally(k),250)}catch(e){}},dng=B.chg||(B.next&&isDng(SKM[B.next]));
+    if(has('oath')&&!A.ult&&(B.kind==='boss'||B.hp<B.max*.5)&&B.turn>=3){A.ult=1;say('oath');hit(3,'高舉提燈，奧義【誓約之燈】');const h=Math.round(s.HP*.15);S.hp=Math.min(s.HP,S.hp+h);B.allyH=h;blog(`蒼藍的光包住了你，回復 ${h} HP`)}
+    else if(S.hp<s.HP*.45&&!A.cd){const h=Math.round(s.HP*A.heal);S.hp=Math.min(s.HP,S.hp+h);A.cd=3;B.allyH=h;say('heal');blog(`露娜舉起提燈【照路之光】：「撐住！」為你回復 ${h} HP`)}
+    else if(dng&&has('ward')&&!A.cd2){A.cd2=4;B.lunaWard=1;say('ward');blog('露娜展開【守燈結界】，下一次受到的傷害降低 40%')}
+    else if(has('clear')&&!A.cd3&&(B.st.poison>0||B.st.burn>0||(B.fb&&B.fb.length))&&Math.random()<.6){A.cd3=4;say('clear');B.st.weak=Math.max(B.st.weak||0,2);hit(.8,'放出【霧散之光】');blog(`${B.name} 的力量被削弱了`)}
+    else if(B.turn%3===0){say('flame');hit(1.6,'點燃燈火，【蒼焰】直擊');if(B.hp>0&&Math.random()<.4){B.st.burn=2;blog(`${B.name} 被蒼焰灼燒`)}}
+    else{try{PFX.ally('bolt')}catch(e){}hit(1,'的燈火彈')}}
   else{if(!A.cd&&Math.random()<.35){A.cd=3;B.taunt=2;blog('蓋爾舉劍擋在你身前：「衝著我來。」')}
     else if(B.turn%3===0)hit(1.9,'揮出【雪葬】');else hit(1.1,'揮劍斬擊');}}
 function allyTgt(){const A=B.ally;if(!A||A.hp<=0)return false;if(B.taunt>0){B.taunt--;return true}return Math.random()<.28}
@@ -1917,6 +1928,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'5.3',d:'2026-11-19',t:'露娜的職業：燈術士',b:'露娜有了自己的職業【燈術士】與技能：燈火彈、蒼焰、照路之光（治療）、守燈結界（看到敵人大招替你擋 40%）、霧散之光（削弱敵人）、奧義誓約之燈（每場一次）。技能隨章節與羈絆解鎖，角色頁可查看。戰鬥畫面中露娜站到主角身後、尺寸放大，出招時會喊招式名並有專屬特效。'},
   {v:'5.2',d:'2026-11-19',t:'人物會說話了＋好友戰力榜',b:'露娜、主角和鎮上的人更像真人：戰鬥中會即時對話（開戰、首領、爆擊、危急、完美防禦、勝利），營火時和露娜聊天、隨章節慢慢聊開她的過去，岔路前也會閒聊；鎮上 NPC 的招呼會依劇情進度、時間和你的狀態改變。排行榜可以用「戰力碼」加入真實好友一起比。'},
   {v:'5.1',d:'2026-11-19',t:'自動收益調整',b:'全自動冒險與背景掛機的收益減半：全自動戰鬥的經驗、金幣與一般裝備掉落減半（首領與寶物守衛不受影響）；背景掛機的經驗、金幣、裝備與素材減半。手動遊玩收益不變。'},
   {v:'5.0',d:'2026-11-19',t:'更新廣播',b:'遊戲更新後，畫面上方會出現跑馬燈系統廣播告訴你更新了什麼；遊玩中有新版本推出時，也會即時廣播並提供「立即更新」按鈕。'},
@@ -2106,7 +2118,7 @@ function foeTurn(){if(!B)return;B.tk=0;const s=stats();
         const res=k&&k.mag?100/(100+s.DEF*.5+s.A.INT*1.5):100/(100+s.DEF*(1+buffSum('def'))*(1-(k&&k.pierce||0)));
         let d=base*res*(.9+Math.random()*.2);if(Math.random()*100<B.crit+fbSum('crit')+(k&&k.cr||0)){d*=1.5;cr=true}tot+=d}
       if(!hit){fx.miss=1;SFX.miss();blog(`你閃開了 ${B.name} 的${nm}！`);if(S.cls==='ranger'){B.cls.focus=Math.min(rmax(5),B.cls.focus+2);blog(`專注 ${B.cls.focus}`)}}
-      else{let d=tot;if(B.guard)d*=(big||dng)?.25:.5;if(B.guard&&(big||dng)){B.opening=1;blog('✦ 完美防禦！看穿破綻，下次攻擊傷害 +50%');setTimeout(()=>talk('guard'),600)}let gd=false;if(s.GUARD&&Math.random()*100<s.GUARD){d*=.5;gd=true}d=Math.max(1,Math.round(d));let ctr=false;if(B.counter){d=Math.max(1,Math.round(d*.3));B.counter=0;ctr=true}
+      else{let d=tot;if(B.lunaWard){d*=.6;B.lunaWard=0;blog('守燈結界擋下了部分衝擊')}if(B.guard)d*=(big||dng)?.25:.5;if(B.guard&&(big||dng)){B.opening=1;blog('✦ 完美防禦！看穿破綻，下次攻擊傷害 +50%');setTimeout(()=>talk('guard'),600)}let gd=false;if(s.GUARD&&Math.random()*100<s.GUARD){d*=.5;gd=true}d=Math.max(1,Math.round(d));let ctr=false;if(B.counter){d=Math.max(1,Math.round(d*.3));B.counter=0;ctr=true}
         let ab=0;if(B.shield>0){ab=Math.min(B.shield,d);B.shield-=ab;d-=ab}
         fx.d=d;fx.cr=cr;fx.quake=!!k||d>s.HP*.15;SFX.hurt(k?.85:0);buzz(k?120:50);S.hp=Math.max(0,S.hp-d);
         blog(`${B.name} 的${nm}造成 ${d} 傷害${cr?'（爆擊）':''}${ab?`（護盾吸收 ${ab}）`:''}${gd?'（格擋）':''}${ctr?'（招架成功）':''}`);
@@ -2240,10 +2252,10 @@ const PFX=(()=>{let HS=0,cv,cx,P=[],Q=[],raf=0,W=0,Hh=0,t0=0,SR={x:0,y:0,w:360,h
     cx.globalCompositeOperation='source-over';cx.globalAlpha=1;
     if(!P.length&&!Q.length){cancelAnimationFrame(raf);raf=0;t0=0;cx.clearRect(0,0,W,Hh)}}
   function run(){ensure();stage();if(!raf){t0=0;raf=requestAnimationFrame(loop)}}
-  const H=[.21,.6],F=[.74,.33];
+  const H=[.21,.6],F=[.74,.33],AL=[.4,.5];
   const GY=f=>f&&f.g!=null?f.g:.13;
   function locate(){try{const st=document.querySelector('.stage');if(!st)return;const sr=st.getBoundingClientRect();if(sr.width<10)return;
-    for(const [sel,A,side] of [['.spr.foe .art',F,'foe'],['.spr.me .art',H,'me']]){const el=document.querySelector(sel);if(!el)continue;const r=el.getBoundingClientRect();if(r.width<4||r.height<4)continue;
+    for(const [sel,A,side] of [['.spr.foe .art',F,'foe'],['.spr.me .art',H,'me'],['.stage .ally .art',AL,'me']]){const el=document.querySelector(sel);if(!el)continue;const r=el.getBoundingClientRect();if(r.width<4||r.height<4)continue;
       A[0]=(r.left+r.width/2-sr.left)/sr.width;A[1]=(r.top+r.height*(side==='foe'?.52:.45)-sr.top)/sr.height;A.g=(r.bottom-r.height*(side==='foe'?.06:.03)-sr.top)/sr.height-A[1];A.R=r.width/sr.width}
     if(typeof syncDerived==='function')syncDerived()}catch(e){}}
   const FIRE=['#ff4a1a','#ff8a2a','#ffc04a','#fff0a0'],GOLD=['#ffd34a','#fff0a0','#ffffff'],ICE=['#8fdcff','#d8f4ff','#ffffff'],VIO=['#b06cff','#e0b8ff','#7a3aff'];
@@ -2722,6 +2734,13 @@ const PFX=(()=>{let HS=0,cv,cx,P=[],Q=[],raf=0,W=0,Hh=0,t0=0,SR={x:0,y:0,w:360,h
   const SELF={heal:'heal_sparkle',buff:'buff_aura',shield:'shield_bubble'};
   return{
     impact,heroFxn,foeFxn,marks(l){if(!B){MS=[];return}locate();syncMarks(l)},
+    ally(k){if(reduce())return;run();locate();const LB='#6ac8ff',HP2=[AL[0]+.03,AL[1]-.04];castPose&&0;
+      if(k==='bolt')comet(HP2,F,LB,.012,.28,{arc:.04,pow:.5});
+      else if(k==='flame'){charge(HP2,LB,{R:.06});later(220,()=>comet(HP2,F,LB,.02,.3,{arc:.05,hit:()=>{hitFx(F,'#bfe8ff',1);flames(F,'#4ab0ff',{n:8,h:.14,sp:.07,life:.7});debris(F,'fire',.6)}}))}
+      else if(k==='heal'){ray(HP2,H,'#9fffe0',.012,.5);later(200,()=>{auraUp(H,'#7fe0c8',{life:.8});twinkle(H,'#e0fff8',7,{rise:.12})})}
+      else if(k==='ward'){rune(H,LB,{R:.14,life:.9});later(150,()=>bubble(H,'#8fd0ff',{R:.17,life:1}))}
+      else if(k==='clear'){charge(HP2,'#e8f8ff',{R:.06});later(250,()=>{column(F,'#cfeeff',{w:.06,life:.5});wind(F,'#e8f8ff',{dir:1,n:6})})}
+      else if(k==='oath'){tint('rgba(40,90,180,.3)',.5);rune(AL,LB,{R:.12,life:1});later(300,()=>{column(F,LB,{w:.13,life:.7});later(160,()=>{flash(F,'#ffffff',.36,.45);shock(F,LB,.38,.55,.32,{gy:.12});debris(F,'holy',1.2);auraUp(H,LB,{life:.9})})})}},
     me(fx){if(reduce())return;run();locate();const k=fx.skill;if(k&&CS[k]){const e=(SKA[k]||[])[0];if(e==='slash'||e==='spin')lunge('me',30);else castPose('me');return CS[k]()}if(fx.d===0)return wind(F,'#e8f0ff',{dir:1,n:3,life:.35});if(fx.d!=null){const bc=CB[S_CLS()]?S_CLS():(BASEC[S_CLS()]||'swordsman');bc==='swordsman'?lunge('me',30):castPose('me');return CB[bc]()}if(fx.glow)CS.heal()},
     foe(fx){if(reduce())return;run();locate();if(fx.fsk){if(CM[fx.fsk])return CM[fx.fsk]();const k=SKM[fx.fsk]||{fx:'roar',c:'#ff4a4a'};return (FO[k.fx]||FO.roar)(k.c,k.h)}
       if(fx.miss)return wind([H[0]+.05,H[1]],'#ffffff',{dir:-1,n:3,life:.35});
