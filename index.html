@@ -1093,7 +1093,7 @@ const NST=[
   a:[['巴爾德','聽說你們要跟遠征隊上山。……我年輕時也去過一次，二十年前那支。'],['巴爾德','走到霜雪山脈就撐不住了。我的搭檔把我推下山坡，自己留下來斷後。'],['巴爾德','他的盾還在山上。我一直沒敢回去拿。'],['巴爾德','山上的冰川巨人身上會掉寒鐵。帶三塊回來，我想用它補好那面盾。']],
   req:{type:'kill',mob:'frostgiant',c:3,d:'在霜雪山脈擊敗冰川巨人 3 隻，取得寒鐵'},
   b:[['旁白','你們在山腰的岩縫裡找到一面凹陷的圓盾，盾面刻著一隻歪歪扭扭的熊。'],['巴爾德','……是他畫的。說是隊徽，醜得要命。'],['巴爾德','我會把它補好，掛在店門口。這樣他在哪裡都看得到，晨星鎮的鐵匠還在打鐵。'],['巴爾德','謝了。強化費……這次算你便宜一點。']],
-  rw:{gold:2500,exp:2000,items:{gem_r:1}}},
+  rw:{gold:2500,exp:2000,items:{stone:3}}},
 
  /* ---- 蜜可：神秘商人 ---- */
  {id:'miko1',npc:'蜜可',fac:'shop',ch:1,n:'假藥水事件',key:'area_forest',
@@ -1193,7 +1193,7 @@ function newGame(name,cls,sex){
   learn(true);const s=stats();S.hp=s.HP;S.mp=s.MP;checkDaily();save();
 }
 /* 舊存檔升級：三格裝備 → 六格、四階稀有度 → 五階 */
-function migrate(){if(!S)return;try{if(!S.gearQfix){for(const g of S.gear||[]){const b=GEAR[g.id];if(!b||g.q!=null)continue;g.q=b.uniq?1:.85;for(const x of g.sub||[])if(SUBS[x.k])x.v=Math.max(1,Math.round(SUBS[x.k](b.t||0)*.7))}S.gearQfix=1}}catch(e){}try{if(S.cleared&&S.main&&!S.main.done&&!S.fixTowerClr){for(const k in S.cleared){const i=+k,bi=(CH[i]&&CH[i].steps||[]).findIndex(x=>x.type==='boss'),ok=S.main.ch>i||(S.main.ch===i&&bi>=0&&S.main.step>bi);if(!ok)delete S.cleared[k]}S.fixTowerClr=1}}catch(e){}if(!S.pid)S.pid=Math.random().toString(36).slice(2,10);dexInit();if(!S.tut){S.tut={};if(S.lv>=5)for(const k in TIPS)if(k!=='tower'&&k!=='ally'&&k!=='adv20')S.tut[k]=1}if(!S.nst)S.nst={};if(S.gem){S.gold+=S.gem*5;S.gem=0}for(const g of S.gear||[])if(!g.sock)g.sock=g.r>=4?[null,null]:g.r>=3?[null]:[];if(!S.sex)S.sex='m';if(!S.flags)S.flags={};if(S.bond==null)S.bond=0;if((S.v||1)>=2)return;
+function migrate(){if(!S)return;try{if(!S.gemFix){let n=0;for(const k of GEMS){n+=S.items[k]||0;delete S.items[k]}for(const g of S.gear||[])if(g.sock)g.sock=g.sock.map(x=>{if(x)n++;return null});if(n){S.gold+=n*120;setTimeout(()=>toast(`寶石改為只有首領掉落：回收 ${n} 顆寶石，補償 ${n*120} G`),2500)}S.gemFix=1}}catch(e){}try{if(!S.gearQfix){for(const g of S.gear||[]){const b=GEAR[g.id];if(!b||g.q!=null)continue;g.q=b.uniq?1:.85;for(const x of g.sub||[])if(SUBS[x.k])x.v=Math.max(1,Math.round(SUBS[x.k](b.t||0)*.7))}S.gearQfix=1}}catch(e){}try{if(S.cleared&&S.main&&!S.main.done&&!S.fixTowerClr){for(const k in S.cleared){const i=+k,bi=(CH[i]&&CH[i].steps||[]).findIndex(x=>x.type==='boss'),ok=S.main.ch>i||(S.main.ch===i&&bi>=0&&S.main.step>bi);if(!ok)delete S.cleared[k]}S.fixTowerClr=1}}catch(e){}if(!S.pid)S.pid=Math.random().toString(36).slice(2,10);dexInit();if(!S.tut){S.tut={};if(S.lv>=5)for(const k in TIPS)if(k!=='tower'&&k!=='ally'&&k!=='adv20')S.tut[k]=1}if(!S.nst)S.nst={};if(S.gem){S.gold+=S.gem*5;S.gem=0}for(const g of S.gear||[])if(!g.sock)g.sock=g.r>=4?[null,null]:g.r>=3?[null]:[];if(!S.sex)S.sex='m';if(!S.flags)S.flags={};if(S.bond==null)S.bond=0;if((S.v||1)>=2)return;
   const om=[0,1,3,4];
   for(const g of S.gear){if(g.id.startsWith('c_'))g.id='r_'+g.id.slice(2);g.r=om[g.r]??g.r;
     if(GEAR[g.id]){if(!g.sub)g.sub=rollSubs(GEAR[g.id].t,g.r);if(g.r>=4&&!g.sp)g.sp=pick(Object.keys(SPEC))}g.lock=!!g.lock}
@@ -1354,7 +1354,7 @@ let DROPS=[];
 function shine(g){g.sh=1;const ks=g.sub.map(x=>x.k),k=Object.keys(SUBS).filter(x=>!ks.includes(x)).sort(()=>Math.random()-.5)[0],t=GEAR[g.id].t;if(k)g.sub.push({k,v:Math.max(1,Math.round(SUBS[k](t)))});const top=g.sub.reduce((a,b)=>b.v/SUBS[b.k](t)>a.v/SUBS[a.k](t)?b:a);top.v=Math.round(top.v*1.5)}
 function dropFx(){if(!DROPS.length)return '';const h=DROPS.map(g=>`<div class="drop d${g.r}${g.sh?' shn':''}"><span class="ico c${g.r}">${gIco(g.id)}</span><span class="grow"><b class="c${g.r}">${gearName(g)}</b><span class="sub">${g.sh?'閃耀・多一條詞條、最強詞條 ×1.5':g.sp&&g.r<4?`稀有詞綴【${SPEC[g.sp].n}】${specD(g)}`:RAR[g.r].n+'裝備'}</span></span></div>`).join('');const best=Math.max(...DROPS.map(g=>g.r+(g.sh?1:0)));DROPS=[];setTimeout(()=>{try{SFX.holy(0);buzz([30,40,60])}catch(e){}},350);return `<div class="drops">${h}</div>`}
 const rollGear=(tier,minR,bonus,hard)=>makeGear(tier,rollRar(minR||0,bonus),hard);
-function dismantle(g){const d=DIS[g.r][0]+g.p*2,st=DIS[g.r][1];addItem('dust',d);if(st)addItem('stone',st);for(const gm of g.sock||[])if(gm)addItem(gm,1);if(g.r>=3&&Math.random()<.4){const gm=pick(GEMS);addItem(gm,1);toast(`分解時取得 ${ITEMS[gm].n}`)}S.gear=S.gear.filter(x=>x.u!==g.u);return [d,st]}
+function dismantle(g){const d=DIS[g.r][0]+g.p*2,st=DIS[g.r][1];addItem('dust',d);if(st)addItem('stone',st);for(const gm of g.sock||[])if(gm)addItem(gm,1);S.gear=S.gear.filter(x=>x.u!==g.u);return [d,st]}
 function gainExp(n){
   S.exp+=n;let up=false;
   while(S.lv<40&&S.exp>=need(S.lv)){S.exp-=need(S.lv);S.lv++;S.pts+=2;S.sp++;const g=CLS[S.cls].grow;for(const k in g)S.attr[k]+=g[k];up=true}
@@ -1736,7 +1736,7 @@ const MV={
      <div class="gsec"><b>主屬性${g.p?`（強化 +${g.p}）`:''}</b><div class="chips">${Object.entries(gearStat(g)).map(([k,v])=>`<span class="chip">${fmt(k,v)}</span>`).join('')}</div></div>
      ${g.sh?`<div class="gsec"><b style="color:#1593b3">✧ 閃耀</b><span class="sub">比同級裝備多一條詞條，最強的詞條 ×1.5。洗練後依然保留。</span></div>`:''}${(g.sub||[]).length?`<div class="gsec"><b>附加詞條</b>${g.sub.map(x=>`<span class="subl c${g.r}">◆ ${fmt(x.k,x.v)}</span>`).join('')}</div>`:''}
      ${GEAR[g.id].uniq?`<div class="gsec"><b class="c4">首領專屬效果</b><span class="sub">${GEAR[g.id].ud}</span></div>`:''}
-     ${(g.sock||[]).length?`<div class="gsec"><b>鑲嵌孔</b>${g.sock.map((gm,i)=>gm?`<span class="subl">◆ ${ITEMS[gm].n}：${Object.entries(ITEMS[gm].gem).map(([k,v])=>fmt(k,v)).join('')}</span>`:`<span class="subl sub">◇ 空孔</span>`).join('')}${GEMS.some(x=>S.items[x])?`<div class="chips">${GEMS.filter(x=>S.items[x]).map(x=>`<button class="btn sm" data-a="sockIn" data-v="${u}|${x}">鑲入${ITEMS[x].n}×${S.items[x]}</button>`).join('')}</div><span class="sub">孔滿時會替換第一顆，舊寶石會碎掉。</span>`:'<span class="sub">寶石從首領、異變種、惡夢怪物與分解高階裝備取得。</span>'}</div>`:''}
+     ${(g.sock||[]).length?`<div class="gsec"><b>鑲嵌孔</b>${g.sock.map((gm,i)=>gm?`<span class="subl">◆ ${ITEMS[gm].n}：${Object.entries(ITEMS[gm].gem).map(([k,v])=>fmt(k,v)).join('')}</span>`:`<span class="subl sub">◇ 空孔</span>`).join('')}${GEMS.some(x=>S.items[x])?`<div class="chips">${GEMS.filter(x=>S.items[x]).map(x=>`<button class="btn sm" data-a="sockIn" data-v="${u}|${x}">鑲入${ITEMS[x].n}×${S.items[x]}</button>`).join('')}</div><span class="sub">孔滿時會替換第一顆，舊寶石會碎掉。</span>`:'<span class="sub">寶石只有首領會掉落（惡夢首領有機會多掉一顆）。</span>'}</div>`:''}
      ${g.sp?`<div class="gsec"><b class="c4">${g.r>=4?'傳說':'稀有'}詞綴【${SPEC[g.sp].n}】</b><span class="sub">${specD(g)}${specV(g)<SPEC[g.sp].v?`（第 ${GEAR[g.id].t+1} 階，滿階為 ${SPEC[g.sp].v}）`:''}</span></div>`:''}
      ${set?`<div class="gsec"><b>${set.n}套裝（已裝備 ${sc} 件）</b><span class="sub ${sc>=2?'son':''}">2 件：${set.d2}</span><span class="sub ${sc>=4?'son':''}">4 件：${set.d4}</span></div>`:''}
      ${!on&&cur?`<p class="sub">目前裝備：<b class="c${cur.r}">${gearName(cur)}</b>（評分 ${gearPower(cur)}）</p>`:''}
@@ -1909,7 +1909,7 @@ const ACH=[
   {id:'lv40',n:'登峰造極',d:'等級達到 40',c:()=>S.lv>=40,rw:{gold:20000,items:{gem_y:1}}},
   {id:'adv',n:'第二次誕生',d:'完成轉職',c:()=>!!S.adv,rw:{items:{stone:3}}},
   {id:'boss5',n:'五燈守護者',d:'討伐所有地區首領',c:()=>[0,1,2,3,4].every(i=>S.cleared[i]),rw:{gold:5000}},
-  {id:'nm1',n:'惡夢行者',d:'擊敗一隻惡夢首領',c:()=>S.st.nmboss>=1,rw:{items:{gem_r:1}}},
+  {id:'nm1',n:'惡夢行者',d:'擊敗一隻惡夢首領',c:()=>S.st.nmboss>=1,rw:{items:{stone:3}}},
   {id:'nm10',n:'夜不能寐',d:'擊敗 10 隻惡夢首領',c:()=>S.st.nmboss>=10,rw:{items:{gem_y:1,stone:5}}},
   {id:'enh10',n:'鍛造狂',d:'擁有 +10 以上的裝備',c:()=>S.gear.some(g=>g.p>=10),rw:{items:{stone:5}}},
   {id:'enh15',n:'傳說工匠',d:'擁有 +15 的裝備',c:()=>S.gear.some(g=>g.p>=15),rw:{gold:20000}},
@@ -1925,7 +1925,7 @@ const ACH=[
   {id:'t30',n:'雲上之人',d:'無盡之塔到達第 30 層',c:()=>S.tower.best>=30,rw:{items:{gem_y:1,stone:5}}},
   {id:'t50',n:'塔頂的風',d:'無盡之塔到達第 50 層',c:()=>S.tower.best>=50,rw:{gold:50000}},
   {id:'craft10',n:'巧手',d:'合成 10 次',c:()=>S.st.craft>=10,rw:{items:{dust:20}}},
-  {id:'rich',n:'晨星鎮首富',d:'持有 50000 G',c:()=>S.gold>=50000,rw:{items:{gem_r:1}}}];
+  {id:'rich',n:'晨星鎮首富',d:'持有 50000 G',c:()=>S.gold>=50000,rw:{items:{stone:3}}}];
 function checkAch(){if(!S||!S.ach)return;for(const a of ACH){if(S.ach[a.id])continue;let ok=false;try{ok=a.c()}catch(e){}
   if(ok){S.ach[a.id]=1;toast(`🏆 成就達成「${a.n}」：${give(a.rw)}`);sys(`${S.name} 達成了成就「${a.n}」`)}}}
 const title=()=>S.title&&S.ach&&S.ach[S.title]?(ACH.find(a=>a.id===S.title)||{}).n:'';
@@ -1936,8 +1936,7 @@ function vAch(){dexInit();const got=ACH.filter(a=>S.ach[a.id]).length;
 const RECIPE=[
   {out:'pot2',n:1,need:{pot:3,m_gel:1},g:20},{out:'eth2',n:1,need:{eth:3,m_ice:1},g:30},
   {out:'stone',n:1,need:{dust:12,m_ore:1},g:100},
-  {out:'gem_r',n:1,need:{dust:20,m_fang:2},g:300},{out:'gem_b',n:1,need:{dust:20,m_ice:2},g:300},{out:'gem_g',n:1,need:{dust:20,m_gel:3},g:300},
-  {out:'gem_y',n:1,need:{dust:25,m_dark:1},g:500},{out:'gem_w',n:1,need:{dust:25,m_ore:2},g:500}];
+];
 const canCraft=r=>S.gold>=r.g&&Object.entries(r.need).every(([k,v])=>(S.items[k]||0)>=v);
 function vCraft(){return{t:'合成工坊',b:npcSay('npc_bald','巴爾德','材料拿來，我幫你湊成好東西。手續費照收。')+`<div class="list">${RECIPE.map((r,i)=>`<div class="item"><span class="ico c${ITEMS[r.out].gem?3:1}">${icon('item_'+r.out,ic(ITEMS[r.out].gem?'mat':'potion'))}</span><span class="grow"><b>${ITEMS[r.out].n}</b><span class="sub">${Object.entries(r.need).map(([k,v])=>`${ITEMS[k].n} ${S.items[k]||0}/${v}`).join('・')}・${r.g} G</span></span><button class="btn sm ${canCraft(r)?'pri':''}" data-a="craft" data-v="${i}" ${canCraft(r)?'':'disabled'}>合成</button></div>`).join('')}</div><p class="sub">星塵來自分解裝備，魔物素材在各地掉落。</p>`}}
 
@@ -1986,6 +1985,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'7.2',d:'2026-11-19',t:'寶石改為首領限定',b:'鑲嵌寶石改為只有首領會掉落：主線首領必掉 1 顆、惡夢首領有機會 2 顆、無盡之塔首領 30%。合成、分解、異變種、惡夢小怪不再產出寶石。已持有與已鑲嵌的寶石全部回收，每顆補償 120 G。'},
   {v:'7.1',d:'2026-11-19',t:'掛機時也能冒險',b:'背景掛機期間可以照常出發冒險、挑戰無盡之塔、開全自動，掛機收益會繼續累積，不用再先結束掛機。'},
   {v:'7.0',d:'2026-11-19',t:'裂甲擊破甲、新站姿立繪',b:'劍士的「裂甲擊」現在會劈開護甲，無視物理抗性（史萊姆、幽靈這類不怕刀砍的魔物，改用裂甲擊就能打出正常傷害，命中時跳出「裂甲！」）。角色頁裝備欄的站姿立繪全部 12 職業男女到齊；劍士全套戰鬥圖換成新版。'},
   {v:'6.9',d:'2026-11-19',t:'魔物專屬裝備',b:'10 種新魔物各有一件史詩級專屬裝備，帶有獨特效果：毒沼凝晶戒、雷角疾靴、噬魂菇冠、幽影狼皮甲、熔岩蝠翼墜、水晶核心、暴雪狼牙鍊、雪暴精靈之冠、血誓戰靴、虛無幽魂斗篷。一般 4%、精英 12%、寶藏魔物 30%、徘徊強敵 50% 掉落；點魔物圖像可看牠掉什麼。'},
@@ -2260,7 +2260,7 @@ function spoil(){const m=B.m,L=B.L,bs=B.kind==='boss',el=B.kind==='elite',T=B.to
   {const tw=RUN.tower,gt=tw?Math.min(RUN.area,S.main.ch):RUN.area,hard=B.mut||B.nm,hd=B.hoard?1:0,n=(FA&&!bs&&!B.hoard&&Math.random()<.5)?0:hd+(bs?(Math.random()<(tw?.3:B.nm?.6:.4)?1:0)+(!tw&&B.nm&&Math.random()<.3?1:0):(B.mut?1:Math.random()<(el?.5:B.nm?.3:lk?.2:.12)*(tw?.6:1)?1:0));for(let i=0;i<n;i++){const g=rollGear(gt,bs?(tw?1:B.nm?3:2):hard?2:el?1:0,bs||hard?(tw?1.3:2):1,hard);if(i<hd||(B.mut&&!bs))minG(g);got.push(gearName(g))}if(tw&&RUN.area>S.main.ch&&Math.random()<.5){addItem('stone',1);got.push('強化石')}
     if(MDROP[B.id]&&Math.random()<(B.wander?.5:B.treasure?.3:B.kind==='elite'?.12:B.nm?.1:.04)*(FA?.5:1)){const u=addGear(MDROP[B.id],3);DROPS.push(u);got.push(gearName(u));sys(`${S.name} 取得魔物專屬裝備【${GEAR[u.id].n}】！`)}
     if(bs&&BOSSU[B.id]&&(!RUN.tower||S.cleared[AREAS.findIndex(a=>a.boss===B.id)])&&Math.random()<(RUN.tower?.03:B.nm?.2:.08)){const u=addGear(BOSSU[B.id],4);DROPS.push(u);got.push(gearName(u));sys(`${S.name} 取得首領專屬裝備【${GEAR[u.id].n}】！`)}
-    if(bs||(B.mut&&Math.random()<.5)||(B.nm&&Math.random()<.25)){const gm=pick(GEMS);addItem(gm,1);got.push(ITEMS[gm].n)}}
+    if(bs&&Math.random()<(RUN.tower?.3:1)){const n=1+(B.nm&&Math.random()<.5?1:0);for(let i=0;i<n;i++){const gm=pick(GEMS);addItem(gm,1);got.push(ITEMS[gm].n)}}}
   got.push(...liveDrop(bs));
   track('kill',B.id);S.st.kills++;if(S.dex)S.dex.m[B.id]=(S.dex.m[B.id]||0)+1;if(bs&&B.nm)S.st.nmboss=(S.st.nmboss||0)+1;
   if(bs&&!RUN.trial&&!RUN.tower){S.cleared[RUN.area]=1;track('boss',B.id);sys(`${S.name} 討伐了首領【${m.n}】！`)}}
