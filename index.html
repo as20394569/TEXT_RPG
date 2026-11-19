@@ -1343,6 +1343,7 @@ function mySkills(){return Object.keys(SK).filter(k=>(SK[k].c===S.cls||SK[k].c==
 function learn(quiet){for(const k of mySkills())if(!S.skl[k]){S.skl[k]=1;if(!quiet)toast(`習得技能【${SK[k].n}】`)}}
 function addItem(id,n){S.items[id]=(S.items[id]||0)+n;if(S.items[id]<=0)delete S.items[id]}
 function rollSubs(t,r){return Object.keys(SUBS).sort(()=>Math.random()-.5).slice(0,Math.min(5,r)).map(k=>({k,v:Math.max(1,Math.round(SUBS[k](t)*(.7+Math.random()*.6)))}))}
+function minG(g){if(!g||GEAR[g.id].uniq)return g;g.q=.85;const t=GEAR[g.id].t||0;for(const x of g.sub||[])if(SUBS[x.k])x.v=Math.max(1,Math.round(SUBS[x.k](t)*.7));if(g.sh){g.sh=0}return g}
 function rollQ(){const x=Math.random();return x<.03?+(1.3+Math.random()*.1).toFixed(2):+(0.85+Math.random()*.4).toFixed(2)}
 function addGear(id,r,set){const g={u:S.uid++,id,r,p:0,q:GEAR[id].uniq?1:rollQ(),sub:rollSubs(GEAR[id].t,r+(r>=2&&Math.random()<.2?1:0)),lock:false,sock:r>=4?[null,null]:r>=3?[null]:[]};if(r>=4&&!GEAR[id].uniq)g.sp=pick(Object.keys(SPEC));if(set!=null)g.set=set;S.gear.push(g);if(S.dex)S.dex.g[id]=1;return g}
 function rollRar(minR,bonus){const lu=1+Math.min(.5,(S?stats().A.LUK:0)*.004);const w=RW.map((x,i)=>i<minR?0:x*(i>=2?(bonus||1)*lu:1)),t=w.reduce((a,b)=>a+b);let r=Math.random()*t;for(let i=0;i<5;i++){if((r-=w[i])<0)return i}return 4}
@@ -1534,7 +1535,7 @@ const BBOX={gold:{n:'👑 金冠寶箱',d:'穩穩到手：大把金幣＋強化�
 function bossBoxHtml(v){if(v.box===2)return v.boxR||'';return `<div class="lbl">首領的寶物堆（只能帶走一箱）</div><div class="list">${Object.keys(BBOX).map(k=>`<button class="btn" style="text-align:left" data-a="bossBox" data-v="${k}"><b>${BBOX[k].n}</b><br><span class="sub">${BBOX[k].d}</span></button>`).join('')}</div>`}
 function bossBox(k){const v=RUN&&RUN.view;if(!v||v.box!==1||!BBOX[k])return;const L=v.boxL||S.lv,t=RUN.area;let x='';DROPS=[];
   if(k==='gold'){const g=Math.round((40+L*25)*(.9+Math.random()*.2));S.gold+=g;RUN.loot.gold+=g;addItem('stone',1);x=`箱裡塞滿了金幣：獲得 ${g} G、強化石×1。`}
-  else if(k==='blue'){const g=rollGear(t,Math.random()<.25?3:2,2);RUN.loot.items.push(gearName(g));x=`蒼紋在掌心亮起：獲得【${gearName(g)}】。`}
+  else if(k==='blue'){const g=minG(rollGear(t,Math.random()<.25?3:2,2));RUN.loot.items.push(gearName(g));x=`蒼紋在掌心亮起：獲得【${gearName(g)}】。`}
   else{if(Math.random()<.35){const g=rollGear(t,3,2,true);RUN.loot.items.push(gearName(g));x=`封印應聲碎裂——獲得【${gearName(g)}】！`}else{const g=10+L*5;S.gold+=g;RUN.loot.gold+=g;x=`鎖鏈落下，裡面只有灰塵和幾枚銅幣（${g} G）。下次運氣會更好。`}}
   v.box=2;v.boxR=`${dropFx()}<p class="sub" style="color:var(--exp)">${BBOX[k].n}：${x}</p>`;try{SFX.holy(0)}catch(e){}save();render()}
 function gatePrep(L){if(RUN.prep)return `<p class="sub" style="color:var(--exp)">已完成準備：${PREP[RUN.prep].n}</p>`;const g=prepCost(L),pot=S.items.pot||0;
@@ -1801,7 +1802,7 @@ function runNext(){const n=RUN.step+1;if(RUN.nodes[n]==='boss'&&!RUN.gate&&RUN.s
   else if(t==='merchant'){const u=12+a.base*6;RUN.view={type:'shop',items:[['pot',Math.round(ITEMS.pot.price*.7)],['pot2',Math.round(ITEMS.pot2.price*.7)],['eth',Math.round(ITEMS.eth.price*.7)],['box',u*12],['hunt',u*5]],bought:{}}}
   else if(t==='chest'&&tg==='rich'&&Math.random()<.3){toast('寶箱張開了大嘴——是寶箱怪！');startBattle(pick(a.mobs),'elite',0);if(B){B.hoard=1;B.gmul=2;B.name='寶箱怪・'+B.m.n;B.log.push('👑 寶箱怪！打倒牠，寶物就是你的')}}
   else if(t==='chest'){const g=Math.round((12+a.base*6)*(1.5+Math.random())*(tg==='rich'?2:1));S.gold+=g;RUN.loot.gold+=g;let x=`你在岩縫中發現一只小寶箱，獲得 ${g} G`;
-    if(Math.random()<.5){addItem('pot',1);x+='、治療藥水'}if(Math.random()<.15){addItem('stone',1);x+='、強化石'}if(tg==='rich'||Math.random()<.15){const gg=rollGear(RUN.area,tg==='rich'?2:1);x+='、'+gearName(gg);RUN.loot.items.push(gearName(gg))}RUN.view={type:'res',title:'發現寶箱',drop:dropFx(),text:x+'。'}}
+    if(Math.random()<.5){addItem('pot',1);x+='、治療藥水'}if(Math.random()<.15){addItem('stone',1);x+='、強化石'}if(tg==='rich'||Math.random()<.15){const gg=rollGear(RUN.area,tg==='rich'?2:1);if(tg==='rich')minG(gg);x+='、'+gearName(gg);RUN.loot.items.push(gearName(gg))}RUN.view={type:'res',title:'發現寶箱',drop:dropFx(),text:x+'。'}}
   else{const sp=tg==='spring';S.hp=Math.min(s.HP,S.hp+Math.round(s.HP*(sp?1:.35)));S.mp=Math.min(s.MP,S.mp+Math.round(s.MP*(sp?1:.35)));
     const al=S.party&&S.party!=='none'&&ALLY[S.party]&&ALLY[S.party].open()?S.party:null,talk=al==='luna'?pick(['露娜望著營火：「媽媽做這盞燈的時候，說是為了讓人在霧裡找得到路。」','露娜把烤好的麵包分你一半：「別逞強。累了要說。」','露娜看著北方：「等霧散了，我想帶{你|妳}去看我們村子的麥田。」']):al==='gale'?pick(['蓋爾默默擦著那把短劍，劍柄上的名字被摸得發亮。','蓋爾：「騎士團守夜，第一個睡著的人要請全隊喝酒。……你別睡。」','蓋爾把披風丟給你：「山上的夜很冷。」']):'';
     RUN.view={type:'res',title:sp?'靈泉':'營火休息',text:sp?'清澈的泉水泛著微光。喝下一口，全身的疲憊一掃而空——HP 與 MP 全部回復！':'你找到一處安全的營地稍作休息，回復了 35% 的 HP 與 MP。'+campTalk()+(talk?`<br><span class="sub">${talk}</span>`:'')}}
@@ -1813,7 +1814,7 @@ function evPick(i){const v=RUN.view,o=v.ev.o[i];
   const tm=setInterval(()=>{const el=$('#die');if(el)el.textContent=R(1,20);
     if(++n>=10){clearInterval(tm);if(!RUN||RUN.view!==v)return;const out=ok?o.ok:o.ng;v.phase='done';v.r={d,mod,dc,ok,a:o.a};v.text=you(out.t);v.gain=applyOut(out,ok&&d===20,v.fate);evTwist(v,ok,d);if(ok)track('check');save();render()}},70)}
 function evTwist(v,ok,d){const T=['atk','def','luck'],N={atk:'劍之紋',def:'盾之紋',luck:'星之紋'};
-  if(d===20){const x=rollGear(RUN.area,2);v.gain.push('大成功獎勵：'+gearName(x));RUN.loot.items.push(gearName(x))}
+  if(d===20){const x=minG(rollGear(RUN.area,2));v.gain.push('大成功獎勵：'+gearName(x));RUN.loot.items.push(gearName(x))}
   if(ok&&!RUN.bless&&Math.random()<(v.fate?.5:.25)){RUN.bless=pick(T);v.gain.push(`✨ 旅途祝福：${N[RUN.bless]}（本趟生效）`);v.text+='<br><span class="sub">離開時，你感覺有股溫暖的力量跟著你。</span>'}
   if(!ok&&Math.random()<(v.fate?.55:.3)){v.amb=1;v.text+='<br><b style="color:var(--hp)">動靜驚動了附近的魔物，牠們朝你衝過來了！</b>'}}
 function applyOut(o,crit,fate){const unit=12+AREAS[RUN.area].base*6,s=stats(),g=[],m=(crit?2:1)*(fate?2:1);
@@ -2254,7 +2255,7 @@ function spoil(){const m=B.m,L=B.L,bs=B.kind==='boss',el=B.kind==='elite',T=B.to
   if(Math.random()<.12){addItem('pot',1);got.push('治療藥水')}
   if(bs||Math.random()<.06){addItem('stone',bs?2:1);got.push(bs?'強化石×2':'強化石')}
   const first=bs&&!S.cleared[RUN.area];
-  {const tw=RUN.tower,gt=tw?Math.min(RUN.area,S.main.ch):RUN.area,hard=B.mut||B.nm,n=(FA&&!bs&&!B.hoard&&Math.random()<.5)?0:(B.hoard?1:0)+(bs?(tw?1:B.nm?3:2):(B.mut?1:Math.random()<(el?.5:B.nm?.3:lk?.2:.12)*(tw?.6:1)?1:0));for(let i=0;i<n;i++){const g=rollGear(gt,bs?(tw?1:first&&!i?3:B.nm?3:2):hard?2:el?1:0,bs||hard?(tw?1.3:2):1,hard);got.push(gearName(g))}if(tw&&RUN.area>S.main.ch&&Math.random()<.5){addItem('stone',1);got.push('強化石')}
+  {const tw=RUN.tower,gt=tw?Math.min(RUN.area,S.main.ch):RUN.area,hard=B.mut||B.nm,hd=B.hoard?1:0,n=(FA&&!bs&&!B.hoard&&Math.random()<.5)?0:hd+(bs?(Math.random()<(tw?.3:B.nm?.6:.4)?1:0)+(!tw&&B.nm&&Math.random()<.3?1:0):(B.mut?1:Math.random()<(el?.5:B.nm?.3:lk?.2:.12)*(tw?.6:1)?1:0));for(let i=0;i<n;i++){const g=rollGear(gt,bs?(tw?1:B.nm?3:2):hard?2:el?1:0,bs||hard?(tw?1.3:2):1,hard);if(i<hd||(B.mut&&!bs))minG(g);got.push(gearName(g))}if(tw&&RUN.area>S.main.ch&&Math.random()<.5){addItem('stone',1);got.push('強化石')}
     if(MDROP[B.id]&&Math.random()<(B.wander?.5:B.treasure?.3:B.kind==='elite'?.12:B.nm?.1:.04)*(FA?.5:1)){const u=addGear(MDROP[B.id],3);DROPS.push(u);got.push(gearName(u));sys(`${S.name} 取得魔物專屬裝備【${GEAR[u.id].n}】！`)}
     if(bs&&BOSSU[B.id]&&(!RUN.tower||S.cleared[AREAS.findIndex(a=>a.boss===B.id)])&&Math.random()<(RUN.tower?.03:B.nm?.2:.08)){const u=addGear(BOSSU[B.id],4);DROPS.push(u);got.push(gearName(u));sys(`${S.name} 取得首領專屬裝備【${GEAR[u.id].n}】！`)}
     if(bs||(B.mut&&Math.random()<.5)||(B.nm&&Math.random()<.25)){const gm=pick(GEMS);addItem(gm,1);got.push(ITEMS[gm].n)}}
