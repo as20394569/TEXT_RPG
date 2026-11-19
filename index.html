@@ -1514,7 +1514,7 @@ function idleCalc(){const I=S.idle;if(!I)return null;const a=AREAS[I.area],ms=Ma
   return{a,ms,h,eff,kills,exp:Math.round(kills*(10+L*6)*.4),gold:Math.round(kills*(6+L*4)*.45),gear:Math.min(15,Math.floor(kills*.025)),stone:Math.floor(kills*.02),pot:Math.floor(kills*.01)}}
 const hms=ms=>{const t=Math.floor(ms/1000);return `${String(Math.floor(t/3600)).padStart(2,'0')}:${String(Math.floor(t%3600/60)).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`};
 function vIdle(){if(S.idle){const c=idleCalc();return `<div class="panel idlep on"><div class="row"><h3 class="grow">⏳ 掛機中・${c.a.n}</h3><span class="tag ${c.eff>=1?'ok':c.eff<.6?'red':''}">效率 ${Math.round(c.eff*100)}%</span></div>
-  <div class="idle-t" id="idleT">${hms(c.ms)}</div><div class="idle-g" id="idleG">${idleLine(c)}</div><p class="sub">最多累積 12 小時。關掉遊戲也會繼續計算，隨時可以結束領取。</p><button class="btn pri big" data-a="idleEnd">結束掛機・結算</button></div>`}
+  <div class="idle-t" id="idleT">${hms(c.ms)}</div><div class="idle-g" id="idleG">${idleLine(c)}</div><p class="sub">最多累積 12 小時。關掉遊戲也會繼續計算，隨時可以結束領取。掛機期間一樣可以出發冒險、挑戰高塔或開全自動。</p><button class="btn pri big" data-a="idleEnd">結束掛機・結算</button></div>`}
   const opts=AREAS.map((a,i)=>S.main.ch>=i?`<button class="btn sm ${i===IDLESEL?'on':''}" data-a="idleSel" data-v="${i}">${a.n}</button>`:'').join('');
   return `<div class="panel idlep"><div class="row"><h3 class="grow">⏳ 背景掛機</h3><span class="sub">離線也會累積</span></div><p class="sub">選一張地圖讓角色自動打怪，經驗、金幣、裝備會隨時間累積。等級越高於地圖，效率越好。</p><div class="chips">${opts}</div><button class="btn pri big" data-a="idleStart">在「${AREAS[IDLESEL].n}」開始掛機</button></div>`}
 const idleLine=c=>`擊倒 <b>${c.kills}</b>　經驗 <b>${c.exp}</b>　金幣 <b>${c.gold}</b>　裝備 <b>${c.gear}</b> 件`;
@@ -1986,6 +1986,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'7.1',d:'2026-11-19',t:'掛機時也能冒險',b:'背景掛機期間可以照常出發冒險、挑戰無盡之塔、開全自動，掛機收益會繼續累積，不用再先結束掛機。'},
   {v:'7.0',d:'2026-11-19',t:'裂甲擊破甲、新站姿立繪',b:'劍士的「裂甲擊」現在會劈開護甲，無視物理抗性（史萊姆、幽靈這類不怕刀砍的魔物，改用裂甲擊就能打出正常傷害，命中時跳出「裂甲！」）。角色頁裝備欄的站姿立繪全部 12 職業男女到齊；劍士全套戰鬥圖換成新版。'},
   {v:'6.9',d:'2026-11-19',t:'魔物專屬裝備',b:'10 種新魔物各有一件史詩級專屬裝備，帶有獨特效果：毒沼凝晶戒、雷角疾靴、噬魂菇冠、幽影狼皮甲、熔岩蝠翼墜、水晶核心、暴雪狼牙鍊、雪暴精靈之冠、血誓戰靴、虛無幽魂斗篷。一般 4%、精英 12%、寶藏魔物 30%、徘徊強敵 50% 掉落；點魔物圖像可看牠掉什麼。'},
   {v:'6.8',d:'2026-11-19',t:'新魔物與稀有遭遇',b:'每張地圖新增 2 種魔物（毒沼史萊姆、雷角野兔、噬魂紫菇、幽影狼、熔岩蝙蝠、水晶魔像、暴雪狼、雪暴精靈、血誓騎士、虛無幽魂），各有不同技能與弱點。冒險中可能遇到閃閃發亮的「寶藏魔物」（3 回合內打倒才拿得到大量金幣與裝備）和危險的「徘徊強敵」（強大但掉落豐厚）。'},
@@ -2881,9 +2882,9 @@ const ACT={
   bcNews(){ACT.bcClose();openM('news')},
   bcReload(){try{navigator.serviceWorker&&navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.update()))}catch(e){}setTimeout(()=>location.reload(),300)},
   bagSlot(v){BAGTAB='gear';BAGF=v;ACT.tab('bag')},
-  idleStart(){if(RUN||B){toast('冒險中不能掛機');return}if(FA)faStop();S.idle={area:IDLESEL,start:Date.now()};save();toast(`開始在 ${AREAS[IDLESEL].n} 掛機`);render()},
+  idleStart(){S.idle={area:IDLESEL,start:Date.now()};save();toast(`開始在 ${AREAS[IDLESEL].n} 掛機`);render()},
   idleEnd(){if(!S.idle)return;const c=idleCalc();if(c.ms<60e3&&!confirm('掛機不到 1 分鐘，幾乎沒有收穫，確定結束？'))return;idleSettle();render()},
-  startRun(v){if(S.idle){toast('掛機中，先結束掛機再出發');return}if(S.hp<=1){toast('HP 太低，先到旅店休息');return}startRun(+v)},
+  startRun(v){if(S.hp<=1){toast('HP 太低，先到旅店休息');return}startRun(+v)},
   trial(){if(S.adv||S.trial||S.lv<TRIAL.lv)return;if(S.hp<=1){toast('HP 太低，先到旅店休息');return}const sh=SHADOW[S.cls];MOBS.shadow.ty=sh[0];MOBS.shadow.sk=sh[1];
     closeM();TAB='adv';RUN={area:Math.min(4,Math.max(0,S.main.ch)),trial:true,nm:false,step:0,nodes:['boss'],loot:{gold:0,exp:0,items:[]},view:{type:'start'}};startBattle('shadow','boss');render()},
   startNm(v){if(S.hp<=1){toast('HP 太低，先到旅店休息');return}startRun(+v,true)},
@@ -2975,7 +2976,7 @@ function faTick(){faDraw();if(!FA||!S||FA.busy)return;
   const s=stats();if(S.hp<s.HP*.7||S.mp<s.MP*.5){const c=S.lv*4;if(S.gold<c){faStop('金幣不足以休息，全自動停止');return}ACT.rest();return}
   if(FA.tower){faStop('高塔挑戰結束');return}
   TAB='adv';startRun(FA.area,FA.nm)}
-ACT.fullAuto=()=>{if(FA){faStop('全自動已關閉');return}if(S.idle){toast('掛機中，先結束掛機');return}
+ACT.fullAuto=()=>{if(FA){faStop('全自動已關閉');return}
   if(RUN)FA={area:RUN.area,nm:!!RUN.nm,tower:!!RUN.tower};
   else{let i=0;AREAS.forEach((a,k)=>{if(S.main.ch>=k&&a.base<=S.lv+2)i=k});FA={area:i,nm:false,tower:false}}
   toast('全自動開啟：隨機選路，自動戰鬥');faDraw();faTick()};
