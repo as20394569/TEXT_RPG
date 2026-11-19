@@ -1598,10 +1598,17 @@ function vChar(){const s=stats(),sc=setCounts();
 function vBag(){
   const tabs=`<div class="tabs">${[['gear','裝備'],['use','道具'],['mat','素材']].map(([k,n])=>`<button class="${BAGTAB===k?'on':''}" data-a="bagTab" data-v="${k}">${n}</button>`).join('')}</div>`;
   let body='';
-  if(BAGTAB==='gear'){const eqd=Object.values(S.eq),F={all:null,weapon:['weapon'],armor:['head','body','feet'],acc:['ring','neck']}[BAGF];
-    const gs=S.gear.filter(g=>!F||F.includes(GEAR[g.id].slot)).sort((a,b)=>(eqd.includes(b.u)-eqd.includes(a.u))||gearPower(b)-gearPower(a));
+  if(BAGTAB==='gear'){const eqd=Object.values(S.eq),F={all:null,weapon:['weapon'],armor:['head','body','feet'],acc:['ring','neck'],head:['head'],body:['body'],feet:['feet'],ring:['ring'],neck:['neck']}[BAGF];
+    const BF=S.bagf||(S.bagf={r:0,sort:'pow',set:0,up:0,sp:0});
+    const SORT={pow:(a,b)=>gearPower(b)-gearPower(a),rar:(a,b)=>b.r-a.r||gearPower(b)-gearPower(a),new:(a,b)=>b.u-a.u,lv:(a,b)=>GEAR[b.id].lv-GEAR[a.id].lv||b.r-a.r};
+    const gs0=S.gear.filter(g=>(!F||F.includes(GEAR[g.id].slot))&&g.r>=BF.r&&(!BF.set||g.set!=null)&&(!BF.sp||g.sp||g.sh||GEAR[g.id].uniq));
     const up=g=>{const b=GEAR[g.id];if(eqd.includes(g.u)||(b.cls&&b.cls!==S.cls)||S.lv<b.lv)return false;const c=gearBy(S.eq[b.slot]);return !c||gearPower(g)>gearPower(c)};
-    body=`<div class="fchips">${[['all','全部'],['weapon','武器'],['armor','防具'],['acc','飾品']].map(([k,n])=>`<button class="${BAGF===k?'on':''}" data-a="gearF" data-v="${k}">${n}</button>`).join('')}<span class="sub" style="margin-left:auto">共 ${S.gear.length} 件</span></div>
+    const gs=gs0.filter(g=>!BF.up||up(g)).sort((a,b)=>(eqd.includes(b.u)-eqd.includes(a.u))||SORT[BF.sort](a,b));
+    const ch=(act,v,on,n)=>`<button class="${on?'on':''}" data-a="${act}" data-v="${v}">${n}</button>`;
+    body=`<div class="fchips">${[['all','全部'],['weapon','武器'],['head','頭盔'],['body','鎧甲'],['feet','鞋子'],['ring','戒指'],['neck','項鍊']].map(([k,n])=>ch('gearF',k,BAGF===k,n)).join('')}</div>
+      <div class="fchips">${[[0,'全稀有度'],[1,'精良+'],[2,'稀有+'],[3,'史詩+'],[4,'傳說']].map(([k,n])=>ch('gearR',k,BF.r===k,n)).join('')}</div>
+      <div class="fchips">${ch('gearT','up',BF.up,'▲只看更強')}${ch('gearT','set',BF.set,'套裝')}${ch('gearT','sp',BF.sp,'詞綴・閃耀・專屬')}<span class="sub" style="margin-left:auto">${gs.length}/${S.gear.length} 件</span></div>
+      <div class="fchips">排序：${[['pow','戰力'],['rar','稀有度'],['lv','等級'],['new','最新']].map(([k,n])=>ch('gearS',k,BF.sort===k,n)).join('')}</div>
       <div class="row" style="gap:6px;flex-wrap:wrap"><button class="btn sm" data-a="disAll">一鍵分解普通、精良</button><button class="btn sm" data-a="sellAll" data-v="1">一鍵販售普通、精良</button><button class="btn sm" data-a="sellAll" data-v="2">一鍵販售稀有以下</button></div><p class="sub" style="margin:2px 0">鎖定與裝備中的不會被處理。</p>`+
       (gs.map(g=>`<button class="item" data-a="openGear" data-v="${g.u}"><span class="ico c${g.r}">${gIco(g.id)}</span><span class="grow"><b class="c${g.r}">${gearName(g)}</b><span class="sub">${gearDesc(g)}</span></span>${eqd.includes(g.u)?'<span class="tag ok">裝備中</span>':up(g)?'<span class="tag upt">▲ 更強</span>':''}${g.lock?'<span class="tag off">鎖</span>':''}</button>`).join('')||'<p class="empty">沒有裝備</p>')}
   else{const ks=Object.keys(S.items).filter(k=>BAGTAB==='use'?ITEMS[k].use:ITEMS[k].mat);
@@ -1946,6 +1953,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'6.3',d:'2026-11-19',t:'背包篩選升級',b:'裝備頁可以依部位（武器、頭盔、鎧甲、鞋子、戒指、項鍊）、稀有度（精良以上～傳說）篩選，並可只看「▲更強」、套裝、詞綴／閃耀／專屬裝備；排序可選戰力、稀有度、等級、最新。設定會記住。'},
   {v:'6.2',d:'2026-11-19',t:'懸賞情報＋新圖',b:'旅行商人開始兜售「懸賞情報」：花一筆金幣，下一場普通戰鬥就會遇上守寶的精英魔物——更危險，但打倒必掉裝備、金幣 ×2。要不要賭，看你的血量和藥水。神射手、聖殿騎士（女）、主教共 5 張動作圖重畫上線（弓弦、握杖修正、拿掉多餘特效）。'},
   {v:'6.1',d:'2026-11-19',t:'一鍵販售',b:'背包裝備頁新增「一鍵販售普通、精良」與「一鍵販售稀有以下」，鎖定、裝備中、閃耀與帶稀有詞綴的裝備都會保留。'},
   {v:'6.0',d:'2026-11-19',t:'裝備改名',b:'首領專屬裝備改成符合新首領名稱：戰酋黑晶護符、腐根樹王之心、鑽岩巨顎、凜冬龍鱗鎧、黑霧魔冠。其他不合理的名稱也一併修正：雷霆權杖、霜風長弓、天使聖錘、雷步戰靴、祭司短槌、祈禱戰錘、黑狼牙項鍊、岩晶墜飾、岩晶戒、橡木指環、黑狼之牙。已持有的裝備會自動顯示新名稱。'},
@@ -2828,7 +2836,7 @@ const ACT={
   bcClose(){const el=$('#bcast');if(el)el.hidden=true;if(S){S.seenVer=NEWS[0].v;save()}},
   bcNews(){ACT.bcClose();openM('news')},
   bcReload(){try{navigator.serviceWorker&&navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.update()))}catch(e){}setTimeout(()=>location.reload(),300)},
-  bagSlot(v){BAGTAB='gear';BAGF=v==='weapon'?'weapon':['ring','neck'].includes(v)?'acc':'armor';ACT.tab('bag')},
+  bagSlot(v){BAGTAB='gear';BAGF=v;ACT.tab('bag')},
   idleStart(){if(RUN||B){toast('冒險中不能掛機');return}if(FA)faStop();S.idle={area:IDLESEL,start:Date.now()};save();toast(`開始在 ${AREAS[IDLESEL].n} 掛機`);render()},
   idleEnd(){if(!S.idle)return;const c=idleCalc();if(c.ms<60e3&&!confirm('掛機不到 1 分鐘，幾乎沒有收穫，確定結束？'))return;idleSettle();render()},
   startRun(v){if(S.idle){toast('掛機中，先結束掛機再出發');return}if(S.hp<=1){toast('HP 太低，先到旅店休息');return}startRun(+v)},
@@ -2843,7 +2851,7 @@ const ACT={
   addPt(v){if(S.pts<1)return;S.pts--;S.attr[v]++;save();render()},
   respec(){const c=respecCost();if(S.gold<c){toast(`需要 ${c} G`);return}const fr=freePts();if(fr<1){toast('目前沒有分配過的點數');return}if(!confirmTap('respec'))return;S.gold-=c;S.attr=baseAttr();S.pts+=fr;clamp();toast(`已重置，退回 ${fr} 點`);save();render()},
   skUp(v){if(S.sp<1||(S.skl[v]||1)>=5)return;S.sp--;S.skl[v]=(S.skl[v]||1)+1;toast(`【${SK[v].n}】提升到 Lv.${S.skl[v]}`);save();render()},
-  bagTab(v){BAGTAB=v;render()},gearF(v){BAGF=v;render()},qTab(v){QTAB=v;render()},
+  bagTab(v){BAGTAB=v;render()},gearF(v){BAGF=v;render()},gearR(v){S.bagf.r=+v;render()},gearS(v){S.bagf.sort=v;render()},gearT(v){S.bagf[v]=S.bagf[v]?0:1;render()},qTab(v){QTAB=v;render()},
   useItem(k){if(RUN&&B)return;const it=ITEMS[k],s=stats();if(it.use.hp&&S.hp>=s.HP||it.use.mp&&S.mp>=s.MP){toast('已經是滿的');return}
     addItem(k,-1);if(it.use.hp)S.hp=Math.min(s.HP,S.hp+it.use.hp);if(it.use.mp)S.mp=Math.min(s.MP,S.mp+it.use.mp);save();render()},
   sellItem(k){addItem(k,-1);S.gold+=sellPrice(k);save();render()},
