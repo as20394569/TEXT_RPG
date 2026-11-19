@@ -1561,8 +1561,8 @@ function vBattle(){const s=stats(),fx=B.fx||{},intro=B.intro,a=AREAS[RUN.area];B
   else if(B.menu==='item'){const us=Object.keys(S.items).filter(k=>ITEMS[k].use);cmd=`<div class="cmd col">${us.map(k=>`<button class="btn" data-a="bItem" data-v="${k}">${ITEMS[k].n} ×${S.items[k]}<small>${ITEMS[k].d}</small></button>`).join('')||'<p class="empty">沒有可用的道具</p>'}<button class="btn" data-a="bMenu" data-v="main">返回</button></div>`}
   else cmd=`<div class="cmd"><button class="btn pri" data-a="bAtk">攻擊</button><button class="btn" data-a="bMenu" data-v="skill">技能</button><button class="btn" data-a="bMenu" data-v="item">道具</button><button class="btn" data-a="bGuard">防禦</button><button class="btn" data-a="bFlee">逃跑</button><button class="btn ${B.auto?'pri':''}" data-a="bAuto">自動 ${B.auto?'開':'關'}</button></div>`;
   return `<div class="battle"><div class="stage bg-${a.id} ${fx.quake&&!fk?'quake':''} ${(sk&&sk[0]==='meteor')||(fk&&fk.fx==='slam')?'quakel':''}" ${sk?`style="--c:${sk[1]}"`:fk?`style="--c:${fk.c}"`:''}><img class="bg" src="art/battle_${a.id}.webp" alt="" ${MISS.has('battle_'+a.id)?'hidden':''} onerror="reTry(this,'battle_${a.id}')||(MISS.add('battle_${a.id}'),this.remove())">
-   <div class="ibox foe-i" data-a="openM" data-v="foe" role="button" aria-label="查看怪物情報"><div class="nm"><span>${B.name}${B.kind==='boss'?' <span class="tag red">首領</span>':''}</span><span>${(B.adds||[]).length?'<span class="tag">目標</span> ':''}Lv${B.L} ⓘ</span></div>${bbar(B.hp,B.max,fp)}<div class="num">${B.hp}/${B.max}</div>${intentHtml()}${st?`<div class="chips">${st}</div>`:''}${(B.adds||[]).length?`<div class="addrow">${B.adds.map((f,i)=>`<button class="addf" data-a="bTarget" data-v="${i}" aria-label="切換目標：${f.name}">${art('mob_'+f.id,f.m.n,'r11')}<span>${f.m.n}${bbar(f.hp,f.max)}</span></button>`).join('')}</div><div class="sub" style="font-size:10px">點小頭像切換目標</div>`:''}</div>
-   <div class="spr foe ${B.m.fly?'fly':''} ${B.kind==='boss'?'boss':''} ${foeC}"><div class="plat"></div>${B.id==='shadow'?art(HK(),'試煉之影','r34','shadowimg'):art(fKey0,B.m.n,'r11','','mob_'+B.id)}${foeFx}</div>
+   <div class="ibox foe-i" data-a="openM" data-v="foe" role="button" aria-label="查看怪物情報"><div class="nm"><span>${B.name}${B.kind==='boss'?' <span class="tag red">首領</span>':''}</span><span>${(B.adds||[]).length?'<span class="tag">目標</span> ':''}Lv${B.L} ⓘ</span></div>${bbar(B.hp,B.max,fp)}${intentHtml()}${(B.adds||[]).length?`<div class="addrow">${B.adds.map((f,i)=>`<button class="addf" data-a="bTarget" data-v="${i}" aria-label="切換目標：${f.name}">${art('mob_'+f.id,f.m.n,'r11')}<span>${f.m.n}${bbar(f.hp,f.max)}</span></button>`).join('')}</div><div class="sub" style="font-size:10px">點小頭像切換目標</div>`:''}</div>
+   <div class="spr foe ${B.m.fly?'fly':''} ${B.kind==='boss'?'boss':''} ${foeC}" data-a="openM" data-v="foe" role="button" aria-label="查看怪物情報" style="cursor:pointer"><div class="plat"></div>${B.id==='shadow'?art(HK(),'試煉之影','r34','shadowimg'):art(fKey0,B.m.n,'r11','','mob_'+B.id)}${foeFx}</div>
    <div class="spr me ${meC}"><div class="plat"></div>${art(mKey0,clsName(),'r34','',HK())}${meFx}</div>
    <div class="ibox me-i"><div class="nm"><span>${esc(S.name)}</span><span>Lv${S.lv}</span></div>${bbar(S.hp,s.HP,pp)}<div class="num">HP ${S.hp}/${s.HP}</div>${bbar(S.mp,s.MP,null,'m')}<div class="num">MP ${S.mp}/${s.MP}</div>${me?`<div class="chips">${me}</div>`:''}</div>
    ${AL?`<div class="ally ${AL.hp<=0?'down':''} ${aD||aH?'aact':''} ${aHit?'ahit':''}">${art('ally_'+AL.id,AL.n,'r34')}${bbar(AL.hp,AL.max)}${aD?`<span class="dmg sm">⚔${aD}</span>`:aH?`<span class="dmg heal sm">+${aH}</span>`:aHit?`<span class="dmg sm">-${aHit}</span>`:''}</div>`:''}
@@ -1628,7 +1628,7 @@ function vQuest(){
 
 /* ============ 浮層 ============ */
 function openM(k,v){MODAL={k,v};if(k==='news'&&S){S.seenVer=NEWS[0].v;const el=$('#bcast');if(el&&BCAST&&!BCAST.newv)el.hidden=true}drawModal()}
-function closeM(){MODAL=null;drawModal()}
+function closeM(){const wasFoe=MODAL&&MODAL.k==='foe';MODAL=null;drawModal();if(wasFoe&&B&&B.auto&&!B.busy)setTimeout(autoAct,400)}
 function drawModal(){setTimeout(()=>{try{tipCheck()}catch(e){}},60);const el=$('#modal');if(!MODAL){el.hidden=true;el.innerHTML='';return}
   const r=MV[MODAL.k](MODAL.v),old=el.querySelector('.sheet-b'),keep=old?old.scrollTop:0;el.hidden=false;
   el.innerHTML=`<div class="sheet"><div class="sheet-h"><h3>${r.t}</h3><button class="x" data-a="closeM" aria-label="關閉">×</button></div><div class="sheet-b">${r.b}</div></div>`;
@@ -1651,7 +1651,8 @@ const MV={
     return{t:'掛機結算',b:`<div class="idle-res"><div class="ir-h">${c.a.n}・${hms(c.ms)}</div><div class="stat-g"><div><span>擊倒</span><b>${c.kills}</b></div><div><span>經驗</span><b>+${c.exp}</b></div><div><span>金幣</span><b>+${c.gold}</b></div><div><span>強化石</span><b>+${c.stone}</b></div><div><span>藥水</span><b>+${c.pot}</b></div><div><span>等級</span><b>${R.lv0===R.lv1?'Lv.'+R.lv1:`${R.lv0}→<span class="up">${R.lv1}</span>`}</b></div></div>
       <h3>取得裝備 ${R.gs.length} 件</h3><div class="list">${best.map(g=>`<button class="item" data-a="openGear" data-v="${g.u}"><span class="ico c${g.r}">${gIco(g.id)}</span><span class="grow"><b class="c${g.r}">${gearName(g)}</b><span class="sub">${RAR[g.r].n}・${SLOTS[GEAR[g.id].slot]}</span></span></button>`).join('')||'<p class="empty">這次沒有撿到裝備</p>'}${R.gs.length>12?`<p class="sub">其餘 ${R.gs.length-12} 件已放進背包</p>`:''}</div></div><button class="btn pri big" data-a="closeM">收下</button>`}},
   foe(){if(!B)return{t:'怪物情報',b:'<p class="empty">目前不在戰鬥中</p>'};const m=B.m,e=MEL[B.id];
-    return{t:B.name,b:`<div class="panel"><div class="row"><div style="width:96px;flex:none">${art('mob_'+B.id,m.n,'r11')}</div><div class="grow"><b>Lv${B.L}　${MTY[m.ty].n}${B.kind==='boss'?'　<span class="tag red">首領</span>':''}</b>
+    const C=B.cls,stc=[...B.aff.map(x=>`<span class="chip" style="color:#fff;background:#7a2a4a">${AFF[x].n}</span>`),...B.fb.map(b=>`<span class="chip">${b.n} ${b.t}</span>`),B.fshield>0?`<span class="chip">盾 ${B.fshield}</span>`:'',C.brk?`<span class="chip" style="color:var(--hp)">破綻 ${C.brk}</span>`:'',C.marks.length?`<span class="chip" style="color:var(--r3)">印記 ${C.marks.join('')}</span>`:'',`<span class="chip">韌性 ${B.tough||0}・爆抗 ${Math.round((B.cdr||0)*100)}%</span>`,...Object.keys(B.st).filter(k=>B.st[k]>0).map(k=>`<span class="chip">${FOE[k]} ${B.st[k]}</span>`)].join('');
+    return{t:B.name+'（暫停中）',b:`<p class="sub" style="text-align:center">戰鬥已暫停，關閉後繼續</p><div class="chips">${stc}</div><div class="panel"><div class="row"><div style="width:96px;flex:none">${art('mob_'+B.id,m.n,'r11')}</div><div class="grow"><b>Lv${B.L}　${MTY[m.ty].n}${B.kind==='boss'?'　<span class="tag red">首領</span>':''}</b>
       <div class="sub">HP ${B.hp}/${B.max}　攻擊 ${B.atk}　魔力 ${B.mag}　防禦 ${B.def}　魔抗 ${B.mres??B.def}</div>
       ${e?`<div class="sub">弱點：<b style="color:#ffd34a">${ELN[e[0]]}</b>（傷害 ×1.5）${e[1]?`　抗性：<b>${ELN[e[1]]}</b>（傷害 ×0.6）`:''}</div>`:''}
       <div class="sub">${{tank:'防禦高，用魔法打比較痛',caster:'魔抗高，用物理打比較痛',brute:'防禦略高於魔抗',swift:'迴避高，物理魔法都可以'}[m.ty]}</div></div></div></div>
@@ -1942,6 +1943,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'5.8',d:'2026-11-19',t:'戰鬥畫面精簡',b:'怪物資訊框只留名稱、血條與下回合預告；點怪物圖像或資訊框就能看完整數值（攻防、弱點、韌性爆抗、狀態），查看時戰鬥自動暫停，關閉後繼續。'},
   {v:'5.7',d:'2026-11-19',t:'怪物韌性與爆抗',b:'爆擊率與爆擊傷害維持原本的強度；改為讓怪物擁有「韌性」（降低你的爆擊率）與「爆抗」（降低爆擊額外傷害），越後面的地圖、精英、首領、惡夢與強敵化的魔物越高，戰鬥畫面可以看到數值。'},
   {v:'5.6',d:'2026-11-19',t:'排行榜可看玩家裝備',b:'點排行榜上的玩家，就能看到他的角色立繪、六個部位的裝備與能力值。修正重新整理後會被當成新玩家的問題。'},
   {v:'5.5',d:'2026-11-19',t:'線上戰力排行榜',b:'排行榜開始連線真實玩家：遊戲每 5 分鐘自動上傳你的戰力，榜上標「玩家」的都是真人。伺服器暫時連不上時，會自動改回顯示 NPC 與好友戰力碼。'},
@@ -2115,7 +2117,7 @@ function intentHtml(){if(!B||B.hp<=0)return '';if(B.chg)return `<div class="inte
   if(!k)return `<div class="intent">⚔ 下回合：普通攻擊</div>`;if(!k.pow){if(k.heal){const pc=Math.round(k.heal*Math.pow(.6,B.hN||0)*(B.st.burn>0?.5:1)*100);return `<div class="intent buff">✚ 下回合：【${k.n}】　<small>回復約 ${pc}%${B.st.burn>0?'（灼燒壓制中）':'・灼燒可減半'}</small></div>`}return `<div class="intent buff">✚ 下回合：【${k.n}】</div>`}return isDng(k)?`<div class="intent dng">⚠ 下回合：【${k.n}】　<small>防禦減傷 75%＋破綻</small></div>`:`<div class="intent sk">✦ 下回合：【${k.n}】</div>`}
 function foePick(){const ks=(B.m.sk||[]).filter(id=>{const k=SKM[id];return !(k.heal&&(B.hp>B.max*.55||B.hcd>B.turn))&&!(k.self&&B.fb.some(b=>b.id===id))&&!(k.shield&&B.fshield>0)});
   const ch=B.kind==='boss'?.5:(B.kind==='elite'||B.mut||B.nm)?.42:.3;return ks.length&&Math.random()<ch?pick(ks):null}
-function foeTurn(){if(!B)return;B.tk=0;const s=stats();
+function foeTurn(){if(!B)return;if(MODAL&&MODAL.k==='foe'){setTimeout(foeTurn,300);return}B.tk=0;const s=stats();
   for(const k of ['poison','burn'])if(B.st[k]>0){const d=Math.max(1,Math.round(B.max*(k==='poison'?.05:.04)*(B.kind==='boss'?.5:1)));B.hp=Math.max(0,B.hp-d);B.st[k]--;blog(`${B.name} 受到${FOE[k]}傷害 ${d}`)}
   addsDot();
   if(B.hp<=0){render();setTimeout(win,1200);return}
@@ -2171,7 +2173,7 @@ function foeTurn(){if(!B)return;B.tk=0;const s=stats();
   B.busy=!!wait;render();setTimeout(()=>{if(!B)return;B.busy=false;if(B.auto)autoAct()},wait+(B.auto?(FA?2000+wait:1000):0))}
 function myPd(k,s){s=s||stats();const x=k&&SK[k],st=x?x.dmg.s:'ATK',v=st==='BOTH'?s.ATK+s.MAG:s[st]||s.ATK,df=st==='MAG'?(B.mres??B.def):B.def;
   return clsDm()*v*(x?x.dmg.p*(x.dmg.h||1)*(1+.15*((S.skl[k]||1)-1)):S.cls==='swordsman'?1.15:1)*100/(100+df)*(1+buffSum('atk'))*(B.opening?1.5:1)*elMul(B.id,x?SKEL2[k]||'phys':'phys')*.85}
-function autoAct(){if(!B||B.busy||!B.auto)return;const s=stats(),sk=mySkills().filter(k=>S.mp>=mpCost(k)&&!(SK[k].ult&&B.ultUsed));
+function autoAct(){if(!B||B.busy||!B.auto)return;if(MODAL&&MODAL.k==='foe')return;const s=stats(),sk=mySkills().filter(k=>S.mp>=mpCost(k)&&!(SK[k].ult&&B.ultUsed));
   if(S.hp<s.HP*.4){const h=sk.find(k=>SK[k].heal);if(h)return pAct('skill',h);const p=['pot2','pot'].find(k=>S.items[k]);if(p)return pAct('item',p)}
   const C=B.cls,est=k=>{const x=SK[k];return elMul(B.id,SKEL2[k]||'phys')*x.dmg.p*(x.dmg.h||1)*(1+(x.fin||0)*C.brk+(x.det||0)*C.marks.length+(x.aim||0)*C.focus+(x.faithAmp?Math.min(1,C.faith/100):0)+(x.faithSpend?C.faith/100*1.2:0))+dotV(x)};
   const dotV=x=>{if(!x.foe)return 0;const base=Math.max(1,x.dmg.s==='MAG'?s.MAG:s.ATK);let v=0;
@@ -2878,7 +2880,7 @@ function faLoop(){try{faTick()}catch(e){}setTimeout(faLoop,faDelay())}
 function faTick(){faDraw();if(!FA||!S||FA.busy)return;
   if(faClick('#tip [data-a="tipOk"]'))return;
   const st=$('#story');if(st&&!st.hidden){(document.querySelector('#story [data-a="storyPick"]')&&faDice('#story [data-a="storyPick"]','劇情抉擇'))||faClick('#story [data-a="storyNext"]');return}
-  if(MODAL){if(B&&MODAL.k!=='msg'){closeM();return}faClick('#modal .sheet-b [data-a="closeM"].pri')||faClick('#modal .x');return}
+  if(MODAL){if(B&&MODAL.k==='foe')return;if(B&&MODAL.k!=='msg'){closeM();return}faClick('#modal .sheet-b [data-a="closeM"].pri')||faClick('#modal .x');return}
   if(B){if(!B.auto){B.auto=AUTO=true;render();setTimeout(autoAct,200)}return}
   if(RUN){if(TAB!=='adv'){TAB='adv';render();return}
     if(RUN.view&&RUN.view.type==='gate'){const L=MOBS[AREAS[RUN.area].boss].lv+(RUN.nm?10:0),st=stats();if((!S.cleared[RUN.area]&&S.lv<L-1)||(S.hp<st.HP*.35&&!S.items.pot&&!S.items.pot2)){toast('全自動：首領太強，先撤退練功');faClick('#main [data-a="retreat"]')}else{if(!RUN.prep){if(S.hp<st.HP*.6)doPrep('camp');else if(S.gold>=prepCost(L)*3)doPrep('scout');else if((S.items.pot||0)>2)doPrep('trap')}faClick('#main [data-a="bossGo"]')}return}
