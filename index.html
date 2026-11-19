@@ -1393,7 +1393,7 @@ function vTown(){
 /* ============ 背景掛機 ============ */
 const IDLE_CAP=12*3600e3;
 function idleCalc(){const I=S.idle;if(!I)return null;const a=AREAS[I.area],ms=Math.min(IDLE_CAP,Date.now()-I.start),h=ms/3600e3,L=a.base+1,eff=Math.max(.25,Math.min(1.2,.7+(S.lv-a.base)*.08)),kills=Math.floor(h*90*eff);
-  return{a,ms,h,eff,kills,exp:Math.round(kills*(10+L*6)*.8),gold:Math.round(kills*(6+L*4)*.9),gear:Math.min(25,Math.floor(kills*.05)),stone:Math.floor(kills*.04),pot:Math.floor(kills*.02)}}
+  return{a,ms,h,eff,kills,exp:Math.round(kills*(10+L*6)*.4),gold:Math.round(kills*(6+L*4)*.45),gear:Math.min(15,Math.floor(kills*.025)),stone:Math.floor(kills*.02),pot:Math.floor(kills*.01)}}
 const hms=ms=>{const t=Math.floor(ms/1000);return `${String(Math.floor(t/3600)).padStart(2,'0')}:${String(Math.floor(t%3600/60)).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`};
 function vIdle(){if(S.idle){const c=idleCalc();return `<div class="panel idlep on"><div class="row"><h3 class="grow">⏳ 掛機中・${c.a.n}</h3><span class="tag ${c.eff>=1?'ok':c.eff<.6?'red':''}">效率 ${Math.round(c.eff*100)}%</span></div>
   <div class="idle-t" id="idleT">${hms(c.ms)}</div><div class="idle-g" id="idleG">${idleLine(c)}</div><p class="sub">最多累積 12 小時。關掉遊戲也會繼續計算，隨時可以結束領取。</p><button class="btn pri big" data-a="idleEnd">結束掛機・結算</button></div>`}
@@ -1847,6 +1847,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'5.1',d:'2026-11-19',t:'自動收益調整',b:'全自動冒險與背景掛機的收益減半：全自動戰鬥的經驗、金幣與一般裝備掉落減半（首領與寶物守衛不受影響）；背景掛機的經驗、金幣、裝備與素材減半。手動遊玩收益不變。'},
   {v:'5.0',d:'2026-11-19',t:'更新廣播',b:'遊戲更新後，畫面上方會出現跑馬燈系統廣播告訴你更新了什麼；遊玩中有新版本推出時，也會即時廣播並提供「立即更新」按鈕。'},
   {v:'4.9',d:'2026-11-19',t:'背景掛機＋人物裝備欄',b:'冒險頁新增「背景掛機」：選地圖後角色自動打怪，關掉遊戲也會累積（最多 12 小時），隨時結束並看結算畫面。角色與背包的裝備改成人物立繪兩側分部位擺放，點部位就能看裝備詳細資料。'},
   {v:'4.8',d:'2026-11-19',t:'斬殺線：看準時機收尾',b:'敵人血量掉到一擊就能收掉時，敵方狀態列會亮出「🗡 普攻可斬殺」或「🗡 技能可斬殺」，提醒你這回合不必再架刀防守，直接出手結束戰鬥（多隻敵人同時在場時不顯示）。自動戰鬥也學會了：能一擊收掉就用最省 MP 的招式直接斬殺；對方攻擊不痛、下回合就能打完時，不再浪費回合招架。實測全自動劍士防守回合從約 45% 降到約 27%。'},
@@ -2083,12 +2084,12 @@ function autoAct(){if(!B||B.busy||!B.auto)return;const s=stats(),sk=mySkills().f
   const d=sk.filter(k=>SK[k].dmg).sort((a,b)=>est(b)-est(a))[0];
   d?pAct('skill',d):pAct('atk')}
 function spoil(){const m=B.m,L=B.L,bs=B.kind==='boss',el=B.kind==='elite',T=B.tot||(B.tot={exp:0,gold:0,got:[],names:[]}),got=T.got;
-  const xm=(B.mut?3:1)*(B.nm?2.5:1),lk=RUN&&RUN.bless==='luck',exp=Math.round((B.xmul||1)*(10+L*6)*(bs?5:el?2:1)*xm*liveExp()*xpPen(L)),gold=Math.round((B.gmul||1)*(6+L*4)*(bs?6:el?2:1)*(.9+Math.random()*.3)*xm*(lk?1.3:1)*(1+Math.min(.4,stats().A.LUK*.004)));S.gold+=gold;T.exp+=exp;T.gold+=gold;T.names.push(B.name);
+  const xm=(B.mut?3:1)*(B.nm?2.5:1),lk=RUN&&RUN.bless==='luck',exp=Math.round((FA?.5:1)*(B.xmul||1)*(10+L*6)*(bs?5:el?2:1)*xm*liveExp()*xpPen(L)),gold=Math.round((FA?.5:1)*(B.gmul||1)*(6+L*4)*(bs?6:el?2:1)*(.9+Math.random()*.3)*xm*(lk?1.3:1)*(1+Math.min(.4,stats().A.LUK*.004)));S.gold+=gold;T.exp+=exp;T.gold+=gold;T.names.push(B.name);
   if(m.mat&&Math.random()<.6){addItem(m.mat,1);got.push(ITEMS[m.mat].n)}
   if(Math.random()<.12){addItem('pot',1);got.push('治療藥水')}
   if(bs||Math.random()<.06){addItem('stone',bs?2:1);got.push(bs?'強化石×2':'強化石')}
   const first=bs&&!S.cleared[RUN.area];
-  {const hard=B.mut||B.nm,n=(B.hoard?1:0)+(bs?(B.nm?3:2):(B.mut?1:Math.random()<(el?.5:B.nm?.3:lk?.2:.12)?1:0));for(let i=0;i<n;i++){const g=rollGear(RUN.area,bs?(first&&!i?3:B.nm?3:2):hard?2:el?1:0,bs||hard?2:1,hard);got.push(gearName(g))}
+  {const hard=B.mut||B.nm,n=(FA&&!bs&&!B.hoard&&Math.random()<.5)?0:(B.hoard?1:0)+(bs?(B.nm?3:2):(B.mut?1:Math.random()<(el?.5:B.nm?.3:lk?.2:.12)?1:0));for(let i=0;i<n;i++){const g=rollGear(RUN.area,bs?(first&&!i?3:B.nm?3:2):hard?2:el?1:0,bs||hard?2:1,hard);got.push(gearName(g))}
     if(bs&&BOSSU[B.id]&&Math.random()<(B.nm?.2:.08)){const u=addGear(BOSSU[B.id],4);DROPS.push(u);got.push(gearName(u));sys(`${S.name} 取得首領專屬裝備【${GEAR[u.id].n}】！`)}
     if(bs||(B.mut&&Math.random()<.5)||(B.nm&&Math.random()<.25)){const gm=pick(GEMS);addItem(gm,1);got.push(ITEMS[gm].n)}}
   got.push(...liveDrop(bs));
