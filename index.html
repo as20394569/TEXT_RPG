@@ -1928,6 +1928,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'5.4',d:'2026-11-19',t:'強敵化',b:'裝備太強、可以一招秒殺魔物時，魔物會「強敵化」：血量與攻擊依你的實力提升，同時給更多經驗與金幣。前期與正常裝備時不受影響。'},
   {v:'5.3',d:'2026-11-19',t:'露娜的職業：燈術士',b:'露娜有了自己的職業【燈術士】與技能：燈火彈、蒼焰、照路之光（治療）、守燈結界（看到敵人大招替你擋 40%）、霧散之光（削弱敵人）、奧義誓約之燈（每場一次）。技能隨章節與羈絆解鎖，角色頁可查看。戰鬥畫面中露娜站到主角身後、尺寸放大，出招時會喊招式名並有專屬特效。'},
   {v:'5.2',d:'2026-11-19',t:'人物會說話了＋好友戰力榜',b:'露娜、主角和鎮上的人更像真人：戰鬥中會即時對話（開戰、首領、爆擊、危急、完美防禦、勝利），營火時和露娜聊天、隨章節慢慢聊開她的過去，岔路前也會閒聊；鎮上 NPC 的招呼會依劇情進度、時間和你的狀態改變。排行榜可以用「戰力碼」加入真實好友一起比。'},
   {v:'5.1',d:'2026-11-19',t:'自動收益調整',b:'全自動冒險與背景掛機的收益減半：全自動戰鬥的經驗、金幣與一般裝備掉落減半（首領與寶物守衛不受影響）；背景掛機的經驗、金幣、裝備與素材減半。手動遊玩收益不變。'},
@@ -1999,6 +2000,11 @@ function mkFoe(id,kind){const m=MOBS[id],bs=!!m.boss,el=kind==='elite',nm=!!(RUN
   const pre=(nm?'惡夢・':'')+(mut?'蝕化・':'')+(el?'精英':'');
   const bdm=bs?(RUN&&!RUN.tower?1.7+RUN.area*.15:1.4):1;
   return{id,m,L,a:st.a,kind:bs?'boss':kind,mut,nm,aff,name:pre+m.n,hp:st.HP,max:st.HP,atk:Math.round(st.ATK*bdm),mag:Math.round(st.MAG*bdm),def:st.DEF,mres:st.MRES,crit:st.CRIT,eva:st.EVA,fb:[],fshield:0,st:{},rage:0,bm}}
+/* 依玩家實力調整魔物：只在玩家太強、會一擊秒殺時才加強，前期不受影響 */
+function hitEst(def){const s=stats(),P=Math.max(s.ATK,s.MAG),best=Math.max(1,...mySkills().map(k=>{const d=SK[k].dmg;return d?d.p*(d.h||1):0})),cr=1+Math.min(1,s.CRIT/100)*Math.max(0,s.CD/100-1);return clsDm()*P*best*100/(100+def)*cr}
+function scaleFoe(){if(!B||B.id==='shadow')return;const mul=B.kind==='boss'?7:B.kind==='elite'?3.5:2.2,fl=hitEst(B.def)*mul,m=fl/B.max;
+  if(m>1.25&&S.lv>=8){const k=Math.min(6,m);B.hp=B.max=Math.round(B.max*k);const a=Math.min(1.5,1+(k-1)*.3);B.atk=Math.round(B.atk*a);B.mag=Math.round(B.mag*a);B.xmul=(B.xmul||1)*Math.min(1.6,1+(k-1)*.25);B.gmul=(B.gmul||1)*Math.min(1.6,1+(k-1)*.25);B.str=1;B.log.push('⚡ 牠感受到你的力量，變得更加凶猛！（強敵化：經驗與金幣增加）')}
+  (B.adds||[]).forEach(f=>{const fl2=hitEst(f.def)*1.6;if(S.lv>=8&&fl2>f.max*1.25){const k=Math.min(5,fl2/f.max);f.hp=f.max=Math.round(f.max*k);f.atk=Math.round(f.atk*Math.min(1.4,1+(k-1)*.25))}})}
 function startBattle(id,kind,nAdds){const F=mkFoe(id,kind),m=F.m,bs=F.kind==='boss';try{preload(['','_atk','_hurt','_low','_lose'].map(x=>'mob_'+id+x))}catch(e){}
   const pool=RUN?AREAS[RUN.area].mobs:[id],adds=[];for(let i=0;i<(nAdds||0);i++){const f=mkFoe(pick(pool),'');f.hp=f.max=Math.round(f.max*.75);adds.push(f)}
   preload([...['','_hurt','_low','_win','_lose','_atk','_skill','_cast'].map(x=>HK()+x),...(id==='shadow'?[]:['','_hurt','_low','_win','_lose'].map(x=>'mob_'+id+x)),...adds.map(f=>'mob_'+f.id),'battle_'+(AREAS.find(a=>a.boss===id||a.mobs.includes(id))||{id:'plain'}).id]);
@@ -2006,6 +2012,7 @@ function startBattle(id,kind,nAdds){const F=mkFoe(id,kind),m=F.m,bs=F.kind==='bo
   B=Object.assign({cls:{brk:0,marks:[],focus:0,faith:0},counter:0,endure:0,adds,ally,taunt:0,
      buffs:[],shield:0,pst:{poison:0,regen:0,burn:0,bleed:0,weak:0,stun:0},guard:false,
      log:[bs?`首領 ${m.n} 擋住了去路！`:F.mut?`被蝕霧侵蝕的 ${m.n} 出現了！氣息完全不同……`:adds.length?`${F.name} 帶著 ${adds.map(f=>f.name).join('、')} 出現了！`:`${F.name} 出現了！`,...(F.aff.length?[`詞綴：${F.aff.map(x=>AFF[x].n).join('、')}`]:[]),...(F.bm?[id==='zenos'?'蓋爾從側面牽制住了澤諾斯！':'你事先摸清了牠的弱點！']:[]),...(ally?[`${ally.n}與你並肩作戰`]:[])],busy:false,auto:AUTO,menu:'main',turn:1,fx:null,intro:true,shown:0,last:0},F);SFX.enc();
+  scaleFoe();
   B.next=foePick();setTimeout(()=>{try{talk(B&&B.kind==='boss'?'boss':'start')}catch(e){}},1100);
   if(RUN&&RUN.bless){const BL={atk:{n:'戰意祝福',atk:.15},def:{n:'守護祝福',def:.35},luck:{n:'幸運祝福'}}[RUN.bless];B.buffs.push(Object.assign({id:'bless',t:999},BL))}
   if(bs&&RUN&&RUN.prep&&!RUN.prepUsed){RUN.prepUsed=1;const p=RUN.prep;
