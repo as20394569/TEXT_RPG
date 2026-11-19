@@ -340,6 +340,7 @@ input,textarea{font:inherit;width:100%;padding:8px 10px;border:2px solid var(--l
 .intent{margin-top:3px;font-size:11px;font-weight:700;padding:2px 6px;border-radius:6px;background:rgba(255,255,255,.75);color:#5a4a3a;display:inline-block}.intent small{font-weight:400;font-size:10px}.intent.sk{background:#fff3c8;color:#8a5a00}.intent.buff{background:#e0f2ff;color:#1a5a8a}.intent.dng{background:#ffe0e0;color:#c0262d;animation:intentP 1s infinite}@keyframes intentP{50%{background:#ffb8b8}}
 .fork .btn .risk{display:block;font-size:10px;color:#8a6a4a;margin-top:2px}.fork .btn.tagged{border-color:#e0a020;box-shadow:0 0 0 2px rgba(240,180,40,.35) inset}.fork .btn .ftag{display:block;margin-top:4px;font-size:12px;font-weight:700;color:#b06a00}.fork .btn .ftag small{display:block;font-weight:400;font-size:10px;color:#8a6a4a}.tag.ok{background:#dff5d8;color:#2a7a2a}.tag.bad{background:#ffe0e0;color:#c0262d}
 .newsbar{display:flex;align-items:center;gap:8px;width:100%;margin:10px 0 6px;padding:10px 12px;border-radius:12px;border:2px solid #e0a020;background:linear-gradient(90deg,#fff6d8,#fffdf4);box-shadow:0 2px 0 rgba(0,0,0,.12);text-align:left;font:inherit;color:inherit;cursor:pointer}.newsbar .nb-tag{flex:none;background:#c0262d;color:#fff;font-weight:800;font-size:12px;padding:3px 8px;border-radius:8px;letter-spacing:1px}.newsbar .nb-t{min-width:0}.newsbar .nb-t b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.newsbar .nb-t small{color:#8a6a4a;font-size:11px}.newsbar .nb-arr{font-size:22px;color:#b06a00;flex:none}.qrow{margin-bottom:6px}
+.fadice{position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;background:rgba(10,20,40,.45);pointer-events:none}.fd-box{background:#fffaf0;border:3px solid #e0a020;border-radius:16px;padding:14px 22px;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.35)}.fd-t{font-weight:800;color:#8a5a00;margin-bottom:6px}.fd-die{width:72px;height:72px;margin:4px auto 8px;border-radius:14px;background:linear-gradient(145deg,#ffffff,#e8e0d0);border:2px solid #b08a50;display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:900;color:#c0262d;transition:transform .08s}.fd-die.done{animation:fdpop .4s}.fd-r{font-size:13px;color:#5a4a3a}@keyframes fdpop{0%{transform:scale(1.5)}60%{transform:scale(.9)}100%{transform:scale(1)}}.fd-pick{outline:3px solid #e0a020;outline-offset:2px}
 </style>
 </head>
 <body>
@@ -1817,6 +1818,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'4.7',d:'2026-11-19',t:'全自動放慢＋命運骰子',b:'全自動速度放慢一半，方便觀戰；遇到岔路、事件或劇情抉擇時再放慢，並擲出命運骰子：1～3 走左邊、4～6 走右邊。'},
   {v:'4.6',d:'2026-11-19',t:'特效定位修正',b:'技能特效改成依照角色與魔物的實際位置與大小定位：魔法陣、冰晶、火柱、震地、藤蔓都落在腳下影子處，命中光效在身體中心，首領、飛行魔物、小型魔物都對得準。'},
   {v:'4.5',d:'2026-11-19',t:'魔物改名',b:'魔物與首領名稱重新整理，更有魄力也更合理：尖角野兔、哥布林掠奪者、哥布林戰酋、瘴氣毒菇、黑森狼、枯藤樹精、腐根樹王、吸血蝙蝠、亡骸礦工、礦脈岩魔像、鑽岩巨蟲、霜牙雪狼、凍晶妖精、冰川巨人、凜冬霜龍、墮落黑騎士、怨靈魅影、煉獄魔衛、黑霧大術士澤諾斯。'},
   {v:'4.4',d:'2026-11-19',t:'首領寶物堆：三箱選一',b:'討伐首領後，戰利品旁會多出一堆寶物，但只能帶走一箱：👑 金冠寶箱（穩拿大把金幣＋強化石）、💠 蒼紋寶箱（一件稀有以上裝備，25% 升為史詩）、⛓️ 封印寶箱（35% 史詩裝備、可能帶職業套裝，否則落空）。缺錢、缺裝還是賭一把，由你決定。另外法師前期火力稍微收斂：點火 160%→140%、霜針 160%→150%（原本每場不到 3 回合，比其他職業快一倍）。'},
@@ -2026,7 +2028,7 @@ function foeTurn(){if(!B)return;B.tk=0;const s=stats();
   if(S.hp<=0){render();setTimeout(lose,1100);return}
   const wait=fx.fsk?1300:0;
   if(B.pst.stun>0){B.pst.stun--;blog(`你${HST.stun}了，這回合無法行動`);B.busy=true;render();setTimeout(foeTurn,wait+1100);return}
-  B.busy=!!wait;render();setTimeout(()=>{if(!B)return;B.busy=false;if(B.auto)autoAct()},wait+(B.auto?1000:0))}
+  B.busy=!!wait;render();setTimeout(()=>{if(!B)return;B.busy=false;if(B.auto)autoAct()},wait+(B.auto?(FA?2000+wait:1000):0))}
 function autoAct(){if(!B||B.busy||!B.auto)return;const s=stats(),sk=mySkills().filter(k=>S.mp>=mpCost(k)&&!(SK[k].ult&&B.ultUsed));
   if(S.hp<s.HP*.4){const h=sk.find(k=>SK[k].heal);if(h)return pAct('skill',h);const p=['pot2','pot'].find(k=>S.items[k]);if(p)return pAct('item',p)}
   const C=B.cls,est=k=>{const x=SK[k];return elMul(B.id,SKEL2[k]||'phys')*x.dmg.p*(x.dmg.h||1)*(1+(x.fin||0)*C.brk+(x.det||0)*C.marks.length+(x.aim||0)*C.focus+(x.faithAmp?Math.min(1,C.faith/100):0)+(x.faithSpend?C.faith/100*1.2:0))+dotV(x)};
@@ -2701,14 +2703,20 @@ let FA=null;
 function faDraw(){const b=$('#fab');if(!b)return;b.hidden=!S||(!RUN&&!FA);b.className=FA?'on':'';b.textContent=FA?'全自動 開':'全自動 關'}
 function faStop(m){if(!FA)return;FA=null;if(B){B.auto=AUTO=false}faDraw();if(m)toast(m)}
 function faClick(sel,rnd){const bs=[...document.querySelectorAll(sel)].filter(b=>!b.disabled&&b.offsetParent!==null);if(!bs.length)return false;(rnd?pick(bs):bs[0]).click();return true}
-function faTick(){faDraw();if(!FA||!S)return;
+function faDice(sel,lab){const bs=[...document.querySelectorAll(sel)].filter(b=>!b.disabled&&b.offsetParent!==null);if(bs.length<2)return faClick(sel);FA.busy=1;
+  const ov=document.createElement('div');ov.className='fadice';ov.innerHTML=`<div class="fd-box"><div class="fd-t">${lab||'命運的骰子'}</div><div class="fd-die">1</div><div class="fd-r">1～3 走左邊　4～6 走右邊</div></div>`;document.body.appendChild(ov);
+  const die=ov.querySelector('.fd-die'),d=1+Math.floor(Math.random()*6);let n=0;const iv=setInterval(()=>{die.textContent=1+Math.floor(Math.random()*6);die.style.transform=`rotate(${Math.random()*40-20}deg) scale(${.9+Math.random()*.2})`;if(++n>=16){clearInterval(iv);die.textContent=d;die.style.transform='';die.classList.add('done');const right=d>3,b=right?bs[bs.length-1]:bs[0];ov.querySelector('.fd-r').innerHTML=`擲出 <b>${d}</b>　→　<b>${right?'右邊':'左邊'}</b>`;b.classList.add('fd-pick');
+    setTimeout(()=>{ov.remove();if(FA){FA.busy=0;b.click()}},1300)}},90);return true}
+function faDelay(){if(!FA)return 1100;if(MODAL||($('#story')&&!$('#story').hidden))return 4400;if(RUN&&RUN.view&&['fork','event','shrine','gate'].includes(RUN.view.type))return 4400;return 2200}
+function faLoop(){try{faTick()}catch(e){}setTimeout(faLoop,faDelay())}
+function faTick(){faDraw();if(!FA||!S||FA.busy)return;
   if(faClick('#tip [data-a="tipOk"]'))return;
-  const st=$('#story');if(st&&!st.hidden){faClick('#story [data-a="storyPick"]',1)||faClick('#story [data-a="storyNext"]');return}
+  const st=$('#story');if(st&&!st.hidden){(document.querySelector('#story [data-a="storyPick"]')&&faDice('#story [data-a="storyPick"]','劇情抉擇'))||faClick('#story [data-a="storyNext"]');return}
   if(MODAL){if(B&&MODAL.k!=='msg'){closeM();return}faClick('#modal .sheet-b [data-a="closeM"].pri')||faClick('#modal .x');return}
   if(B){if(!B.auto){B.auto=AUTO=true;render();setTimeout(autoAct,200)}return}
   if(RUN){if(TAB!=='adv'){TAB='adv';render();return}
     if(RUN.view&&RUN.view.type==='gate'){const L=MOBS[AREAS[RUN.area].boss].lv+(RUN.nm?10:0),st=stats();if((!S.cleared[RUN.area]&&S.lv<L-1)||(S.hp<st.HP*.35&&!S.items.pot&&!S.items.pot2)){toast('全自動：首領太強，先撤退練功');faClick('#main [data-a="retreat"]')}else{if(!RUN.prep){if(S.hp<st.HP*.6)doPrep('camp');else if(S.gold>=prepCost(L)*3)doPrep('scout');else if((S.items.pot||0)>2)doPrep('trap')}faClick('#main [data-a="bossGo"]')}return}
-    faClick('#main [data-a="bossBox"]',1)||faClick('#main [data-a="pickFork"]',1)||faClick('#main [data-a="evPick"]',1)||faClick('#main [data-a="evFight"]')||faClick('#main [data-a="bless"]',1)||faClick('#main [data-a="runNext"]')||faClick('#main [data-a="towerNext"]')||faClick('#main [data-a="finish"]');return}
+    faClick('#main [data-a="bossBox"]',1)||(document.querySelector('#main [data-a="pickFork"]')&&faDice('#main [data-a="pickFork"]','岔路'))||(document.querySelector('#main [data-a="evPick"]')&&faDice('#main [data-a="evPick"]','事件抉擇'))||faClick('#main [data-a="evFight"]')||faClick('#main [data-a="bless"]',1)||faClick('#main [data-a="runNext"]')||faClick('#main [data-a="towerNext"]')||faClick('#main [data-a="finish"]');return}
   /* 回城：休息後重新出發同一地區 */
   const s=stats();if(S.hp<s.HP*.7||S.mp<s.MP*.5){const c=S.lv*4;if(S.gold<c){faStop('金幣不足以休息，全自動停止');return}ACT.rest();return}
   if(FA.tower){faStop('高塔挑戰結束');return}
@@ -2718,7 +2726,7 @@ ACT.fullAuto=()=>{if(FA){faStop('全自動已關閉');return}
   else{let i=0;AREAS.forEach((a,k)=>{if(S.main.ch>=k&&a.base<=S.lv+2)i=k});FA={area:i,nm:false,tower:false}}
   toast('全自動開啟：隨機選路，自動戰鬥');faDraw();faTick()};
 {const _lose=lose;lose=function(){_lose.apply(this,arguments);faStop('戰敗，全自動停止')}}
-setInterval(faTick,1100);
+faLoop();
 document.body.classList.toggle('noshake',SHAKEOFF);
 
 /* ============ 啟動 ============ */
