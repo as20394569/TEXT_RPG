@@ -1495,7 +1495,7 @@ function afterBattle(){const el=$('#msg');if(!el||!B)return;if(B.pfx){const f=B.
   window.TYPER=setInterval(()=>{n+=2;el.textContent=txt.slice(0,n);if(n>=txt.length)clearInterval(window.TYPER)},16)}
 
 function dollHtml(){const sl=k=>{const g=gearBy(S.eq[k]);return g?`<button class="dslot r${g.r}" data-a="openGear" data-v="${g.u}"><small>${SLOTS[k]}</small><span class="ico c${g.r}">${gIco(g.id)}</span><b class="c${g.r}">${gearName(g).replace(/^\+\d+\s*/,'')}</b>${g.p?`<span class="pl">+${g.p}</span>`:''}</button>`:`<button class="dslot empty" data-a="bagSlot" data-v="${k}"><small>${SLOTS[k]}</small><span class="ico c0">${SLOTCH[k]}</span><b>未裝備</b></button>`};
-  return `<div class="doll"><div class="dcol">${sl('head')}${sl('body')}${sl('feet')}</div><div class="dmid">${art(HK(),clsName()+'立繪','r34')}</div><div class="dcol">${sl('weapon')}${sl('neck')}${sl('ring')}</div></div>`}
+  return `<div class="doll"><div class="dcol">${sl('head')}${sl('body')}${sl('feet')}</div><div class="dmid">${art(hasArt(HK()+'_stand')?HK()+'_stand':HK(),clsName()+'立繪','r34')}</div><div class="dcol">${sl('weapon')}${sl('neck')}${sl('ring')}</div></div>`}
 function vChar(){const s=stats(),sc=setCounts();
   const setHtml=Object.keys(sc).map(i=>{const st=SETS[i],n=sc[i];return `<div class="gsec"><b>${st.n}套裝　${n}/4</b><span class="sub ${n>=2?'son':''}">2 件：${st.d2}</span><span class="sub ${n>=4?'son':''}">4 件：${st.d4}</span></div>`}).join('');
   const eq=dollHtml();
