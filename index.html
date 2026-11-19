@@ -1429,7 +1429,7 @@ const hpCls=(v,m)=>v/m>.5?'g':v/m>.2?'y':'r';
 function bbar(v,m,prev,c){const p=Math.max(0,Math.min(100,v/m*100));return `<div class="bbar ${c?'s':''}"><i class="${c||hpCls(v,m)}" style="width:${prev==null?p:prev}%" data-w="${p}"></i></div>`}
 function vBattle(){const s=stats(),fx=B.fx||{},intro=B.intro,a=AREAS[RUN.area];B.fx=null;B.intro=false;const AL=B.ally,aD=B.allyD,aH=B.allyH,aHit=B.allyHit;B.allyD=B.allyH=B.allyHit=0;
   const fp=B.fhp,pp=B.php;B.fhp=B.hp/B.max*100;B.php=S.hp/s.HP*100;
-  const C=B.cls,st=[...B.aff.map(x=>`<span class="chip" style="color:#fff;background:#7a2a4a">${AFF[x].n}</span>`),...B.fb.map(b=>`<span class="chip">${b.n} ${b.t}</span>`),B.fshield>0?`<span class="chip">盾 ${B.fshield}</span>`:'',C.brk?`<span class="chip" style="color:var(--hp)">破綻 ${C.brk}</span>`:'',C.marks.length?`<span class="chip" style="color:var(--r3)">印記 ${C.marks.join('')}</span>`:'',...Object.keys(B.st).filter(k=>B.st[k]>0).map(k=>`<span class="chip">${FOE[k]} ${B.st[k]}</span>`)].join('');
+  const C=B.cls,kl=B.hp>0&&!(B.adds||[]).some(f=>f.hp>0)&&(()=>{try{return myPd(null,s)>=B.hp?'普攻':mySkills().some(k=>SK[k].dmg&&S.mp>=mpCost(k)&&myPd(k,s)>=B.hp)?'技能':''}catch(e){return ''}})(),st=[kl?`<span class="chip" style="color:#fff;background:#b8452a" title="這一擊大概就能收掉，不必再防守">🗡 ${kl}可斬殺</span>`:'',...B.aff.map(x=>`<span class="chip" style="color:#fff;background:#7a2a4a">${AFF[x].n}</span>`),...B.fb.map(b=>`<span class="chip">${b.n} ${b.t}</span>`),B.fshield>0?`<span class="chip">盾 ${B.fshield}</span>`:'',C.brk?`<span class="chip" style="color:var(--hp)">破綻 ${C.brk}</span>`:'',C.marks.length?`<span class="chip" style="color:var(--r3)">印記 ${C.marks.join('')}</span>`:'',...Object.keys(B.st).filter(k=>B.st[k]>0).map(k=>`<span class="chip">${FOE[k]} ${B.st[k]}</span>`)].join('');
   const me=[C.focus?`<span class="chip" style="color:var(--exp)">專注 ${C.focus}</span>`:'',S.cls==='cleric'?`<span class="chip" style="color:var(--r4)">信仰 ${C.faith}</span>`:'',B.counter?'<span class="chip">招架反擊</span>':'',B.endure?'<span class="chip">鬥氣解放</span>':'',...B.buffs.map(b=>`<span class="chip">${b.n} ${b.t}</span>`),B.shield>0?`<span class="chip">護盾 ${B.shield}</span>`:'',...['poison','burn','bleed','weak','stun'].filter(h=>B.pst[h]>0).map(h=>`<span class="chip" style="color:var(--hp)">${HST[h]} ${B.pst[h]}</span>`),B.pst.regen>0?`<span class="chip">再生 ${B.pst.regen}</span>`:'',B.guard?'<span class="chip">防禦中</span>':''].join('');
   
   if(fx.by)B.pfx=fx;const mine=fx.by==='me',theirs=fx.by==='foe',atk=mine&&fx.d!=null;const sk=fx.skill?SKA[fx.skill]:null,fk=theirs&&fx.fsk?(SKM[fx.fsk]||{fx:'roar',c:'#ff4a4a'}):null;B.delayBar=!!(sk||fk);
@@ -1818,6 +1818,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'4.8',d:'2026-11-19',t:'斬殺線：看準時機收尾',b:'敵人血量掉到一擊就能收掉時，敵方狀態列會亮出「🗡 普攻可斬殺」或「🗡 技能可斬殺」，提醒你這回合不必再架刀防守，直接出手結束戰鬥（多隻敵人同時在場時不顯示）。自動戰鬥也學會了：能一擊收掉就用最省 MP 的招式直接斬殺；對方攻擊不痛、下回合就能打完時，不再浪費回合招架。實測全自動劍士防守回合從約 45% 降到約 27%。'},
   {v:'4.7',d:'2026-11-19',t:'全自動放慢＋命運骰子',b:'全自動速度放慢一半，方便觀戰；遇到岔路、事件或劇情抉擇時再放慢，並擲出命運骰子：1～3 走左邊、4～6 走右邊。'},
   {v:'4.6',d:'2026-11-19',t:'特效定位修正',b:'技能特效改成依照角色與魔物的實際位置與大小定位：魔法陣、冰晶、火柱、震地、藤蔓都落在腳下影子處，命中光效在身體中心，首領、飛行魔物、小型魔物都對得準。'},
   {v:'4.5',d:'2026-11-19',t:'魔物改名',b:'魔物與首領名稱重新整理，更有魄力也更合理：尖角野兔、哥布林掠奪者、哥布林戰酋、瘴氣毒菇、黑森狼、枯藤樹精、腐根樹王、吸血蝙蝠、亡骸礦工、礦脈岩魔像、鑽岩巨蟲、霜牙雪狼、凍晶妖精、冰川巨人、凜冬霜龍、墮落黑騎士、怨靈魅影、煉獄魔衛、黑霧大術士澤諾斯。'},
@@ -2029,16 +2030,23 @@ function foeTurn(){if(!B)return;B.tk=0;const s=stats();
   const wait=fx.fsk?1300:0;
   if(B.pst.stun>0){B.pst.stun--;blog(`你${HST.stun}了，這回合無法行動`);B.busy=true;render();setTimeout(foeTurn,wait+1100);return}
   B.busy=!!wait;render();setTimeout(()=>{if(!B)return;B.busy=false;if(B.auto)autoAct()},wait+(B.auto?(FA?2000+wait:1000):0))}
+function myPd(k,s){s=s||stats();const x=k&&SK[k],st=x?x.dmg.s:'ATK',v=st==='BOTH'?s.ATK+s.MAG:s[st]||s.ATK,df=st==='MAG'?(B.mres??B.def):B.def;
+  return clsDm()*v*(x?x.dmg.p*(x.dmg.h||1)*(1+.15*((S.skl[k]||1)-1)):S.cls==='swordsman'?1.15:1)*100/(100+df)*(1+buffSum('atk'))*(B.opening?1.5:1)*elMul(B.id,x?SKEL2[k]||'phys':'phys')*.85}
 function autoAct(){if(!B||B.busy||!B.auto)return;const s=stats(),sk=mySkills().filter(k=>S.mp>=mpCost(k)&&!(SK[k].ult&&B.ultUsed));
   if(S.hp<s.HP*.4){const h=sk.find(k=>SK[k].heal);if(h)return pAct('skill',h);const p=['pot2','pot'].find(k=>S.items[k]);if(p)return pAct('item',p)}
   const C=B.cls,est=k=>{const x=SK[k];return elMul(B.id,SKEL2[k]||'phys')*x.dmg.p*(x.dmg.h||1)*(1+(x.fin||0)*C.brk+(x.det||0)*C.marks.length+(x.aim||0)*C.focus+(x.faithAmp?Math.min(1,C.faith/100):0)+(x.faithSpend?C.faith/100*1.2:0))+dotV(x)};
   const dotV=x=>{if(!x.foe)return 0;const base=Math.max(1,x.dmg.s==='MAG'?s.MAG:s.ATK);let v=0;
     for(const [k,f] of [['poison',.05],['burn',.04]])if(x.foe[k]&&!(B.st[k]>0))v+=Math.min(B.hp*.6,B.max*f*(B.kind==='boss'?.5:1)*x.foe[k])/base;
     if(x.foe.weak&&!(B.st.weak>0)&&B.hp>s.ATK*3)v+=.35;if(x.foe.stun&&!(B.st.stun>0)&&B.hp>s.ATK*3)v+=.5;return v};
+  /* 斬殺判斷：這一擊就能收掉、或對方攻擊不痛且下回合就能收尾時，不再浪費回合招架 */
+  const solo=!(B.adds||[]).some(f=>f.hp>0),pd=k=>myPd(k,s),
+    killer=solo?[null,...sk.filter(k=>SK[k].dmg)].filter(k=>pd(k)>=B.hp).sort((a,b)=>(a?mpCost(a):0)-(b?mpCost(b):0))[0]:undefined;
+  if(killer!==undefined)return killer?pAct('skill',killer):pAct('atk');
+  const nk0=B.next&&SKM[B.next],inc=(nk0&&nk0.mag?B.mag:B.atk)*(nk0&&nk0.pow||1)*(nk0&&nk0.h||1)*100/(100+s.DEF),soft=solo&&!B.chg&&inc<S.hp*.15&&B.hp<=2.2*Math.max(pd(null),...sk.filter(k=>SK[k].dmg).map(pd));
   if(B.chg||(B.next&&isDng(SKM[B.next])))return pAct('guard');
   /* 看預告決定：對方下回合要出傷害招就先架刀；強敵開場先上增益 */
   const nk=B.next&&SKM[B.next],hit=nk?!!nk.pow:'next' in B;
-  if(!B.counter&&hit){const g=sk.find(k=>(SK[k].counter||(SK[k].shield&&!(B.shield>0)))&&!SK[k].dmg);if(g&&(nk||Math.random()<.35))return pAct('skill',g)}
+  if(!B.counter&&hit&&!soft){const g=sk.find(k=>(SK[k].counter||(SK[k].shield&&!(B.shield>0)))&&!SK[k].dmg);if(g&&(nk||Math.random()<.35))return pAct('skill',g)}
   if(B.kind==='boss'||B.kind==='elite'||B.hp>s.ATK*6){const bf=sk.find(k=>SK[k].buff&&!SK[k].dmg&&!B.buffs.some(b=>b.id===k)&&S.mp>=mpCost(k)+8);if(bf&&S.hp>s.HP*.5)return pAct('skill',bf)}
   if(nk&&nk.heal&&!(B.st.burn>0)){const f=sk.find(k=>SK[k].dmg&&SK[k].foe&&SK[k].foe.burn);if(f)return pAct('skill',f)}
   const d=sk.filter(k=>SK[k].dmg).sort((a,b)=>est(b)-est(a))[0];
