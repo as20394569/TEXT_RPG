@@ -1379,7 +1379,7 @@ async function rankUrl(){if(RANKURL)return RANKURL;try{const r=await fetch('rank
 async function rankSync(force){if(!S||!S.cls)return;if(!force&&Date.now()-RANKT<5*60e3)return;RANKT=Date.now();const u=await rankUrl();if(!u){RANKERR=1;return}
   if(!S.pid){S.pid=Math.random().toString(36).slice(2,10);save()}
   try{const ctl=new AbortController();setTimeout(()=>ctl.abort(),6000);
-    await fetch(u+'/api/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:S.pid,name:S.name,cls:clsName(),lv:S.lv,power:power()}),signal:ctl.signal});
+    await fetch(u+'/api/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:S.pid,name:S.name,cls:clsName(),lv:S.lv,power:power(),hk:HK(),eq:Object.keys(SLOTS).map(sl=>{const g=gearBy(S.eq[sl]);return g?[g.id,g.r,g.p||0,g.sh?1:0,g.set!=null?g.set:-1]:null}),st:(()=>{const s=stats();return[s.HP,s.MP,s.ATK,s.MAG,s.DEF,s.CRIT]})()}),signal:ctl.signal});
     const r=await fetch(u+'/api/top?n=50',{signal:ctl.signal});RANKTOP=await r.json();RANKERR=0;if(MODAL&&MODAL.k==='rank')drawModal()}catch(e){RANKERR=1;RANKURL=null}}
 setInterval(()=>rankSync(),60e3);setTimeout(()=>rankSync(true),8000);
 function myCode(){if(!S.pid){S.pid=Math.random().toString(36).slice(2,10);save()}const j=JSON.stringify({i:S.pid,n:S.name,c:clsName(),l:S.lv,p:power(),t:Date.now()});return 'AO1-'+btoa(unescape(encodeURIComponent(j)))}
@@ -1641,6 +1641,12 @@ const canEnh=g=>!!g&&g.p<15&&S.gold>=enhCost(g)&&(S.items.stone||0)>=enhStone(g)
 const reforgeCost=g=>({d:10*(GEAR[g.id].t+1),g:100*(GEAR[g.id].t+1)});
 const canReforge=g=>!!g&&g.r>0&&(S.items.dust||0)>=reforgeCost(g).d&&S.gold>=reforgeCost(g).g;
 const MV={
+  pview(id){let x=id==='me'?{name:S.name,cls:clsName(),lv:S.lv,power:power(),hk:HK(),eq:Object.keys(SLOTS).map(sl=>{const g=gearBy(S.eq[sl]);return g?[g.id,g.r,g.p||0,g.sh?1:0,g.set!=null?g.set:-1]:null}),st:(()=>{const s=stats();return[s.HP,s.MP,s.ATK,s.MAG,s.DEF,s.CRIT]})()}:(RANKTOP||[]).find(r=>r.id===id);if(!x)return{t:'玩家',b:'<p class="empty">找不到這位玩家</p>'};
+    const sl=(k,i)=>{const e=x.eq&&x.eq[i];if(!e||!GEAR[e[0]])return `<div class="dslot empty"><small>${SLOTS[k]}</small><span class="ico c0">${SLOTCH[k]}</span><b>未裝備</b></div>`;const g={id:e[0],r:e[1],p:e[2],sh:e[3],set:e[4]>=0&&SETS[e[4]]?e[4]:null};return `<div class="dslot r${g.r}"><small>${SLOTS[k]}</small><span class="ico c${g.r}">${gIco(g.id)}</span><b class="c${g.r}">${gearName(g)}</b><small>${RAR[g.r].n}</small></div>`};
+    const ks=Object.keys(SLOTS),pos=k=>ks.indexOf(k),hk=/^class_[a-z]+_[mf]$/.test(x.hk||'')?x.hk:null;
+    return{t:esc(x.name),b:`<div class="row"><span class="tag">${esc(x.cls||'')}</span><span class="sub">Lv.${x.lv}　戰力 <b>${x.power}</b></span></div>
+      ${x.eq?`<div class="doll" style="margin-top:8px"><div class="dcol">${sl('head',pos('head'))}${sl('body',pos('body'))}${sl('feet',pos('feet'))}</div><div class="dmid">${hk?art(hasArt(hk+'_stand')?hk+'_stand':hk,x.cls,'r34'):''}</div><div class="dcol">${sl('weapon',pos('weapon'))}${sl('neck',pos('neck'))}${sl('ring',pos('ring'))}</div></div>`:'<p class="sub">這位玩家還沒更新到新版本，暫時看不到裝備。</p>'}
+      ${x.st?`<div class="stat-g" style="margin-top:8px">${['HP','MP','攻擊','魔力','防禦','爆擊'].map((n,i)=>`<div><span>${n}</span><b>${x.st[i]}${i===5?'%':''}</b></div>`).join('')}</div>`:''}<button class="btn big" data-a="openM" data-v="rank">返回排行榜</button>`}},
   idleRes(){const R=IDLERES;if(!R)return{t:'結算',b:''};const c=R.c,best=[...R.gs].sort((a,b)=>b.r-a.r).slice(0,12);
     return{t:'掛機結算',b:`<div class="idle-res"><div class="ir-h">${c.a.n}・${hms(c.ms)}</div><div class="stat-g"><div><span>擊倒</span><b>${c.kills}</b></div><div><span>經驗</span><b>+${c.exp}</b></div><div><span>金幣</span><b>+${c.gold}</b></div><div><span>強化石</span><b>+${c.stone}</b></div><div><span>藥水</span><b>+${c.pot}</b></div><div><span>等級</span><b>${R.lv0===R.lv1?'Lv.'+R.lv1:`${R.lv0}→<span class="up">${R.lv1}</span>`}</b></div></div>
       <h3>取得裝備 ${R.gs.length} 件</h3><div class="list">${best.map(g=>`<button class="item" data-a="openGear" data-v="${g.u}"><span class="ico c${g.r}">${gIco(g.id)}</span><span class="grow"><b class="c${g.r}">${gearName(g)}</b><span class="sub">${RAR[g.r].n}・${SLOTS[GEAR[g.id].slot]}</span></span></button>`).join('')||'<p class="empty">這次沒有撿到裝備</p>'}${R.gs.length>12?`<p class="sub">其餘 ${R.gs.length-12} 件已放進背包</p>`:''}</div></div><button class="btn pri big" data-a="closeM">收下</button>`}},
@@ -1676,8 +1682,8 @@ const MV={
         <button class="btn pri big" data-a="trial" ${ok?'':'disabled'}>${ok?'挑戰試煉':'材料不足'}</button>`}
     else b+=`<p class="sub">試煉已通過。選擇${you('你')}的路線，選定之後無法更改。</p><div class="grid2">${CLS[S.cls].adv.map(k=>`<div class="panel">${art(`class_${k}_${S.sex}`,ADV[k].n,'r34')}<h3>${ADV[k].n}</h3><p class="sub">${ADV[k].d}</p><button class="btn pri" data-a="advance" data-v="${k}">轉職</button></div>`).join('')}</div>`;
     return{t:'轉職神殿',b}},
-  rank(){if(!RANKTOP||Date.now()-RANKT>60e3)rankSync(true);const online=Array.isArray(RANKTOP)&&RANKTOP.length;const P=online?[]:[9820,8450,7300,6120,5200,4100,3050,2200,1400,800].map((p,i)=>({n:FAKE[i],p}));if(online){const seen={};RANKTOP.filter(x=>x.id!==S.pid&&!(x.name===S.name&&x.cls===clsName())).sort((a,b)=>b.ts-a.ts).forEach(x=>{const k=x.name+'|'+x.cls;if(seen[k])return;seen[k]=1;P.push({n:x.name,p:x.power,c:x.cls,l:x.lv,t:x.ts,on:1})})}P.push({n:S.name,p:power(),me:1,c:clsName(),l:S.lv});Object.entries(S.friends||{}).forEach(([id,f])=>P.push({n:f.n,p:f.p,c:f.c,l:f.l,t:f.t,fr:id}));P.sort((a,b)=>b.p-a.p);
-    return{t:'戰力排行榜',b:`<div class="list">${P.map((x,i)=>`<div class="item" ${x.me?'style="border:2px solid var(--navy);background:var(--panel2)"':''}><span class="ico c${i<3?4:0}">${i+1}</span><span class="grow"><b>${esc(x.n)}</b>${x.on?' <span class="tag ok">玩家</span>':x.fr?' <span class="tag ok">好友</span>':x.me?' <span class="tag">我</span>':''}${x.c?`<span class="sub">${esc(x.c)}・Lv.${x.l}${x.t?`・${new Date(x.t).toLocaleDateString()} 更新`:''}</span>`:''}</span><b>${x.p}</b>${x.fr?`<button class="btn sm" data-a="rankDel" data-v="${x.fr}">移除</button>`:''}</div>`).join('')}</div>
+  rank(){if(!RANKTOP||Date.now()-RANKT>60e3)rankSync(true);const online=Array.isArray(RANKTOP)&&RANKTOP.length;const P=online?[]:[9820,8450,7300,6120,5200,4100,3050,2200,1400,800].map((p,i)=>({n:FAKE[i],p}));if(online){const seen={};RANKTOP.filter(x=>x.id!==S.pid&&!(x.name===S.name&&x.cls===clsName())).sort((a,b)=>b.ts-a.ts).forEach(x=>{const k=x.name+'|'+x.cls;if(seen[k])return;seen[k]=1;P.push({n:x.name,p:x.power,c:x.cls,l:x.lv,t:x.ts,on:1,id:x.id})})}P.push({n:S.name,p:power(),me:1,c:clsName(),l:S.lv});Object.entries(S.friends||{}).forEach(([id,f])=>P.push({n:f.n,p:f.p,c:f.c,l:f.l,t:f.t,fr:id}));P.sort((a,b)=>b.p-a.p);
+    return{t:'戰力排行榜',b:`<div class="list">${P.map((x,i)=>`<div class="item" ${x.me?'style="border:2px solid var(--navy);background:var(--panel2)"':''} ${x.on||x.me?`data-a="pview" data-v="${x.me?'me':x.id}" style="cursor:pointer${x.me?';border:2px solid var(--navy);background:var(--panel2)':''}"`:''}><span class="ico c${i<3?4:0}">${i+1}</span><span class="grow"><b>${esc(x.n)}</b>${x.on?' <span class="tag ok">玩家</span>':x.fr?' <span class="tag ok">好友</span>':x.me?' <span class="tag">我</span>':''}${x.c?`<span class="sub">${esc(x.c)}・Lv.${x.l}${x.t?`・${new Date(x.t).toLocaleDateString()} 更新`:''}</span>`:''}</span><b>${x.p}</b>${x.fr?`<button class="btn sm" data-a="rankDel" data-v="${x.fr}">移除</button>`:''}</div>`).join('')}</div>
       <div class="panel"><h3>和朋友比戰力</h3><p class="sub">遊戲沒有伺服器，所以用「戰力碼」交換：把你的碼傳給朋友，再把朋友的碼貼進來。朋友變強後，請他再傳一次新碼就會更新。</p>
       <div class="fcode-me">${myCode()}</div><button class="btn pri" data-a="rankCopy">複製我的戰力碼</button>
       <div class="row" style="margin-top:8px"><input id="fcode" class="grow" placeholder="貼上朋友的戰力碼" style="padding:8px;border-radius:8px;border:1px solid #c8b890;min-width:0"><button class="btn" data-a="rankAdd">加入</button></div></div>
@@ -1937,6 +1943,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'5.6',d:'2026-11-19',t:'排行榜可看玩家裝備',b:'點排行榜上的玩家，就能看到他的角色立繪、六個部位的裝備與能力值。修正重新整理後會被當成新玩家的問題。'},
   {v:'5.5',d:'2026-11-19',t:'線上戰力排行榜',b:'排行榜開始連線真實玩家：遊戲每 5 分鐘自動上傳你的戰力，榜上標「玩家」的都是真人。伺服器暫時連不上時，會自動改回顯示 NPC 與好友戰力碼。'},
   {v:'5.4',d:'2026-11-19',t:'強敵化',b:'裝備太強、可以一招秒殺魔物時，魔物會「強敵化」：血量與攻擊依你的實力提升，同時給更多經驗與金幣。前期與正常裝備時不受影響。'},
   {v:'5.3',d:'2026-11-19',t:'露娜的職業：燈術士',b:'露娜有了自己的職業【燈術士】與技能：燈火彈、蒼焰、照路之光（治療）、守燈結界（看到敵人大招替你擋 40%）、霧散之光（削弱敵人）、奧義誓約之燈（每場一次）。技能隨章節與羈絆解鎖，角色頁可查看。戰鬥畫面中露娜站到主角身後、尺寸放大，出招時會喊招式名並有專屬特效。'},
@@ -2779,6 +2786,7 @@ const ACT={
   openGear(v){openM('gear',+v)},
   sign(){checkDaily();if(S.daily.sign)return;S.daily.sign=true;S.gold+=300;addItem('pot',2);toast('簽到成功：300 G、治療藥水×2');save();render()},
   idleSel(v){IDLESEL=+v;render()},
+  pview(v){openM('pview',v)},
   rankCopy(){const c=myCode();save();try{navigator.clipboard.writeText(c).then(()=>toast('已複製戰力碼，傳給朋友吧！'),()=>toast('請長按上方的碼手動複製'))}catch(e){toast('請長按上方的碼手動複製')}},
   rankAdd(){const el=$('#fcode'),o=readCode(el&&el.value);if(!o){toast('戰力碼格式不對');return}if(o.i===S.pid){toast('這是你自己的碼喔');return}S.friends=S.friends||{};const old=S.friends[o.i];if(old&&old.t>o.t){toast('這組碼比目前的還舊');return}S.friends[o.i]={n:String(o.n).slice(0,16),c:String(o.c||'').slice(0,10),l:+o.l||1,p:Math.min(999999,+o.p||0),t:+o.t||Date.now()};save();toast(old?`已更新 ${o.n} 的戰力`:`已加入好友 ${o.n}`);drawModal()},
   rankDel(v){if(S.friends&&S.friends[v]){delete S.friends[v];save();drawModal()}},

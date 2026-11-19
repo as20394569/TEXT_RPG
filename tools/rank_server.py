@@ -74,7 +74,7 @@ class H(BaseHTTPRequestHandler):
             return self.reply(404, {'error': 'not found'})
         try:
             ln = int(self.headers.get('Content-Length', '0'))
-            if ln <= 0 or ln > 1024:
+            if ln <= 0 or ln > 4096:
                 return self.reply(400, {'error': 'bad size'})
             d = json.loads(self.rfile.read(ln).decode('utf-8'))
             pid = str(d.get('id', ''))
@@ -87,6 +87,21 @@ class H(BaseHTTPRequestHandler):
             row = {'id': pid, 'name': clean(d.get('name'), 16) or '冒險者', 'cls': clean(d.get('cls'), 10),
                    'lv': max(1, min(99, int(d.get('lv', 1)))), 'power': max(0, min(999999, int(d.get('power', 0)))),
                    'ts': int(now * 1000)}
+            hk = str(d.get('hk', ''))
+            if re.fullmatch(r'class_[a-z]{3,12}_[mf]', hk):
+                row['hk'] = hk
+            eq = d.get('eq')
+            if isinstance(eq, list) and len(eq) <= 8:
+                out = []
+                for e in eq:
+                    if isinstance(e, list) and len(e) >= 3 and re.fullmatch(r'[a-z0-9_]{1,24}', str(e[0])):
+                        out.append([str(e[0])] + [max(-1, min(99, int(v))) for v in e[1:5]])
+                    else:
+                        out.append(None)
+                row['eq'] = out
+            st = d.get('st')
+            if isinstance(st, list) and len(st) <= 8:
+                row['st'] = [max(0, min(9999999, int(v))) for v in st]
             with LOCK:
                 for k in [k for k, r in DB.items() if k != pid and r.get('name') == row['name'] and r.get('cls') == row['cls']]:
                     DB.pop(k, None)  # 同名同職業的舊紀錄（重整產生的分身）合併
