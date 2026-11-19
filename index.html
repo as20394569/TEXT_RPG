@@ -341,6 +341,8 @@ input,textarea{font:inherit;width:100%;padding:8px 10px;border:2px solid var(--l
 .fork .btn .risk{display:block;font-size:10px;color:#8a6a4a;margin-top:2px}.fork .btn.tagged{border-color:#e0a020;box-shadow:0 0 0 2px rgba(240,180,40,.35) inset}.fork .btn .ftag{display:block;margin-top:4px;font-size:12px;font-weight:700;color:#b06a00}.fork .btn .ftag small{display:block;font-weight:400;font-size:10px;color:#8a6a4a}.tag.ok{background:#dff5d8;color:#2a7a2a}.tag.bad{background:#ffe0e0;color:#c0262d}
 .newsbar{display:flex;align-items:center;gap:8px;width:100%;margin:10px 0 6px;padding:10px 12px;border-radius:12px;border:2px solid #e0a020;background:linear-gradient(90deg,#fff6d8,#fffdf4);box-shadow:0 2px 0 rgba(0,0,0,.12);text-align:left;font:inherit;color:inherit;cursor:pointer}.newsbar .nb-tag{flex:none;background:#c0262d;color:#fff;font-weight:800;font-size:12px;padding:3px 8px;border-radius:8px;letter-spacing:1px}.newsbar .nb-t{min-width:0}.newsbar .nb-t b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.newsbar .nb-t small{color:#8a6a4a;font-size:11px}.newsbar .nb-arr{font-size:22px;color:#b06a00;flex:none}.qrow{margin-bottom:6px}
 .fadice{position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;background:rgba(10,20,40,.45);pointer-events:none}.fd-box{background:#fffaf0;border:3px solid #e0a020;border-radius:16px;padding:14px 22px;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.35)}.fd-t{font-weight:800;color:#8a5a00;margin-bottom:6px}.fd-die{width:72px;height:72px;margin:4px auto 8px;border-radius:14px;background:linear-gradient(145deg,#ffffff,#e8e0d0);border:2px solid #b08a50;display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:900;color:#c0262d;transition:transform .08s}.fd-die.done{animation:fdpop .4s}.fd-r{font-size:13px;color:#5a4a3a}@keyframes fdpop{0%{transform:scale(1.5)}60%{transform:scale(.9)}100%{transform:scale(1)}}.fd-pick{outline:3px solid #e0a020;outline-offset:2px}
+.idlep{border:2px solid #7fa8d8}.idlep.on{border-color:#e0a020;background:linear-gradient(180deg,#fffbe8,#fff)}.idle-t{font-size:34px;font-weight:900;text-align:center;letter-spacing:2px;color:#1a3a6a;font-variant-numeric:tabular-nums}.idle-g{text-align:center;font-size:13px;margin:4px 0 6px}.idle-res .ir-h{text-align:center;font-weight:800;font-size:16px;margin-bottom:6px}
+.doll{display:grid;grid-template-columns:1fr 1.25fr 1fr;gap:8px;align-items:center}.doll .dcol{display:flex;flex-direction:column;gap:8px}.doll .dmid{position:relative;border-radius:14px;background:radial-gradient(ellipse at 50% 70%,#e8f0ff,#c8d8f0);min-height:230px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden}.doll .dmid .art{width:100%}.dslot{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 4px;border-radius:12px;border:2px solid #c8b890;background:#fffaf0;font:inherit;color:inherit;cursor:pointer;min-height:84px;justify-content:center}.dslot .ico{width:44px;height:44px}.dslot b{font-size:11px;line-height:1.2;text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dslot small{font-size:10px;color:#8a7a6a}.dslot.empty{border-style:dashed;opacity:.75}.dslot.r1{border-color:#4caf50}.dslot.r2{border-color:#3a7bd5}.dslot.r3{border-color:#9b59b6}.dslot.r4{border-color:#e0a020;box-shadow:0 0 8px rgba(224,160,32,.5)}.dslot .pl{font-size:10px;color:#c0262d;font-weight:700}
 </style>
 </head>
 <body>
@@ -1380,7 +1382,21 @@ function vTown(){
   <div class="grid2">${F.map(([k,a,who,n,d])=>`<button class="fac" data-a="fac" data-v="${k}"><div class="pt">${art(a,who,'r34','mini')}</div><div><b>${n}${nstFor(k).length||(k==='inn'&&nstFor('inn').length)?' <span class="tag new">!</span>':''}</b><span>${d}</span></div></button>`).join('')}</div>
   ${nstDot()?`<div class="panel"><h3>鎮上的故事</h3><div class="list">${NST.filter(q=>['new','ready'].includes(nstState(q))).map(q=>`<button class="item" data-a="${nstState(q)==='new'?'nstStart':'nstEnd'}" data-v="${q.id}"><span class="ico c4">${icon(NPC[q.npc]||'npc_boy','<b>'+q.npc[0]+'</b>')}</span><span class="grow"><b>${q.npc}</b><span class="sub">${nstState(q)==='new'?you('好像有話想對你說……'):`「${q.n}」可以完成了`}</span></span><span class="tag new">!</span></button>`).join('')}</div></div>`:''}
 `}
-function vAreas(){return `<h2>選擇冒險地點</h2>`+AREAS.map((a,i)=>{const open=S.main.ch>=i,bossOn=bossReady(i);
+/* ============ 背景掛機 ============ */
+const IDLE_CAP=12*3600e3;
+function idleCalc(){const I=S.idle;if(!I)return null;const a=AREAS[I.area],ms=Math.min(IDLE_CAP,Date.now()-I.start),h=ms/3600e3,L=a.base+1,eff=Math.max(.25,Math.min(1.2,.7+(S.lv-a.base)*.08)),kills=Math.floor(h*90*eff);
+  return{a,ms,h,eff,kills,exp:Math.round(kills*(10+L*6)*.8),gold:Math.round(kills*(6+L*4)*.9),gear:Math.min(25,Math.floor(kills*.05)),stone:Math.floor(kills*.04),pot:Math.floor(kills*.02)}}
+const hms=ms=>{const t=Math.floor(ms/1000);return `${String(Math.floor(t/3600)).padStart(2,'0')}:${String(Math.floor(t%3600/60)).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`};
+function vIdle(){if(S.idle){const c=idleCalc();return `<div class="panel idlep on"><div class="row"><h3 class="grow">⏳ 掛機中・${c.a.n}</h3><span class="tag ${c.eff>=1?'ok':c.eff<.6?'red':''}">效率 ${Math.round(c.eff*100)}%</span></div>
+  <div class="idle-t" id="idleT">${hms(c.ms)}</div><div class="idle-g" id="idleG">${idleLine(c)}</div><p class="sub">最多累積 12 小時。關掉遊戲也會繼續計算，隨時可以結束領取。</p><button class="btn pri big" data-a="idleEnd">結束掛機・結算</button></div>`}
+  const opts=AREAS.map((a,i)=>S.main.ch>=i?`<button class="btn sm ${i===IDLESEL?'on':''}" data-a="idleSel" data-v="${i}">${a.n}</button>`:'').join('');
+  return `<div class="panel idlep"><div class="row"><h3 class="grow">⏳ 背景掛機</h3><span class="sub">離線也會累積</span></div><p class="sub">選一張地圖讓角色自動打怪，經驗、金幣、裝備會隨時間累積。等級越高於地圖，效率越好。</p><div class="chips">${opts}</div><button class="btn pri big" data-a="idleStart">在「${AREAS[IDLESEL].n}」開始掛機</button></div>`}
+const idleLine=c=>`擊倒 <b>${c.kills}</b>　經驗 <b>${c.exp}</b>　金幣 <b>${c.gold}</b>　裝備 <b>${c.gear}</b> 件`;
+let IDLESEL=0,IDLERES=null;
+setInterval(()=>{if(!S||!S.idle)return;const t=$('#idleT'),g=$('#idleG');if(!t)return;const c=idleCalc();t.textContent=hms(c.ms);g.innerHTML=idleLine(c)},1000);
+function idleSettle(){const c=idleCalc();if(!c)return;const lv0=S.lv,gs=[];S.idle=null;gainExp(c.exp);S.gold+=c.gold;if(c.stone)addItem('stone',c.stone);if(c.pot)addItem('pot',c.pot);
+  for(let i=0;i<c.gear;i++){const g=rollGear(AREAS.indexOf(c.a),0);gs.push(g)}DROPS=[];IDLERES={c,lv0,lv1:S.lv,gs};save();openM('idleRes')}
+function vAreas(){return `<h2>選擇冒險地點</h2>`+vIdle()+AREAS.map((a,i)=>{const open=S.main.ch>=i,bossOn=bossReady(i);
   return `<div class="panel area ${open?'':'lock'}">${art('area_'+a.id,a.n)}
   <div class="row"><h3 class="grow">${a.n}</h3><span class="tag">Lv ${a.lv}</span>${S.cleared[i]?'<span class="tag ok">已通關</span>':''}</div>
   <p class="sub">${a.d}</p><div class="chips">${a.mobs.map(m=>`<span class="chip">${MOBS[m].n}</span>`).join('')}<span class="chip" style="color:var(--hp)">首領 ${MOBS[a.boss].n}${bossOn?'':'（未現身）'}</span></div>${open&&bossOn&&!S.cleared[i]&&S.lv<MOBS[a.boss].lv?`<p class="sub" style="color:var(--hp)">⚠ ${MOBS[a.boss].n} 已在深處等著（Lv ${MOBS[a.boss].lv}）。現在 Lv ${S.lv}，這趟終點會直接碰上它——不夠強就先在岔路多打幾場、換好裝備。</p>`:''}
@@ -1470,9 +1486,11 @@ function afterBattle(){const el=$('#msg');if(!el||!B)return;if(B.pfx){const f=B.
   const txt=B.msg=B.log.slice(Math.max(B.shown,B.log.length-3)).join('\n');B.shown=B.log.length;let n=0;
   window.TYPER=setInterval(()=>{n+=2;el.textContent=txt.slice(0,n);if(n>=txt.length)clearInterval(window.TYPER)},16)}
 
+function dollHtml(){const sl=k=>{const g=gearBy(S.eq[k]);return g?`<button class="dslot r${g.r}" data-a="openGear" data-v="${g.u}"><small>${SLOTS[k]}</small><span class="ico c${g.r}">${gIco(g.id)}</span><b class="c${g.r}">${gearName(g).replace(/^\+\d+\s*/,'')}</b>${g.p?`<span class="pl">+${g.p}</span>`:''}</button>`:`<button class="dslot empty" data-a="bagSlot" data-v="${k}"><small>${SLOTS[k]}</small><span class="ico c0">${SLOTCH[k]}</span><b>未裝備</b></button>`};
+  return `<div class="doll"><div class="dcol">${sl('head')}${sl('body')}${sl('feet')}</div><div class="dmid">${art(HK(),clsName()+'立繪','r34')}</div><div class="dcol">${sl('weapon')}${sl('neck')}${sl('ring')}</div></div>`}
 function vChar(){const s=stats(),sc=setCounts();
   const setHtml=Object.keys(sc).map(i=>{const st=SETS[i],n=sc[i];return `<div class="gsec"><b>${st.n}套裝　${n}/4</b><span class="sub ${n>=2?'son':''}">2 件：${st.d2}</span><span class="sub ${n>=4?'son':''}">4 件：${st.d4}</span></div>`}).join('');
-  const eq=Object.keys(SLOTS).map(sl=>{const g=gearBy(S.eq[sl]);return `<button class="item" data-a="${g?'openGear':'tabBag'}" data-v="${g?g.u:''}"><span class="ico c${g?g.r:0}">${g?gIco(g.id):SLOTCH[sl]}</span><span class="grow"><b class="c${g?g.r:0}">${g?gearName(g):'未裝備'+SLOTS[sl]}</b><span class="sub">${g?gearDesc(g):'點擊前往背包'}</span></span></button>`}).join('');
+  const eq=dollHtml();
   const sk=mySkills().map(k=>{const lv=S.skl[k]||1;return `<div class="item"><span class="ico c2">${icon('skill_'+k,ic('skill'))}</span><span class="grow"><b>${SK[k].n}　Lv.${lv}/5</b><span class="sub">MP ${mpCost(k)}・${SK[k].d}</span></span><button class="btn sm" data-a="skUp" data-v="${k}" ${S.sp>0&&lv<5?'':'disabled'}>升級</button></div>`}).join('');
   const nxt=Object.keys(SK).filter(k=>(SK[k].c===S.cls||SK[k].c===S.adv)&&S.lv<SK[k].lv).map(k=>`<span class="chip">Lv.${SK[k].lv} ${SK[k].n}</span>`).join('');
   return `<div class="panel"><div class="char-top">${art(HK(),clsName()+'立繪','r34')}
@@ -1482,7 +1500,7 @@ function vChar(){const s=stats(),sc=setCounts();
   <div class="panel"><h3>職業特色</h3><p class="sub">${CLS[S.cls].f}</p>${Object.keys(PASS).filter(id=>PASS[id].c===S.cls||PASS[id].c===S.adv).map(id=>`<span class="subl row ${hasP(id)?'':'sub'}" style="gap:6px"><span class="ico c4" style="width:30px;height:30px">${icon('pass_'+id,ic('skill'))}</span><span class="grow">被動【${PASS[id].n}】Lv.${PASS[id].lv}：${PASS[id].d}</span></span>`).join('')}${S.adv?`<p class="sub">${ADV[S.adv].n}：${ADV[S.adv].d}</p>`:''}</div>
   <div class="panel"><h3>屬性　<span class="tag ${S.pts?'red':'off'}">可用 ${S.pts} 點</span><button class="btn sm" style="float:right" data-a="respec">重置（${respecCost()} G）</button></h3>${Object.keys(ATTR).map(k=>`<div class="attr"><span>${ATTR[k]}<span class="sub">　${{STR:'物理攻擊',DEX:'迴避・爆擊・連擊',INT:'魔力・MP・技能省 MP',VIT:'HP・防禦・每回合回血',LUK:'爆擊・爆傷・掉寶・金幣'}[k]}</span></span><b>${S.attr[k]}${s.A[k]>S.attr[k]?`<small class="up">+${s.A[k]-S.attr[k]}</small>`:''}</b><button class="btn sm" data-a="addPt" data-v="${k}" ${S.pts?'':'disabled'}>＋</button></div>`).join('')}</div>
   ${Object.keys(ALLY).some(k=>ALLY[k].open())?`<div class="panel"><h3>同行夥伴</h3><div class="party">${[...Object.keys(ALLY).filter(k=>ALLY[k].open()),'none'].map(k=>`<button class="btn ${(S.party||'none')===k?'on':''}" data-a="setParty" data-v="${k}">${k==='none'?'<b>獨自冒險</b><span class="sub">不帶夥伴</span>':`${art(ALLY[k].img,ALLY[k].n,'r11','mini')}<b>${ALLY[k].n}</b><span class="sub">${ALLY[k].role}</span>`}</button>`).join('')}</div><p class="sub">${S.party&&S.party!=='none'?ALLY[S.party].d+(S.party==='luna'?'　羈絆越深，露娜越強。':''):'不帶夥伴時，所有戰鬥都靠自己。'}</p></div>`:''}
-  <div class="panel"><h3>裝備</h3><div class="list">${eq}</div>${setHtml}</div>
+  <div class="panel"><h3>裝備</h3>${eq}<p class="sub" style="text-align:center">點部位查看裝備詳細資料</p>${setHtml}</div>
   <div class="panel"><h3>技能　<span class="tag ${S.sp?'red':'off'}">技能點 ${S.sp}</span></h3><div class="list">${sk}</div>${nxt?`<div class="chips">${nxt}</div>`:''}</div>`}
 function vBag(){
   const tabs=`<div class="tabs">${[['gear','裝備'],['use','道具'],['mat','素材']].map(([k,n])=>`<button class="${BAGTAB===k?'on':''}" data-a="bagTab" data-v="${k}">${n}</button>`).join('')}</div>`;
@@ -1495,7 +1513,7 @@ function vBag(){
       (gs.map(g=>`<button class="item" data-a="openGear" data-v="${g.u}"><span class="ico c${g.r}">${gIco(g.id)}</span><span class="grow"><b class="c${g.r}">${gearName(g)}</b><span class="sub">${gearDesc(g)}</span></span>${eqd.includes(g.u)?'<span class="tag ok">裝備中</span>':up(g)?'<span class="tag upt">▲ 更強</span>':''}${g.lock?'<span class="tag off">鎖</span>':''}</button>`).join('')||'<p class="empty">沒有裝備</p>')}
   else{const ks=Object.keys(S.items).filter(k=>BAGTAB==='use'?ITEMS[k].use:ITEMS[k].mat);
     body=ks.map(k=>`<div class="item"><span class="ico c0">${icon('item_'+k,ic(BAGTAB==='use'?'potion':'mat'))}</span><span class="grow"><b>${ITEMS[k].n} ×${S.items[k]}</b><span class="sub">${ITEMS[k].d}</span></span>${ITEMS[k].use?`<button class="btn sm" data-a="useItem" data-v="${k}">使用</button>`:''}<button class="btn sm" data-a="sellItem" data-v="${k}">賣 ${sellPrice(k)}G</button></div>`).join('')||'<p class="empty">空空如也</p>'}
-  return `<h2>背包</h2>${tabs}<div class="panel"><div class="list">${body}</div></div>`}
+  return `<h2>背包</h2>${BAGTAB==='gear'?`<div class="panel">${dollHtml()}</div>`:''}${tabs}<div class="panel"><div class="list">${body}</div></div>`}
 const sellPrice=k=>ITEMS[k].sell||Math.round(ITEMS[k].price*.4);
 function vQuest(){
   const tabs=`<div class="tabs">${[['main','主線'],['story','人物故事'],['side','支線委託'],['daily','每日']].map(([k,n])=>`<button class="${QTAB===k?'on':''}" data-a="qTab" data-v="${k}">${n}${k==='story'&&nstDot()?' <span class="tag new">!</span>':''}</button>`).join('')}</div>`;
@@ -1532,6 +1550,9 @@ const canEnh=g=>!!g&&g.p<15&&S.gold>=enhCost(g)&&(S.items.stone||0)>=enhStone(g)
 const reforgeCost=g=>({d:10*(GEAR[g.id].t+1),g:100*(GEAR[g.id].t+1)});
 const canReforge=g=>!!g&&g.r>0&&(S.items.dust||0)>=reforgeCost(g).d&&S.gold>=reforgeCost(g).g;
 const MV={
+  idleRes(){const R=IDLERES;if(!R)return{t:'結算',b:''};const c=R.c,best=[...R.gs].sort((a,b)=>b.r-a.r).slice(0,12);
+    return{t:'掛機結算',b:`<div class="idle-res"><div class="ir-h">${c.a.n}・${hms(c.ms)}</div><div class="stat-g"><div><span>擊倒</span><b>${c.kills}</b></div><div><span>經驗</span><b>+${c.exp}</b></div><div><span>金幣</span><b>+${c.gold}</b></div><div><span>強化石</span><b>+${c.stone}</b></div><div><span>藥水</span><b>+${c.pot}</b></div><div><span>等級</span><b>${R.lv0===R.lv1?'Lv.'+R.lv1:`${R.lv0}→<span class="up">${R.lv1}</span>`}</b></div></div>
+      <h3>取得裝備 ${R.gs.length} 件</h3><div class="list">${best.map(g=>`<button class="item" data-a="openGear" data-v="${g.u}"><span class="ico c${g.r}">${gIco(g.id)}</span><span class="grow"><b class="c${g.r}">${gearName(g)}</b><span class="sub">${RAR[g.r].n}・${SLOTS[GEAR[g.id].slot]}</span></span></button>`).join('')||'<p class="empty">這次沒有撿到裝備</p>'}${R.gs.length>12?`<p class="sub">其餘 ${R.gs.length-12} 件已放進背包</p>`:''}</div></div><button class="btn pri big" data-a="closeM">收下</button>`}},
   foe(){if(!B)return{t:'怪物情報',b:'<p class="empty">目前不在戰鬥中</p>'};const m=B.m,e=MEL[B.id];
     return{t:B.name,b:`<div class="panel"><div class="row"><div style="width:96px;flex:none">${art('mob_'+B.id,m.n,'r11')}</div><div class="grow"><b>Lv${B.L}　${MTY[m.ty].n}${B.kind==='boss'?'　<span class="tag red">首領</span>':''}</b>
       <div class="sub">HP ${B.hp}/${B.max}　攻擊 ${B.atk}　魔力 ${B.mag}　防禦 ${B.def}　魔抗 ${B.mres??B.def}</div>
@@ -1818,6 +1839,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'4.9',d:'2026-11-19',t:'背景掛機＋人物裝備欄',b:'冒險頁新增「背景掛機」：選地圖後角色自動打怪，關掉遊戲也會累積（最多 12 小時），隨時結束並看結算畫面。角色與背包的裝備改成人物立繪兩側分部位擺放，點部位就能看裝備詳細資料。'},
   {v:'4.8',d:'2026-11-19',t:'斬殺線：看準時機收尾',b:'敵人血量掉到一擊就能收掉時，敵方狀態列會亮出「🗡 普攻可斬殺」或「🗡 技能可斬殺」，提醒你這回合不必再架刀防守，直接出手結束戰鬥（多隻敵人同時在場時不顯示）。自動戰鬥也學會了：能一擊收掉就用最省 MP 的招式直接斬殺；對方攻擊不痛、下回合就能打完時，不再浪費回合招架。實測全自動劍士防守回合從約 45% 降到約 27%。'},
   {v:'4.7',d:'2026-11-19',t:'全自動放慢＋命運骰子',b:'全自動速度放慢一半，方便觀戰；遇到岔路、事件或劇情抉擇時再放慢，並擲出命運骰子：1～3 走左邊、4～6 走右邊。'},
   {v:'4.6',d:'2026-11-19',t:'特效定位修正',b:'技能特效改成依照角色與魔物的實際位置與大小定位：魔法陣、冰晶、火柱、震地、藤蔓都落在腳下影子處，命中光效在身體中心，首領、飛行魔物、小型魔物都對得準。'},
@@ -2638,7 +2660,11 @@ const ACT={
   openM(v){openM(v)},closeM(){closeM()},
   openGear(v){openM('gear',+v)},
   sign(){checkDaily();if(S.daily.sign)return;S.daily.sign=true;S.gold+=300;addItem('pot',2);toast('簽到成功：300 G、治療藥水×2');save();render()},
-  startRun(v){if(S.hp<=1){toast('HP 太低，先到旅店休息');return}startRun(+v)},
+  idleSel(v){IDLESEL=+v;render()},
+  bagSlot(v){BAGTAB='gear';BAGF=v==='weapon'?'weapon':['ring','neck'].includes(v)?'acc':'armor';ACT.tab('bag')},
+  idleStart(){if(RUN||B){toast('冒險中不能掛機');return}if(FA)faStop();S.idle={area:IDLESEL,start:Date.now()};save();toast(`開始在 ${AREAS[IDLESEL].n} 掛機`);render()},
+  idleEnd(){if(!S.idle)return;const c=idleCalc();if(c.ms<60e3&&!confirm('掛機不到 1 分鐘，幾乎沒有收穫，確定結束？'))return;idleSettle();render()},
+  startRun(v){if(S.idle){toast('掛機中，先結束掛機再出發');return}if(S.hp<=1){toast('HP 太低，先到旅店休息');return}startRun(+v)},
   trial(){if(S.adv||S.trial||S.lv<TRIAL.lv)return;if(S.hp<=1){toast('HP 太低，先到旅店休息');return}const sh=SHADOW[S.cls];MOBS.shadow.ty=sh[0];MOBS.shadow.sk=sh[1];
     closeM();TAB='adv';RUN={area:Math.min(4,Math.max(0,S.main.ch)),trial:true,nm:false,step:0,nodes:['boss'],loot:{gold:0,exp:0,items:[]},view:{type:'start'}};startBattle('shadow','boss');render()},
   startNm(v){if(S.hp<=1){toast('HP 太低，先到旅店休息');return}startRun(+v,true)},
@@ -2729,7 +2755,7 @@ function faTick(){faDraw();if(!FA||!S||FA.busy)return;
   const s=stats();if(S.hp<s.HP*.7||S.mp<s.MP*.5){const c=S.lv*4;if(S.gold<c){faStop('金幣不足以休息，全自動停止');return}ACT.rest();return}
   if(FA.tower){faStop('高塔挑戰結束');return}
   TAB='adv';startRun(FA.area,FA.nm)}
-ACT.fullAuto=()=>{if(FA){faStop('全自動已關閉');return}
+ACT.fullAuto=()=>{if(FA){faStop('全自動已關閉');return}if(S.idle){toast('掛機中，先結束掛機');return}
   if(RUN)FA={area:RUN.area,nm:!!RUN.nm,tower:!!RUN.tower};
   else{let i=0;AREAS.forEach((a,k)=>{if(S.main.ch>=k&&a.base<=S.lv+2)i=k});FA={area:i,nm:false,tower:false}}
   toast('全自動開啟：隨機選路，自動戰鬥');faDraw();faTick()};
