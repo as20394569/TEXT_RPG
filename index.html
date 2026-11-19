@@ -1373,6 +1373,15 @@ const GREET={
     ['年輕人別太拚。我兒子以前也是……算了，不說這個。',null],['這麼晚才回來。路上沒遇到怪東西吧？',night],['露娜那孩子昨晚又坐在窗邊看著北方，一整夜沒睡。{你|妳}多陪陪她。',()=>chA(2)&&withLuna()]],
   '占星師':[['星辰今晚很吵。……大概是有誰要來了。',night],['{你|妳}的星，比上次見面時亮了一點。',null],['霧遮住了北方的星座。這可不是好兆頭。',()=>chA(2)],['想問命運？命運是答案，不是路。路要自己走。',null]],
   '艾德溫':[['我年輕時也在自己的影子面前跪過。它比{你|妳}想像的還了解{你|妳}。',null],['守燈人的事知道得越多，越會明白……我們只是在跟霧借時間。',()=>chA(1)],['露娜那孩子，很像她母親。固執，卻溫柔。',()=>chA(1)],['轉職不是終點。換了一身衣服，該面對的東西還是一樣。',()=>S.lv>=18]]};
+/* 線上排行榜（伺服器在製作人電腦，網址記在 rank.json） */
+let RANKURL=null,RANKTOP=null,RANKERR=0,RANKT=0;
+async function rankUrl(){if(RANKURL)return RANKURL;try{const r=await fetch('rank.json?'+Date.now(),{cache:'no-store'});const j=await r.json();if(j&&j.url)RANKURL=j.url.replace(/\/$/,'')}catch(e){}return RANKURL}
+async function rankSync(force){if(!S||!S.cls)return;if(!force&&Date.now()-RANKT<5*60e3)return;RANKT=Date.now();const u=await rankUrl();if(!u){RANKERR=1;return}
+  if(!S.pid)S.pid=Math.random().toString(36).slice(2,10);
+  try{const ctl=new AbortController();setTimeout(()=>ctl.abort(),6000);
+    await fetch(u+'/api/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:S.pid,name:S.name,cls:clsName(),lv:S.lv,power:power()}),signal:ctl.signal});
+    const r=await fetch(u+'/api/top?n=50',{signal:ctl.signal});RANKTOP=await r.json();RANKERR=0;if(MODAL&&MODAL.k==='rank')drawModal()}catch(e){RANKERR=1;RANKURL=null}}
+setInterval(()=>rankSync(),60e3);setTimeout(()=>rankSync(true),8000);
 function myCode(){if(!S.pid)S.pid=Math.random().toString(36).slice(2,10);const j=JSON.stringify({i:S.pid,n:S.name,c:clsName(),l:S.lv,p:power(),t:Date.now()});return 'AO1-'+btoa(unescape(encodeURIComponent(j)))}
 function readCode(c){try{c=(c||'').trim();if(!c.startsWith('AO1-'))return null;const o=JSON.parse(decodeURIComponent(escape(atob(c.slice(4)))));if(!o.i||!o.n||typeof o.p!=='number')return null;return o}catch(e){return null}}
 function greet(who,fallback){const g=GREET[who];return (g&&pickC(g))||fallback}
@@ -1667,12 +1676,12 @@ const MV={
         <button class="btn pri big" data-a="trial" ${ok?'':'disabled'}>${ok?'挑戰試煉':'材料不足'}</button>`}
     else b+=`<p class="sub">試煉已通過。選擇${you('你')}的路線，選定之後無法更改。</p><div class="grid2">${CLS[S.cls].adv.map(k=>`<div class="panel">${art(`class_${k}_${S.sex}`,ADV[k].n,'r34')}<h3>${ADV[k].n}</h3><p class="sub">${ADV[k].d}</p><button class="btn pri" data-a="advance" data-v="${k}">轉職</button></div>`).join('')}</div>`;
     return{t:'轉職神殿',b}},
-  rank(){const P=[9820,8450,7300,6120,5200,4100,3050,2200,1400,800].map((p,i)=>({n:FAKE[i],p}));P.push({n:S.name,p:power(),me:1,c:clsName(),l:S.lv});Object.entries(S.friends||{}).forEach(([id,f])=>P.push({n:f.n,p:f.p,c:f.c,l:f.l,t:f.t,fr:id}));P.sort((a,b)=>b.p-a.p);
-    return{t:'戰力排行榜',b:`<div class="list">${P.map((x,i)=>`<div class="item" ${x.me?'style="border:2px solid var(--navy);background:var(--panel2)"':''}><span class="ico c${i<3?4:0}">${i+1}</span><span class="grow"><b>${esc(x.n)}</b>${x.fr?' <span class="tag ok">好友</span>':x.me?' <span class="tag">我</span>':''}${x.c?`<span class="sub">${esc(x.c)}・Lv.${x.l}${x.t?`・${new Date(x.t).toLocaleDateString()} 更新`:''}</span>`:''}</span><b>${x.p}</b>${x.fr?`<button class="btn sm" data-a="rankDel" data-v="${x.fr}">移除</button>`:''}</div>`).join('')}</div>
+  rank(){if(!RANKTOP||Date.now()-RANKT>60e3)rankSync(true);const online=Array.isArray(RANKTOP)&&RANKTOP.length;const P=online?[]:[9820,8450,7300,6120,5200,4100,3050,2200,1400,800].map((p,i)=>({n:FAKE[i],p}));if(online)RANKTOP.filter(x=>x.id!==S.pid).forEach(x=>P.push({n:x.name,p:x.power,c:x.cls,l:x.lv,t:x.ts,on:1}));P.push({n:S.name,p:power(),me:1,c:clsName(),l:S.lv});Object.entries(S.friends||{}).forEach(([id,f])=>P.push({n:f.n,p:f.p,c:f.c,l:f.l,t:f.t,fr:id}));P.sort((a,b)=>b.p-a.p);
+    return{t:'戰力排行榜',b:`<div class="list">${P.map((x,i)=>`<div class="item" ${x.me?'style="border:2px solid var(--navy);background:var(--panel2)"':''}><span class="ico c${i<3?4:0}">${i+1}</span><span class="grow"><b>${esc(x.n)}</b>${x.on?' <span class="tag ok">玩家</span>':x.fr?' <span class="tag ok">好友</span>':x.me?' <span class="tag">我</span>':''}${x.c?`<span class="sub">${esc(x.c)}・Lv.${x.l}${x.t?`・${new Date(x.t).toLocaleDateString()} 更新`:''}</span>`:''}</span><b>${x.p}</b>${x.fr?`<button class="btn sm" data-a="rankDel" data-v="${x.fr}">移除</button>`:''}</div>`).join('')}</div>
       <div class="panel"><h3>和朋友比戰力</h3><p class="sub">遊戲沒有伺服器，所以用「戰力碼」交換：把你的碼傳給朋友，再把朋友的碼貼進來。朋友變強後，請他再傳一次新碼就會更新。</p>
       <div class="fcode-me">${myCode()}</div><button class="btn pri" data-a="rankCopy">複製我的戰力碼</button>
       <div class="row" style="margin-top:8px"><input id="fcode" class="grow" placeholder="貼上朋友的戰力碼" style="padding:8px;border-radius:8px;border:1px solid #c8b890;min-width:0"><button class="btn" data-a="rankAdd">加入</button></div></div>
-      <p class="sub">沒有標記的冒險者為單機模擬的 NPC 玩家。</p>`}},
+      <p class="sub">${online?'🟢 已連線線上排行榜：顯示所有真實玩家（每 5 分鐘自動上傳你的戰力）。':'⚪ 線上排行榜目前連不上，暫時顯示 NPC 玩家與好友戰力碼。'}</p>`}},
   gear(u){const g=gearBy(u);if(!g)return{t:'裝備',b:'<p class="empty">這件裝備已不存在</p>'};const b=GEAR[g.id],on=S.eq[b.slot]===u,cur=gearBy(S.eq[b.slot]);
     const can=(!b.cls||b.cls===S.cls)&&S.lv>=b.lv,cmp=!on&&cur?gearPower(g)-gearPower(cur):null,set=g.set!=null?SETS[g.set]:null,sc=set?setCounts()[g.set]||0:0,rf=reforgeCost(g),dz=DIS[g.r];
     return{t:gearName(g),b:`<div class="row"><span class="ico c${g.r}">${gIco(g.id)}</span><div class="grow"><b class="c${g.r}">${RAR[g.r].n}・${SLOTS[b.slot]}</b><div class="sub">需求 Lv.${b.lv}${b.cls?'・'+CLS[b.cls].n+'專用':''}・評分 ${gearPower(g)}${cmp!=null?` <b class="${cmp>=0?'up':'down'}">${cmp>=0?'▲':'▼'} ${Math.abs(cmp)}</b>`:''}</div></div>${g.lock?'<span class="tag">已鎖定</span>':''}</div>
@@ -1928,6 +1937,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'5.5',d:'2026-11-19',t:'線上戰力排行榜',b:'排行榜開始連線真實玩家：遊戲每 5 分鐘自動上傳你的戰力，榜上標「玩家」的都是真人。伺服器暫時連不上時，會自動改回顯示 NPC 與好友戰力碼。'},
   {v:'5.4',d:'2026-11-19',t:'強敵化',b:'裝備太強、可以一招秒殺魔物時，魔物會「強敵化」：血量與攻擊依你的實力提升，同時給更多經驗與金幣。前期與正常裝備時不受影響。'},
   {v:'5.3',d:'2026-11-19',t:'露娜的職業：燈術士',b:'露娜有了自己的職業【燈術士】與技能：燈火彈、蒼焰、照路之光（治療）、守燈結界（看到敵人大招替你擋 40%）、霧散之光（削弱敵人）、奧義誓約之燈（每場一次）。技能隨章節與羈絆解鎖，角色頁可查看。戰鬥畫面中露娜站到主角身後、尺寸放大，出招時會喊招式名並有專屬特效。'},
   {v:'5.2',d:'2026-11-19',t:'人物會說話了＋好友戰力榜',b:'露娜、主角和鎮上的人更像真人：戰鬥中會即時對話（開戰、首領、爆擊、危急、完美防禦、勝利），營火時和露娜聊天、隨章節慢慢聊開她的過去，岔路前也會閒聊；鎮上 NPC 的招呼會依劇情進度、時間和你的狀態改變。排行榜可以用「戰力碼」加入真實好友一起比。'},
