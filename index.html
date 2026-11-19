@@ -1807,6 +1807,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'4.0',d:'2026-11-19',t:'回血怪不再無限再生',b:'史萊姆、樹精、骷髏這類會回血的怪，每用一次回復量只剩上次的 60%，而且用完要隔兩回合才能再用，不會再卡在打不死的長戰。灼燒中的敵人回復量減半：行動預告會顯示這次大約回多少，看到它要回血，先點火再打。自動戰鬥也會在敵人準備回血時優先用灼燒招。'},
   {v:'3.9',d:'2026-11-19',t:'首領前哨：戰前準備三選一',b:'在首領前哨可以先做一項戰前準備，但只能選一個：🔭 偵察動向（花金幣，首領開場 HP -12%）、🪤 布置陷阱（拿一瓶治療藥水當誘餌，首領開場中毒 4 回合、攻擊下降）、🔥 營火調息（免費回 30% HP／MP，但火光會驚動首領，攻擊 +12%）。錢、藥水、血量，看你缺哪個再決定。全自動也會依狀態挑一項。'},
   {v:'3.8',d:'2026-11-19',t:'首領前哨＋自動戰鬥會用毒和火',b:'走到首領前會先停在「首領前哨」：顯示首領等級、你的 HP／MP／藥水和勝算，要硬闖還是帶著戰利品撤退由你決定。全自動在等級差太多或狀態太差時會先撤退練功，不再一直衝去送死掉金幣。自動戰鬥會把中毒、灼燒、虛弱、暈眩的價值算進去：遊俠會用蛇牙箭、法師更常點火，對付厚血的敵人更有效率。'},
   {v:'3.7',d:'2026-11-19',t:'遊俠專注增傷＋自動戰鬥會看預告',b:'遊俠的專注現在每層讓攻擊 +6%，「屏息」提前到 Lv.5 就能學，雙矢每箭 90%→100%：攢專注變強、什麼時候一箭打光要自己拿捏。自動戰鬥變聰明了：看到敵人下回合要出傷害招，劍士會先架招架反擊、法師會先開薄冰鏡；打首領和精英時會先上增益（伏身、晨禱、鬥氣解放）。冒險地點卡片新增提醒：首領已現身但你等級還不夠時，會先告訴你終點會碰上它。'},
@@ -1953,8 +1954,8 @@ function pAct(type,arg){if(!B||B.busy)return;const s=stats();
   setTimeout(foeTurn,type==='skill'?1750:850)}
 const isDng=k=>!!k&&!!k.pow&&((k.pow||0)>=1.6||(k.h||1)>=3);
 function intentHtml(){if(!B||B.hp<=0)return '';if(B.chg)return `<div class="intent dng">⚠ 下回合：毀滅一擊　<small>防禦減傷 75%</small></div>`;if(B.kind==='boss'&&!B.big&&B.turn>=3&&B.turn%4===3&&!(B.st.stun>0))return `<div class="intent dng">⚠ 下回合：開始蓄力</div>`;if(!('next' in B))return '';const k=B.next&&SKM[B.next];
-  if(!k)return `<div class="intent">⚔ 下回合：普通攻擊</div>`;if(!k.pow)return `<div class="intent buff">✚ 下回合：【${k.n}】</div>`;return isDng(k)?`<div class="intent dng">⚠ 下回合：【${k.n}】　<small>防禦減傷 75%＋破綻</small></div>`:`<div class="intent sk">✦ 下回合：【${k.n}】</div>`}
-function foePick(){const ks=(B.m.sk||[]).filter(id=>{const k=SKM[id];return !(k.heal&&B.hp>B.max*.55)&&!(k.self&&B.fb.some(b=>b.id===id))&&!(k.shield&&B.fshield>0)});
+  if(!k)return `<div class="intent">⚔ 下回合：普通攻擊</div>`;if(!k.pow){if(k.heal){const pc=Math.round(k.heal*Math.pow(.6,B.hN||0)*(B.st.burn>0?.5:1)*100);return `<div class="intent buff">✚ 下回合：【${k.n}】　<small>回復約 ${pc}%${B.st.burn>0?'（灼燒壓制中）':'・灼燒可減半'}</small></div>`}return `<div class="intent buff">✚ 下回合：【${k.n}】</div>`}return isDng(k)?`<div class="intent dng">⚠ 下回合：【${k.n}】　<small>防禦減傷 75%＋破綻</small></div>`:`<div class="intent sk">✦ 下回合：【${k.n}】</div>`}
+function foePick(){const ks=(B.m.sk||[]).filter(id=>{const k=SKM[id];return !(k.heal&&(B.hp>B.max*.55||B.hcd>B.turn))&&!(k.self&&B.fb.some(b=>b.id===id))&&!(k.shield&&B.fshield>0)});
   const ch=B.kind==='boss'?.5:(B.kind==='elite'||B.mut||B.nm)?.42:.3;return ks.length&&Math.random()<ch?pick(ks):null}
 function foeTurn(){if(!B)return;B.tk=0;const s=stats();
   for(const k of ['poison','burn'])if(B.st[k]>0){const d=Math.max(1,Math.round(B.max*(k==='poison'?.05:.04)*(B.kind==='boss'?.5:1)));B.hp=Math.max(0,B.hp-d);B.st[k]--;blog(`${B.name} 受到${FOE[k]}傷害 ${d}`)}
@@ -1971,7 +1972,7 @@ function foeTurn(){if(!B)return;B.tk=0;const s=stats();
     if(k){fx.cut=k.n;fx.fsk=id}
     if(k&&k.cost)B.hp=Math.max(1,B.hp-Math.round(B.max*k.cost));
     if(k&&!k.pow){const ps=[];
-      if(k.heal){const h=Math.round(B.max*k.heal);B.hp=Math.min(B.max,B.hp+h);fx.fheal=h;ps.push(`回復 ${h} HP`)}
+      if(k.heal){const n=B.hN||0,bn=B.st.burn>0,h=Math.round(B.max*k.heal*Math.pow(.6,n)*(bn?.5:1));B.hN=n+1;B.hcd=B.turn+2;B.hp=Math.min(B.max,B.hp+h);fx.fheal=h;ps.push(`回復 ${h} HP`);if(bn)ps.push('灼燒讓傷口難以癒合');else if(n)ps.push('再生力正在衰退')}
       if(k.self){B.fb.push(Object.assign({id,n:k.n},k.self));ps.push(k.d)}
       if(k.shield){B.fshield=Math.round(B.max*k.shield);ps.push(`獲得 ${B.fshield} 點護盾`)}
       if(k.hst&&Math.random()<(k.p||1))for(const h in k.hst){B.pst[h]=Math.max(1,k.hst[h]-(hasP('cl3')?1:0));ps.push(`你陷入${HST[h]}`)}
@@ -2020,6 +2021,7 @@ function autoAct(){if(!B||B.busy||!B.auto)return;const s=stats(),sk=mySkills().f
   const nk=B.next&&SKM[B.next],hit=nk?!!nk.pow:'next' in B;
   if(!B.counter&&hit){const g=sk.find(k=>(SK[k].counter||(SK[k].shield&&!(B.shield>0)))&&!SK[k].dmg);if(g&&(nk||Math.random()<.35))return pAct('skill',g)}
   if(B.kind==='boss'||B.kind==='elite'||B.hp>s.ATK*6){const bf=sk.find(k=>SK[k].buff&&!SK[k].dmg&&!B.buffs.some(b=>b.id===k)&&S.mp>=mpCost(k)+8);if(bf&&S.hp>s.HP*.5)return pAct('skill',bf)}
+  if(nk&&nk.heal&&!(B.st.burn>0)){const f=sk.find(k=>SK[k].dmg&&SK[k].foe&&SK[k].foe.burn);if(f)return pAct('skill',f)}
   const d=sk.filter(k=>SK[k].dmg).sort((a,b)=>est(b)-est(a))[0];
   d?pAct('skill',d):pAct('atk')}
 function spoil(){const m=B.m,L=B.L,bs=B.kind==='boss',el=B.kind==='elite',T=B.tot||(B.tot={exp:0,gold:0,got:[],names:[]}),got=T.got;
