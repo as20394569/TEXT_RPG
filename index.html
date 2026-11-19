@@ -1162,7 +1162,7 @@ function newGame(name,cls,sex){
   learn(true);const s=stats();S.hp=s.HP;S.mp=s.MP;checkDaily();save();
 }
 /* 舊存檔升級：三格裝備 → 六格、四階稀有度 → 五階 */
-function migrate(){if(!S)return;dexInit();if(!S.tut){S.tut={};if(S.lv>=5)for(const k in TIPS)if(k!=='tower'&&k!=='ally'&&k!=='adv20')S.tut[k]=1}if(!S.nst)S.nst={};if(S.gem){S.gold+=S.gem*5;S.gem=0}for(const g of S.gear||[])if(!g.sock)g.sock=g.r>=4?[null,null]:g.r>=3?[null]:[];if(!S.sex)S.sex='m';if(!S.flags)S.flags={};if(S.bond==null)S.bond=0;if((S.v||1)>=2)return;
+function migrate(){if(!S)return;if(!S.pid)S.pid=Math.random().toString(36).slice(2,10);dexInit();if(!S.tut){S.tut={};if(S.lv>=5)for(const k in TIPS)if(k!=='tower'&&k!=='ally'&&k!=='adv20')S.tut[k]=1}if(!S.nst)S.nst={};if(S.gem){S.gold+=S.gem*5;S.gem=0}for(const g of S.gear||[])if(!g.sock)g.sock=g.r>=4?[null,null]:g.r>=3?[null]:[];if(!S.sex)S.sex='m';if(!S.flags)S.flags={};if(S.bond==null)S.bond=0;if((S.v||1)>=2)return;
   const om=[0,1,3,4];
   for(const g of S.gear){if(g.id.startsWith('c_'))g.id='r_'+g.id.slice(2);g.r=om[g.r]??g.r;
     if(GEAR[g.id]){if(!g.sub)g.sub=rollSubs(GEAR[g.id].t,g.r);if(g.r>=4&&!g.sp)g.sp=pick(Object.keys(SPEC))}g.lock=!!g.lock}
@@ -1377,12 +1377,12 @@ const GREET={
 let RANKURL=null,RANKTOP=null,RANKERR=0,RANKT=0;
 async function rankUrl(){if(RANKURL)return RANKURL;try{const r=await fetch('rank.json?'+Date.now(),{cache:'no-store'});const j=await r.json();if(j&&j.url)RANKURL=j.url.replace(/\/$/,'')}catch(e){}return RANKURL}
 async function rankSync(force){if(!S||!S.cls)return;if(!force&&Date.now()-RANKT<5*60e3)return;RANKT=Date.now();const u=await rankUrl();if(!u){RANKERR=1;return}
-  if(!S.pid)S.pid=Math.random().toString(36).slice(2,10);
+  if(!S.pid){S.pid=Math.random().toString(36).slice(2,10);save()}
   try{const ctl=new AbortController();setTimeout(()=>ctl.abort(),6000);
     await fetch(u+'/api/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:S.pid,name:S.name,cls:clsName(),lv:S.lv,power:power()}),signal:ctl.signal});
     const r=await fetch(u+'/api/top?n=50',{signal:ctl.signal});RANKTOP=await r.json();RANKERR=0;if(MODAL&&MODAL.k==='rank')drawModal()}catch(e){RANKERR=1;RANKURL=null}}
 setInterval(()=>rankSync(),60e3);setTimeout(()=>rankSync(true),8000);
-function myCode(){if(!S.pid)S.pid=Math.random().toString(36).slice(2,10);const j=JSON.stringify({i:S.pid,n:S.name,c:clsName(),l:S.lv,p:power(),t:Date.now()});return 'AO1-'+btoa(unescape(encodeURIComponent(j)))}
+function myCode(){if(!S.pid){S.pid=Math.random().toString(36).slice(2,10);save()}const j=JSON.stringify({i:S.pid,n:S.name,c:clsName(),l:S.lv,p:power(),t:Date.now()});return 'AO1-'+btoa(unescape(encodeURIComponent(j)))}
 function readCode(c){try{c=(c||'').trim();if(!c.startsWith('AO1-'))return null;const o=JSON.parse(decodeURIComponent(escape(atob(c.slice(4)))));if(!o.i||!o.n||typeof o.p!=='number')return null;return o}catch(e){return null}}
 function greet(who,fallback){const g=GREET[who];return (g&&pickC(g))||fallback}
 /* 戰鬥中的即時對話泡泡 */
@@ -1676,7 +1676,7 @@ const MV={
         <button class="btn pri big" data-a="trial" ${ok?'':'disabled'}>${ok?'挑戰試煉':'材料不足'}</button>`}
     else b+=`<p class="sub">試煉已通過。選擇${you('你')}的路線，選定之後無法更改。</p><div class="grid2">${CLS[S.cls].adv.map(k=>`<div class="panel">${art(`class_${k}_${S.sex}`,ADV[k].n,'r34')}<h3>${ADV[k].n}</h3><p class="sub">${ADV[k].d}</p><button class="btn pri" data-a="advance" data-v="${k}">轉職</button></div>`).join('')}</div>`;
     return{t:'轉職神殿',b}},
-  rank(){if(!RANKTOP||Date.now()-RANKT>60e3)rankSync(true);const online=Array.isArray(RANKTOP)&&RANKTOP.length;const P=online?[]:[9820,8450,7300,6120,5200,4100,3050,2200,1400,800].map((p,i)=>({n:FAKE[i],p}));if(online)RANKTOP.filter(x=>x.id!==S.pid).forEach(x=>P.push({n:x.name,p:x.power,c:x.cls,l:x.lv,t:x.ts,on:1}));P.push({n:S.name,p:power(),me:1,c:clsName(),l:S.lv});Object.entries(S.friends||{}).forEach(([id,f])=>P.push({n:f.n,p:f.p,c:f.c,l:f.l,t:f.t,fr:id}));P.sort((a,b)=>b.p-a.p);
+  rank(){if(!RANKTOP||Date.now()-RANKT>60e3)rankSync(true);const online=Array.isArray(RANKTOP)&&RANKTOP.length;const P=online?[]:[9820,8450,7300,6120,5200,4100,3050,2200,1400,800].map((p,i)=>({n:FAKE[i],p}));if(online){const seen={};RANKTOP.filter(x=>x.id!==S.pid&&!(x.name===S.name&&x.cls===clsName())).sort((a,b)=>b.ts-a.ts).forEach(x=>{const k=x.name+'|'+x.cls;if(seen[k])return;seen[k]=1;P.push({n:x.name,p:x.power,c:x.cls,l:x.lv,t:x.ts,on:1})})}P.push({n:S.name,p:power(),me:1,c:clsName(),l:S.lv});Object.entries(S.friends||{}).forEach(([id,f])=>P.push({n:f.n,p:f.p,c:f.c,l:f.l,t:f.t,fr:id}));P.sort((a,b)=>b.p-a.p);
     return{t:'戰力排行榜',b:`<div class="list">${P.map((x,i)=>`<div class="item" ${x.me?'style="border:2px solid var(--navy);background:var(--panel2)"':''}><span class="ico c${i<3?4:0}">${i+1}</span><span class="grow"><b>${esc(x.n)}</b>${x.on?' <span class="tag ok">玩家</span>':x.fr?' <span class="tag ok">好友</span>':x.me?' <span class="tag">我</span>':''}${x.c?`<span class="sub">${esc(x.c)}・Lv.${x.l}${x.t?`・${new Date(x.t).toLocaleDateString()} 更新`:''}</span>`:''}</span><b>${x.p}</b>${x.fr?`<button class="btn sm" data-a="rankDel" data-v="${x.fr}">移除</button>`:''}</div>`).join('')}</div>
       <div class="panel"><h3>和朋友比戰力</h3><p class="sub">遊戲沒有伺服器，所以用「戰力碼」交換：把你的碼傳給朋友，再把朋友的碼貼進來。朋友變強後，請他再傳一次新碼就會更新。</p>
       <div class="fcode-me">${myCode()}</div><button class="btn pri" data-a="rankCopy">複製我的戰力碼</button>

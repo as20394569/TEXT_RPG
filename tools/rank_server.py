@@ -88,6 +88,8 @@ class H(BaseHTTPRequestHandler):
                    'lv': max(1, min(99, int(d.get('lv', 1)))), 'power': max(0, min(999999, int(d.get('power', 0)))),
                    'ts': int(now * 1000)}
             with LOCK:
+                for k in [k for k, r in DB.items() if k != pid and r.get('name') == row['name'] and r.get('cls') == row['cls']]:
+                    DB.pop(k, None)  # 同名同職業的舊紀錄（重整產生的分身）合併
                 DB[pid] = row
                 save()
                 rank = sorted(DB.values(), key=lambda r: -r['power']).index(row) + 1

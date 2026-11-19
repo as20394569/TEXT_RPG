@@ -11,7 +11,7 @@
 - 怪物有「下回合行動預告」（`intentHtml`、`B.next`），紅色⚠大招可完美防禦得破綻。
 - 岔路有危險度與特殊標記（`TAGS`、`rTag`），事件顯示成功率、有祝福／驚動魔物（`evTwist`）。
 - **人物要像真人**：露娜、主角、城鎮 NPC 不能只是劇情機器。台詞放在 `GREET`（城鎮招呼，依章節/時間/狀態）、`BT`（戰鬥泡泡）、`CAMP`（營火閒聊，依章節逐段聊開）、`FORKL`（岔路閒聊）。每次排程可以補充台詞，要有個性、口語、偶爾開玩笑或流露情緒，並跟劇情進度一致。
-- 排行榜：伺服器跑在製作人電腦（`tools/rank_server.py`，Codex 架設在 `azure-oath\rank_server\`，用 Cloudflare 臨時通道對外）。遊戲從 `rank.json` 讀伺服器網址（`rankSync`）。**每次排程都要**用 device 檔案工具讀 `C:\Users\Administrator\Documents\ChatGPT\cluade畫圖\azure-oath\rank_url.txt`，網址和 `rank.json` 不同就更新並 push（電腦重開後網址會變）。連不上時遊戲退回 NPC＋好友戰力碼（`myCode`／`readCode`）。
+- 排行榜：伺服器跑在製作人電腦（`tools/rank_server.py`，Codex 架設在 `azure-oath\rank_server\`，用 Cloudflare 臨時通道對外）。遊戲從 `rank.json` 讀伺服器網址（`rankSync`）。**每次排程都要**用 device 檔案工具讀 `C:\Users\Administrator\Documents\ChatGPT\cluade畫圖\azure-oath\rank_url.txt`，網址和 `rank.json` 不同就更新並 push（電腦重開後網址會變）。伺服器程式有更新時（例如 2026-11-19 合併同名分身），請 Codex 重新下載 tools/rank_server.py 並重啟 AzureOathRank。連不上時遊戲退回 NPC＋好友戰力碼（`myCode`／`readCode`）。
 - 文字一律繁體中文，自然、不老套。招式名稱要像真的遊戲招式。
 
 ## 美術流程（Codex 畫圖）
