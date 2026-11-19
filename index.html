@@ -154,7 +154,7 @@ input,textarea{font:inherit;width:100%;padding:8px 10px;border:2px solid var(--l
 .lunge-me{animation:lgM .4s}@keyframes lgM{40%{transform:translate(38%,-28%)}}
 .lunge-foe{animation:lgF .4s}@keyframes lgF{40%{transform:translate(-38%,28%)}}
 .spr.hit .art{animation:hitA .5s .2s}@keyframes hitA{0%{filter:brightness(2.4) saturate(.3)}18%{filter:brightness(1.3)}40%,100%{filter:none}}
-.spr.faint{animation:faint .5s .6s forwards}.faintl{animation:faint .5s 1.4s forwards}.dmg.eltag{font-size:13px;margin-top:-26px;color:#ffd34a}.dmg.eltag.r{color:#9fb0c8}@keyframes faint{to{transform:translateY(60%);opacity:0}}
+.spr.faint{animation:faint .5s .6s forwards}.faintl{animation:faint .5s 1.4s forwards}.dmg.eltag{font-size:13px;margin-top:-26px;color:#ffd34a}.dmg.eltag.r{color:#9fb0c8}.dmg.eltag.rend{color:#ffb070}@keyframes faint{to{transform:translateY(60%);opacity:0}}
 .spr.glow .art{animation:glow .7s}@keyframes glow{50%{box-shadow:0 0 18px 6px #fff7b0;filter:brightness(1.4)}}
 .quake{animation:quake .4s .2s}@keyframes quake{20%,60%{transform:translate(-6px,3px)}40%,80%{transform:translate(6px,-3px)}}
 .fl{position:absolute;inset:-10%;border-radius:50%;opacity:0;animation:fl .45s .2s;pointer-events:none}
@@ -425,7 +425,7 @@ const ADV={
   templar:{n:'聖殿騎士',d:'把信仰變成鐵鎚。力量 +6、體質 +4，Lv.20/23/26 習得天秤、聖光鎚擊、審判之日。被動【信念之鎚】攻擊、魔力 +10%。',bonus:{STR:6,VIT:4}}
 };
 const SK={
-  slash:{n:'裂甲擊',c:'swordsman',lv:1,mp:4,dmg:{s:'ATK',p:1.55},brk:2,d:'踏前一步重砍，敵人破綻 +2。'},
+  slash:{n:'裂甲擊',c:'swordsman',lv:1,mp:4,dmg:{s:'ATK',p:1.55,rend:1},brk:2,d:'踏前一步重砍，敵人破綻 +2。劈開護甲：無視物理抗性。'},
   guard:{n:'招架反擊',c:'swordsman',lv:1,mp:5,counter:1,d:'擺好架勢。下次被攻擊只受 30% 傷害，並反擊 150%。'},
   whirl:{n:'十字裂斬',c:'swordsman',lv:3,mp:8,dmg:{s:'ATK',p:1.2},fin:.6,d:'清算所有破綻，每層傷害 +60%。'},
   warcry:{n:'鬥氣解放',c:'swordsman',lv:8,mp:8,buff:{atk:.35,t:3},endure:1,d:'3 回合攻擊 +35%，受到致命傷時以 1 HP 撐住一次。'},
@@ -1577,7 +1577,7 @@ function vBattle(){const s=stats(),fx=B.fx||{},intro=B.intro,a=AREAS[RUN.area];B
   if(fx.by)B.pfx=fx;const mine=fx.by==='me',theirs=fx.by==='foe',atk=mine&&fx.d!=null;const sk=fx.skill?SKA[fx.skill]:null,fk=theirs&&fx.fsk?(SKM[fx.fsk]||{fx:'roar',c:'#ff4a4a'}):null;B.delayBar=!!(sk||fk);
   const foeC=[intro?'in-r':'',atk&&fx.d>0?(sk?'hitl':'hit'):'',theirs&&!fx.stun?(fk?(MELEE[fk.fx]?'charge lunge2':'charge'):'lunge-foe'):'',B.hp<=0?(sk?'faintl':'faint'):'',B.mut?'mut':'',B.nm?'nm':'',B.treasure?'gold':'',B.wander?'wander':'',...Object.keys(B.st||{}).filter(k=>B.st[k]>0).map(k=>'s-'+k),B.frozen&&B.st.stun>0?'s-freeze':''].join(' ');
   const meC=[intro?'in-l':'',sk?(sk[0]==='slash'||sk[0]==='spin'?'cast dash':'cast'):atk?'lunge-me':'',mine&&fx.glow&&!sk?'glow':'',theirs&&fx.d>0?(fk?'hitl':'hit'):'',...Object.keys(B.pst||{}).filter(k=>B.pst[k]>0).map(k=>'s-'+k)].join(' ');
-  const foeFx=(fx.fheal?`<span class="dmg heal ${fk?'late':''}">+${fx.fheal}</span>`:'')+(atk&&fx.d===0?'<span class="dmg miss">MISS</span>':'')+(atk&&fx.d>0?(sk?`<span class="dmg late ${fx.cr?'cr':''}">-${fx.d}${fx.cr?'!':''}</span>`:`<span class="dmg ${fx.cr?'cr':''}">-${fx.d}${fx.cr?'!':''}</span>`):'')+(atk&&fx.d>0&&B.elHit?`<span class="dmg ${sk?'late':''} eltag ${B.elHit}">${B.elHit==='w'?'弱點！':'抵抗'}</span>`:'');
+  const foeFx=(fx.fheal?`<span class="dmg heal ${fk?'late':''}">+${fx.fheal}</span>`:'')+(atk&&fx.d===0?'<span class="dmg miss">MISS</span>':'')+(atk&&fx.d>0?(sk?`<span class="dmg late ${fx.cr?'cr':''}">-${fx.d}${fx.cr?'!':''}</span>`:`<span class="dmg ${fx.cr?'cr':''}">-${fx.d}${fx.cr?'!':''}</span>`):'')+(atk&&fx.d>0&&B.elHit?`<span class="dmg ${sk?'late':''} eltag ${B.elHit}">${B.elHit==='w'?'弱點！':B.elHit==='rend'?'裂甲！':'抵抗'}</span>`:'');
   const meFx=(theirs?(fx.miss?'<span class="dmg miss">MISS</span>':fx.d>0?(fk?`<span class="dmg late ${fx.cr?'cr':''}">-${fx.d}</span>`:`<span class="dmg">-${fx.d}</span>`):fx.d===0?'<span class="dmg miss">擋下</span>':''):'')+(fx.heal?`<span class="dmg heal ${sk?'late':''}">+${fx.heal}</span>`:'');
   /* 動作依時間發生：先出手，命中瞬間才受傷／倒地，之後回到待機 */
   const fB='mob_'+B.id,fIdle=h=>fB+(h<=0?'_lose':h<30?'_low':''),mB=HK(),mIdle=h=>mB+(h<30?'_low':'');
@@ -1986,6 +1986,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'7.0',d:'2026-11-19',t:'裂甲擊破甲、新站姿立繪',b:'劍士的「裂甲擊」現在會劈開護甲，無視物理抗性（史萊姆、幽靈這類不怕刀砍的魔物，改用裂甲擊就能打出正常傷害，命中時跳出「裂甲！」）。角色頁裝備欄的站姿立繪全部 12 職業男女到齊；劍士全套戰鬥圖換成新版。'},
   {v:'6.9',d:'2026-11-19',t:'魔物專屬裝備',b:'10 種新魔物各有一件史詩級專屬裝備，帶有獨特效果：毒沼凝晶戒、雷角疾靴、噬魂菇冠、幽影狼皮甲、熔岩蝠翼墜、水晶核心、暴雪狼牙鍊、雪暴精靈之冠、血誓戰靴、虛無幽魂斗篷。一般 4%、精英 12%、寶藏魔物 30%、徘徊強敵 50% 掉落；點魔物圖像可看牠掉什麼。'},
   {v:'6.8',d:'2026-11-19',t:'新魔物與稀有遭遇',b:'每張地圖新增 2 種魔物（毒沼史萊姆、雷角野兔、噬魂紫菇、幽影狼、熔岩蝙蝠、水晶魔像、暴雪狼、雪暴精靈、血誓騎士、虛無幽魂），各有不同技能與弱點。冒險中可能遇到閃閃發亮的「寶藏魔物」（3 回合內打倒才拿得到大量金幣與裝備）和危險的「徘徊強敵」（強大但掉落豐厚）。'},
   {v:'6.7',d:'2026-11-19',t:'裝備隨機性提升',b:'新掉落的裝備多了「品質」：主屬性在 85%～125% 之間隨機，3% 機率出現 130%～140% 的【完美】裝備；附加詞條數值浮動加大（70%～130%）；稀有以上有 20% 機率多一條詞條。同名同稀有度的裝備也會有明顯差異，值得多刷幾件挑最好的。'},
@@ -2127,7 +2128,7 @@ const basicEl=()=>({swordsman:'phys',ranger:'phys',mage:'arcane',cleric:'holy'}[
 const capB=d=>{if(!B||B.kind!=='boss')return d;const lim=B.max,r=Math.max(1,Math.min(d,lim-(B.tk||0)));B.tk=(B.tk||0)+r;return r};
 function bossPhase(){if(B&&B.kind==='boss'&&!B.ph2&&B.hp>0&&B.hp<=B.max*.5){B.ph2=1;B.fshield=(B.fshield||0)+Math.round(B.max*.12);blog(`${B.name} 被逼入絕境，張開了護盾！`)}}
 function hitFoe(stat,pow,o){o=o||{};const s=stats();if(s.GALE&&!B.gale){B.gale=1;o=Object.assign({},o,{sure:1});B.log.push('【疾風】先發制人！')}if(!o.sure&&Math.random()*100<(B.eva+fbSum('eva'))*.6)return{d:0,cr:false,miss:true};let base=clsDm()*(B.opening?1.5:1)*(S.cls==='swordsman'&&B.cls&&B.cls.brk?1+.06*B.cls.brk:1)*(S.cls==='ranger'&&B.cls&&B.cls.focus?1+.06*B.cls.focus:1)*(stat==='BOTH'?s.ATK+s.MAG:s[stat])*(1+buffSum('atk')+(s.FOCUSATK&&B.cls.focus>=rmax(5)?s.FOCUSATK/100:0))*(B.pst.weak>0?.75:1)*(s.BACK&&S.hp<s.HP*.35?1+s.BACK/100:1);
-  const fdef=stat==='MAG'?(B.mres??B.def):stat==='BOTH'?((B.mres??B.def)+B.def)/2:B.def;const em=elMul(B.id,B.curEl);if(em!==1)B.elHit=em>1?'w':'r';let d=em*base*pow*100/(100+fdef*(1+fbSum('def'))*(1-(o.pierce||0)))*(.9+Math.random()*.2);const cr=!!o.sure||Math.random()*100<-(B.tough||0)+s.CRIT+(o.cr||0)+(hasP('sw1')&&B.cls.brk>=3?15:0);if(cr){const cdm=(s.CD+(hasP('rg3')&&B.cls.focus>=5?30:0)+s.BRKCD*B.cls.brk)/100;d*=1+(cdm-1)*(1-(B.cdr||0))}
+  const fdef=stat==='MAG'?(B.mres??B.def):stat==='BOTH'?((B.mres??B.def)+B.def)/2:B.def;let em=elMul(B.id,B.curEl);if(o.rend&&em<1){em=1;B.elHit='rend'}else if(em!==1)B.elHit=em>1?'w':'r';let d=em*base*pow*100/(100+fdef*(1+fbSum('def'))*(1-(o.pierce||0)))*(.9+Math.random()*.2);const cr=!!o.sure||Math.random()*100<-(B.tough||0)+s.CRIT+(o.cr||0)+(hasP('sw1')&&B.cls.brk>=3?15:0);if(cr){const cdm=(s.CD+(hasP('rg3')&&B.cls.focus>=5?30:0)+s.BRKCD*B.cls.brk)/100;d*=1+(cdm-1)*(1-(B.cdr||0))}
   d=capB(Math.max(1,Math.round(d)));if(B.fshield>0){const ab=Math.min(B.fshield,d);B.fshield-=ab;d-=ab}B.hp=Math.max(0,B.hp-d);bossPhase();return{d,cr}}
 function pAct(type,arg){if(!B||B.busy)return;const s=stats();
   if(type==='skill'&&S.mp<mpCost(arg)){toast('MP 不足');return}
@@ -2229,7 +2230,7 @@ function foeTurn(){if(!B)return;if(B.treasure&&B.turn>=3&&B.hp>0){B=null;RUN.vie
   if(B.pst.stun>0){B.pst.stun--;blog(`你${HST.stun}了，這回合無法行動`);B.busy=true;render();setTimeout(foeTurn,wait+1100);return}
   B.busy=!!wait;render();setTimeout(()=>{if(!B)return;B.busy=false;if(B.auto)autoAct()},wait+(B.auto?(FA?2000+wait:1000):0))}
 function myPd(k,s){s=s||stats();const x=k&&SK[k],st=x?x.dmg.s:'ATK',v=st==='BOTH'?s.ATK+s.MAG:s[st]||s.ATK,df=st==='MAG'?(B.mres??B.def):B.def;
-  return clsDm()*v*(x?x.dmg.p*(x.dmg.h||1)*(1+.15*((S.skl[k]||1)-1)):S.cls==='swordsman'?1.15:1)*100/(100+df)*(1+buffSum('atk'))*(B.opening?1.5:1)*elMul(B.id,x?SKEL2[k]||'phys':'phys')*.85}
+  return clsDm()*v*(x?x.dmg.p*(x.dmg.h||1)*(1+.15*((S.skl[k]||1)-1)):S.cls==='swordsman'?1.15:1)*100/(100+df)*(1+buffSum('atk'))*(B.opening?1.5:1)*(x&&x.dmg.rend?Math.max(1,elMul(B.id,SKEL2[k]||'phys')):elMul(B.id,x?SKEL2[k]||'phys':'phys'))*.85}
 function autoAct(){if(!B||B.busy||!B.auto)return;if(MODAL&&MODAL.k==='foe')return;const s=stats(),sk=mySkills().filter(k=>S.mp>=mpCost(k)&&!(SK[k].ult&&B.ultUsed));
   if(S.hp<s.HP*.4){const h=sk.find(k=>SK[k].heal);if(h)return pAct('skill',h);const p=['pot2','pot'].find(k=>S.items[k]);if(p)return pAct('item',p)}
   const C=B.cls,est=k=>{const x=SK[k];return elMul(B.id,SKEL2[k]||'phys')*x.dmg.p*(x.dmg.h||1)*(1+(x.fin||0)*C.brk+(x.det||0)*C.marks.length+(x.aim||0)*C.focus+(x.faithAmp?Math.min(1,C.faith/100):0)+(x.faithSpend?C.faith/100*1.2:0))+dotV(x)};
