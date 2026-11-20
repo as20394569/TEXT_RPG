@@ -350,6 +350,7 @@ input,textarea{font:inherit;width:100%;padding:8px 10px;border:2px solid var(--l
 .mkc{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;color:#fff;font-weight:900;font-size:12px;margin-right:2px;box-shadow:0 0 6px currentColor}.mkc.m灼{background:radial-gradient(#ffcf5a,#ff5a1a)}.mkc.m凍{background:radial-gradient(#e0f8ff,#3aa0e0)}.mkc.m蝕{background:radial-gradient(#d8b8ff,#6a2aaa)}.mkc.m奧{background:radial-gradient(#e8d0ff,#8a4ae0)}.mkc.m星{background:radial-gradient(#fff6c0,#e0a020)}
 .spr.gold{filter:sepia(1) saturate(4) hue-rotate(-10deg) brightness(1.2) drop-shadow(0 0 10px #ffd34a)}.spr.gold .art img.unused{filter:sepia(1) saturate(4) hue-rotate(-10deg) brightness(1.2) drop-shadow(0 0 10px #ffd34a)!important;animation:goldGlow 1s infinite alternate}@keyframes goldGlow{to{filter:sepia(1) saturate(5) hue-rotate(-10deg) brightness(1.45) drop-shadow(0 0 18px #ffe27a)}}.spr.wander{filter:drop-shadow(0 0 12px #ff2a2a) brightness(.9) contrast(1.2)!important}.spr.wander .plat{background:radial-gradient(rgba(255,40,40,.5),transparent 70%)}
 #maint{position:fixed;inset:0;z-index:999;background:rgba(14,24,44,.92);display:flex;align-items:center;justify-content:center;padding:20px}#maint .mt-box{background:#fffaf0;border:3px solid #e0a020;border-radius:16px;padding:22px 20px;text-align:center;max-width:340px}#maint .mt-ic{font-size:44px}#maint h2{margin:6px 0 10px}#maint p{margin:6px 0}
+.art.scn img{animation:none!important;filter:none!important}.art.scn img.hero{inset:auto;bottom:-4%;height:100%;width:auto;max-width:none;object-fit:contain;z-index:2;filter:drop-shadow(0 4px 6px rgba(0,0,0,.35))!important}.art.scn img.hero.l{left:-2%}.art.scn img.hero.r{right:-2%;transform:scaleX(-1)}
 </style>
 </head>
 <body>
@@ -383,6 +384,7 @@ const SHO=['','mage','ranger','cleric','knight','berserker','archmage','warlock'
 const shKey=k=>{const m=k&&k.match(/^story_ch(\d)_(intro|mid|outro)_([mf])(?:_(\w+))?$/);if(!m)return null;const i=SHO.indexOf(m[4]||'');return i<0?null:{f:`sheet_ch${m[1]}_${m[2]}_${m[3]}`,i}};
 const shPos=i=>`background-position:${(i%4)/3*100}% ${Math.floor(i/4)/2*100}%`;
 function art(key,label,r='r169',extra='',under){let vf='';{const m=key&&key.match(/^mob_([a-z]+)(_\w+)?$/);if(m&&typeof MVAR!=='undefined'&&MVAR[m[1]]&&!(ARTSET&&ARTSET.has(key))){vf=MVAR[m[1]].f;key='mob_'+MVAR[m[1]].base+(m[2]||'')}if(under){const u2=under.match(/^mob_([a-z]+)(_\w+)?$/);if(u2&&typeof MVAR!=='undefined'&&MVAR[u2[1]])under='mob_'+MVAR[u2[1]].base+(u2[2]||'')}}if(key&&/^npc_\w+$/.test(key))key='portrait_'+key;if(under&&/^npc_\w+$/.test(under))under='portrait_'+under;
+  {const sc=key&&key.match(/^(story_ch(\d+)_(intro|mid|outro))_[mf]/);if(sc&&ARTSET&&ARTSET.has(sc[1]+'_scene')&&typeof S!=='undefined'&&S){const P=SPOSE[sc[2]+'_'+sc[3]]||{},side=P.side||'l',hk=HK()+(P.pose||({outro:'_win'}[sc[3]]||'')),hs=artSrc(hk)||artSrc(HK());return `<div class="art ${r} ${extra} has scn" data-art="${key}"><img src="art/${sc[1]}_scene.webp" alt=""><img class="hero ${side}" src="art/${hs}.webp" alt=""></div>`}}
   const sk=shKey(key);if(sk)return `<div class="art ${r} ${extra} has" data-art="${key}"${vf?` style="filter:${vf}"`:''}><i class="sht" style="background-image:url(art/${sk.f}.webp);${shPos(sk.i)}"></i></div>`;
   const src=artSrc(key);
   const u=under&&under!==src&&!MISS.has(under)&&PRE[under]?`<img class="under" src="art/${under}.webp" alt="">`:'';
@@ -404,6 +406,8 @@ const HK=()=>`class_${S.adv||S.cls}_${S.sex}`;
 const SCLS=()=>S.adv?'_'+S.adv:S.cls==='swordsman'?'':'_'+S.cls;
 const PKEY=(e)=>`portrait_${S.adv||S.cls}_${S.sex}${e?'_'+e:''}`;
 const heroFace=t=>/謝謝|一起|嗯|太好|請多指教|好！/.test(t)?'smile':/[！？]|……|對不起|別|不/.test(t)?'serious':'';
+/* 劇情場景：背景不含主角，主角用職業立繪疊上去；side l/r＝主角站左/右，pose＝動作後綴 */
+const SPOSE={};
 const SKEY=(n,io)=>`story_ch${n}_${io}_${S.sex}${SCLS()}`;
 function toast(t){const T=$('#toast');while(T.children.length>=3)T.firstChild.remove();const d=document.createElement('div');d.textContent=t;T.appendChild(d);setTimeout(()=>d.remove(),2300)}
 
