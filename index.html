@@ -2374,6 +2374,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'9.5',d:'2026-11-20',t:'自動戰鬥會喝魔力藥水',b:'自動／全自動戰鬥遇到首領、精英等硬敵時，魔力見底會自動喝魔力藥水（缺得多才用高級版），不再只能普攻硬磨。'},
   {v:'9.4',d:'2026-11-20',t:'生活機能調整',b:'①占星師新增「每日星象」：每天免費占卜一次，抽一個整天有效的祝福（經驗、金幣、掉寶、爆擊、屬性連鎖）。②每日任務獎勵大幅提高，三項全完成再送寶石與強化石。③裝備強化到 +10 會多開一個寶石孔，精英魔物也會掉寶石。'},
   {v:'9.3',d:'2026-11-20',t:'強化改版',b:'強化加入鐵鎚演出；6% 機率「大成功」直接 +2。+7 以上失敗仍會降一級。'},
   {v:'9.2',d:'2026-11-20',t:'攻防與屬性改版',b:'①魔物防禦與魔抗隨等級成長，破甲、穿透與物理／魔法的選擇更重要。②主角新增「魔抗」，布甲、輕甲、項鍊、戒指提供，重甲防禦高但魔抗低。③新增火、冰、雷、暗抗性，魔物屬性招式會被抗性減傷，森林／火山／雪地／雷擊套裝附帶對應抗性，詞條也會出現。④屬性連鎖：冰凍時火攻「碎冰」、灼燒時冰攻「蒸發」、雷打冰凍「導電」、雷打中毒「毒爆」、聖打虛弱「淨化」、暗打流血「血蝕」，傷害提高。'},
@@ -2657,6 +2658,8 @@ function autoAct(){if(!B||B.busy||!B.auto)return;if(MODAL&&MODAL.k==='foe')retur
   const solo=!(B.adds||[]).some(f=>f.hp>0),pd=k=>myPd(k,s),
     killer=solo?[null,...sk.filter(k=>SK[k].dmg)].filter(k=>pd(k)>=B.hp).sort((a,b)=>(a?mpCost(a):0)-(b?mpCost(b):0))[0]:undefined;
   if(killer!==undefined)return killer?pAct('skill',killer):pAct('atk');
+  /* 魔力見底：強敵還很硬、主力招放不出來時喝魔力藥水（缺得多才喝高級的） */
+  if(S.mp<s.MP*.25&&(B.kind==='boss'||B.kind==='elite'||B.hp>pd(null)*4)&&mySkills().some(k=>SK[k].dmg&&!SK[k].ult&&mpCost(k)>S.mp)){const lack=s.MP-S.mp,e=lack>=110&&S.items.eth2?'eth2':S.items.eth?'eth':S.items.eth2?'eth2':null;if(e)return pAct('item',e)}
   const nk0=B.next&&SKM[B.next],inc=(nk0&&nk0.mag?B.mag:B.atk)*(nk0&&nk0.pow||1)*(nk0&&nk0.h||1)*100/(100+s.DEF),soft=solo&&!B.chg&&inc<S.hp*.15&&B.hp<=2.2*Math.max(pd(null),...sk.filter(k=>SK[k].dmg).map(pd));
   if(B.chg||(B.next&&isDng(SKM[B.next])))return pAct('guard');
   /* 看預告決定：對方下回合要出傷害招就先架刀；強敵開場先上增益 */
