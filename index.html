@@ -1078,6 +1078,80 @@ if(P2){
    ['艾德溫','地下書庫……三百年前的檔案也在那裡。{name}，這次換我帶路了。'],
    ['旁白','【第六章 完】第七章「沉沒的檔案館」製作中。']]});
 }
+
+/* ===== 第七章「沉沒的檔案館」：美術到齊前保持關閉（P3） ===== */
+const P3=false;
+if(P2&&P3){
+  Object.assign(ITEMS,{m_page:{n:'泡水的檔案頁',d:'字跡被水暈開，還能勉強讀出幾個名字',sell:240,mat:1}});
+  Object.assign(MOBS,{
+    bookworm:{n:'噬紙書蠹',lv:30,ty:'swift',mat:'m_page',sk:['m_inkspit','m_burrow']},
+    waterwraith:{n:'積水妖',lv:31,ty:'caster',hpM:.9,sk:['m_drown','m_mistveil']},
+    rustguard:{n:'鏽蝕守衛',lv:32,ty:'tank',hpM:1.25,sk:['m_rustblade','m_seal']},
+    archivist:{n:'檔案守門人',lv:33,ty:'brute',boss:1,hpM:1.35,mat:'m_page',sk:['m_redact','m_seal','m_sentence']}});
+  Object.assign(SKM,{
+    m_inkspit:{n:'墨汁噴吐',pow:.9,hst:{weak:2},fx:'orb',c:'#2a2a3a',d:'墨汁糊住視線，主角攻擊下降'},
+    m_burrow:{n:'鑽進書堆',self:{eva:40,t:2},fx:'spore',c:'#c8b48a',d:'躲進書堆，迴避 +40%'},
+    m_drown:{n:'沉溺之手',mag:1,pow:1.6,hst:{stun:1},p:.25,fx:'beam',c:'#4aa8c8',d:'積水化成手臂把人往下拖，25% 機率暈眩'},
+    m_mistveil:{n:'水霧帷幕',self:{eva:25,t:3},heal:.08,fx:'aura',c:'#9fd8e8',d:'迴避 +25%，回復 8% HP'},
+    m_rustblade:{n:'鏽刃劈砍',pow:1.5,pierce:.25,hst:{weak:2},fx:'claw',c:'#a86a3a',d:'生鏽的劍刃，無視 25% 防禦'},
+    m_seal:{n:'封存印',shield:.18,self:{def:.35,t:3},fx:'aura',c:'#d8c070',d:'護盾 18%，防禦 +35%'},
+    m_redact:{n:'塗銷',mag:1,pow:1.3,h:2,hst:{weak:2},fx:'orb',c:'#1a1a1a',d:'把名字塗黑的墨刃，連擊兩次'},
+    m_sentence:{n:'機密判決',mag:1,pow:2.4,hst:{stun:1},p:.3,fx:'beam',c:'#e8d27a',d:'宣讀判決的金色光柱，30% 機率暈眩'}});
+  GEAR.u_archive={n:'封存司的鑰匙',slot:'neck',t:5,lv:33,price:18000,hp:420,cd:30,uq:{magp:10,atkp:10,mpcut:15},ud:'攻擊與魔力 +10%、技能 MP 消耗 -15%',uniq:1};
+  BOSSU.archivist='u_archive';BGEM.archivist='gem_w';
+  AREAS.push({id:'archive',n:'王都地下書庫',lv:'30–33',base:30,d:'大教堂底下的舊書庫。地下水滲進來，三百年的紀錄泡在黑水裡。',mobs:['bookworm','waterwraith','rustguard'],boss:'archivist'});
+  Object.assign(NPC,{'檔案守門人':'mob_archivist','鏽蝕守衛':'mob_rustguard'});
+  CH[5].outro[CH[5].outro.length-1]=['旁白','【第六章 完】'];
+  CH.push({t:'第七章　沉沒的檔案館',goal:'潛入大教堂底下的王都地下書庫',steps:[{type:'kill',mob:'rustguard',n:5},{type:'boss',mob:'archivist'}],rw:{gold:11000,exp:7500,gem:320,items:{stone:6,pot2:6}},
+  intro:[
+   ['旁白','受勳典禮前一晚。白塔城的大教堂熄了燈，只剩地下室一扇鐵門透出潮氣。'],
+   ['艾德溫','二十年前，我就是從這扇門被帶出去的。他們讓我簽了一張紙，說我什麼都沒看到。'],
+   ['露娜','艾德溫先生……{你|妳}不是說，等我們回來再說嗎？'],
+   ['艾德溫','嗯。所以這次換我帶路。有些話，在那些名字面前說比較好。'],
+   ['希瑟','我只能送你們到這裡。……天亮前要回來，王宮的人會點名。'],
+   ['{name}','希瑟，妳也想知道吧。妳母親的事。'],
+   ['希瑟','……我是騎士。騎士不該違抗王命。'],
+   ['希瑟','可是，如果你們找到她的名字，請告訴我她最後寫了什麼。'],
+   ['旁白','鐵門後面是向下的石階。越往下，水聲越大。']],
+  mid:[
+   ['旁白','書庫的第三層泡在膝蓋深的黑水裡。書架上一排排檔案盒，標籤都被刮掉了。'],
+   ['露娜','有人來過。不是水泡爛的……是故意刮掉的。'],
+   ['旁白','只有一個盒子還貼著標籤：「北方遠征隊・人員名冊・永久封存」。'],
+   ['艾德溫','……二十個人。我記得每一個。'],
+   ['旁白','名冊第一行：隊長，雷恩・白塔。國王的親弟弟。'],
+   ['旁白','第二行：測霧員，艾琳。旁邊有一行小字——「王弟之未婚妻」。'],
+   ['旁白','第十二行：氣象官，瑟琳。備註欄寫著「澤諾斯之妻」。'],
+   ['{name}','澤諾斯的妻子……也在隊伍裡。'],
+   ['旁白','{name} 想起要塞裡帶走的那本筆記：「她在等我。我要把門打開，接她回來。」','#diary'],
+   ['艾德溫','我是第二十個。隊裡年紀最小的挑燈人。'],
+   ['艾德溫','走進霧裡第三天，所有人都停下來了。不是死，是停住，像在等什麼。'],
+   ['艾德溫','只有艾琳還能動。她把我推出霧外，說：「去告訴他們，我們沒有死。」'],
+   ['艾德溫','我回到王都說了。然後就被帶到這裡，簽了那張紙。……二十年，我一個字都沒再說過。'],
+   {q:'名冊要怎麼處理？',choice:[
+    {t:'整本帶走，交給希瑟當證據',fx:{flag:'roster'},lines:[['露娜','這樣王宮一定會發現少了東西。'],['{name}','那就讓他們發現。二十個人，不該只是一個上了鎖的盒子。']]},
+    {t:'抄下名字，把名冊放回原位',fx:{bond:1,flag:'rosterCopy'},lines:[['艾德溫','……謝謝你。至少，他們還留在該在的地方。'],['露娜','我來抄。我的字比較工整。']]}]}],
+  pre:[
+   ['旁白','最深處是一扇刻滿名字的石門。門前站著一具比書架還高的青銅守衛，胸口嵌著一枚封蠟。'],
+   ['旁白','它手上的筆一下一下劃過空中，把石門上的名字一個一個塗黑。'],
+   ['艾德溫','三百年前的封存司……它還在執行最後一道命令：「把所有走進霧裡的人，從紀錄上抹掉。」'],
+   ['露娜','它在塗的，是三百年前的人，還有二十年前的人……'],
+   ['{name}','那就由我們把名字留下來。']],
+  outro:[
+   ['旁白','守門人的筆斷成兩截。石門上還沒被塗掉的名字，在燈下一行行亮了起來。'],
+   ['旁白','最上面是三百年前的名字，數不清有幾百個。最下面，是二十年前的二十個。'],
+   ['露娜','{name}，你看。三百年前那些人旁邊，也寫著同一句話。'],
+   ['旁白','「我們沒有死。我們在等。」'],
+   ['艾德溫','……艾琳說的，是真的。'],
+   ['旁白','回到地面時，天還沒亮。希瑟站在教堂門口，一夜沒睡。'],
+   ['希瑟','……找到了嗎？'],
+   ['{name}','她最後在名冊上寫了一句話。「等我回來」。跟簽到簿上的一樣。'],
+   ['希瑟','……母親。'],
+   ['希瑟','名冊，我會親手交給陛下。不管會發生什麼。','#roster'],
+   ['希瑟','謝謝你們把名字留在原地。……我會記得每一個。','#rosterCopy'],
+   ['艾德溫','還有一件事。名冊夾頁裡有一張地圖，標著霧最早停住的地方。'],
+   ['露娜','……那是霜語村。我的村子。'],
+   ['旁白','【第七章 完】第八章「霜語村的早晨」製作中。']]});
+}
 const SQ=[
   {id:'s1',ch:0,n:'黏答答的麻煩',npc:'蜜可',d:'擊敗史萊姆 5 隻',type:'kill',mob:'slime',c:5,rw:{gold:80,exp:60,items:{pot:3}}},
   {id:'s2',ch:0,n:'藥水的原料',npc:'蜜可',d:'交付史萊姆凝膠 3 個',type:'item',item:'m_gel',c:3,rw:{gold:120,exp:50,items:{stone:1}}},
@@ -1095,6 +1169,9 @@ const SQ=[
 if(P2)SQ.push(
    {id:'s13',ch:5,n:'驛站的清掃',npc:'莉雅',d:'擊敗街道盜賊 8 隻',type:'kill',mob:'bandit',c:8,rw:{gold:4000,exp:3000,items:{stone:2}}},
    {id:'s14',ch:5,n:'會打雷的零件',npc:'巴爾德',d:'交付雷擊齒輪 5 個',type:'item',item:'m_gear',c:5,rw:{gold:5000,exp:2500,gem:100}});
+if(P2&&P3)SQ.push(
+   {id:'s15',ch:6,n:'書蠹清除',npc:'艾德溫',d:'擊敗噬紙書蠹 8 隻',type:'kill',mob:'bookworm',c:8,rw:{gold:5500,exp:3500,items:{stone:2}}},
+   {id:'s16',ch:6,n:'泡水的名字',npc:'莉雅',d:'交付泡水的檔案頁 5 個',type:'item',item:'m_page',c:5,rw:{gold:6000,exp:3000,gem:120}});
 /* ============ NPC 故事支線 ============
    a = 接取時的劇情，req = 需要完成的事，b = 完成後的劇情。pre = 前一段故事 id，ch = 需要完成的主線章數 */
 const NST=[
@@ -2162,7 +2239,7 @@ const SKEL2=Object.assign({slash:'phys',whirl:'phys',charge:'phys',flurry:'phys'
   holy:'holy',smite:'holy',judge:'holy',hammer:'holy',doom:'holy',wrath:'thunder'},{});
 const MEL={...Object.fromEntries(Object.entries(MVAR).map(([k,v])=>[k,v.el])),slime:['fire','phys'],hornrabbit:['ice'],goblin:['thunder'],goblinboss:['thunder','fire'],shroom:['fire','poison'],wolf:['fire'],treant:['fire','thunder'],treeking:['fire','poison'],
   bat:['thunder','dark'],skeleton:['holy','poison'],golem:['ice','fire'],worm:['ice','poison'],snowwolf:['fire','ice'],icesprite:['fire','ice'],frostgiant:['fire','ice'],icedragon:['fire','ice'],
-  darkknight:['holy','dark'],phantom:['holy','phys'],demon:['holy','fire'],zenos:['holy','dark'],bandit:['poison'],deserter:['thunder'],stormhawk:['ice','thunder'],weathergolem:['ice','thunder']};
+  darkknight:['holy','dark'],phantom:['holy','phys'],demon:['holy','fire'],zenos:['holy','dark'],bandit:['poison'],deserter:['thunder'],stormhawk:['ice','thunder'],weathergolem:['ice','thunder']};if(P3)Object.assign(MEL,{bookworm:['fire'],waterwraith:['thunder','ice'],rustguard:['thunder'],archivist:['holy','phys']});
 const elMul=(id,el)=>{const e=MEL[id];if(!e||!el)return 1;return e[0]===el?1.5:e[1]===el?.6:1};
 const basicEl=()=>({swordsman:'phys',ranger:'phys',mage:'arcane',cleric:'holy'}[S.cls]||'phys');
 /* 首領護甲：每回合傷害上限；半血時進入狂怒（護盾＋攻擊上升） */
