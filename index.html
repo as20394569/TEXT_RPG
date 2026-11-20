@@ -199,6 +199,7 @@ input,textarea{font:inherit;width:100%;padding:8px 10px;border:2px solid var(--l
 .ef-box.ok .ef-res{color:#ffe45a;text-shadow:0 0 12px #ff9a2a;animation:efP .5s}.ef-box.great{animation:efG 1s}.ef-box.great .ef-res{color:#fff;font-size:26px;text-shadow:0 0 12px #ff5ad0,0 0 24px #ffd700;animation:efP .6s}
 .ef-box.ng{filter:saturate(.4);animation:quake .4s}.ef-box.ng .ef-res{color:#ff8a8a}
 @keyframes efP{0%{transform:scale(2.2);opacity:0}60%{transform:scale(.9);opacity:1}100%{transform:scale(1)}}@keyframes efG{0%,100%{box-shadow:0 0 40px #ffd700}50%{box-shadow:0 0 90px #ff5ad0,0 0 140px #ffd700}}
+.xfcode{font-family:var(--display);font-size:30px;font-weight:900;letter-spacing:.15em;text-align:center;color:var(--navy);background:#fff;border:2px dashed var(--gold);border-radius:10px;padding:8px;user-select:all}
 .tabs.rk{margin-bottom:0}.rkme{font-size:13px;padding:4px 8px;border-radius:8px;background:var(--panel2)}.rkrow{gap:8px}.rkn{width:26px;text-align:center;font-family:var(--display);font-weight:900;font-size:15px;color:var(--navy)}.rkav{width:34px;height:34px;border-radius:50%;overflow:hidden;flex:none;border:1px solid var(--line);background:#fff}.rkav .art{height:100%;border:0}.rkrow.top{background:linear-gradient(90deg,#fff6d8,#fff)}.rkv{font-variant-numeric:tabular-nums;color:var(--navy)}
 .stat-g .main{font-weight:700;color:#7a3fc0}.stat-g .main b{font-size:15px}
 .attr{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;font-variant-numeric:tabular-nums}
@@ -1549,7 +1550,7 @@ const GREET={
 let RANKURL=null,RANKTOP=null,RANKERR=0,RANKT=0;
 async function rankUrl(){if(RANKURL)return RANKURL;try{const r=await fetch('rank.json?'+Date.now(),{cache:'no-store'});const j=await r.json();if(j&&j.url)RANKURL=j.url.replace(/\/$/,'')}catch(e){}return RANKURL}
 /* 玩家意見回報：與排行榜共用伺服器，資料分開 */
-let RKTAB='power',RKCLS='all';
+let RKTAB='power',RKCLS='all',XFC=null,XFOK=null;
 let FBL=null,FBERR=0,FBT=0;const FBCAT={bug:'🐞 錯誤回報',idea:'💡 建議',balance:'⚖ 平衡',art:'🎨 美術',other:'💬 其他'};
 async function fbLoad(){const u=await rankUrl();if(!u){FBERR=1;if(MODAL&&MODAL.k==='fb')drawModal();return}try{const ctl=new AbortController();setTimeout(()=>ctl.abort(),8000);const r=await fetch(u+'/api/fb?n=50',{cache:'no-store',signal:ctl.signal});FBL=await r.json();FBERR=0;FBT=Date.now()}catch(e){FBERR=1}if(MODAL&&MODAL.k==='fb'&&!document.activeElement?.closest?.('#modal textarea'))drawModal()}
 async function fbSend(){const ta=$('#fbText'),cat=$('#fbCat');const text=(ta&&ta.value||'').trim();if(text.length<4){toast('請至少寫 4 個字');return}
@@ -1953,7 +1954,11 @@ const MV={
      <div class="row wrap"><button class="btn grow" data-a="enh" data-v="${u}" ${canEnh(g)?'':'disabled'}>${g.p>=15?'已滿強化':`強化 ${enhRate(g)}%`}</button><button class="btn grow" data-a="reforge" data-v="${u}" ${canReforge(g)?'':'disabled'}>洗練</button><button class="btn grow" data-a="lock" data-v="${u}">${g.lock?'解鎖':'鎖定'}</button></div>
      <p class="sub">強化：${g.p>=15?'已達上限':`${enhCost(g)} G＋強化石×${enhStone(g)}（持有 ${S.items.stone||0}）${g.p>=10?'，失敗會降 1 級':''}`}<br>洗練：${g.r?`星塵×${rf.d}（持有 ${S.items.dust||0}）＋${rf.g} G，重新隨機附加詞條`:'普通裝備沒有詞條'}</p>
      ${on||g.lock?'':`<div class="row"><button class="btn grow" data-a="dis" data-v="${u}">分解：星塵×${dz[0]+g.p*2}${dz[1]?`、強化石×${dz[1]}`:''}</button><button class="btn grow" data-a="sellGear" data-v="${u}">出售 ${gearSell(g)} G</button></div>`}`}},
-  settings(){return{t:'設定',b:`<div class="panel"><h3>存檔</h3><p class="sub">進度會自動存在這台裝置的瀏覽器。換裝置或清除瀏覽資料前，請先複製存檔碼。</p><button class="btn" data-a="exportSave">產生存檔碼</button><textarea id="saveTxt" class="mono" rows="3" placeholder="存檔碼會顯示在這裡，也可以貼上存檔碼後按「讀取」"></textarea><button class="btn" data-a="importSave">讀取存檔碼</button></div>
+  settings(){return{t:'設定',b:`<div class="panel"><h3>裝置轉移</h3><p class="sub">把進度搬到另一台手機或電腦：這台按「產生轉移碼」，在新裝置輸入 6 碼即可，24 小時內有效、只能使用一次。</p>
+      ${XFC?`<div class="xfcode">${XFC.code.split('').join(' ')}</div><p class="sub" style="text-align:center">有效到 ${new Date(XFC.exp).toLocaleString()}・在新裝置的「設定 → 裝置轉移」輸入</p>`:''}
+      <button class="btn pri" data-a="xferUp">${XFC?'重新產生轉移碼':'產生轉移碼'}</button>
+      <div class="row" style="margin-top:6px"><input id="xfIn" class="grow mono" maxlength="8" placeholder="輸入 6 碼轉移碼" style="text-transform:uppercase;font-size:18px;letter-spacing:.2em;padding:8px;border:2px solid var(--line);border-radius:8px"><button class="btn" data-a="xferGet">接收</button></div></div>
+    <div class="panel"><h3>存檔</h3><p class="sub">進度會自動存在這台裝置的瀏覽器。換裝置或清除瀏覽資料前，請先複製存檔碼。</p><button class="btn" data-a="exportSave">產生存檔碼</button><textarea id="saveTxt" class="mono" rows="3" placeholder="存檔碼會顯示在這裡，也可以貼上存檔碼後按「讀取」"></textarea><button class="btn" data-a="importSave">讀取存檔碼</button></div>
     <div class="panel"><h3>聲音</h3><div class="row"><button class="btn grow" data-a="mute">音效：${MUTE?'關閉':'開啟'}</button><button class="btn grow" data-a="bgmT">音樂：${BGMOFF?'關閉':'開啟'}</button></div><div class="row" style="margin-top:6px"><button class="btn grow" data-a="shakeT">畫面震動＋手機震動：${SHAKEOFF?'關閉':'開啟'}</button></div></div>
     <div class="panel"><h3>重新開始</h3><button class="btn" data-a="reset" data-v="${MODAL&&MODAL.v==='sure'?'go':'ask'}">${MODAL&&MODAL.v==='sure'?'確定刪除所有進度':'刪除存檔'}</button></div>${location.hash==='#dev'?`<div class="panel"><h3>插畫清單（給 Codex）</h3><p class="sub">把圖檔命名為下列檔名，放進 art/ 資料夾，預留框就會自動換成插畫。共 ${artList().length} 張。</p><button class="btn" data-a="copyArt">複製清單</button><textarea id="artTxt" class="mono" rows="6" readonly>${artList().map(a=>`art/${a[0]}.png\t${a[2]}\t${a[1]}`).join('\n')}</textarea></div>
     `:''}`}}
@@ -2423,6 +2428,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'9.8',d:'2026-11-20',t:'裝置轉移',b:'設定新增「裝置轉移」：舊裝置按「產生轉移碼」得到 6 碼，在新裝置輸入就能搬走進度，24 小時內有效、用一次就失效。原本的存檔碼也還能用。'},
   {v:'9.7',d:'2026-11-20',t:'用道具換結果的新事件',b:'①五張地圖各多一個事件：突來的雷雨、捕獸夾上的狐狸、失控的礦車、凍僵的信鴿、黑霧祭壇。②部分選項可以「消耗藥水」換穩定的報酬，身上沒有就不能選。③要花錢的選項會標出價格，錢不夠時不能選。④修正事件扣魔力時可能變成負數的問題。⑤劍士、法師待機與站姿立繪重畫（手部更自然）。'},
   {v:'9.6',d:'2026-11-20',t:'各地新事件＋狂戰士新造型',b:'①五張地圖各多一個專屬事件：翻倒的貨車、滴蜜的大樹、發光的瓦斯、被雪埋住的雪橇、地牢裡的人，有的要花錢或冒險換裝備。②狂戰士男女換上新服裝（深紅短戰袍＋單邊肩甲），全部動作與頭像重畫。'},
   {v:'9.5',d:'2026-11-20',t:'排行榜改版',b:'排行榜顯示前 100 名，新增戰力／等級／討伐／強化四種排行與職業篩選，顯示頭像、主線章節、最後上線時間與你的名次。'},
@@ -3448,6 +3454,14 @@ const ACT={
   importSave(){const t=$('#saveTxt').value.trim();let o=loadCode(t);if(!o){try{o=JSON.parse(decodeURIComponent(escape(atob(t))));if(!o||!o.cls||!o.attr)o=null}catch(e){o=null}}
     if(!o){toast('存檔碼無效，請確認是否完整貼上');return}if(IMPOK!==t){IMPOK=t;toast(`讀到「${o.name}」Lv.${o.lv}。會覆蓋目前進度，確定的話再按一次`);return}
     IMPOK=null;S=o;migrate();RUN=null;B=null;checkDaily();save();closeM();TAB='town';render();toast('讀取成功')},
+  async xferUp(){const u=await rankUrl();if(!u){toast('轉移伺服器暫時連不上，請改用下方存檔碼');return}if(!S.pid){S.pid=Math.random().toString(36).slice(2,10)}save();
+    try{const r=await fetch(u+'/api/xfer',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:S.pid,name:S.name,lv:S.lv,data:saveCode()})});const j=await r.json();
+      if(j.code){XFC=j;S.lastExport=Date.now();save();toast('轉移碼已產生，24 小時內有效');drawModal()}else toast(r.status===429?'太頻繁了，請 30 秒後再試':'產生失敗，請改用存檔碼')}catch(e){toast('連線失敗，請改用存檔碼')}},
+  async xferGet(){const code=($('#xfIn').value||'').toUpperCase().replace(/\s/g,'');if(!/^[A-Z0-9]{6}$/.test(code)){toast('請輸入 6 碼轉移碼');return}const u=await rankUrl();if(!u){toast('轉移伺服器暫時連不上');return}
+    const take=XFOK===code;try{const r=await fetch(u+'/api/xfer/get',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code,take:take?1:0})});const j=await r.json();
+      if(!j.data){toast(r.status===429?'嘗試太多次，請 10 分鐘後再試':'轉移碼無效或已過期');return}const o=loadCode(j.data);if(!o){toast('存檔資料損毀，請重新產生');return}
+      if(!take){XFOK=code;toast(`找到「${o.name}」Lv.${o.lv}。會覆蓋這台裝置的進度，確定的話再按一次「接收」`);return}
+      XFOK=null;S=o;migrate();RUN=null;B=null;checkDaily();save();closeM();TAB='town';render();toast(`轉移成功！歡迎回來，${o.name}`)}catch(e){toast('連線失敗，請稍後再試')}},
   reset(v){if(v==='ask'){MODAL.v='sure';drawModal();return}try{localStorage.removeItem(KEY)}catch(e){}S=null;RUN=null;B=null;MODAL=null;drawModal();render()}
 };
 document.addEventListener('click',e=>{

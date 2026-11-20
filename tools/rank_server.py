@@ -1,6 +1,8 @@
 """蒼藍誓約 Online 排行榜伺服器（只用 Python 標準函式庫）
 GET  /api/top?n=50   -> 依戰力排序的玩家列表（最多 300）
 POST /api/submit     -> {"id","name","cls","lv","power"} 新增或更新自己的紀錄
+POST /api/xfer        -> {"id","name","lv","data"} 上傳存檔換 6 碼轉移碼（24 小時）
+POST /api/xfer/get    -> {"code","take"} 用轉移碼取回存檔（take=1 取用後刪除）
 GET  /api/fb?n=50    -> 玩家意見回報（新到舊），與排行榜資料分開存放
 POST /api/fb         -> {"id","name","cls","lv","cat","text"} 送出意見（每人 60 秒一則）
 POST /api/fb/reply   -> {"token","ts","reply"} 開發者回覆（token 存在 fb_token.txt）
@@ -36,6 +38,27 @@ def fb_token():
             return f.read().strip()
     except Exception:
         return ''
+
+# ---- 存檔轉移：上傳存檔換 6 碼轉移碼，24 小時內在另一台裝置輸入即可下載（取用一次即刪除） ----
+XF_DATA = os.path.join(HERE, 'xfer_data.json')
+XF_LAST = {}
+XF_GET = {}
+XF_CH = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+def xf_load():
+    try:
+        with open(XF_DATA, encoding='utf-8') as f:
+            return json.load(f)
+    except Exception:
+        return {}
+XF = xf_load()
+def xf_save():
+    now = time.time()
+    for k in [k for k, v in XF.items() if v.get('exp', 0) < now]:
+        XF.pop(k, None)
+    tmp = XF_DATA + '.tmp'
+    with open(tmp, 'w', encoding='utf-8') as f:
+        json.dump(XF, f, ensure_ascii=False)
+    os.replace(tmp, XF_DATA)
 
 def load():
     try:
@@ -107,8 +130,55 @@ class H(BaseHTTPRequestHandler):
             raise ValueError('bad size')
         return json.loads(self.rfile.read(ln).decode('utf-8'))
 
+    def ip(self):
+        return self.headers.get('CF-Connecting-IP') or self.client_address[0]
+
     def do_POST(self):
         path = urlparse(self.path).path
+        if path == '/api/xfer':
+            try:
+                d = self.body(800000)
+                pid = str(d.get('id', ''))
+                data = d.get('data')
+                if not re.fullmatch(r'[a-z0-9]{4,16}', pid) or not isinstance(data, str) or not data.startswith('AO1.') or len(data) > 780000:
+                    return self.reply(400, {'error': 'bad data'})
+                now = time.time()
+                if now - XF_LAST.get(pid, 0) < 30:
+                    return self.reply(429, {'error': 'too fast'})
+                XF_LAST[pid] = now
+                import secrets
+                with LOCK:
+                    for k in [k for k, v in XF.items() if v.get('id') == pid]:
+                        XF.pop(k, None)
+                    code = ''.join(secrets.choice(XF_CH) for _ in range(6))
+                    while code in XF:
+                        code = ''.join(secrets.choice(XF_CH) for _ in range(6))
+                    XF[code] = {'id': pid, 'd': data, 'exp': now + 86400, 'n': clean(d.get('name'), 16), 'lv': max(1, min(99, int(d.get('lv', 1))))}
+                    xf_save()
+                return self.reply(200, {'code': code, 'exp': int((now + 86400) * 1000)})
+            except Exception:
+                return self.reply(400, {'error': 'bad request'})
+        if path == '/api/xfer/get':
+            try:
+                d = self.body(200)
+                code = str(d.get('code', '')).upper().replace(' ', '')
+                ip = self.ip()
+                now = time.time()
+                hist = [t for t in XF_GET.get(ip, []) if now - t < 600]
+                if len(hist) >= 10:
+                    return self.reply(429, {'error': 'too many tries'})
+                hist.append(now)
+                XF_GET[ip] = hist
+                with LOCK:
+                    v = XF.get(code)
+                    if not v or v.get('exp', 0) < now:
+                        return self.reply(404, {'error': 'not found'})
+                    if d.get('take'):
+                        XF.pop(code, None)
+                        xf_save()
+                return self.reply(200, {'data': v['d'], 'name': v.get('n', ''), 'lv': v.get('lv', 1)})
+            except Exception:
+                return self.reply(400, {'error': 'bad request'})
         if path == '/api/fb':
             try:
                 d = self.body(4096)
