@@ -1646,7 +1646,7 @@ function chatTick(){if(!S)return;const el=$('#chat');
 /* ============ 畫面 ============ */
 function bar(k,v,m,cls=''){return `<div class="bar ${k} ${cls}"><i style="width:${Math.max(0,Math.min(100,v/m*100))}%"></i><span>${k.toUpperCase()} ${v}/${m}</span></div>`}
 let WARM=0;function warm(){if(WARM||!S)return;WARM=1;try{preload(['','_hurt','_low','_win','_lose','_atk','_skill','_cast'].map(x=>HK()+x));preload(mySkills().map(k=>HK()+'_sk_'+k));preload([PKEY(),PKEY('smile'),PKEY('serious')]);const n=Math.min(S.main.ch,CH.length-1);preload([SKEY(n+1,'intro'),SKEY(n+1,'mid'),SKEY(n+1,'outro'),'atlas_ui','town_bg',...AREAS.map(a=>'area_'+a.id),...[...AREAS[n].mobs,AREAS[n].boss].flatMap(m=>['','_atk','_hurt','_low','_lose'].map(x=>'mob_'+m+x)),'portrait_npc_luna','portrait_npc_ria','battle_'+AREAS[n].id])}catch(e){}}
-function render(){try{bgmAuto()}catch(e){}if(!B)document.querySelectorAll('.spb').forEach(e=>e.remove());setTimeout(()=>{try{PFX.marks(B&&B.hp>0?B.cls.marks:[])}catch(e){}},280);if(!WARM)setTimeout(warm,400);setTimeout(()=>{try{tipCheck()}catch(e){}},60);
+function render(){try{bgmAuto()}catch(e){}try{faDraw()}catch(e){}if(!B)document.querySelectorAll('.spb').forEach(e=>e.remove());setTimeout(()=>{try{PFX.marks(B&&B.hp>0?B.cls.marks:[])}catch(e){}},280);if(!WARM)setTimeout(warm,400);setTimeout(()=>{try{tipCheck()}catch(e){}},60);
   const app=$('#app');
   if(!S){app.className='pre';$('#main').innerHTML=vTitle();return}
   app.className='';clamp();const s=stats();
@@ -2351,7 +2351,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
-  {v:'8.6',d:'2026-11-20',t:'魔物放大',b:'史萊姆、蝙蝠、角兔、書蠹等小型魔物，以及狼、雷鷹，在戰鬥畫面中放大顯示。'},
+  {v:'8.6',d:'2026-11-20',t:'魔物放大',b:'史萊姆、蝙蝠、角兔、書蠹等小型魔物，以及狼、雷鷹，在戰鬥畫面中放大顯示。「全自動」按鈕改為進入地圖後才出現。'},
   {v:'8.5',d:'2026-11-20',t:'露娜新台詞',b:'露娜會依你的職業、進階職、性別說不同的話；你放技能時她也會即時反應。出發與營火時也有專屬閒聊。'},
   {v:'8.4',d:'2026-11-20',t:'全自動與站位',b:'全自動時自己點岔路或選項，就不會再擲骰子，直接照你的選擇走。露娜改站在主角後方。'},
   {v:'8.3',d:'2026-11-20',t:'法師強化',b:'角色面板改為「物理攻擊／魔法攻擊」，職業主攻會標亮。法杖魔攻 +15%，木戒指系列新增魔攻，木珠串系列魔攻提高。隨機詞條不再出現用不到的屬性（法師不會再抽到物理攻擊、力量）。'},
@@ -3335,7 +3335,7 @@ document.addEventListener('click',e=>{
 
 /* ============ 全自動：隨機路線、自動點擊 ============ */
 let FA=null;
-function faDraw(){const b=$('#fab');if(!b)return;b.hidden=!S||(!RUN&&!FA);b.className=FA?'on':'';b.textContent=FA?'全自動 開':'全自動 關'}
+function faDraw(){const b=$('#fab');if(!b)return;b.hidden=!S||!(FA||(RUN&&TAB==='adv'));b.className=FA?'on':'';b.textContent=FA?'全自動 開':'全自動 關'}
 function faStop(m){if(!FA)return;FA=null;if(B){B.auto=AUTO=false}faDraw();if(m)toast(m)}
 function faClick(sel,rnd){const bs=[...document.querySelectorAll(sel)].filter(b=>!b.disabled&&b.offsetParent!==null);if(!bs.length)return false;(rnd?pick(bs):bs[0]).click();return true}
 function faDice(sel,lab){const bs=[...document.querySelectorAll(sel)].filter(b=>!b.disabled&&b.offsetParent!==null);if(bs.length<2)return faClick(sel);FA.busy=1;
