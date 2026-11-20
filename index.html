@@ -138,6 +138,7 @@ input,textarea{font:inherit;width:100%;padding:8px 10px;border:2px solid var(--l
 .stage>img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .spr{position:absolute}
 .spr.foe{right:7%;top:9%;width:38%}
+.spr.foe.szs{right:2%;top:5%;width:50%}.spr.foe.szm{right:4%;top:7%;width:44%}
 .spr.me{left:4%;bottom:2%;width:40%}
 .plat{position:absolute;left:-12%;right:-12%;bottom:-8px;height:26px;border-radius:50%;background:rgba(0,0,0,.22)}
 .ibox{position:absolute;background:var(--panel);border:2px solid var(--navy);border-radius:8px 2px 8px 2px;padding:4px 8px;font-size:12px;box-shadow:2px 2px 0 rgba(0,0,0,.3);display:flex;flex-direction:column;gap:3px}
@@ -729,6 +730,8 @@ const ARMB={head:[['學徒兜帽','法師頭巾','刻紋頭環','毛皮兜帽','
   neck:[['木珠串','智者項鍊','月石墜飾','冰晶念珠','星星項鍊','白塔徽章'],i=>({mp:10+i*14,mag:1+i*4}),.7]};
 for(const sl in ARMB){const [ns,f,pm]=ARMB[sl];ns.forEach((n,i)=>GEAR[SLOTP[sl]+'b_'+i]=Object.assign({n,slot:sl,t:i,lv:TLV[i],price:Math.round(TPRICE[i]*pm)},f(i)))}
 const MDROP={bogslime:'x_bog',sparkrabbit:'x_spark',soulshroom:'x_soul',shadewolf:'x_shade',lavabat:'x_lava',crystalgolem:'x_crystal',blizzardwolf:'x_blizzard',stormsprite:'x_storm',bloodknight:'x_blood',voidwraith:'x_void'};
+/* 原圖較小的魔物在戰鬥畫面放大 */
+const MSMALL=new Set(['bat','bogslime','bookworm','hornrabbit','icesprite','lavabat','slime','sparkrabbit']),MMID=new Set(['wolf','shadewolf','blizzardwolf','stormhawk','snowwolf']);
 const mobBase=id=>MVAR[id]?MVAR[id].base:id;
 const AREAS=[
   {id:'plain',n:'微風草原',lv:'1–5',base:1,d:'晨星鎮外的遼闊草原，新手冒險者的起點。',mobs:['slime','hornrabbit','goblin','bogslime','sparkrabbit'],boss:'goblinboss'},
@@ -1764,7 +1767,7 @@ function vBattle(){const s=stats(),fx=B.fx||{},intro=B.intro,a=AREAS[RUN.area];B
   else cmd=`<div class="cmd"><button class="btn pri" data-a="bAtk">攻擊</button><button class="btn" data-a="bMenu" data-v="skill">技能</button><button class="btn" data-a="bMenu" data-v="item">道具</button><button class="btn" data-a="bGuard">防禦</button><button class="btn" data-a="bFlee">逃跑</button><button class="btn ${B.auto?'pri':''}" data-a="bAuto">自動 ${B.auto?'開':'關'}</button></div>`;
   return `<div class="battle"><div class="stage bg-${a.id} ${fx.quake&&!fk?'quake':''} ${(sk&&sk[0]==='meteor')||(fk&&fk.fx==='slam')?'quakel':''}" ${sk?`style="--c:${sk[1]}"`:fk?`style="--c:${fk.c}"`:''}><img class="bg" src="art/battle_${a.id}.webp" alt="" ${MISS.has('battle_'+a.id)?'hidden':''} onerror="reTry(this,'battle_${a.id}')||(MISS.add('battle_${a.id}'),this.remove())">
    <div class="ibox foe-i" data-a="openM" data-v="foe" role="button" aria-label="查看怪物情報"><div class="nm"><span>${B.name}${B.kind==='boss'?' <span class="tag red">首領</span>':''}</span><span>${(B.adds||[]).length?'<span class="tag">目標</span> ':''}Lv${B.L} ⓘ</span></div>${bbar(B.hp,B.max,fp)}${intentHtml()}${(B.adds||[]).length?`<div class="addrow">${B.adds.map((f,i)=>`<button class="addf" data-a="bTarget" data-v="${i}" aria-label="切換目標：${f.name}">${art('mob_'+f.id,f.m.n,'r11')}<span>${f.m.n}${bbar(f.hp,f.max)}</span></button>`).join('')}</div><div class="sub" style="font-size:10px">點小頭像切換目標</div>`:''}</div>
-   <div class="spr foe ${B.m.fly?'fly':''} ${B.kind==='boss'?'boss':''} ${foeC}" data-a="openM" data-v="foe" role="button" aria-label="查看怪物情報" style="cursor:pointer"><div class="plat"></div>${B.id==='shadow'?art(HK(),'試煉之影','r34','shadowimg'):art(fKey0,B.m.n,'r11','','mob_'+B.id)}${foeFx}</div>
+   <div class="spr foe ${B.m.fly?'fly':''} ${B.kind==='boss'?'boss':''} ${MSMALL.has(mobBase(B.id))?'szs':MMID.has(mobBase(B.id))?'szm':''} ${foeC}" data-a="openM" data-v="foe" role="button" aria-label="查看怪物情報" style="cursor:pointer"><div class="plat"></div>${B.id==='shadow'?art(HK(),'試煉之影','r34','shadowimg'):art(fKey0,B.m.n,'r11','','mob_'+B.id)}${foeFx}</div>
    <div class="spr me ${meC}"><div class="plat"></div>${art(mKey0,clsName(),'r34','',HK())}${meFx}</div>
    <div class="ibox me-i"><div class="nm"><span>${esc(S.name)}</span><span>Lv${S.lv}</span></div>${bbar(S.hp,s.HP,pp)}<div class="num">HP ${S.hp}/${s.HP}</div>${bbar(S.mp,s.MP,null,'m')}<div class="num">MP ${S.mp}/${s.MP}</div>${me?`<div class="chips">${me}</div>`:''}</div>
    ${AL?`<div class="ally ${AL.hp<=0?'down':''} ${aD||aH?'aact':''} ${aHit?'ahit':''}">${art('ally_'+AL.id+(AL.hp<=0?'_lose':aHit?'_hurt':aH?'_cast':aD?'_atk':AL.hp<AL.max*.3?'_low':''),AL.n,'r34')}${bbar(AL.hp,AL.max)}${aD?`<span class="dmg sm">⚔${aD}</span>`:aH?`<span class="dmg heal sm">+${aH}</span>`:aHit?`<span class="dmg sm">-${aHit}</span>`:''}</div>`:''}
@@ -2348,6 +2351,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'8.6',d:'2026-11-20',t:'魔物放大',b:'史萊姆、蝙蝠、角兔、書蠹等小型魔物，以及狼、雷鷹，在戰鬥畫面中放大顯示。'},
   {v:'8.5',d:'2026-11-20',t:'露娜新台詞',b:'露娜會依你的職業、進階職、性別說不同的話；你放技能時她也會即時反應。出發與營火時也有專屬閒聊。'},
   {v:'8.4',d:'2026-11-20',t:'全自動與站位',b:'全自動時自己點岔路或選項，就不會再擲骰子，直接照你的選擇走。露娜改站在主角後方。'},
   {v:'8.3',d:'2026-11-20',t:'法師強化',b:'角色面板改為「物理攻擊／魔法攻擊」，職業主攻會標亮。法杖魔攻 +15%，木戒指系列新增魔攻，木珠串系列魔攻提高。隨機詞條不再出現用不到的屬性（法師不會再抽到物理攻擊、力量）。'},
