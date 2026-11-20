@@ -199,6 +199,16 @@ input,textarea{font:inherit;width:100%;padding:8px 10px;border:2px solid var(--l
 .ef-box.ok .ef-res{color:#ffe45a;text-shadow:0 0 12px #ff9a2a;animation:efP .5s}.ef-box.great{animation:efG 1s}.ef-box.great .ef-res{color:#fff;font-size:26px;text-shadow:0 0 12px #ff5ad0,0 0 24px #ffd700;animation:efP .6s}
 .ef-box.ng{filter:saturate(.4);animation:quake .4s}.ef-box.ng .ef-res{color:#ff8a8a}
 @keyframes efP{0%{transform:scale(2.2);opacity:0}60%{transform:scale(.9);opacity:1}100%{transform:scale(1)}}@keyframes efG{0%,100%{box-shadow:0 0 40px #ffd700}50%{box-shadow:0 0 90px #ff5ad0,0 0 140px #ffd700}}
+body.pc{display:flex;justify-content:center;align-items:flex-start;gap:18px;background:radial-gradient(ellipse at 50% 0,#3c4f8f,#1a2142 70%)}
+body.pc #app{margin:0;flex:none;box-shadow:0 0 40px rgba(0,0,0,.45)}
+.pcside{width:310px;flex:none;overflow-y:auto;padding:16px 4px;display:flex;flex-direction:column;gap:12px;scrollbar-width:thin}
+.pcc{background:linear-gradient(#fffdf5,#f6ecd2);border:2px solid #a67c3d;border-radius:12px;padding:12px;box-shadow:0 4px 12px rgba(0,0,0,.25);display:flex;flex-direction:column;gap:6px}
+.pcc h3{font-family:var(--display);color:var(--navy);font-size:18px}.pcc h4{font-family:var(--display);color:var(--navy);font-size:15px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px dashed #c9b27a;padding-bottom:4px}
+.pchero{flex-direction:row;gap:10px}.pchero>div:last-child{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0}.pcav{width:96px;flex:none}.pcav .art{border-radius:10px}
+.pcst{display:grid;grid-template-columns:1fr 1fr;gap:2px 8px;font-size:12px}.pcst span{display:flex;justify-content:space-between}.pcst b{color:var(--navy)}
+.pceq{display:flex;gap:8px;align-items:center}.pceq .ico{width:34px;height:34px;flex:none}.pceq .grow{display:flex;flex-direction:column;min-width:0}.pceq small{font-size:10px;color:#8a7a5a}.pceq b{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pcrk{display:flex;gap:8px;align-items:center;font-size:13px}.pcrk>span:first-child{width:22px;text-align:center}.pcrk small{display:block;font-size:10px;color:#8a7a5a}
+.pclog p{font-size:12px;line-height:1.4}.pclog small{color:#8a7a5a}.pcnw b{font-size:13px;color:var(--navy)}
 .xfcode{font-family:var(--display);font-size:30px;font-weight:900;letter-spacing:.15em;text-align:center;color:var(--navy);background:#fff;border:2px dashed var(--gold);border-radius:10px;padding:8px;user-select:all}
 .tabs.rk{margin-bottom:0}.rkme{font-size:13px;padding:4px 8px;border-radius:8px;background:var(--panel2)}.rkrow{gap:8px}.rkn{width:26px;text-align:center;font-family:var(--display);font-weight:900;font-size:15px;color:var(--navy)}.rkav{width:34px;height:34px;border-radius:50%;overflow:hidden;flex:none;border:1px solid var(--line);background:#fff}.rkav .art{height:100%;border:0}.rkrow.top{background:linear-gradient(90deg,#fff6d8,#fff)}.rkv{font-variant-numeric:tabular-nums;color:var(--navy)}
 .stat-g .main{font-weight:700;color:#7a3fc0}.stat-g .main b{font-size:15px}
@@ -1657,14 +1667,37 @@ function bcast(html,act){BCAST={html,act};const el=$('#bcast');if(el){el.innerHT
 function bcastCheckSeen(){if(!S)return;const v=NEWS[0].v;if(S.seenVer!==v){const n=NEWS[0];bcast(`<b>系統廣播</b>　遊戲已更新至 <b>v${v}</b>：${n.t}　—　${n.b}`,{a:'bcNews',l:'看公告'});sys(`遊戲已更新至 v${v}：${n.t}`)}}
 async function bcastPoll(){try{const r=await fetch('index.html?v='+Date.now(),{cache:'no-store'});const t=await r.text(),m=t.match(/\{v:'([\d.]+)',d:'[^']*',t:'([^']*)'/);if(m&&parseFloat(m[1])>parseFloat(NEWS[0].v)&&(!BCAST||!BCAST.newv||BCAST.newv!==m[1])){bcast(`<b>系統廣播</b>　新版本 <b>v${m[1]}</b>「${esc(m[2])}」已推出！重新整理即可更新`,{a:'bcReload',l:'立即更新'});BCAST.newv=m[1];sys(`新版本 v${m[1]} 已推出`)}}catch(e){}}
 setInterval(bcastPoll,3*60e3);setTimeout(bcastPoll,20e3);
-function sys(t){CHATQ.push(`<span><b class="sys">[系統]</b> ${esc(t)}</span>`)}
+const CHATH=[];function sys(t){CHATQ.push(`<span><b class="sys">[系統]</b> ${esc(t)}</span>`);CHATH.unshift({t,ts:Date.now()});if(CHATH.length>40)CHATH.pop()}
+
+/* ============ 電腦版版面：遊戲本體放大置中＋左右資訊欄 ============ */
+let PCW=false;
+function pcLayout(){const app=$('#app');if(!app)return;const W=innerWidth,H=innerHeight,wide=W>=1100&&W/H>=1.25;
+  document.body.classList.toggle('pc',wide);PCW=wide;
+  if(!wide){app.style.zoom='';app.style.height='';['pcL','pcR'].forEach(id=>{const e=$('#'+id);if(e)e.remove()});return}
+  const z=Math.max(1,Math.min(H/860,W/1180,1.8));app.style.zoom=z;app.style.height=(H/z)+'px';
+  for(const id of ['pcL','pcR']){let d=$('#'+id);if(!d){d=document.createElement('aside');d.id=id;d.className='pcside';id==='pcL'?document.body.insertBefore(d,app):document.body.appendChild(d)}d.style.zoom=z;d.style.height=(H/z)+'px'}
+  pcDraw()}
+function pcDraw(){if(!PCW)return;const L=$('#pcL'),Rr=$('#pcR');if(!L||!Rr)return;
+  if(!S){L.innerHTML='<div class="pcc"><h3>蒼藍誓約 Online</h3><p class="sub">建立角色後，這裡會顯示你的角色資訊。</p></div>';Rr.innerHTML=pcNews();return}
+  const s=stats(),mg=CLS[S.cls].basic==='MAG',ft=typeof fortune==='function'?fortune():null;
+  const eq=Object.keys(SLOTS).map(sl=>{const g=gearBy(S.eq[sl]);return `<div class="pceq"><span class="ico c${g?g.r:0}">${g?gIco(g.id):''}</span><span class="grow"><small>${SLOTS[sl]}</small><b class="c${g?g.r:0}">${g?esc(gearName(g)):'—'}</b></span></div>`}).join('');
+  L.innerHTML=`<div class="pcc pchero"><div class="pcav">${art(HK(),S.name,'r34')}</div><div><h3>${esc(S.name)}</h3><p class="sub">${clsName()}・Lv.${S.lv}・戰力 <b>${power()}</b></p>${bar('hp',S.hp,s.HP)}${bar('mp',S.mp,s.MP)}
+     <div class="pcst"><span>${mg?'魔法攻擊':'物理攻擊'}<b>${mg?s.MAG:s.ATK}</b></span><span>防禦<b>${s.DEF}</b></span><span>魔抗<b>${s.MRES}</b></span><span>爆擊<b>${s.CRIT}%</b></span><span>金幣<b>${S.gold}</b></span><span>強化石<b>${S.items.stone||0}</b></span></div></div></div>
+    <div class="pcc"><h4>裝備 <button class="btn sm" data-a="pcTab" data-v="char">角色</button></h4>${eq}</div>
+    <div class="pcc"><h4>今日</h4><p class="sub">✦ 星象：${ft?`<b>${FORT[ft.k].n}</b>（${FORT[ft.k].d}）`:'尚未占卜（星象台）'}</p>${DAILY.map(d=>`<p class="sub">${S.daily.got[d.k]?'✅':'▫'} ${d.n}　${Math.min(d.c,S.daily[d.k]||0)}/${d.c}</p>`).join('')}</div>`;
+  const top=Array.isArray(RANKTOP)?RANKTOP.slice().sort((a,b)=>b.power-a.power).slice(0,10):[];
+  Rr.innerHTML=`<div class="pcc"><h4>排行榜 <button class="btn sm" data-a="pcOpen" data-v="rank">全部</button></h4>${top.length?top.map((x,i)=>`<div class="pcrk"><span>${i<3?['🥇','🥈','🥉'][i]:i+1}</span><span class="grow">${esc(x.name)}<small>${esc(x.cls)}・Lv.${x.lv}</small></span><b>${x.power}</b></div>`).join(''):'<p class="sub">讀取中……</p>'}</div>
+    <div class="pcc pclog"><h4>系統訊息</h4>${CHATH.length?CHATH.slice(0,12).map(c=>`<p class="sub"><small>${new Date(c.ts).toLocaleTimeString().slice(0,-3)}</small> ${esc(c.t)}</p>`).join(''):'<p class="sub">歡迎來到晨星鎮。</p>'}</div>`+pcNews()}
+function pcNews(){return `<div class="pcc"><h4>更新公告 <button class="btn sm" data-a="pcOpen" data-v="news">全部</button></h4>${NEWS.slice(0,4).map(n=>`<div class="pcnw"><b>v${n.v}　${esc(n.t)}</b><p class="sub">${esc(n.b).slice(0,70)}${n.b.length>70?'…':''}</p></div>`).join('')}</div>`}
+addEventListener('resize',()=>{clearTimeout(window.__pcT);window.__pcT=setTimeout(pcLayout,150)});setInterval(()=>{if(PCW)pcDraw()},4000);setTimeout(pcLayout,50);
+
 function chatTick(){if(!S)return;const el=$('#chat');
   if(CHATQ.length)el.innerHTML=CHATQ.shift();else if(!el.innerHTML)el.innerHTML='<span><b class="sys">[系統]</b> 歡迎來到晨星鎮，祝你冒險愉快。</span>'}
 
 /* ============ 畫面 ============ */
 function bar(k,v,m,cls=''){return `<div class="bar ${k} ${cls}"><i style="width:${Math.max(0,Math.min(100,v/m*100))}%"></i><span>${k.toUpperCase()} ${v}/${m}</span></div>`}
 let WARM=0;function warm(){if(WARM||!S)return;WARM=1;try{preload(['','_hurt','_low','_win','_lose','_atk','_skill','_cast'].map(x=>HK()+x));preload(mySkills().map(k=>HK()+'_sk_'+k));preload([PKEY(),PKEY('smile'),PKEY('serious')]);const n=Math.min(S.main.ch,CH.length-1);preload([SKEY(n+1,'intro'),SKEY(n+1,'mid'),SKEY(n+1,'outro'),'atlas_ui','town_bg',...AREAS.map(a=>'area_'+a.id),...[...AREAS[n].mobs,AREAS[n].boss].flatMap(m=>['','_atk','_hurt','_low','_lose'].map(x=>'mob_'+m+x)),'portrait_npc_luna','portrait_npc_ria','battle_'+AREAS[n].id])}catch(e){}}
-function render(){try{bgmAuto()}catch(e){}try{faDraw()}catch(e){}if(!B)document.querySelectorAll('.spb').forEach(e=>e.remove());setTimeout(()=>{try{PFX.marks(B&&B.hp>0?B.cls.marks:[])}catch(e){}},280);if(!WARM)setTimeout(warm,400);setTimeout(()=>{try{tipCheck()}catch(e){}},60);
+function render(){try{bgmAuto()}catch(e){}try{faDraw()}catch(e){}setTimeout(()=>{try{pcDraw()}catch(e){}},0);if(!B)document.querySelectorAll('.spb').forEach(e=>e.remove());setTimeout(()=>{try{PFX.marks(B&&B.hp>0?B.cls.marks:[])}catch(e){}},280);if(!WARM)setTimeout(warm,400);setTimeout(()=>{try{tipCheck()}catch(e){}},60);
   const app=$('#app');
   if(!S){app.className='pre';$('#main').innerHTML=vTitle();return}
   app.className='';clamp();const s=stats();
@@ -2428,6 +2461,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'9.9',d:'2026-11-21',t:'電腦版版面',b:'用電腦寬螢幕開啟時，遊戲畫面自動放大置中，左側顯示角色、裝備與今日任務，右側顯示排行榜、系統訊息與更新公告。'},
   {v:'9.8',d:'2026-11-20',t:'裝置轉移',b:'設定新增「裝置轉移」：舊裝置按「產生轉移碼」得到 6 碼，在新裝置輸入就能搬走進度，24 小時內有效、用一次就失效。原本的存檔碼也還能用。'},
   {v:'9.7',d:'2026-11-20',t:'用道具換結果的新事件',b:'①五張地圖各多一個事件：突來的雷雨、捕獸夾上的狐狸、失控的礦車、凍僵的信鴿、黑霧祭壇。②部分選項可以「消耗藥水」換穩定的報酬，身上沒有就不能選。③要花錢的選項會標出價格，錢不夠時不能選。④修正事件扣魔力時可能變成負數的問題。⑤劍士、法師待機與站姿立繪重畫（手部更自然）。'},
   {v:'9.6',d:'2026-11-20',t:'各地新事件＋狂戰士新造型',b:'①五張地圖各多一個專屬事件：翻倒的貨車、滴蜜的大樹、發光的瓦斯、被雪埋住的雪橇、地牢裡的人，有的要花錢或冒險換裝備。②狂戰士男女換上新服裝（深紅短戰袍＋單邊肩甲），全部動作與頭像重畫。'},
@@ -3443,6 +3477,7 @@ const ACT={
   sqAccept(id){S.side[id]={prog:0,done:false};toast('已接受委託');save();render()},
   sqDone(id){const q=SQ.find(x=>x.id===id);if(sqProg(q)<q.c)return;if(q.type==='item')addItem(q.item,-q.c);S.side[id].done=true;const t=give(q.rw);toast(`委託完成：${t}`);save();render()},
   fortune(){if(fortune())return;const k=pick(Object.keys(FORT));S.fort={d:new Date().toDateString(),k};SFX.holy(0);toast(`今日星象：${FORT[k].n}（${FORT[k].d}）`);save();render()},
+  pcOpen(v){openM(v)},pcTab(v){if(B)return;MODAL=null;drawModal();TAB=v;render()},
   rkTab(v){RKTAB=v;drawModal()},rkCls(v){RKCLS=v;drawModal()},
   dailyGet(k){const d=DAILY.find(x=>x.k===k);if(S.daily.got[k]||S.daily[k]<d.c)return;S.daily.got[k]=true;toast('獲得 '+give(d.rw));if(DAILY.every(x=>S.daily.got[x.k])&&!S.daily.all){S.daily.all=1;const gm=pick(GEMS);addItem(gm,1);addItem('stone',3);setTimeout(()=>toast(`每日全部完成！額外獲得 ${ITEMS[gm].n}、強化石×3`),900)}save();render()},
   bgmT(){BGMOFF=!BGMOFF;try{localStorage.setItem(KEY+'_bgm',BGMOFF?'0':'1')}catch(e){}if(BGMOFF)bgm(null);else bgmAuto();drawModal()},
