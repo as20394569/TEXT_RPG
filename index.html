@@ -200,7 +200,7 @@ input,textarea{font:inherit;width:100%;padding:8px 10px;border:2px solid var(--l
 .ef-box.ok .ef-res{color:#ffe45a;text-shadow:0 0 12px #ff9a2a;animation:efP .5s}.ef-box.great{animation:efG 1s}.ef-box.great .ef-res{color:#fff;font-size:26px;text-shadow:0 0 12px #ff5ad0,0 0 24px #ffd700;animation:efP .6s}
 .ef-box.ng{filter:saturate(.4);animation:quake .4s}.ef-box.ng .ef-res{color:#ff8a8a}
 @keyframes efP{0%{transform:scale(2.2);opacity:0}60%{transform:scale(.9);opacity:1}100%{transform:scale(1)}}@keyframes efG{0%,100%{box-shadow:0 0 40px #ffd700}50%{box-shadow:0 0 90px #ff5ad0,0 0 140px #ffd700}}
-body.pc{display:flex;justify-content:center;align-items:flex-start;gap:18px;background:radial-gradient(ellipse at 50% 0,#3c4f8f,#1a2142 70%)}
+html:has(body.pc){overflow:hidden}body.pc{overflow:hidden;width:100vw;display:flex;justify-content:center;align-items:flex-start;gap:18px;background:radial-gradient(ellipse at 50% 0,#3c4f8f,#1a2142 70%)}
 body.pc #app{margin:0;flex:none;box-shadow:0 0 40px rgba(0,0,0,.45)}
 .pcside{width:310px;flex:none;overflow-y:auto;padding:16px 4px;display:flex;flex-direction:column;gap:12px;scrollbar-width:thin}
 .pcc{background:linear-gradient(#fffdf5,#f6ecd2);border:2px solid #a67c3d;border-radius:12px;padding:12px;box-shadow:0 4px 12px rgba(0,0,0,.25);display:flex;flex-direction:column;gap:6px}
@@ -1675,10 +1675,12 @@ const CHATH=[];function sys(t){CHATQ.push(`<span><b class="sys">[系統]</b> ${e
 
 /* ============ 電腦版版面：遊戲本體放大置中＋左右資訊欄 ============ */
 let PCW=false;
-function pcLayout(){const app=$('#app');if(!app)return;const W=innerWidth,H=innerHeight,wide=W>=1100&&W/H>=1.25;
+let PCSZ=null;
+function pcLayout(force){const app=$('#app');if(!app)return;const W=Math.round(screen&&screen.availWidth&&document.fullscreenElement?screen.availWidth:document.documentElement.clientWidth),H=Math.round(document.documentElement.clientHeight);
+  if(!force&&PCSZ&&Math.abs(PCSZ[0]-W)<40&&Math.abs(PCSZ[1]-H)<40)return;PCSZ=[W,H];const wide=W>=1100&&W/H>=1.25;
   document.body.classList.toggle('pc',wide);PCW=wide;
   if(!wide){app.style.zoom='';app.style.height='';['pcL','pcR'].forEach(id=>{const e=$('#'+id);if(e)e.remove()});return}
-  const z=Math.max(1,Math.min(H/860,W/1180,1.8));app.style.zoom=z;app.style.height=(H/z)+'px';
+  const z=Math.max(1,Math.floor(Math.min(H/860,W/1180,1.8)*20)/20);app.style.zoom=z;app.style.height=(H/z)+'px';
   for(const id of ['pcL','pcR']){let d=$('#'+id);if(!d){d=document.createElement('aside');d.id=id;d.className='pcside';id==='pcL'?document.body.insertBefore(d,app):document.body.appendChild(d)}d.style.zoom=z;d.style.height=(H/z)+'px'}
   pcDraw()}
 function pcDraw(){if(!PCW)return;const L=$('#pcL'),Rr=$('#pcR');if(!L||!Rr)return;
@@ -1693,7 +1695,7 @@ function pcDraw(){if(!PCW)return;const L=$('#pcL'),Rr=$('#pcR');if(!L||!Rr)retur
   Rr.innerHTML=`<div class="pcc"><h4>排行榜 <button class="btn sm" data-a="pcOpen" data-v="rank">全部</button></h4>${top.length?top.map((x,i)=>`<div class="pcrk"><span>${i<3?['🥇','🥈','🥉'][i]:i+1}</span><span class="grow">${esc(x.name)}<small>${esc(x.cls)}・Lv.${x.lv}</small></span><b>${x.power}</b></div>`).join(''):'<p class="sub">讀取中……</p>'}</div>
     <div class="pcc pclog"><h4>系統訊息</h4>${CHATH.length?CHATH.slice(0,12).map(c=>`<p class="sub"><small>${new Date(c.ts).toLocaleTimeString().slice(0,-3)}</small> ${esc(c.t)}</p>`).join(''):'<p class="sub">歡迎來到晨星鎮。</p>'}</div>`+pcNews()}
 function pcNews(){return `<div class="pcc"><h4>更新公告 <button class="btn sm" data-a="pcOpen" data-v="news">全部</button></h4>${NEWS.slice(0,4).map(n=>`<div class="pcnw"><b>v${n.v}　${esc(n.t)}</b><p class="sub">${esc(n.b).slice(0,70)}${n.b.length>70?'…':''}</p></div>`).join('')}</div>`}
-addEventListener('resize',()=>{clearTimeout(window.__pcT);window.__pcT=setTimeout(pcLayout,150)});setInterval(()=>{if(PCW)pcDraw()},4000);setTimeout(pcLayout,50);
+addEventListener('resize',()=>{clearTimeout(window.__pcT);window.__pcT=setTimeout(pcLayout,150)});setInterval(()=>{if(PCW)pcDraw()},4000);setTimeout(()=>pcLayout(true),50);
 
 function chatTick(){if(!S)return;const el=$('#chat');
   if(CHATQ.length)el.innerHTML=CHATQ.shift();else if(!el.innerHTML)el.innerHTML='<span><b class="sys">[系統]</b> 歡迎來到晨星鎮，祝你冒險愉快。</span>'}
