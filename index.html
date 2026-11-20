@@ -1675,10 +1675,10 @@ function bossReady(i){return !!S.cleared[i]||(S.main.ch===i&&S.main.acc&&(CH[i].
 function vRun(){if(RUN.tower)return vTower();const a=AREAS[RUN.area],v=RUN.view,last=RUN.step>=RUN.nodes.length-1;
   const pips=`<div class="pips">${RUN.nodes.map((t,i)=>`<span class="pip ${i<RUN.step||(i===RUN.step&&v.type==='res')?'done':i===RUN.step?'now':''} ${t==='boss'?'boss':''}">${t==='boss'||t==='elite'||t==='story'?'★':t?(i<=RUN.step?NODE[t]?NODE[t][0]:i+1:i+1):'⋔'}</span>`).join('')}</div>`;
   let body='';
-  if(v.type==='start')body=`<div class="panel">${art('area_'+a.id,a.n)}<p>${a.d}</p><p class="sub">本次路線共 ${RUN.nodes.length} 段，終點是${RUN.nodes[RUN.nodes.length-1]==='boss'?'首領 '+MOBS[a.boss].n:'精英魔物'}。</p><button class="btn pri big" data-a="runNext">踏入${a.n}</button><button class="btn" data-a="retreat">返回</button></div>`;
+  if(v.type==='start')body=`<div class="panel">${art('area_'+a.id,a.n)}<p>${a.d}</p>${AFX[a.id]?`<div class="gsec"><b>地區特性：${AFX[a.id].n}</b><span class="sub">${AFX[a.id].d}</span></div>`:''}<p class="sub">本次路線共 ${RUN.nodes.length} 段，終點是${RUN.nodes[RUN.nodes.length-1]==='boss'?'首領 '+MOBS[a.boss].n:'精英魔物'}。</p><button class="btn pri big" data-a="runNext">踏入${a.n}</button><button class="btn" data-a="retreat">返回</button></div>`;
   else if(v.type==='gate')body=bossGate(a);
   else if(v.type==='res')body=`<div class="panel">${v.img?`<div class="duo">${art(v.img,'勝利','r34')}${v.mimg?art(v.mimg,'','r11'):''}</div>`:''}<h3>${v.title}</h3>${v.drop||''}<p>${v.text}</p>${v.box?bossBoxHtml(v):''}${v.box===1?'':last?`<button class="btn pri big" data-a="finish">完成冒險</button>`:`<button class="btn pri big" data-a="runNext">繼續前進</button><button class="btn" data-a="retreat">撤退回城（保留戰利品）</button>`}</div>`;
-  else if(v.type==='fork')body=`<div class="panel"><h3>岔路</h3><p class="sub">前方的路分成兩條。要往哪邊走？</p>${forkTalk()}<div class="fork">${v.opts.map((o,i)=>(()=>{const tg=((RUN.ftags||[])[RUN.step+1]||[])[i],T=tg&&TAGS[tg];return `<button class="btn ${T?'tagged':''}" data-a="pickFork" data-v="${i}"><i>${NODE[o][0]}</i><b>${NODE[o][1]}</b><span>${NODE[o][2]}</span><span class="risk">${NRISK[o]||''}</span>${T?`<span class="ftag">${T[0]} ${T[1]}<small>${T[2]}</small></span>`:''}</button>`})()).join('')}</div><button class="btn" data-a="retreat">撤退回城（保留戰利品）</button></div>`;
+  else if(v.type==='fork')body=`<div class="panel"><h3>岔路</h3><p class="sub">前方的路分成兩條。要往哪邊走？</p>${forkTalk()}<div class="fork">${v.opts.map((o,i)=>(()=>{const tg=((RUN.ftags||[])[RUN.step+1]||[])[i],T=tg&&TAGS[tg];const bl=(RUN.blind||[])[RUN.step+1]===i;if(bl)return `<button class="btn" data-a="pickFork" data-v="${i}"><i>🌫</i><b>濃霧中的路</b><span>霧太濃了，看不清前面有什麼</span><span class="risk">完全未知</span></button>`;return `<button class="btn ${T?'tagged':''}" data-a="pickFork" data-v="${i}"><i>${NODE[o][0]}</i><b>${NODE[o][1]}</b><span>${NODE[o][2]}</span><span class="risk">${NRISK[o]||''}</span>${T?`<span class="ftag">${T[0]} ${T[1]}<small>${T[2]}</small></span>`:''}</button>`})()).join('')}</div><button class="btn" data-a="retreat">撤退回城（保留戰利品）</button></div>`;
   else if(v.type==='shrine')body=`<div class="panel">${art('event_shrine','古老的祭壇')}<h3>古老的祭壇</h3><p>長滿青苔的石台上刻著三個符號。指尖碰到其中一個時，微弱的光流進了身體。</p>${v.done?`<p>${v.done}</p><button class="btn pri big" data-a="${last?'finish':'runNext'}">${last?'完成冒險':'繼續前進'}</button>`:`<div class="list">${[['atk','劍之紋','本次冒險中，攻擊與魔力 +15%'],['def','盾之紋','本次冒險中，受到的傷害大幅降低'],['luck','星之紋','本次冒險中，金幣 +30%、裝備掉落提升']].map(([k,n,d])=>`<button class="btn opt" data-a="bless" data-v="${k}"><span><b>${n}</b>　<span class="sub">${d}</span></span></button>`).join('')}</div>`}</div>`;
   else if(v.type==='shop')body=`<div class="panel">${art('event_merchant','旅行商人')}<h3>旅行商人</h3><p>背著巨大背包的商人朝你招手：「出門在外，價錢好商量！」</p><div class="list">${v.items.map(([k,pr],i)=>{const one=k==='box'||k==='hunt',so=one&&(v.bought[k]||(k==='hunt'&&RUN.hunt)),SP={box:['神秘裝備箱','隨機一件本區域裝備，精良以上',ic('mat')],hunt:['懸賞情報','「附近有隻守寶的大傢伙。」下一場普通戰鬥變成精英守寶怪：更危險，但必掉裝備、金幣 ×2',icon('item_tok',ic('mat'))]}[k];return `<div class="item"><span class="ico c${one?3:1}">${SP?SP[2]:icon('item_'+k,ic('potion'))}</span><span class="grow"><b>${SP?SP[0]:ITEMS[k].n}</b><span class="sub">${SP?SP[1]:ITEMS[k].d}</span></span><button class="btn sm ${S.gold>=pr&&!so?'pri':''}" data-a="buyRun" data-v="${i}" ${S.gold<pr||so?'disabled':''}>${so?'售完':pr+' G'}</button></div>`}).join('')}</div><p class="sub">持有 ${S.gold} G</p><button class="btn pri big" data-a="${last?'finish':'runNext'}">${last?'完成冒險':'繼續前進'}</button></div>`;
   else if(v.type==='event'){const e=v.ev;
@@ -1901,18 +1901,30 @@ function storyEnd(){const f=STORY.after;STORY=null;drawStory();if(f)f()}
 /* ============ 冒險流程 ============ */
 const NODE={battle:['⚔','魔物的足跡','一般戰鬥'],event:['❗','奇怪的動靜','隨機事件・屬性檢定'],chest:['✦','閃光的東西','可能有寶箱'],rest:['☘','安全的營地','回復 HP 與 MP'],
   shrine:['✧','古老的祭壇','本次冒險獲得祝福'],merchant:['⚖','旅行商人','購買補給或神秘箱'],ambush:['☠','強敵的氣息','精英戰鬥・掉寶提升'],mystery:['？','濃霧籠罩','完全未知']};
+/* 各地區探索規則：每章的冒險手感不同 */
+const AFX={plain:{n:'🌾 順風',d:'寶箱與流浪商人比較多，適合新手',w:{chest:1.6,merchant:1.5}},
+  forest:{n:'🌫 迷霧',d:'岔路常被霧遮住，看不出前面是什麼',w:{mystery:2.2},blind:.35},
+  mine:{n:'🪨 落石',d:'每走一段有 15% 機率被落石砸中（HP -6%）；礦脈寶箱較多',w:{chest:1.7},rock:.15},
+  snow:{n:'❄ 酷寒',d:'每走一段 HP -4%；避風的營地（休息點）較多',w:{rest:2.2},cold:.04},
+  castle:{n:'☠ 霧蝕',d:'魔物與埋伏更多，詛咒之地常出現',w:{battle:1.4,ambush:1.6},curse:.35},
+  road:{n:'🗡 盜賊橫行',d:'埋伏和驛站商人都變多，懸賞目標常出現',w:{ambush:1.9,merchant:1.6},bounty:.35},
+  archive:{n:'💧 積水',d:'每走一段 MP -5%；泡水的檔案（事件）與寶箱較多',w:{event:1.6,chest:1.4},wet:.05}};
+const afx=()=>RUN&&AFX[AREAS[RUN.area].id]||{};
 function startRun(i,nm){DROPS=[];const POOL=[['battle',5],['event',4],['chest',2],['rest',2],['shrine',1.5],['merchant',1.5],['ambush',1.5],['mystery',2]];
+  const AW=(AFX[AREAS[i].id]||{}).w||{};for(const p of POOL)if(AW[p[0]])p[1]*=AW[p[0]];
   const wp=ex=>{const P=POOL.filter(p=>p[0]!==ex);let r=Math.random()*P.reduce((a,b)=>a+b[1],0);for(const p of P)if((r-=p[1])<0)return p[0];return 'battle'};
-  const nodes=['battle'],forks=[null],ftags=[null];for(let k=1;k<5;k++){const x=wp(),y=wp(x);nodes.push(null);forks.push([x,y]);ftags.push([rTag(x),rTag(y)])}
+  const F=AFX[AREAS[i].id]||{},tg2=t=>{const r=rTag(t);if(r)return r;if(F.curse&&t==='battle'&&Math.random()<F.curse)return 'cursed';if(F.bounty&&(t==='battle'||t==='ambush')&&Math.random()<F.bounty)return 'bounty';return null};
+  const nodes=['battle'],forks=[null],ftags=[null],blind=[null];for(let k=1;k<5;k++){const x=wp(),y=wp(x);nodes.push(null);forks.push([x,y]);ftags.push([tg2(x),tg2(y)]);blind.push(F.blind&&Math.random()<F.blind?Math.floor(Math.random()*2):null)}
   if(!nm&&S.main.acc&&S.main.ch===i&&!S.main.mid&&CH[i].mid){nodes[2]='story';forks[2]=null}
   nodes.push(nm||bossReady(i)?'boss':'elite');forks.push(null);
-  RUN={area:i,nm:!!nm,step:-1,nodes,forks,ftags,tagAt:{},bless:null,loot:{gold:0,exp:0,items:[]},view:{type:'start'}};render();$('#main').scrollTop=0}
+  RUN={area:i,nm:!!nm,step:-1,nodes,forks,ftags,blind,tagAt:{},bless:null,loot:{gold:0,exp:0,items:[]},view:{type:'start'}};render();$('#main').scrollTop=0}
 const TAGS={lord:['👹','領主巢穴','區域領主盤踞，強大但會掉寶石與好裝備'],hoard:['💎','寶物守衛','精英怪把守，打贏必掉裝備'],bounty:['💰','懸賞目標','金幣 ×2.5'],fate:['🎲','命運之地','檢定獎勵加倍，失敗代價也更重'],rich:['👑','大寶箱','金幣加倍、必有裝備……據說有寶箱怪'],spring:['💧','靈泉','HP・MP 全回復'],cursed:['☠','詛咒之地','怪物更強，經驗 ×2']};
 const rTag=t=>{const r=Math.random();if(t==='battle'&&r<.08)return 'lord';if(r>.45)return null;return {battle:pick(['hoard','bounty','cursed']),ambush:'bounty',event:'fate',chest:'rich',rest:'spring'}[t]||null};
 const NRISK={battle:'危險 ★　金幣・經驗',ambush:'危險 ★★　裝備 50%',event:'屬性檢定・結果不定',chest:'無危險・金幣道具',rest:'無危險・回復 35%',shrine:'無危險・本趟增益',merchant:'無危險・補給／懸賞情報',mystery:'完全未知'};
 const nAdds=el=>{const a=RUN.area,r=Math.random();if(el)return a>=3&&r<.5?1:0;return a>=3&&r<.2?2:a>=2&&r<.5?1:0};
 function runNext(){const n=RUN.step+1;if(RUN.nodes[n]==='boss'&&!RUN.gate&&RUN.step>=0){RUN.view={type:'gate'};save();render();$('#main').scrollTop=0;return}if(RUN.forks&&RUN.forks[n]&&!RUN.nodes[n]){RUN.view={type:'fork',opts:RUN.forks[n]};save();render();$('#main').scrollTop=0;return}
   RUN.step++;const a=AREAS[RUN.area],s=stats();let t=RUN.nodes[RUN.step];const tg=(RUN.tagAt||{})[RUN.step]||null;
+  if(RUN.step>0){const F=afx();if(F.rock&&Math.random()<F.rock){const v=Math.round(s.HP*.06);S.hp=Math.max(1,S.hp-v);toast(`🪨 落石！HP -${v}`)}if(F.cold&&t!=='rest'){const v=Math.round(s.HP*F.cold);S.hp=Math.max(1,S.hp-v);toast(`❄ 寒氣刺骨 HP -${v}`)}if(F.wet){const v=Math.round(s.MP*F.wet);S.mp=Math.max(0,S.mp-v);toast(`💧 積水浸濕了裝備 MP -${v}`)}}
   if(t==='mystery'){t=RUN.nodes[RUN.step]=pick(['battle','event','chest','ambush','merchant','shrine']);toast(`濃霧散去……是「${NODE[t][1]}」`)}
   if(t==='battle'&&tg==='lord'&&LORD[RUN.area]){startBattle(LORD[RUN.area],'',0);if(B)B.log.push('👹 區域領主現身！')}
   else if(t==='battle'&&RUN.hunt&&tg!=='hoard'){RUN.hunt=0;startBattle(pick(a.mobs),'elite',nAdds(1));if(B){B.hoard=1;B.gmul=2;B.name='懸賞・'+B.m.n;B.log.push('📜 情報沒錯，就是牠！打倒牠必掉裝備、金幣 ×2')}}
@@ -1920,7 +1932,7 @@ function runNext(){const n=RUN.step+1;if(RUN.nodes[n]==='boss'&&!RUN.gate&&RUN.s
   else if(t==='elite'||t==='ambush'){startBattle(pick(a.mobs),'elite',nAdds(1));if(B&&tg==='bounty'){B.gmul=2.5;B.log.push('💰 懸賞目標！金幣 ×2.5')}}
   else if(t==='boss'){const i=RUN.area;if(!RUN.nm&&S.main.acc&&S.main.ch===i&&!S.main.pre&&CH[i].pre){play(CH[i].pre,`story_ch${i+1}_pre`,a.n,()=>{S.main.pre=true;save();startBattle(a.boss,'boss');render()});return}startBattle(a.boss,'boss')}
   else if(t==='story'){const i=RUN.area;play(CH[i].mid,SKEY(i+1,'mid'),a.n,()=>{S.main.mid=true;if(RUN)RUN.view={type:'res',title:'旅途見聞',text:you('你把這件事記在心裡，繼續前進。')};save();render()});return}
-  else if(t==='event'){const seen=RUN.evSeen||(RUN.evSeen=[]),ar=AREAS[RUN.area].id,pool=EVENTS.filter(e=>!seen.includes(e.id)&&(!e.ar||e.ar===ar)),loc=pool.filter(e=>e.ar),ev=loc.length&&Math.random()<.5?pick(loc):pick(pool.length?pool:EVENTS.filter(e=>!e.ar));seen.push(ev.id);RUN.view={type:'event',ev,phase:'ask',fate:tg==='fate'}}
+  else if(t==='event'){const seen=RUN.evSeen||(RUN.evSeen=[]),ar=AREAS[RUN.area].id,pool=EVENTS.filter(e=>!seen.includes(e.id)&&(!e.ar||e.ar===ar)),loc=pool.filter(e=>e.ar),ev=loc.length&&Math.random()<.75?pick(loc):pick(pool.length?pool:EVENTS.filter(e=>!e.ar));seen.push(ev.id);RUN.view={type:'event',ev,phase:'ask',fate:tg==='fate'}}
   else if(t==='shrine')RUN.view={type:'shrine'};
   else if(t==='merchant'){const u=12+a.base*6;RUN.view={type:'shop',items:[['pot',Math.round(ITEMS.pot.price*.7)],['pot2',Math.round(ITEMS.pot2.price*.7)],['eth',Math.round(ITEMS.eth.price*.7)],['box',u*12],['hunt',u*5]],bought:{}}}
   else if(t==='chest'&&tg==='rich'&&Math.random()<.3){toast('寶箱張開了大嘴——是寶箱怪！');startBattle(pick(a.mobs),'elite',0);if(B){B.hoard=1;B.gmul=2;B.name='寶箱怪・'+B.m.n;B.log.push('👑 寶箱怪！打倒牠，寶物就是你的')}}
@@ -1975,6 +1987,49 @@ EVENTS.push(
   {id:'a_ink',ar:'archive',n:'自己寫字的羽毛筆',t:'一張桌子上，羽毛筆正在空白的紙上一筆一筆寫著一個名字，寫完就塗黑，再重寫一次。',o:[
     {l:'握住羽毛筆',a:'VIT',dc:14,ok:{t:'筆在你手中停了。紙上留下一個名字，沒有被塗黑。你覺得肩膀輕了一點。',exp:3.5,mp:.4},ng:{t:'筆尖刺進你的手，墨水滲進傷口。',hp:-.15,mp:-.15}},
     {l:'把那頁紙收起來',a:'LUK',dc:12,ok:{t:'紙背面寫著書庫暗門的位置。',gold:2,stone:1},ng:{t:'紙一碰就化成了黑水。',exp:.5}}]});
+EVENTS.push(
+  {id:'p_kite',ar:'plain',n:'卡在樹上的風箏',t:'一個小女孩指著樹梢哭，她的風箏卡在枝頭，風一吹就快要扯破了。',o:[
+    {l:'爬上去拿',a:'DEX',dc:10,ok:{t:'你把風箏完好地拿下來。小女孩的媽媽塞給你一袋烤餅乾。',exp:1.5,hp:.2},ng:{t:'樹枝斷了，你摔了個屁股著地。小女孩破涕為笑。',hp:-.06,exp:.5}},
+    {l:'教她怎麼收線',a:'INT',dc:9,ok:{t:'風一轉向，風箏自己滑了下來。她說長大也要當冒險者。',exp:2},ng:{t:'線斷了，風箏飄向北方。',exp:.3}}]},
+  {id:'p_goblin',ar:'plain',n:'哥布林的交易',t:'一隻落單的哥布林舉著一顆紫色石頭，比手畫腳地想跟你換東西。',o:[
+    {l:'拿乾糧跟牠換',a:'LUK',dc:11,ok:{t:'牠開心地抱著乾糧跑了。石頭是一塊小小的霧晶，露娜說很有研究價值。',exp:2,gold:1.5},ng:{t:'牠搶了乾糧就跑，連石頭也沒留下。',gold:-.4}},
+    {l:'問牠石頭哪來的',a:'INT',dc:12,ok:{t:'牠指了指北方，又學「穿斗篷的人」走路的樣子。你記下了這個情報。',exp:2.5},ng:{t:'牠聽不懂，嘰嘰喳喳地走了。',exp:.3}}]},
+  {id:'f_wisp2',ar:'forest',n:'停住的蝴蝶',t:'霧邊的空氣裡，一隻藍色蝴蝶懸在半空，翅膀張開，一動也不動。',o:[
+    {l:'伸手碰牠',a:'VIT',dc:12,ok:{t:'指尖一碰，蝴蝶突然拍拍翅膀飛走了。周圍的霧退了一點點。',exp:2.5,mp:.3},ng:{t:'一股寒意從指尖竄上來，你的手麻了好一陣子。',hp:-.1,mp:-.1}},
+    {l:'把這一幕畫下來',a:'INT',dc:11,ok:{t:'露娜看了你的畫很久：「霧碰過的東西，會停在那一刻。」',exp:2},ng:{t:'畫得太醜，連你自己都看不懂。',exp:.3}}]},
+  {id:'f_mushroom',ar:'forest',n:'發光的蘑菇圈',t:'樹根之間長了一圈發著紫光的蘑菇，中間的草地乾乾淨淨，好像有人常常坐在這裡。',o:[
+    {l:'摘幾朵回去',a:'LUK',dc:11,ok:{t:'蜜可說這是上好的藥材，跟你高價收購。',gold:3},ng:{t:'孢子噴了你一臉，你打了一整天噴嚏。',hp:-.08}},
+    {l:'坐在圈裡休息',safe:1,ok:{t:'你坐下來，四周安靜得只剩下呼吸聲。醒來時精神好多了。',hp:.25,mp:.25}}]},
+  {id:'m_lamp',ar:'mine',n:'熄滅的礦燈',t:'坑道牆上掛著一排礦燈，全都熄了，只有最裡面一盞還在閃。',o:[
+    {l:'把礦燈一盞盞點亮',a:'INT',dc:12,ok:{t:'燈光照亮了一條被遺忘的支坑，裡面堆著沒運走的礦石。',stone:1,gold:2},ng:{t:'燈油漏出來，差點燒到你的袖子。',hp:-.08}},
+    {l:'朝著閃爍的燈走',a:'LUK',dc:12,ok:{t:'燈下躺著一個舊工具箱，裡面有前人留下的裝備。',loot:1},ng:{t:'燈在你靠近時熄了，你在黑暗中撞到頭。',hp:-.12}}]},
+  {id:'m_miner',ar:'mine',n:'迷路的老礦工',t:'一個白髮礦工坐在岔路口發呆，嘴裡唸著三十年前的坑道編號。',o:[
+    {l:'陪他找出口',a:'VIT',dc:11,ok:{t:'他記起了路，還告訴你一條通往深處的捷徑。',exp:2.5,item:['pot2',1]},ng:{t:'你們一起繞了好久才出來。',hp:-.08,exp:1}},
+    {l:'問他三十年前的事',a:'INT',dc:12,ok:{t:'「我們挖到一面畫著人的牆，他們都在笑……然後礦坑就封了。」',exp:3},ng:{t:'他搖搖頭，什麼都想不起來。',exp:.3}}]},
+  {id:'s_wolf',ar:'snow',n:'受傷的雪狼',t:'雪地上一隻雪狼拖著受傷的後腿，看見你，齜牙低吼，卻站不起來。',o:[
+    {l:'替牠包紮',a:'VIT',dc:13,ok:{t:'牠舔了舔你的手，一拐一拐地跑進風雪。不久後，你在路邊發現牠叼來的一袋東西。',exp:2.5,loot:1},ng:{t:'牠咬了你一口，然後逃走了。',hp:-.15}},
+    {l:'留下食物離開',safe:1,ok:{t:'你放下一塊肉，慢慢後退。雪狼一直看著你走遠。',exp:1.5}}]},
+  {id:'s_aurora',ar:'snow',n:'山頂的極光',t:'夜裡的山頂上，綠色的光帶在天空流動。露娜說，霧最濃的那年，北方再也看不到極光。',o:[
+    {l:'許個願',safe:1,ok:{t:'你閉上眼睛許願。睜開時，露娜正偷偷看你。',hp:.3,mp:.3,exp:1}},
+    {l:'記錄光帶的方向',a:'INT',dc:13,ok:{t:'光帶指的方向，剛好是黑霧要塞。艾德溫說這份紀錄很珍貴。',exp:3,gold:1.5},ng:{t:'冷到手抖，什麼都沒寫好。',hp:-.06}}]},
+  {id:'c_knight',ar:'castle',n:'跪著的黑騎士',t:'大廳裡一具黑色鎧甲單膝跪地，手按著劍。鎧甲胸口掛著遠征隊的徽章。',o:[
+    {l:'取下徽章',a:'LUK',dc:13,ok:{t:'徽章背面刻著名字。你把它收好，要帶回去給艾德溫。',exp:3,gold:1},ng:{t:'鎧甲突然動了一下，你嚇得退開。',hp:-.12}},
+    {l:'對他行禮',safe:1,ok:{t:'你低頭行禮。鎧甲的頭盔好像微微點了一下。',exp:2}}]},
+  {id:'c_engine',ar:'castle',n:'嗡嗡作響的管線',t:'牆裡的銅管發出低沉的嗡嗡聲，一路通往要塞深處。管子上結著一層霧晶。',o:[
+    {l:'敲下霧晶',a:'STR',dc:13,ok:{t:'敲下的霧晶還很完整，能賣不少錢。',gold:4},ng:{t:'管子噴出一陣冷霧，凍傷了你的手。',hp:-.15}},
+    {l:'順著管線找源頭',a:'INT',dc:14,ok:{t:'你畫下管線的走向，找到了一條通往引擎的捷徑。',exp:3.5},ng:{t:'管線繞成一團，你迷路了一陣子。',exp:.5}}]},
+  {id:'r_toll',ar:'road',n:'私設的關卡',t:'幾個盜賊用破馬車擋住街道：「過路費，一人十枚金幣。」',o:[
+    {l:'打過去',a:'STR',dc:13,ok:{t:'盜賊四散逃跑，留下他們搶來的東西。',gold:3,loot:1},ng:{t:'對方人多，你挨了幾下才突破。',hp:-.18}},
+    {l:'付錢了事',safe:1,ok:{t:'你付了錢。盜賊頭目愣了一下，還找了零錢給你。',gold:-.8,exp:1}}]},
+  {id:'r_field',ar:'road',n:'荒廢的麥田',t:'街道兩旁是一望無際的荒地，地上還插著褪色的稻草人。瑪莎說過，這裡以前全是麥田。',o:[
+    {l:'在稻草人底下挖挖看',a:'LUK',dc:12,ok:{t:'稻草人底下埋著一個陶罐，裝著農家藏的積蓄和一封信：「等霧退了就回來」。',gold:3.5,exp:1},ng:{t:'只挖到石頭。',exp:.3}},
+    {l:'把稻草人扶正',safe:1,ok:{t:'你把稻草人扶好。遠處好像有人家冒出了炊煙。',exp:1.5,hp:.15}}]},
+  {id:'a_whisper',ar:'archive',n:'書架間的低語',t:'書架深處有人在小聲唸名字，一個接一個，聲音溼漉漉的。',o:[
+    {l:'跟著一起唸',a:'VIT',dc:14,ok:{t:'唸完最後一個名字，低語停了。你覺得那些人好像說了聲謝謝。',exp:4,mp:.3},ng:{t:'名字越唸越多，你頭痛欲裂。',mp:-.25}},
+    {l:'循聲找過去',a:'DEX',dc:13,ok:{t:'書架後面是一具積水妖，牠抱著一本名冊，看見你就化成水流走了，名冊留了下來。',exp:3,gold:2},ng:{t:'你踩進深水，整個人沉了一下。',hp:-.15}}]},
+  {id:'a_seal',ar:'archive',n:'上了封蠟的箱子',t:'一個鐵箱上貼滿紅色封蠟，每一張都寫著「永久封存」。',o:[
+    {l:'撬開封蠟',a:'STR',dc:14,ok:{t:'箱子裡是氣象院的舊儀器和一件裝備。',loot:1,stone:1},ng:{t:'封蠟一破，警報般的金光閃過，你被震退。',hp:-.18}},
+    {l:'抄下封蠟上的日期',a:'INT',dc:12,ok:{t:'封存的日期全都是同一天——遠征隊出發的隔天。艾德溫沉默了很久。',exp:3.5},ng:{t:'字跡被水泡糊了。',exp:.5}}]});
 function evPick(i){const v=RUN.view,o=v.ev.o[i];
   if(o.safe){v.phase='done';v.r=null;v.text=you(o.ok.t);v.gain=applyOut(o.ok,false);save();render();return}
   const d=R(1,20),mod=Math.floor(S.attr[o.a]/4),dc=o.dc+RUN.area*3,ok=d===20||(d!==1&&d+mod>=dc);
@@ -2153,7 +2208,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
-  {v:'7.7',d:'2026-11-20',t:'地區探索事件',b:'每張地圖新增兩個專屬探索事件，例如草原走散的羊群、礦坑深處的歌聲、雪山的遠征隊避難小屋、灰石街道的廢棄驛站帳本，跟該地區的故事有關。灰石街道的三種魔物也有了專屬掉落裝備。'},
+  {v:'7.7',d:'2026-11-20',t:'每章探索不同',b:'每張地圖有自己的地區特性：草原順風寶箱多、森林迷霧遮住岔路、礦坑會落石、雪山酷寒扣 HP、要塞霧蝕魔物更多、灰石街道盜賊橫行、地下書庫積水扣 MP。每張地圖也有 4 個專屬探索事件，會優先出現，例如走散的羊群、停住的蝴蝶、礦坑深處的歌聲、山頂的極光、跪著的黑騎士、廢棄驛站的帳本。灰石街道的三種魔物也有了專屬掉落裝備。'},
   {v:'7.6',d:'2026-11-20',t:'裝備擴充',b:'裝備從 70 件增加到 116 件。8 個進階職業各有兩把專屬武器（Lv.20、Lv.26），附帶職業特色效果；頭、身、腳、戒指、項鍊每一階多一條路線，例如法冠、輕甲、重靴、力量戒、智者項鍊，同一階可以依職業和打法挑選。'},
   {v:'7.5',d:'2026-11-20',t:'美術全面翻新',b:'12 個職業男女全部動作圖與站姿依統一規格重繪：武器、服裝固定，比例與角度一致。10 種新魔物與 5 位區域領主換上正式立繪，魔物專屬裝備也有了專屬圖示。'},
   {v:'7.4',d:'2026-11-19',t:'區域領主',b:'每張地圖新增一位區域領主：巨角兔王、月牙狼王、白骨礦工頭、冰川巨人王、黑霧將軍。岔路上出現「👹 領主巢穴」時才會遇到，首領級強度，每位固定掉落一種寶石（黃玉、月石、紅玉、翠玉、藍玉），也有機會掉裝備。'},
