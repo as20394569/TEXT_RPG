@@ -1617,7 +1617,7 @@ function vBattle(){const s=stats(),fx=B.fx||{},intro=B.intro,a=AREAS[RUN.area];B
    <div class="spr foe ${B.m.fly?'fly':''} ${B.kind==='boss'?'boss':''} ${foeC}" data-a="openM" data-v="foe" role="button" aria-label="查看怪物情報" style="cursor:pointer"><div class="plat"></div>${B.id==='shadow'?art(HK(),'試煉之影','r34','shadowimg'):art(fKey0,B.m.n,'r11','','mob_'+B.id)}${foeFx}</div>
    <div class="spr me ${meC}"><div class="plat"></div>${art(mKey0,clsName(),'r34','',HK())}${meFx}</div>
    <div class="ibox me-i"><div class="nm"><span>${esc(S.name)}</span><span>Lv${S.lv}</span></div>${bbar(S.hp,s.HP,pp)}<div class="num">HP ${S.hp}/${s.HP}</div>${bbar(S.mp,s.MP,null,'m')}<div class="num">MP ${S.mp}/${s.MP}</div>${me?`<div class="chips">${me}</div>`:''}</div>
-   ${AL?`<div class="ally ${AL.hp<=0?'down':''} ${aD||aH?'aact':''} ${aHit?'ahit':''}">${art('ally_'+AL.id,AL.n,'r34')}${bbar(AL.hp,AL.max)}${aD?`<span class="dmg sm">⚔${aD}</span>`:aH?`<span class="dmg heal sm">+${aH}</span>`:aHit?`<span class="dmg sm">-${aHit}</span>`:''}</div>`:''}
+   ${AL?`<div class="ally ${AL.hp<=0?'down':''} ${aD||aH?'aact':''} ${aHit?'ahit':''}">${art('ally_'+AL.id+(AL.hp<=0?'_lose':aHit?'_hurt':aH?'_cast':aD?'_atk':AL.hp<AL.max*.3?'_low':''),AL.n,'r34')}${bbar(AL.hp,AL.max)}${aD?`<span class="dmg sm">⚔${aD}</span>`:aH?`<span class="dmg heal sm">+${aH}</span>`:aHit?`<span class="dmg sm">-${aHit}</span>`:''}</div>`:''}
    ${sk?skillFx(sk[0],fx.hits||1):fk?foeSkillFx(fx.fsk):''}${fx.cut?`<div class="cutin ${theirs?'bad':''}">${fx.cut}</div>`:''}</div>
   <div class="msg" id="msg"></div>${cmd}</div>`}
 function skillFx(t,n){return '<div class="fxl"><div class="dim"></div><div class="mc"><i></i><i></i></div></div>'}
