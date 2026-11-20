@@ -1308,8 +1308,10 @@ const ALLY={
   luna:{n:'露娜',img:'npc_luna',d:'研究黑霧的少女。職業【燈術士】：用測霧燈的蒼焰攻擊，替你治療、展開結界、驅散霧氣。',role:'燈術士',open:()=>S.main.ch>=1},
   gale:{n:'蓋爾',img:'npc_gale',d:'前王國騎士團的王牌。重擊敵人，並時常替你擋下攻擊。',role:'坦克・物理',open:()=>!!S.flags.galeBack}};
 
-const DAILY=[{k:'kill',c:10,n:'擊敗 10 隻魔物',rw:{gold:300,items:{stone:1}}},{k:'run',c:2,n:'完成 2 次冒險',rw:{gold:300,items:{dust:3}}},{k:'enh',c:1,n:'強化裝備 1 次',rw:{gold:200,items:{stone:1}}}];
-const FAKE=['夜雨聲煩','小籠包戰神','月見草','Kirara','阿土伯','白貓不吃魚','一刀九九九','奶茶半糖','咕咕雞','星野光','北境旅人','雷姆的梳子'];
+/* 占星師：每日星象，整天有效的小祝福 */
+const FORT={exp:{n:'智者之星',d:'戰鬥經驗 +15%',say:'學到的東西會比平常多。'},gold:{n:'商人之星',d:'金幣 +25%',say:'錢包會變重的。'},drop:{n:'獵人之星',d:'稀有裝備掉落率提高',say:'好東西在等你。'},crit:{n:'戰士之星',d:'爆擊率 +8%',say:'你的刀會找到縫隙。'},chain:{n:'元素之星',d:'屬性連鎖傷害再 +20%',say:'火與冰今天特別躁動。'}};
+const fortune=()=>{const d=new Date().toDateString();return S.fort&&S.fort.d===d?S.fort:null},fortK=k=>{const f=fortune();return !!f&&f.k===k};
+const DAILY=[{k:'kill',c:10,n:'擊敗 10 隻魔物',rw:{gold:800,items:{stone:2}}},{k:'run',c:2,n:'完成 2 次冒險',rw:{gold:800,items:{stone:1,pot2:2}}},{k:'enh',c:1,n:'強化裝備 1 次',rw:{gold:500,items:{stone:2}}}];
 
 /* ============ 狀態 ============ */
 const KEY='azure_oath_save_v1';
@@ -1463,7 +1465,7 @@ function gearTotals(){const e={},add=o=>{for(const k in o)e[k]=(e[k]||0)+o[k]};
   for(const id in PASS)if(PASS[id].st&&hasP(id))add(PASS[id].st);return e}
 function stats(){const e=gearTotals(),a={},c=CLS[S.cls],v=k=>e[k]||0,p=k=>1+v(k)/100;for(const k in ATTR)a[k]=S.attr[k]+v(k);
   const rgB=S.cls==='ranger'?1.35:1;return{HP:Math.round((60+a.VIT*14+S.lv*8+v('hp'))*p('hpp')*rgB),MP:Math.round((20+a.INT*5+S.lv*3+v('mp'))*p('mpp')),ATK:Math.round((a[c.atk]*2+v('atk'))*p('atkp')),MAG:Math.round((a.INT*2.2+v('mag'))*p('magp')),
-    DEF:Math.round((a.VIT*1.4+v('def'))*p('defp')*rgB),MRES:Math.round((a.INT*.8+a.VIT*.4+S.lv+v('mres'))*p('mresp')),RF:Math.min(60,v('rfire')),RI:Math.min(60,v('rice')),RT:Math.min(60,v('rthunder')),RD:Math.min(60,v('rdark')),CRIT:Math.min(75,Math.round(5+a.LUK*.6+a.DEX*.2+v('crit'))),CD:150+Math.round(a.LUK*.8)+v('cd'),EVA:Math.min(45,Math.round(a.DEX*.6+v('eva'))),
+    DEF:Math.round((a.VIT*1.4+v('def'))*p('defp')*rgB),MRES:Math.round((a.INT*.8+a.VIT*.4+S.lv+v('mres'))*p('mresp')),RF:Math.min(60,v('rfire')),RI:Math.min(60,v('rice')),RT:Math.min(60,v('rthunder')),RD:Math.min(60,v('rdark')),CRIT:Math.min(75,Math.round(5+a.LUK*.6+a.DEX*.2+v('crit')+(fortK('crit')?8:0))),CD:150+Math.round(a.LUK*.8)+v('cd'),EVA:Math.min(45,Math.round(a.DEX*.6+v('eva'))),
     LS:v('ls'),REGEN:v('regen')+Math.min(3,a.VIT*.03),MPCUT:Math.min(50,Math.round(v('mpcut')+Math.min(20,a.INT*.15))),BURN:v('burn'),DOUBLE:v('double')+Math.min(20,Math.round(a.DEX*.15)),STUN:v('stun'),GUARD:v('guard'),SHIELD:v('shield'),BACK:Math.min(60,v('back')),THORN:Math.min(50,v('thorn')),GALE:v('gale'),REAP:Math.min(25,v('reap')),MPREG:v('mpreg'),RESMAX:v('resmax'),BRKCD:v('brkcd'),DETAMP:v('detamp'),FOCUSATK:v('focusatk'),ANSWER:v('answer'),HEALP:v('healp'),FAITHG:v('faithg'),A:a}}
 function power(){const s=stats();return Math.round(s.HP/4+s.MP/4+s.ATK*3+s.MAG*3+s.DEF*2.5+s.CRIT*4+(s.CD-150)*1.5+s.EVA*3+s.LS*5+(s.BURN+s.DOUBLE+s.STUN+s.GUARD+s.SHIELD+s.BACK+s.THORN+s.REAP)*3+s.GALE*40)}
 const baseAttr=()=>{const a=Object.assign({},CLS[S.cls].base),g=CLS[S.cls].grow;for(const k in g)a[k]+=g[k]*(S.lv-1);if(S.adv){const b=ADV[S.adv].bonus;for(const k in b)a[k]+=b[k]}return a};
@@ -1480,7 +1482,7 @@ function rollSubs(t,r){const off=OFFK();return Object.keys(SUBS).filter(k=>!off.
 function minG(g){if(!g||GEAR[g.id].uniq)return g;g.q=.85;const t=GEAR[g.id].t||0;for(const x of g.sub||[])if(SUBS[x.k])x.v=Math.max(1,Math.round(SUBS[x.k](t)*.7));if(g.sh){g.sh=0}return g}
 function rollQ(){const x=Math.random();return x<.03?+(1.3+Math.random()*.1).toFixed(2):+(0.85+Math.random()*.4).toFixed(2)}
 function addGear(id,r,set){const g={u:S.uid++,id,r,p:0,q:GEAR[id].uniq?1:rollQ(),sub:rollSubs(GEAR[id].t,r+(r>=2&&Math.random()<.2?1:0)),lock:false,sock:r>=4?[null,null]:r>=3?[null]:[]};if(r>=4&&!GEAR[id].uniq)g.sp=pick(Object.keys(SPEC));if(set!=null)g.set=set;S.gear.push(g);if(S.dex)S.dex.g[id]=1;return g}
-function rollRar(minR,bonus){const lu=1+Math.min(.5,(S?stats().A.LUK:0)*.004);const w=RW.map((x,i)=>i<minR?0:x*(i>=2?(bonus||1)*lu:1)),t=w.reduce((a,b)=>a+b);let r=Math.random()*t;for(let i=0;i<5;i++){if((r-=w[i])<0)return i}return 4}
+function rollRar(minR,bonus){if(S&&fortK('drop'))bonus=(bonus||1)*1.3;const lu=1+Math.min(.5,(S?stats().A.LUK:0)*.004);const w=RW.map((x,i)=>i<minR?0:x*(i>=2?(bonus||1)*lu:1)),t=w.reduce((a,b)=>a+b);let r=Math.random()*t;for(let i=0;i<5;i++){if((r-=w[i])<0)return i}return 4}
 function makeGear(tier,r,hard){const sl=pick(Object.keys(SLOTS)),alt=Math.random()<.5,id=sl==='weapon'?(alt&&S.adv&&GEAR[`w_${S.adv}_${tier}`]?`w_${S.adv}_${tier}`:`w_${S.cls}_${tier}`):(alt&&GEAR[`${SLOTP[sl]}b_${tier}`]?`${SLOTP[sl]}b_${tier}`:`${SLOTP[sl]}_${tier}`);
   const g=addGear(id,r,hard&&r>=3&&Math.random()<.4?CSET[S.cls]:r>=2&&Math.random()<.35?ASET(tier):null);if(r>=1&&Math.random()<.05)shine(g);if((r===2||r===3)&&!g.sp&&!GEAR[id].uniq&&Math.random()<.06)g.sp=pick(Object.keys(SPEC));if(r>=3||g.sh||g.sp)DROPS.push(g);if(r>=3||g.sh||g.sp)sys(`恭喜 ${S.name} 獲得【${gearName(g)}】！`);return g}
 /* 閃耀裝備：多一條詞條、最高詞條 ×1.5 */
@@ -1681,7 +1683,7 @@ function vTitle(){const c=CLS[NEWCLS];return `<div class="title">${art('title_bg
   <p>${c.d}</p><p class="sub">${c.f}</p><div class="chips">${Object.keys(ATTR).map(k=>`<span class="chip">${ATTR[k]} ${c.base[k]}</span>`).join('')}</div>
   <p class="sub">男女主角的部分劇情對話不同。</p><button class="btn pri big" data-a="start">開始冒險</button></div></div>`}
 function vTown(){
-  const F=[['guild','npc_ria','莉雅','冒險者公會','主線與委託'],['smith','npc_bald','巴爾德','鐵匠鋪','強化・分解'],['shop','npc_miko','蜜可','道具商店','藥水與裝備'],['inn','npc_martha','瑪莎','旅店',`休息回復（${S.lv*4} G）`],['altar','npc_oracle','占星師','星象台','掉落情報'],['temple','npc_edwin','艾德溫','轉職神殿','Lv.20 轉職試煉']];
+  const F=[['guild','npc_ria','莉雅','冒險者公會','主線與委託'],['smith','npc_bald','巴爾德','鐵匠鋪','強化・分解'],['shop','npc_miko','蜜可','道具商店','藥水與裝備'],['inn','npc_martha','瑪莎','旅店',`休息回復（${S.lv*4} G）`],['altar','npc_oracle','占星師','星象台','每日占卜・掉落情報'],['temple','npc_edwin','艾德溫','轉職神殿','Lv.20 轉職試煉']];
   return `<div class="banner">${art('town_bg','晨星鎮全景')}<div class="cap">晨星鎮<small>頻道 1</small></div></div>
   <button class="newsbar" data-a="openM" data-v="news"><span class="nb-tag">公告</span><span class="grow nb-t"><b>v${NEWS[0].v}　${NEWS[0].t}</b><small>${NEWS[0].d}・點我看全部更新</small></span>${newsDot()?'<span class="tag new">NEW</span>':''}<span class="nb-arr">›</span></button>
   <div class="row qrow"><button class="btn grow" data-a="openM" data-v="dex">冒險圖鑑</button><button class="btn grow" data-a="openM" data-v="ach">成就</button><button class="btn grow" data-a="openM" data-v="rank">排行榜</button><button class="btn grow" data-a="openM" data-v="fb">意見回報</button></div>
@@ -1848,7 +1850,7 @@ function vQuest(){
       return `<div class="item"><span class="grow"><b>${q.n}　<span class="sub">委託人 ${q.npc}</span></b><span>${q.d}${s?`　<b>${p}/${q.c}</b>`:''}</span><span class="sub">獎勵：${rwText(q.rw)}</span></span>${!s?`<button class="btn sm" data-a="sqAccept" data-v="${q.id}">接受</button>`:p>=q.c?`<button class="btn pri sm" data-a="sqDone" data-v="${q.id}">回報</button>`:'<span class="tag off">進行中</span>'}</div>`}).join('')||'<p class="empty">目前沒有新的委託，推進主線後會出現更多。</p>';
     const dn=av.filter(q=>(S.side[q.id]||{}).done);if(dn.length)body+=`<p class="sub">已完成：${dn.map(q=>q.n).join('、')}</p>`}
   else{body=`<div class="item"><span class="grow"><b>每日簽到</b><span class="sub">300 G、治療藥水×2</span></span>${S.daily.sign?'<span class="tag ok">已領取</span>':'<button class="btn pri sm" data-a="sign">領取</button>'}</div>`+
-    DAILY.map(d=>{const p=Math.min(d.c,S.daily[d.k]);return `<div class="item"><span class="grow"><b>${d.n}　${p}/${d.c}</b><span class="sub">獎勵：${rwText(d.rw)}</span></span>${S.daily.got[d.k]?'<span class="tag ok">已領取</span>':p>=d.c?`<button class="btn pri sm" data-a="dailyGet" data-v="${d.k}">領取</button>`:'<span class="tag off">進行中</span>'}</div>`}).join('')+'<p class="sub">每日任務於換日後重置。</p>'}
+    DAILY.map(d=>{const p=Math.min(d.c,S.daily[d.k]);return `<div class="item"><span class="grow"><b>${d.n}　${p}/${d.c}</b><span class="sub">獎勵：${rwText(d.rw)}</span></span>${S.daily.got[d.k]?'<span class="tag ok">已領取</span>':p>=d.c?`<button class="btn pri sm" data-a="dailyGet" data-v="${d.k}">領取</button>`:'<span class="tag off">進行中</span>'}</div>`}).join('')+`<div class="item"><span class="grow"><b>全部完成獎勵</b><span class="sub">隨機寶石 1 顆、強化石×3</span></span>${S.daily.all?'<span class="tag ok">已領取</span>':'<span class="tag off">'+DAILY.filter(x=>S.daily.got[x.k]).length+'/3</span>'}</div>`+'<p class="sub">每日任務於換日後重置。</p>'}
   return `<h2>任務</h2>${tabs}<div class="panel"><div class="list">${body}</div></div>`}
 
 /* ============ 浮層 ============ */
@@ -1905,7 +1907,8 @@ const MV={
   inn(){const c=S.lv*4;return{t:'旅店',b:npcSay('npc_martha','瑪莎','累了吧？睡一覺就能恢復精神。')+`<button class="btn pri big" data-a="rest" ${S.gold>=c?'':'disabled'}>休息一晚（${c} G）</button>`}},
   altar(){const rows=AREAS.map((A,i)=>{const lock=i>=S.main.ch+1&&!S.main.done;return `<div class="gsec"><b>${A.n}　<small class="sub">Lv.${A.lv}</small></b>${lock?'<span class="sub">星象尚未顯現……推進主線後再來。</span>':`<span class="subl">◆ 地區套裝【${SETS[ASET(i)].n}】：此地魔物掉落（稀有以上）</span><span class="subl">◆ 首領專屬【${GEAR[BOSSU[A.boss]].n}】：${MOBS[A.boss].n}，掉落率 8%（惡夢 20%）</span>`}</div>`}).join('');
     const cs=SETS[CSET[S.cls]];
-    return{t:'星象台',b:npcSay('npc_oracle','占星師','星辰不賣裝備，只告訴你去哪裡找。好裝備，要自己打出來。')+rows+`<div class="gsec"><b>職業套裝【${cs.n}】</b><span class="subl">◆ 只從<b class="c3">異變種</b>與<b class="c4">惡夢模式</b>的魔物身上掉落</span><span class="sub">2 件：${cs.d2}　4 件：${cs.d4}</span></div>`}},
+    const ft=fortune(),FI=FORT[ft&&ft.k];
+    return{t:'星象台',b:npcSay('npc_oracle','占星師',FI?`今天的星象是【${FI.n}】。${FI.say}`:'星辰不賣裝備，只告訴你去哪裡找。……要看看今天的星象嗎？')+`<div class="gsec"><b>今日星象</b>${FI?`<span class="subl">✦ ${FI.n}：${FI.d}（今天有效）</span>`:`<span class="sub">每天免費占卜一次，抽一個整天有效的祝福。</span><button class="btn pri" data-a="fortune">占卜今天的星象</button>`}</div>`+rows+`<div class="gsec"><b>職業套裝【${cs.n}】</b><span class="subl">◆ 只從<b class="c3">異變種</b>與<b class="c4">惡夢模式</b>的魔物身上掉落</span><span class="sub">2 件：${cs.d2}　4 件：${cs.d4}</span></div>`}},
   temple(){let b=npcSay('npc_edwin','艾德溫','轉職是冒險者的第二次誕生。先證明你能贏過自己的影子。');
     if(S.adv)b+=`<p>${you('你')}已轉職為 <b>${ADV[S.adv].n}</b>。</p>`;
     else if(S.lv<TRIAL.lv)b+=`<div class="gsec"><b>轉職試煉</b><span class="sub">Lv.${TRIAL.lv} 才能接受試煉（目前 Lv.${S.lv}）。在那之前，先把現在職業的技能練熟吧。</span></div>`;
@@ -2371,6 +2374,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'9.4',d:'2026-11-20',t:'生活機能調整',b:'①占星師新增「每日星象」：每天免費占卜一次，抽一個整天有效的祝福（經驗、金幣、掉寶、爆擊、屬性連鎖）。②每日任務獎勵大幅提高，三項全完成再送寶石與強化石。③裝備強化到 +5、+10 各開一個寶石孔（最多 3 孔），精英魔物也會掉寶石。'},
   {v:'9.3',d:'2026-11-20',t:'強化改版',b:'強化加入鐵鎚演出；6% 機率「大成功」直接 +2。+7 以上失敗仍會降一級。'},
   {v:'9.2',d:'2026-11-20',t:'攻防與屬性改版',b:'①魔物防禦與魔抗隨等級成長，破甲、穿透與物理／魔法的選擇更重要。②主角新增「魔抗」，布甲、輕甲、項鍊、戒指提供，重甲防禦高但魔抗低。③新增火、冰、雷、暗抗性，魔物屬性招式會被抗性減傷，森林／火山／雪地／雷擊套裝附帶對應抗性，詞條也會出現。④屬性連鎖：冰凍時火攻「碎冰」、灼燒時冰攻「蒸發」、雷打冰凍「導電」、雷打中毒「毒爆」、聖打虛弱「淨化」、暗打流血「血蝕」，傷害提高。'},
   {v:'9.1',d:'2026-11-20',t:'立繪重繪',b:'12 個職業男女的站姿立繪全部重新繪製，手部改為自然放鬆或握住武器。'},
@@ -2536,7 +2540,7 @@ const basicEl=()=>({swordsman:'phys',ranger:'phys',mage:'arcane',cleric:'holy'}[
 const capB=d=>{if(!B||B.kind!=='boss')return d;const lim=B.max,r=Math.max(1,Math.min(d,lim-(B.tk||0)));B.tk=(B.tk||0)+r;return r};
 function bossPhase(){if(B&&B.kind==='boss'&&!B.ph2&&B.hp>0&&B.hp<=B.max*.5){B.ph2=1;B.fshield=(B.fshield||0)+Math.round(B.max*.12);blog(`${B.name} 被逼入絕境，張開了護盾！`)}}
 function hitFoe(stat,pow,o){o=o||{};const s=stats();if(s.GALE&&!B.gale){B.gale=1;o=Object.assign({},o,{sure:1});B.log.push('【疾風】先發制人！')}if(!o.sure&&Math.random()*100<(B.eva+fbSum('eva'))*.6)return{d:0,cr:false,miss:true};let base=clsDm()*(B.opening?1.5:1)*(S.cls==='swordsman'&&B.cls&&B.cls.brk?1+.06*B.cls.brk:1)*(S.cls==='ranger'&&B.cls&&B.cls.focus?1+.09*B.cls.focus:1)*(stat==='BOTH'?s.ATK+s.MAG:s[stat])*(1+buffSum('atk')+(s.FOCUSATK&&B.cls.focus>=rmax(5)?s.FOCUSATK/100:0))*(B.pst.weak>0?.75:1)*(s.BACK&&S.hp<s.HP*.35?1+s.BACK/100:1);
-  const fdef=stat==='MAG'?(B.mres??B.def):stat==='BOTH'?((B.mres??B.def)+B.def)/2:B.def;let em=elMul(B.id,B.curEl);{const ce=B.curEl,st=B.st||{};let cm=0,cn='';if(ce==='fire'&&B.frozen&&st.stun>0){cm=.5;cn='碎冰';st.stun=0;B.frozen=0}else if(ce==='ice'&&st.burn>0){cm=.3;cn='蒸發';st.burn=0}else if(ce==='thunder'&&B.frozen&&st.stun>0){cm=.3;cn='導電'}else if(ce==='thunder'&&st.poison>0){cm=.25;cn='毒爆';st.poison=Math.max(0,st.poison-1)}else if(ce==='holy'&&st.weak>0){cm=.2;cn='淨化'}else if(ce==='dark'&&st.bleed>0){cm=.25;cn='血蝕'}if(cm){em*=1+cm;B.chain=cn;B.log.push(`【${cn}】屬性連鎖！傷害 +${Math.round(cm*100)}%`)}}if(o.rend&&em<1){em=1;B.elHit='rend'}else if(em!==1)B.elHit=em>1?'w':'r';let d=em*base*pow*100/(100+fdef*(1+fbSum('def'))*(1-(o.pierce||0)))*(.9+Math.random()*.2);const cr=!!o.sure||Math.random()*100<-(B.tough||0)+s.CRIT+(o.cr||0)+(hasP('sw1')&&B.cls.brk>=3?15:0);if(cr){const cdm=(s.CD+(hasP('rg3')&&B.cls.focus>=5?30:0)+s.BRKCD*B.cls.brk)/100;d*=1+(cdm-1)*(1-(B.cdr||0))}
+  const fdef=stat==='MAG'?(B.mres??B.def):stat==='BOTH'?((B.mres??B.def)+B.def)/2:B.def;let em=elMul(B.id,B.curEl);{const ce=B.curEl,st=B.st||{};let cm=0,cn='';if(ce==='fire'&&B.frozen&&st.stun>0){cm=.5;cn='碎冰';st.stun=0;B.frozen=0}else if(ce==='ice'&&st.burn>0){cm=.3;cn='蒸發';st.burn=0}else if(ce==='thunder'&&B.frozen&&st.stun>0){cm=.3;cn='導電'}else if(ce==='thunder'&&st.poison>0){cm=.25;cn='毒爆';st.poison=Math.max(0,st.poison-1)}else if(ce==='holy'&&st.weak>0){cm=.2;cn='淨化'}else if(ce==='dark'&&st.bleed>0){cm=.25;cn='血蝕'}if(cm){if(fortK('chain'))cm+=.2;em*=1+cm;B.chain=cn;B.log.push(`【${cn}】屬性連鎖！傷害 +${Math.round(cm*100)}%`)}}if(o.rend&&em<1){em=1;B.elHit='rend'}else if(em!==1)B.elHit=em>1?'w':'r';let d=em*base*pow*100/(100+fdef*(1+fbSum('def'))*(1-(o.pierce||0)))*(.9+Math.random()*.2);const cr=!!o.sure||Math.random()*100<-(B.tough||0)+s.CRIT+(o.cr||0)+(hasP('sw1')&&B.cls.brk>=3?15:0);if(cr){const cdm=(s.CD+(hasP('rg3')&&B.cls.focus>=5?30:0)+s.BRKCD*B.cls.brk)/100;d*=1+(cdm-1)*(1-(B.cdr||0))}
   d=capB(Math.max(1,Math.round(d)));if(B.fshield>0){const ab=Math.min(B.fshield,d);B.fshield-=ab;d-=ab}B.hp=Math.max(0,B.hp-d);bossPhase();return{d,cr}}
 /* 魔物技能屬性：依招式名稱判斷，主角對應抗性減傷 */
 const MOBEL=k=>{if(!k)return '';if(k.el)return k.el;const t=(k.n||'')+(k.d||'');return /火|炎|焰|熔|灼|爆/.test(t)?'fire':/冰|霜|雪|凍|寒|零/.test(t)?'ice':/雷|電|閃|落擊/.test(t)?'thunder':/暗|闇|魂|影|毒|腐|孢|咒|蝕|墨|塗銷/.test(t)?'dark':''};
@@ -2663,7 +2667,7 @@ function autoAct(){if(!B||B.busy||!B.auto)return;if(MODAL&&MODAL.k==='foe')retur
   const d=sk.filter(k=>SK[k].dmg).sort((a,b)=>est(b)-est(a))[0];
   d?pAct('skill',d):pAct('atk')}
 function spoil(){const m=B.m,L=B.L,bs=B.kind==='boss',el=B.kind==='elite',T=B.tot||(B.tot={exp:0,gold:0,got:[],names:[]}),got=T.got;
-  const xm=(B.mut?3:1)*(B.nm?2.5:1),lk=RUN&&RUN.bless==='luck',exp=Math.round((FA?.5:1)*(B.xmul||1)*(10+L*6)*(bs?5:el?2:1)*xm*liveExp()*xpPen(L)),gold=Math.round((FA?.5:1)*(B.gmul||1)*(6+L*4)*(bs?6:el?2:1)*(.9+Math.random()*.3)*xm*(lk?1.3:1)*(1+Math.min(.4,stats().A.LUK*.004)));S.gold+=gold;T.exp+=exp;T.gold+=gold;T.names.push(B.name);
+  const xm=(B.mut?3:1)*(B.nm?2.5:1),lk=RUN&&RUN.bless==='luck',exp=Math.round((FA?.5:1)*(fortK('exp')?1.15:1)*(B.xmul||1)*(10+L*6)*(bs?5:el?2:1)*xm*liveExp()*xpPen(L)),gold=Math.round((FA?.5:1)*(fortK('gold')?1.25:1)*(B.gmul||1)*(6+L*4)*(bs?6:el?2:1)*(.9+Math.random()*.3)*xm*(lk?1.3:1)*(1+Math.min(.4,stats().A.LUK*.004)));S.gold+=gold;T.exp+=exp;T.gold+=gold;T.names.push(B.name);
   if(m.mat&&Math.random()<.6){addItem(m.mat,1);got.push(ITEMS[m.mat].n)}
   if(Math.random()<.12){addItem('pot',1);got.push('治療藥水')}
   if(bs||Math.random()<.06){addItem('stone',bs?2:1);got.push(bs?'強化石×2':'強化石')}
@@ -2671,6 +2675,7 @@ function spoil(){const m=B.m,L=B.L,bs=B.kind==='boss',el=B.kind==='elite',T=B.to
   {const tw=RUN.tower,gt=tw?Math.min(RUN.area,S.main.ch):RUN.area,hard=B.mut||B.nm,hd=B.hoard?1:0,n=(FA&&!bs&&!B.hoard&&Math.random()<.5)?0:hd+(bs?(Math.random()<(tw?.3:B.nm?.6:.4)?1:0)+(!tw&&B.nm&&Math.random()<.3?1:0):(B.mut?1:Math.random()<(el?.5:B.nm?.3:lk?.2:.12)*(tw?.6:1)?1:0));for(let i=0;i<n;i++){const g=rollGear(gt,bs?(tw?1:B.nm?3:2):hard?2:el?1:0,bs||hard?(tw?1.3:2):1,hard);if(i<hd||(B.mut&&!bs))minG(g);got.push(gearName(g))}if(tw&&RUN.area>S.main.ch&&Math.random()<.5){addItem('stone',1);got.push('強化石')}
     if(MDROP[B.id]&&Math.random()<(B.wander?.5:B.treasure?.3:B.kind==='elite'?.12:B.nm?.1:.04)*(FA?.5:1)){const u=addGear(MDROP[B.id],3);DROPS.push(u);got.push(gearName(u));sys(`${S.name} 取得魔物專屬裝備【${GEAR[u.id].n}】！`)}
     if(bs&&BOSSU[B.id]&&(!RUN.tower||S.cleared[AREAS.findIndex(a=>a.boss===B.id)])&&Math.random()<(RUN.tower?.03:B.nm?.2:.08)){const u=addGear(BOSSU[B.id],4);DROPS.push(u);got.push(gearName(u));sys(`${S.name} 取得首領專屬裝備【${GEAR[u.id].n}】！`)}
+    if(!bs&&B.kind==='elite'&&Math.random()<.06){const gm=pick(GEMS);addItem(gm,1);got.push(ITEMS[gm].n)}
     if(bs&&Math.random()<(RUN.tower?.3:1)){const n=1+(B.nm&&Math.random()<.5?1:0);for(let i=0;i<n;i++){const gm=BGEM[B.id]||pick(GEMS);addItem(gm,1);got.push(ITEMS[gm].n)}}}
   got.push(...liveDrop(bs));
   track('kill',B.id);S.st.kills++;if(S.dex)S.dex.m[B.id]=(S.dex.m[B.id]||0)+1;if(bs&&B.nm)S.st.nmboss=(S.st.nmboss||0)+1;
@@ -3345,7 +3350,7 @@ const ACT={
   buyGear(id){if(S.gold<GEAR[id].price)return;S.gold-=GEAR[id].price;addGear(id,0);toast(`購買了 ${GEAR[id].n}，已放入背包`);save();render()},
   enh(u){const g=gearBy(+u);if(!canEnh(g)||document.querySelector('.enhfx'))return;S.gold-=enhCost(g);addItem('stone',-enhStone(g));track('enh');
     const rate=enhRate(g),p0=g.p,ok=Math.random()*100<rate,great=ok&&g.p<12&&g.p+2<=15&&Math.random()<.06;let msg,cls;
-    if(ok){g.p+=great?2:1;cls=great?'great':'ok';msg=great?`大成功！+${p0} → +${g.p}`:`成功！+${p0} → +${g.p}`;if(g.p>=7||great)sys(`${S.name} 將【${gearName(g)}】強化${great?'大成功':'成功'}！`)}
+    if(ok){g.p+=great?2:1;{const want=(g.r>=4?2:g.r>=3?1:0)+(g.p>=5?1:0)+(g.p>=10?1:0);g.sock=g.sock||[];let add=0;while(g.sock.length<Math.min(3,want)){g.sock.push(null);add++}if(add)setTimeout(()=>toast(`裝備開出新的寶石孔！（${g.sock.length} 孔）`),1800)}cls=great?'great':'ok';msg=great?`大成功！+${p0} → +${g.p}`:`成功！+${p0} → +${g.p}`;if(g.p>=7||great)sys(`${S.name} 將【${gearName(g)}】強化${great?'大成功':'成功'}！`)}
     else{cls='ng';if(g.p>=7){g.p--;msg=`失敗…… 降為 +${g.p}`}else msg='失敗…… 材料消失了';}
     save();enhFx(g,p0,rate,cls,msg)},
   sockIn(v){const [u,gm]=v.split('|'),g=gearBy(+u);if(!g||!(S.items[gm]>0)||!(g.sock||[]).length)return;let i=g.sock.indexOf(null);if(i<0)i=0;g.sock[i]=gm;addItem(gm,-1);SFX.buff();toast(`鑲入 ${ITEMS[gm].n}`);save();render()},
@@ -3376,7 +3381,8 @@ const ACT={
   bTarget(v){if(!B||B.busy||!B.adds||!B.adds[+v])return;swapFoe(+v);B.fx=null;render()},
   sqAccept(id){S.side[id]={prog:0,done:false};toast('已接受委託');save();render()},
   sqDone(id){const q=SQ.find(x=>x.id===id);if(sqProg(q)<q.c)return;if(q.type==='item')addItem(q.item,-q.c);S.side[id].done=true;const t=give(q.rw);toast(`委託完成：${t}`);save();render()},
-  dailyGet(k){const d=DAILY.find(x=>x.k===k);if(S.daily.got[k]||S.daily[k]<d.c)return;S.daily.got[k]=true;toast('獲得 '+give(d.rw));save();render()},
+  fortune(){if(fortune())return;const k=pick(Object.keys(FORT));S.fort={d:new Date().toDateString(),k};SFX.holy(0);toast(`今日星象：${FORT[k].n}（${FORT[k].d}）`);save();render()},
+  dailyGet(k){const d=DAILY.find(x=>x.k===k);if(S.daily.got[k]||S.daily[k]<d.c)return;S.daily.got[k]=true;toast('獲得 '+give(d.rw));if(DAILY.every(x=>S.daily.got[x.k])&&!S.daily.all){S.daily.all=1;const gm=pick(GEMS);addItem(gm,1);addItem('stone',3);setTimeout(()=>toast(`每日全部完成！額外獲得 ${ITEMS[gm].n}、強化石×3`),900)}save();render()},
   bgmT(){BGMOFF=!BGMOFF;try{localStorage.setItem(KEY+'_bgm',BGMOFF?'0':'1')}catch(e){}if(BGMOFF)bgm(null);else bgmAuto();drawModal()},
   shakeT(){SHAKEOFF=!SHAKEOFF;try{localStorage.setItem(KEY+'_shake',SHAKEOFF?'0':'1')}catch(e){}document.body.classList.toggle('noshake',SHAKEOFF);drawModal()},
   mute(){MUTE=!MUTE;try{localStorage.setItem(KEY+'_mute',MUTE?'1':'0')}catch(e){}drawModal()},
