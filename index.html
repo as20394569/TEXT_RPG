@@ -689,7 +689,7 @@ const AFF={rage:{n:'狂暴',d:'攻擊 +40%'},shell:{n:'堅殼',d:'防禦 +80%'},
   reflect:{n:'反射',d:'反彈 15% 受到的傷害'},swift:{n:'迅捷',d:'迴避 +15%、爆擊 +15%'},venom:{n:'劇毒',d:'攻擊附帶中毒'}};
 const HST={poison:'中毒',burn:'灼燒',bleed:'流血',weak:'虛弱',stun:'暈眩'};
 function mobBuild(m,lv,mult,kindHP){const w=MTY[m.ty].w,pts=20+lv*5,a={};for(const k in w)a[k]=Math.max(1,Math.round(pts*w[k]*mult));
-  const sw=m.ty==='swift';return{a,HP:Math.round((18+a.VIT*5+lv*18)*(m.hpM||1)*kindHP),ATK:Math.round((sw?a.DEX:a.STR)*2+lv),MAG:Math.round(a.INT*2.2+lv),
+  const sw=m.ty==='swift',lg=1+Math.max(0,lv-14)*.007;return{a,HP:Math.round((18+a.VIT*5+lv*18)*(m.hpM||1)*kindHP*lg),ATK:Math.round(((sw?a.DEX:a.STR)*2+lv)*lg),MAG:Math.round((a.INT*2.2+lv)*lg),
     DEF:Math.round(a.VIT+lv*2.2),MRES:Math.round(a.INT+a.VIT*.5+lv*2.2),CRIT:Math.min(40,Math.round(5+a.LUK*.5+a.DEX*.15)),EVA:Math.min(30,Math.round(a.DEX*.35))}}
 /* 新魔物（先用同系魔物改色，正式插畫待 Codex） */
 const MVAR={
@@ -2374,7 +2374,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
-  {v:'9.4',d:'2026-11-20',t:'生活機能調整',b:'①占星師新增「每日星象」：每天免費占卜一次，抽一個整天有效的祝福（經驗、金幣、掉寶、爆擊、屬性連鎖）。②每日任務獎勵大幅提高，三項全完成再送寶石與強化石。③裝備強化到 +5、+10 各開一個寶石孔（最多 3 孔），精英魔物也會掉寶石。'},
+  {v:'9.4',d:'2026-11-20',t:'生活機能調整',b:'①占星師新增「每日星象」：每天免費占卜一次，抽一個整天有效的祝福（經驗、金幣、掉寶、爆擊、屬性連鎖）。②每日任務獎勵大幅提高，三項全完成再送寶石與強化石。③裝備強化到 +10 會多開一個寶石孔，精英魔物也會掉寶石。'},
   {v:'9.3',d:'2026-11-20',t:'強化改版',b:'強化加入鐵鎚演出；6% 機率「大成功」直接 +2。+7 以上失敗仍會降一級。'},
   {v:'9.2',d:'2026-11-20',t:'攻防與屬性改版',b:'①魔物防禦與魔抗隨等級成長，破甲、穿透與物理／魔法的選擇更重要。②主角新增「魔抗」，布甲、輕甲、項鍊、戒指提供，重甲防禦高但魔抗低。③新增火、冰、雷、暗抗性，魔物屬性招式會被抗性減傷，森林／火山／雪地／雷擊套裝附帶對應抗性，詞條也會出現。④屬性連鎖：冰凍時火攻「碎冰」、灼燒時冰攻「蒸發」、雷打冰凍「導電」、雷打中毒「毒爆」、聖打虛弱「淨化」、暗打流血「血蝕」，傷害提高。'},
   {v:'9.1',d:'2026-11-20',t:'立繪重繪',b:'12 個職業男女的站姿立繪全部重新繪製，手部改為自然放鬆或握住武器。'},
@@ -3350,7 +3350,7 @@ const ACT={
   buyGear(id){if(S.gold<GEAR[id].price)return;S.gold-=GEAR[id].price;addGear(id,0);toast(`購買了 ${GEAR[id].n}，已放入背包`);save();render()},
   enh(u){const g=gearBy(+u);if(!canEnh(g)||document.querySelector('.enhfx'))return;S.gold-=enhCost(g);addItem('stone',-enhStone(g));track('enh');
     const rate=enhRate(g),p0=g.p,ok=Math.random()*100<rate,great=ok&&g.p<12&&g.p+2<=15&&Math.random()<.06;let msg,cls;
-    if(ok){g.p+=great?2:1;{const want=(g.r>=4?2:g.r>=3?1:0)+(g.p>=5?1:0)+(g.p>=10?1:0);g.sock=g.sock||[];let add=0;while(g.sock.length<Math.min(3,want)){g.sock.push(null);add++}if(add)setTimeout(()=>toast(`裝備開出新的寶石孔！（${g.sock.length} 孔）`),1800)}cls=great?'great':'ok';msg=great?`大成功！+${p0} → +${g.p}`:`成功！+${p0} → +${g.p}`;if(g.p>=7||great)sys(`${S.name} 將【${gearName(g)}】強化${great?'大成功':'成功'}！`)}
+    if(ok){g.p+=great?2:1;{const want=(g.r>=4?2:g.r>=3?1:0)+(g.p>=10?1:0);g.sock=g.sock||[];let add=0;while(g.sock.length<Math.min(3,want)){g.sock.push(null);add++}if(add)setTimeout(()=>toast(`裝備開出新的寶石孔！（${g.sock.length} 孔）`),1800)}cls=great?'great':'ok';msg=great?`大成功！+${p0} → +${g.p}`:`成功！+${p0} → +${g.p}`;if(g.p>=7||great)sys(`${S.name} 將【${gearName(g)}】強化${great?'大成功':'成功'}！`)}
     else{cls='ng';if(g.p>=7){g.p--;msg=`失敗…… 降為 +${g.p}`}else msg='失敗…… 材料消失了';}
     save();enhFx(g,p0,rate,cls,msg)},
   sockIn(v){const [u,gm]=v.split('|'),g=gearBy(+u);if(!g||!(S.items[gm]>0)||!(g.sock||[]).length)return;let i=g.sock.indexOf(null);if(i<0)i=0;g.sock[i]=gm;addItem(gm,-1);SFX.buff();toast(`鑲入 ${ITEMS[gm].n}`);save();render()},
