@@ -2857,9 +2857,18 @@ const PFX=(()=>{let HS=0,cv,cx,P=[],Q=[],raf=0,W=0,Hh=0,t0=0,SR={x:0,y:0,w:360,h
   const H=[.21,.6],F=[.74,.33],AL=[.4,.5];
   const GY=f=>f&&f.g!=null?f.g:.13;
   function offRect(el,st,sr){let x=0,y=0,e=el;while(e&&e!==st){x+=e.offsetLeft;y+=e.offsetTop;e=e.offsetParent}if(e!==st){return el.getBoundingClientRect()}const w=el.offsetWidth,h=el.offsetHeight,l=sr.left+st.clientLeft+x,t=sr.top+st.clientTop+y;return{left:l,top:t,width:w,height:h,right:l+w,bottom:t+h}}
+  /* 依圖片實際不透明範圍找角色身體位置（換圖、攻擊姿勢前衝時特效不會跑掉） */
+  const BBX={};function figBox(img,r){try{if(!img||!img.complete||!img.naturalWidth)return null;const k=img.currentSrc||img.src;let b=BBX[k];
+      if(b===undefined){const c=document.createElement('canvas'),w=c.width=64,h=c.height=Math.round(64*img.naturalHeight/img.naturalWidth),x=c.getContext('2d',{willReadFrequently:true});x.drawImage(img,0,0,w,h);const d=x.getImageData(0,0,w,h).data;let x0=w,y0=h,x1=-1,y1=-1;
+        for(let yy=0;yy<h;yy++)for(let xx=0;xx<w;xx++)if(d[(yy*w+xx)*4+3]>60){if(xx<x0)x0=xx;if(xx>x1)x1=xx;if(yy<y0)y0=yy;if(yy>y1)y1=yy}
+        b=BBX[k]=x1<0?null:[x0/w,y0/h,(x1+1)/w,(y1+1)/h]}
+      if(!b)return null;const nw=img.naturalWidth,nh=img.naturalHeight,sc=Math.max(r.width/nw,r.height/nh),dw=nw*sc,dh=nh*sc,ox=r.left+(r.width-dw)/2,oy=r.top+(r.height-dh)/2;
+      return[ox+b[0]*dw,oy+b[1]*dh,ox+b[2]*dw,oy+b[3]*dh]}catch(e){return null}}
   function locate(){try{const st=document.querySelector('.stage');if(!st)return;const sr=st.getBoundingClientRect();if(sr.width<10)return;
     for(const [sel,A,side] of [['.spr.foe .art',F,'foe'],['.spr.me .art',H,'me'],['.stage .ally .art',AL,'me']]){const el=document.querySelector(sel);if(!el)continue;const r=offRect(el,st,sr);if(r.width<4||r.height<4)continue;
-      A[0]=(r.left+r.width/2-sr.left)/sr.width;A[1]=(r.top+r.height*(side==='foe'?.52:.45)-sr.top)/sr.height;A.g=(r.bottom-r.height*(side==='foe'?.06:.03)-sr.top)/sr.height-A[1];A.R=r.width/sr.width}
+      const bx=figBox(el.querySelector('img'),r);
+      if(bx){A[0]=((bx[0]+bx[2])/2-sr.left)/sr.width;A[1]=(bx[1]+(bx[3]-bx[1])*(side==='foe'?.52:.45)-sr.top)/sr.height;A.g=(bx[3]-(bx[3]-bx[1])*.02-sr.top)/sr.height-A[1]}
+      else{A[0]=(r.left+r.width/2-sr.left)/sr.width;A[1]=(r.top+r.height*(side==='foe'?.52:.45)-sr.top)/sr.height;A.g=(r.bottom-r.height*(side==='foe'?.06:.03)-sr.top)/sr.height-A[1]}A.R=r.width/sr.width}
     if(typeof syncDerived==='function')syncDerived()}catch(e){}}
   const FIRE=['#ff4a1a','#ff8a2a','#ffc04a','#fff0a0'],GOLD=['#ffd34a','#fff0a0','#ffffff'],ICE=['#8fdcff','#d8f4ff','#ffffff'],VIO=['#b06cff','#e0b8ff','#7a3aff'];
   const sparks=(f,c,n,sp,ms)=>at(ms||0,()=>emit({x:f[0],y:f[1],n,s0:sp*.5,s1:sp,l0:.18,l1:.42,z0:.003,z1:.006,c,sh:'streak',len:1.2,g:.9,drag:2}));
