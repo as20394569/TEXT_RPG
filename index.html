@@ -1527,6 +1527,13 @@ const GREET={
 /* 線上排行榜（伺服器在製作人電腦，網址記在 rank.json） */
 let RANKURL=null,RANKTOP=null,RANKERR=0,RANKT=0;
 async function rankUrl(){if(RANKURL)return RANKURL;try{const r=await fetch('rank.json?'+Date.now(),{cache:'no-store'});const j=await r.json();if(j&&j.url)RANKURL=j.url.replace(/\/$/,'')}catch(e){}return RANKURL}
+/* 玩家意見回報：與排行榜共用伺服器，資料分開 */
+let FBL=null,FBERR=0,FBT=0;const FBCAT={bug:'🐞 錯誤回報',idea:'💡 建議',balance:'⚖ 平衡',art:'🎨 美術',other:'💬 其他'};
+async function fbLoad(){const u=await rankUrl();if(!u){FBERR=1;if(MODAL&&MODAL.k==='fb')drawModal();return}try{const ctl=new AbortController();setTimeout(()=>ctl.abort(),8000);const r=await fetch(u+'/api/fb?n=50',{cache:'no-store',signal:ctl.signal});FBL=await r.json();FBERR=0;FBT=Date.now()}catch(e){FBERR=1}if(MODAL&&MODAL.k==='fb'&&!document.activeElement?.closest?.('#modal textarea'))drawModal()}
+async function fbSend(){const ta=$('#fbText'),cat=$('#fbCat');const text=(ta&&ta.value||'').trim();if(text.length<4){toast('請至少寫 4 個字');return}
+  const u=await rankUrl();if(!u){toast('伺服器暫時連不上，稍後再試');return}if(!S.pid){S.pid=Math.random().toString(36).slice(2,10);save()}
+  try{const r=await fetch(u+'/api/fb',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:S.pid,name:S.name,cls:clsName(),lv:S.lv,cat:cat?cat.value:'other',text})});const j=await r.json();
+    if(j.ok){toast('已送出，謝謝你的意見！');ta.value='';FBL=null;await fbLoad();drawModal()}else toast(j.error==='too fast'?'送太快了，1 分鐘後再試':'送出失敗，請再試一次')}catch(e){toast('送出失敗，請檢查網路')}}
 async function rankSync(force){if(!S||!S.cls)return;if(!force&&Date.now()-RANKT<5*60e3)return;RANKT=Date.now();const u=await rankUrl();if(!u){RANKERR=1;return}
   if(!S.pid){S.pid=Math.random().toString(36).slice(2,10);save()}
   try{const ctl=new AbortController();setTimeout(()=>ctl.abort(),6000);
@@ -1623,7 +1630,7 @@ function vTown(){
   const F=[['guild','npc_ria','莉雅','冒險者公會','主線與委託'],['smith','npc_bald','巴爾德','鐵匠鋪','強化・分解'],['shop','npc_miko','蜜可','道具商店','藥水與裝備'],['inn','npc_martha','瑪莎','旅店',`休息回復（${S.lv*4} G）`],['altar','npc_oracle','占星師','星象台','掉落情報'],['temple','npc_edwin','艾德溫','轉職神殿','Lv.20 轉職試煉']];
   return `<div class="banner">${art('town_bg','晨星鎮全景')}<div class="cap">晨星鎮<small>頻道 1</small></div></div>
   <button class="newsbar" data-a="openM" data-v="news"><span class="nb-tag">公告</span><span class="grow nb-t"><b>v${NEWS[0].v}　${NEWS[0].t}</b><small>${NEWS[0].d}・點我看全部更新</small></span>${newsDot()?'<span class="tag new">NEW</span>':''}<span class="nb-arr">›</span></button>
-  <div class="row qrow"><button class="btn grow" data-a="openM" data-v="dex">冒險圖鑑</button><button class="btn grow" data-a="openM" data-v="ach">成就</button><button class="btn grow" data-a="openM" data-v="rank">排行榜</button></div>
+  <div class="row qrow"><button class="btn grow" data-a="openM" data-v="dex">冒險圖鑑</button><button class="btn grow" data-a="openM" data-v="ach">成就</button><button class="btn grow" data-a="openM" data-v="rank">排行榜</button><button class="btn grow" data-a="openM" data-v="fb">意見回報</button></div>
   ${liveNow().map(e=>`<button class="ebanner" data-a="openM" data-v="news"><span class="grow"><b>${e.n} 進行中</b><span class="sub">　～${e.end.slice(5)}　經驗 +${Math.round((e.exp-1)*100)}%・活動徽章掉落中</span></span><span class="tag red">活動</span></button>`).join('')}
   ${S.lv>=5&&Date.now()-(S.lastExport||S.created||0)>6048e5?`<div class="panel"><div class="row"><div class="grow"><b>備份提醒</b><div class="sub">進度只存在這台裝置，建議複製存檔碼留底。</div></div><button class="btn sm" data-a="openM" data-v="settings">去備份</button></div></div>`:''}
   ${S.daily.sign?'':`<div class="panel"><div class="row"><div class="grow"><b>每日簽到</b><div class="sub">今日獎勵：300 G、治療藥水×2</div></div><button class="btn pri sm" data-a="sign">領取</button></div></div>`}
@@ -1847,6 +1854,12 @@ const MV={
         <button class="btn pri big" data-a="trial" ${ok?'':'disabled'}>${ok?'挑戰試煉':'材料不足'}</button>`}
     else b+=`<p class="sub">試煉已通過。選擇${you('你')}的路線，選定之後無法更改。</p><div class="grid2">${CLS[S.cls].adv.map(k=>`<div class="panel">${art(`class_${k}_${S.sex}`,ADV[k].n,'r34')}<h3>${ADV[k].n}</h3><p class="sub">${ADV[k].d}</p><button class="btn pri" data-a="advance" data-v="${k}">轉職</button></div>`).join('')}</div>`;
     return{t:'轉職神殿',b}},
+  fb(){if(!FBL&&!FBERR||Date.now()-FBT>60e3)fbLoad();const L=Array.isArray(FBL)?FBL:[];
+    return{t:'玩家意見回報',b:`<div class="panel"><p class="sub">遇到錯誤、想要的功能、平衡或美術意見都可以寫在這裡。所有玩家都看得到，開發者會不定期回覆。</p>
+      <select id="fbCat" class="btn" style="width:100%;margin:6px 0">${Object.entries(FBCAT).map(([k,n])=>`<option value="${k}">${n}</option>`).join('')}</select>
+      <textarea id="fbText" maxlength="300" rows="4" placeholder="寫下你的意見（最多 300 字）" style="width:100%;box-sizing:border-box;border:2px solid var(--line);border-radius:8px;padding:8px;font:inherit;resize:vertical"></textarea>
+      <button class="btn pri big" data-a="fbSend">送出意見</button></div>
+      <div class="list">${L.length?L.map(x=>`<div class="item" style="display:block"><div class="row"><b class="grow">${esc(x.name)}</b><span class="tag">${FBCAT[x.cat]||FBCAT.other}</span></div><span class="sub">${esc(x.cls||'')}・Lv.${x.lv}・${new Date(x.ts).toLocaleString()}</span><p style="white-space:pre-wrap;margin:6px 0 0">${esc(x.text)}</p>${x.reply?`<p class="gsec" style="margin-top:6px"><b>開發者回覆</b><span class="sub" style="white-space:pre-wrap">${esc(x.reply)}</span></p>`:''}</div>`).join(''):`<p class="empty">${FBERR?'⚪ 伺服器暫時連不上，稍後再試。':FBL?'還沒有人留言，來當第一個吧！':'讀取中……'}</p>`}</div>`}},
   rank(){if(!RANKTOP||Date.now()-RANKT>60e3)rankSync(true);const online=Array.isArray(RANKTOP);const P=[];P.push({n:S.name,p:power(),me:1,c:clsName(),l:S.lv});
     if(online){const seen={};RANKTOP.filter(x=>x.id!==S.pid&&!(x.name===S.name&&x.cls===clsName())).sort((a,b)=>b.ts-a.ts).forEach(x=>{const k=x.name+'|'+x.cls;if(seen[k])return;seen[k]=1;P.push({n:x.name,p:x.power,c:x.cls,l:x.lv,t:x.ts,on:1,id:x.id})})}
     P.sort((a,b)=>b.p-a.p);
@@ -2297,6 +2310,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'8.1',d:'2026-11-20',t:'玩家意見回報',b:'城鎮新增「意見回報」：錯誤、建議、平衡、美術都可以留言，所有玩家都看得到，開發者會不定期回覆。'},
   {v:'8.0',d:'2026-11-20',t:'開服大改版',b:'① 全職業立繪、頭像、魔物重新繪製，造型統一。② 第七章「沉沒的檔案館」開放。③ 裝備增加到 116 件，進階職業有專屬武器。④ 每張地圖有自己的探索特性與專屬事件。⑤ 新增五位旅人，冒險途中可能遇見他們。'},
   {v:'7.8',d:'2026-11-20',t:'第七章「沉沒的檔案館」',b:'第二部第七章開放：潛入大教堂底下的王都地下書庫，找出遠征隊名冊的真相。新地區積水書庫（Lv.30–33）、四種新魔物與首領「檔案守門人」，各自有專屬掉落裝備。劇情插圖全面換成主角通常造型，所有裝備都有專屬圖示，隊友露娜與蓋爾在戰鬥中也有動作了。'},
   {v:'7.7',d:'2026-11-20',t:'每章探索不同',b:'每張地圖有自己的地區特性：草原順風寶箱多、森林迷霧遮住岔路、礦坑會落石、雪山酷寒扣 HP、要塞霧蝕魔物更多、灰石街道盜賊橫行、地下書庫積水扣 MP。每張地圖也有 4 個專屬探索事件，會優先出現，例如走散的羊群、停住的蝴蝶、礦坑深處的歌聲、山頂的極光、跪著的黑騎士、廢棄驛站的帳本。灰石街道的三種魔物也有了專屬掉落裝備。'},
@@ -3194,6 +3208,7 @@ const ACT={
   sign(){checkDaily();if(S.daily.sign)return;S.daily.sign=true;S.gold+=300;addItem('pot',2);toast('簽到成功：300 G、治療藥水×2');save();render()},
   idleSel(v){IDLESEL=+v;render()},
   pview(v){openM('pview',v)},
+  fbSend(){fbSend()},
   rankCopy(){const c=myCode();save();try{navigator.clipboard.writeText(c).then(()=>toast('已複製戰力碼，傳給朋友吧！'),()=>toast('請長按上方的碼手動複製'))}catch(e){toast('請長按上方的碼手動複製')}},
   rankAdd(){const el=$('#fcode'),o=readCode(el&&el.value);if(!o){toast('戰力碼格式不對');return}if(o.i===S.pid){toast('這是你自己的碼喔');return}S.friends=S.friends||{};const old=S.friends[o.i];if(old&&old.t>o.t){toast('這組碼比目前的還舊');return}S.friends[o.i]={n:String(o.n).slice(0,16),c:String(o.c||'').slice(0,10),l:+o.l||1,p:Math.min(999999,+o.p||0),t:+o.t||Date.now()};save();toast(old?`已更新 ${o.n} 的戰力`:`已加入好友 ${o.n}`);drawModal()},
   rankDel(v){if(S.friends&&S.friends[v]){delete S.friends[v];save();drawModal()}},
