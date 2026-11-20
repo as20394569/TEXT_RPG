@@ -1748,7 +1748,7 @@ function vRun(){if(RUN.tower)return vTower();const a=AREAS[RUN.area],v=RUN.view,
   else if(v.type==='shop')body=`<div class="panel">${art('event_merchant','旅行商人')}<h3>旅行商人</h3><p>背著巨大背包的商人朝你招手：「出門在外，價錢好商量！」</p><div class="list">${v.items.map(([k,pr],i)=>{const one=k==='box'||k==='hunt',so=one&&(v.bought[k]||(k==='hunt'&&RUN.hunt)),SP={box:['神秘裝備箱','隨機一件本區域裝備，精良以上',ic('mat')],hunt:['懸賞情報','「附近有隻守寶的大傢伙。」下一場普通戰鬥變成精英守寶怪：更危險，但必掉裝備、金幣 ×2',icon('item_tok',ic('mat'))]}[k];return `<div class="item"><span class="ico c${one?3:1}">${SP?SP[2]:icon('item_'+k,ic('potion'))}</span><span class="grow"><b>${SP?SP[0]:ITEMS[k].n}</b><span class="sub">${SP?SP[1]:ITEMS[k].d}</span></span><button class="btn sm ${S.gold>=pr&&!so?'pri':''}" data-a="buyRun" data-v="${i}" ${S.gold<pr||so?'disabled':''}>${so?'售完':pr+' G'}</button></div>`}).join('')}</div><p class="sub">持有 ${S.gold} G</p><button class="btn pri big" data-a="${last?'finish':'runNext'}">${last?'完成冒險':'繼續前進'}</button></div>`;
   else if(v.type==='event'){const e=v.ev;
     body=`<div class="panel">${art(e.img||'event_'+e.id,e.n)}<h3>${e.n}${v.fate?' <span class="tag red">🎲 命運之地</span>':''}</h3><p>${e.t}</p>`;
-    if(v.phase==='ask')body+=`<div class="list">${e.o.map((o,i)=>`<button class="btn opt" data-a="evPick" data-v="${i}"><span>${o.l}</span>${o.safe?'<span class="tag off">免檢定</span>':(()=>{const md=Math.floor(S.attr[o.a]/4),dc=o.dc+RUN.area*3,p=Math.max(5,Math.min(95,(21-(dc-md))*5));return `<span class="tag ${p>=60?'ok':p<40?'bad':''}">${ATTR[o.a]} 成功率 ${p}%</span>`})()}</button>`).join('')}</div><p class="sub">檢定：d20 + 屬性修正 ≥ 難度（DC）即成功。骰出 20 必定大成功，1 必定失敗。</p>`;
+    if(v.phase==='ask')body+=`<div class="list">${e.o.map((o,i)=>`<button class="btn opt" data-a="evPick" data-v="${i}"${evLack(o)?' disabled':''}><span>${o.l}</span>${o.safe?evCostTag(o):(()=>{const md=Math.floor(S.attr[o.a]/4),dc=o.dc+RUN.area*3,p=Math.max(5,Math.min(95,(21-(dc-md))*5));return `<span class="tag ${p>=60?'ok':p<40?'bad':''}">${ATTR[o.a]} 成功率 ${p}%</span>`})()}</button>`).join('')}</div><p class="sub">檢定：d20 + 屬性修正 ≥ 難度（DC）即成功。骰出 20 必定大成功，1 必定失敗。</p>`;
     else if(v.phase==='roll')body+=`<div class="die" id="die">?</div><p class="calc sub">擲骰中…</p>`;
     else body+=(v.r?`<div class="die ${v.r.ok?'ok':'ng'}">${v.r.d}</div><p class="calc">d20 <b>${v.r.d}</b> + ${ATTR[v.r.a]}修正 <b>${v.r.mod}</b> = <b>${v.r.d+v.r.mod}</b>　／　DC ${v.r.dc}<br><b style="color:var(--${v.r.ok?'exp':'hp'})">${v.r.d===20?'大成功！':v.r.d===1?'大失敗…':v.r.ok?'檢定成功':'檢定失敗'}</b></p>`:'')+
       `<p>${v.text}</p>${v.gain.length?`<div class="chips">${v.gain.map(g=>`<span class="chip">${g}</span>`).join('')}</div>`:''}${v.amb?'<button class="btn pri big" data-a="evFight">迎戰！</button>':`<button class="btn pri big" data-a="${last?'finish':'runNext'}">${last?'完成冒險':'繼續前進'}</button>`}`;
@@ -2090,6 +2090,26 @@ EVENTS.push(
   {id:'c_cell',ar:'castle',n:'地牢裡的人',t:'地牢最深處，一個瘦得只剩骨頭的人抓著鐵欄：「鑰匙在守衛身上……拜託。」',o:[
     {l:'撬開牢門',a:'DEX',dc:14,ok:{t:'他是二十年前遠征隊的斥候，告訴你要塞巡邏換班的時間。',exp:3.5,gold:1},ng:{t:'鎖發出一聲巨響，遠處傳來腳步聲，你只能先走。',hp:-.12}},
     {l:'留下食物和水',safe:1,ok:{t:'他哭著道謝，把一直藏在懷裡的舊裝備塞給你：「我用不到了。」',gold:-1,loot:1}}]},
+  {id:'p_rain',ar:'plain',n:'突來的雷雨',t:'草原上的天色一下子暗下來，遠方的雷一道接一道，雨點已經打在臉上了。',o:[
+    {l:'躲到孤樹下',a:'LUK',dc:11,ok:{t:'雨停的時候，樹上的鳥巢被吹落，裡面滾出幾枚亮晶晶的硬幣。',gold:2,exp:1},ng:{t:'雷正好劈在樹梢，你被震得耳朵嗡嗡響。',hp:-.15}},
+    {l:'冒雨趕路',a:'VIT',dc:11,ok:{t:'渾身濕透，但你比預定早了半天抵達下一個路口。',exp:2.5},ng:{t:'淋了一身雨，腳步越走越沉。',hp:-.08,mp:-.12}},
+    {l:'搭起斗篷等雨停',safe:1,ok:{t:'雨聲很大，你聽著聽著打了個盹。醒來時天放晴了。',hp:.2,mp:.2}}]},
+  {id:'f_fox',ar:'forest',n:'捕獸夾上的狐狸',t:'一隻小狐狸的後腿被生鏽的捕獸夾咬住，看到你也不逃，只是一直發抖。',o:[
+    {l:'撬開夾子',a:'DEX',dc:12,ok:{t:'夾子一鬆，牠一拐一拐地跑進樹叢。你跟過去，發現獵人藏起來的獵物箱。',loot:1},ng:{t:'夾子彈回來，夾到的是你的手指。',hp:-.12}},
+    {l:'先替牠敷藥再放走',need:['pot',1],safe:1,ok:{t:'牠舔了舔你的手。走了沒多遠，牠叼回一塊被泥巴包住的礦石，放在你腳邊。',exp:2,stone:1}},
+    {l:'不要多管閒事',safe:1,ok:{t:'你走了。背後的叫聲，一直到霧裡才聽不見。'}}]},
+  {id:'m_rail',ar:'mine',n:'失控的礦車',t:'軌道上方傳來轟隆聲，一台裝滿礦石的礦車衝下坡——前面還有兩個礦工在敲岩壁！',o:[
+    {l:'扳動道岔',a:'INT',dc:13,ok:{t:'礦車拐進廢棄的支線，撞成一堆。礦工們嚇得腿軟，硬塞給你一袋工錢。',gold:2.5,exp:1.5},ng:{t:'你扳錯了方向，礦車擦著你身邊衝過去。',hp:-.12}},
+    {l:'用身體擋下來',a:'STR',dc:14,ok:{t:'你死命頂住車頭，礦車在礦工面前停了下來。散落的礦石裡有兩塊好料。',exp:3,stone:2},ng:{t:'車是停了，你也被撞飛到牆上。',hp:-.22}},
+    {l:'大喊示警',safe:1,ok:{t:'礦工們滾到一旁，礦車撞上岩壁碎成一地。人沒事就好。',exp:.8}}]},
+  {id:'s_dove',ar:'snow',n:'凍僵的信鴿',t:'雪地上躺著一隻信鴿，腳上還綁著小小的信筒，身體冷得跟石頭一樣。',o:[
+    {l:'塞進懷裡暖牠',a:'VIT',dc:12,ok:{t:'牠在你懷裡醒了。信上寫著山腰補給洞的位置，你順路去拿了一些。',item:['pot2',1],exp:1.5},ng:{t:'你也冷得發抖，最後只能把牠放進避風的石縫。',hp:-.08}},
+    {l:'灌一瓶魔力藥水生火',need:['eth',1],safe:1,ok:{t:'藍色的火燒了很久。鴿子醒來後不肯走，你讀了信——是給北方哨站的情報。',exp:3,gold:1.5}},
+    {l:'取下信就好',safe:1,ok:{t:'信上的字被雪浸糊了，只看得出「霧」和「等」兩個字。',exp:.5}}]},
+  {id:'c_altar',ar:'castle',n:'黑霧祭壇',t:'走廊盡頭有一座黑石祭壇，上面擺著空的供碗。霧在碗邊打轉，像是在等什麼。',o:[
+    {l:'倒進一瓶高級治療藥水',need:['pot2',1],safe:1,ok:{t:'霧把藥水喝得一滴不剩，祭壇底下「喀」一聲彈開暗格，裡面放著一件裝備。',loot:1,exp:2}},
+    {l:'砸了祭壇',a:'STR',dc:14,ok:{t:'黑石裂開，裡面嵌著兩塊還在發光的礦石。',stone:2,exp:3},ng:{t:'霧從裂縫噴出來，吸走了你的力氣。',hp:-.18,mp:-.15}},
+    {l:'讀祭壇上的刻字',a:'INT',dc:14,ok:{t:'是一段祈禱：「替我們記得。」讀完之後，你的魔力莫名地滿了。',mp:.6,exp:3},ng:{t:'刻字在你眼前扭動，看久了頭痛欲裂。',mp:-.25}}]},
   {id:'p_kite',ar:'plain',n:'卡在樹上的風箏',t:'一個小女孩指著樹梢哭，她的風箏卡在枝頭，風一吹就快要扯破了。',o:[
     {l:'爬上去拿',a:'DEX',dc:10,ok:{t:'你把風箏完好地拿下來。小女孩的媽媽塞給你一袋烤餅乾。',exp:1.5,hp:.2},ng:{t:'樹枝斷了，你摔了個屁股著地。小女孩破涕為笑。',hp:-.06,exp:.5}},
     {l:'教她怎麼收線',a:'INT',dc:9,ok:{t:'風一轉向，風箏自己滑了下來。她說長大也要當冒險者。',exp:2},ng:{t:'線斷了，風箏飄向北方。',exp:.3}}]},
@@ -2221,7 +2241,11 @@ function wanderEv(id){S.wander=S.wander||{};const w=(S.wander[id]=S.wander[id]||
   return {id:'w_'+id,n:`旅人・${T.n}`,img:`story_w_${id}_${WMAP[w.st]}`,t:sc.t,w:id,o:sc.o.map(o=>Object.assign({safe:1},o))}}
 function wanderDone(ev,o){const w=S.wander[ev.w];w.aff=(w.aff||0)+(o.aff||0);const last=w.st===4;w.st++;
   if(last){const hi=w.aff>=5;S.wander[ev.w].done=1;return (hi&&o.end?o.end:o.ok.t)+(hi?'\n（羈絆深厚的結局）':'')}return null}
-function evPick(i){const v=RUN.view,o=v.ev.o[i];
+/* 事件選項的代價：need=[道具,數量]；免檢定又要付錢的選項，錢不夠就不能選 */
+function evGoldCost(o){return o.safe&&o.ok&&o.ok.gold<0?Math.round((12+AREAS[RUN.area].base*6)*-o.ok.gold):0}
+function evLack(o){if(o.need&&(S.items[o.need[0]]||0)<o.need[1])return true;const c=evGoldCost(o);return c>0&&S.gold<c}
+function evCostTag(o){if(o.need){const h=S.items[o.need[0]]||0;return `<span class="tag ${h<o.need[1]?'bad':'off'}">消耗 ${ITEMS[o.need[0]].n}×${o.need[1]}（持有 ${h}）</span>`}const c=evGoldCost(o);return c?`<span class="tag ${S.gold<c?'bad':'off'}">花費 ${c} G</span>`:'<span class="tag off">免檢定</span>'}
+function evPick(i){const v=RUN.view,o=v.ev.o[i];if(!o||v.phase!=='ask'||evLack(o))return;if(o.need)addItem(o.need[0],-o.need[1]);
   if(o.safe){v.phase='done';v.r=null;v.text=you(o.ok.t);v.gain=applyOut(o.ok,false);if(v.ev.w){const e=wanderDone(v.ev,o);if(e){v.text=you(e);const g=applyOut({gold:4,exp:4,stone:2},false);v.gain=v.gain.concat(g)}}save();render();return}
   const d=R(1,20),mod=Math.floor(S.attr[o.a]/4),dc=o.dc+RUN.area*3,ok=d===20||(d!==1&&d+mod>=dc);
   v.phase='roll';render();let n=0;
@@ -2234,7 +2258,7 @@ function evTwist(v,ok,d){const T=['atk','def','luck'],N={atk:'劍之紋',def:'�
 function applyOut(o,crit,fate){const unit=12+AREAS[RUN.area].base*6,s=stats(),g=[],m=(crit?2:1)*(fate?2:1);
   if(o.gold){let v=Math.round(unit*o.gold*(o.gold>0?m:1));if(v<0)v=-Math.min(S.gold,-v);S.gold+=v;if(v>0)RUN.loot.gold+=v;g.push(`${v>0?'+':''}${v} G`)}
   if(o.hp){const v=Math.round(s.HP*o.hp*(o.hp<0&&fate?2:1));S.hp=Math.max(1,Math.min(s.HP,S.hp+v));g.push(`HP ${v>0?'+':''}${v}`)}
-  if(o.mp){const v=Math.round(s.MP*o.mp);S.mp=Math.min(s.MP,S.mp+v);g.push(`MP +${v}`)}
+  if(o.mp){const v=Math.round(s.MP*o.mp);S.mp=Math.max(0,Math.min(s.MP,S.mp+v));g.push(`MP ${v>0?'+':''}${v}`)}
   if(o.stone){addItem('stone',o.stone);g.push(`強化石×${o.stone}`)}
   if(o.item){addItem(o.item[0],o.item[1]);g.push(`${ITEMS[o.item[0]].n}×${o.item[1]}`)}
   if(o.loot){const x=rollGear(RUN.area,crit?2:1);g.push(gearName(x));RUN.loot.items.push(gearName(x))}
@@ -2399,6 +2423,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'9.7',d:'2026-11-20',t:'用道具換結果的新事件',b:'①五張地圖各多一個事件：突來的雷雨、捕獸夾上的狐狸、失控的礦車、凍僵的信鴿、黑霧祭壇。②部分選項可以「消耗藥水」換穩定的報酬，身上沒有就不能選。③要花錢的選項會標出價格，錢不夠時不能選。④修正事件扣魔力時可能變成負數的問題。⑤劍士、法師待機與站姿立繪重畫（手部更自然）。'},
   {v:'9.6',d:'2026-11-20',t:'各地新事件＋狂戰士新造型',b:'①五張地圖各多一個專屬事件：翻倒的貨車、滴蜜的大樹、發光的瓦斯、被雪埋住的雪橇、地牢裡的人，有的要花錢或冒險換裝備。②狂戰士男女換上新服裝（深紅短戰袍＋單邊肩甲），全部動作與頭像重畫。'},
   {v:'9.5',d:'2026-11-20',t:'排行榜改版',b:'排行榜顯示前 100 名，新增戰力／等級／討伐／強化四種排行與職業篩選，顯示頭像、主線章節、最後上線時間與你的名次。'},
   {v:'9.5',d:'2026-11-20',t:'自動戰鬥會喝魔力藥水',b:'自動／全自動戰鬥遇到首領、精英等硬敵時，魔力見底會自動喝魔力藥水（缺得多才用高級版），不再只能普攻硬磨。'},
