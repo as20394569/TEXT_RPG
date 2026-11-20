@@ -185,6 +185,7 @@ input,textarea{font:inherit;width:100%;padding:8px 10px;border:2px solid var(--l
 .char-top{display:grid;grid-template-columns:38% 1fr;gap:10px}
 .stat-g{display:grid;grid-template-columns:1fr 1fr;gap:3px 10px;font-size:13px;font-variant-numeric:tabular-nums}
 .stat-g div{display:flex;justify-content:space-between;border-bottom:1px dotted #d8c79b}
+.stat-g .main{font-weight:700;color:#7a3fc0}.stat-g .main b{font-size:15px}
 .attr{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;font-variant-numeric:tabular-nums}
 .step{display:flex;gap:6px;align-items:baseline}.step i{font-style:normal;color:var(--sub)}.step.done{color:var(--exp)}
 
@@ -420,12 +421,12 @@ const CLS={
 const ADV={
   knight:{n:'騎士',d:'用身體擋住一切。體質 +5、力量 +3，Lv.20/23/26 習得重盾衝擊、堅守、聖騎衝鋒。被動【守護者】防禦 +20%。',bonus:{VIT:5,STR:3}},
   berserker:{n:'狂戰士',d:'拿血換傷害。力量 +8，Lv.20/23/26 習得捨身猛擊、狂暴化、血之饗宴。被動【嗜血】吸血 +8%。',bonus:{STR:8}},
-  archmage:{n:'大魔導士',d:'把印記玩到極致。智力 +8，Lv.20/23/26 習得墜星、奧術飛彈、元素領域。被動【奧術精通】魔力 +15%。',bonus:{INT:8}},
+  archmage:{n:'大魔導士',d:'把印記玩到極致。智力 +8，Lv.20/23/26 習得墜星、奧術飛彈、元素領域。被動【奧術精通】魔攻 +15%。',bonus:{INT:8}},
   warlock:{n:'咒術師',d:'靠吸取活下去。智力 +5、體質 +3，Lv.20/23/26 習得汲魂、詛咒、靈魂收割。被動【黑暗契約】吸血與魔力提升。',bonus:{INT:5,VIT:3}},
   sniper:{n:'神射手',d:'專注越高越可怕。敏捷 +8，Lv.20/23/26 習得驟雨、爆裂箭、致命狙擊。被動【穩定瞄準】爆擊傷害 +30%。',bonus:{DEX:8}},
   assassin:{n:'刺客',d:'只出一刀。敏捷 +5、幸運 +5，Lv.20/23/26 習得影縫、煙霧彈、千刃。被動【暗殺術】爆擊率 +10%。',bonus:{DEX:5,LUK:5}},
   bishop:{n:'主教',d:'讓神更快回應。智力 +6、體質 +2，Lv.20/23/26 習得庇護所、復活之光、天罰。被動【慈悲】治療與信仰提升。',bonus:{INT:6,VIT:2}},
-  templar:{n:'聖殿騎士',d:'把信仰變成鐵鎚。力量 +6、體質 +4，Lv.20/23/26 習得天秤、聖光鎚擊、審判之日。被動【信念之鎚】攻擊、魔力 +10%。',bonus:{STR:6,VIT:4}}
+  templar:{n:'聖殿騎士',d:'把信仰變成鐵鎚。力量 +6、體質 +4，Lv.20/23/26 習得天秤、聖光鎚擊、審判之日。被動【信念之鎚】物攻、魔攻 +10%。',bonus:{STR:6,VIT:4}}
 };
 const SK={
   slash:{n:'裂甲擊',c:'swordsman',lv:1,mp:4,dmg:{s:'ATK',p:1.55,rend:1},brk:2,d:'踏前一步重砍，敵人破綻 +2。劈開護甲：無視物理抗性。'},
@@ -471,7 +472,7 @@ Object.assign(SK,{
   berserk:{n:'狂暴化',c:'berserker',lv:23,mp:8,cost:.1,buff:{atk:.6,t:3},d:'燒掉 10% HP，3 回合攻擊 +60%。'},
   feast:{n:'血之饗宴',c:'berserker',lv:26,mp:14,dmg:{s:'ATK',p:2.4},drain:.4,fin:.5,d:'清算破綻，吸取 40% 傷害。'},
   missiles:{n:'奧術飛彈',c:'archmage',lv:23,mp:14,dmg:{s:'MAG',p:.45,h:5},mark:'奧',d:'五發追蹤飛彈，留下「奧」印記。'},
-  field:{n:'元素領域',c:'archmage',lv:26,mp:16,buff:{atk:.5,t:3},d:'3 回合攻擊與魔力 +50%。'},
+  field:{n:'元素領域',c:'archmage',lv:26,mp:16,buff:{atk:.5,t:3},d:'3 回合物攻與魔攻 +50%。'},
   curse:{n:'詛咒',c:'warlock',lv:23,mp:10,dmg:{s:'MAG',p:.8},foe:{weak:3,poison:3},mark:'蝕',d:'虛弱與中毒 3 回合，留下「蝕」印記。'},
   reap:{n:'靈魂收割',c:'warlock',lv:26,mp:18,dmg:{s:'MAG',p:2.4},det:.7,drain:.3,d:'引爆印記，每個 +70%，吸取 30% 傷害。'},
   explo:{n:'爆裂箭',c:'sniper',lv:23,mp:12,dmg:{s:'ATK',p:2},foe:{burn:3},focus:1,d:'命中後爆炸，灼燒 3 回合，專注 +1。'},
@@ -498,12 +499,12 @@ const PASS={
   cl3:{n:'聖光護體',c:'cleric',lv:25,st:{defp:15},d:'防禦 +15%，受到的異常狀態少 1 回合。'},
   kn:{n:'守護者',c:'knight',lv:20,st:{defp:20},d:'防禦 +20%。'},
   bk:{n:'嗜血',c:'berserker',lv:20,st:{ls:8},d:'吸血 +8%。'},
-  am:{n:'奧術精通',c:'archmage',lv:20,st:{magp:15},d:'魔力 +15%。'},
-  wl:{n:'黑暗契約',c:'warlock',lv:20,st:{ls:5,magp:8},d:'吸血 +5%、魔力 +8%。'},
+  am:{n:'奧術精通',c:'archmage',lv:20,st:{magp:15},d:'魔攻 +15%。'},
+  wl:{n:'黑暗契約',c:'warlock',lv:20,st:{ls:5,magp:8},d:'吸血 +5%、魔攻 +8%。'},
   sn:{n:'穩定瞄準',c:'sniper',lv:20,st:{cd:30},d:'爆擊傷害 +30%。'},
   as:{n:'暗殺術',c:'assassin',lv:20,st:{crit:10},d:'爆擊率 +10%。'},
   bp:{n:'慈悲',c:'bishop',lv:20,st:{healp:30,faithg:50},d:'治療量 +30%，信仰獲得 +50%。'},
-  tp:{n:'信念之鎚',c:'templar',lv:20,st:{atkp:10,magp:10},d:'攻擊、魔力 +10%。'}};
+  tp:{n:'信念之鎚',c:'templar',lv:20,st:{atkp:10,magp:10},d:'物攻、魔攻 +10%。'}};
 const hasP=id=>{const p=PASS[id];return !!S&&S.lv>=p.lv&&(p.c===S.cls||p.c===S.adv)};
 const SKA={charge:['slash','#cfe0ff'],flurry:['slash','#dfe8ff'],skyslash:['slash','#ffffff'],nova:['ice','#8fdcff'],firestorm:['fire','#ff8a2a'],collapse:['meteor','#e0b8ff'],pierce:['arrow','#ffffff'],trap:['arrow','#c9b08a'],arrowstorm:['arrow','#cfff9a'],
   aegis:['shield','#ffd34a'],smite:['holy','#fff1a8'],miracle:['heal','#fff1a8'],hold:['buff','#9fd0ff'],holycharge:['slash','#ffd34a'],berserk:['buff','#ff4a4a'],feast:['slash','#ff4a4a'],missiles:['fire','#e0b8ff'],field:['buff','#e0b8ff'],
@@ -529,17 +530,17 @@ const ICON={town:'<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1
 const ic=k=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k]}</svg>`;
 const SLOTCH={weapon:ic('weapon'),head:ic('head'),body:ic('body'),feet:ic('feet'),ring:ic('ring'),neck:ic('neck')};
 const SLOTP={weapon:'w',head:'h',body:'a',feet:'f',ring:'r',neck:'n'};
-const STATN={atk:'攻擊',mag:'魔力',def:'防禦',hp:'HP',mp:'MP',crit:'爆擊率',cd:'爆擊傷害',eva:'迴避',ls:'吸血',atkp:'攻擊',magp:'魔力',defp:'防禦',hpp:'HP',regen:'每回合回復',mpcut:'MP 消耗減少',mpp:'MP',resmax:'資源上限',brkcd:'每層破綻爆傷',detamp:'引爆傷害',focusatk:'專注滿攻擊',answer:'回應回復',mpreg:'每回合回 MP',healp:'治療量',faithg:'信仰獲得',burn:'灼燒機率',double:'連擊機率',stun:'暈眩機率',guard:'格擋機率',shield:'開場護盾',back:'背水增傷',thorn:'荊棘反彈',gale:'疾風',reap:'擊倒回復',STR:'力量',DEX:'敏捷',INT:'智力',VIT:'體質',LUK:'幸運'};
+const STATN={atk:'物理攻擊',mag:'魔法攻擊',def:'防禦',hp:'HP',mp:'MP',crit:'爆擊率',cd:'爆擊傷害',eva:'迴避',ls:'吸血',atkp:'物理攻擊',magp:'魔法攻擊',defp:'防禦',hpp:'HP',regen:'每回合回復',mpcut:'MP 消耗減少',mpp:'MP',resmax:'資源上限',brkcd:'每層破綻爆傷',detamp:'引爆傷害',focusatk:'專注滿攻擊',answer:'回應回復',mpreg:'每回合回 MP',healp:'治療量',faithg:'信仰獲得',burn:'灼燒機率',double:'連擊機率',stun:'暈眩機率',guard:'格擋機率',shield:'開場護盾',back:'背水增傷',thorn:'荊棘反彈',gale:'疾風',reap:'擊倒回復',STR:'力量',DEX:'敏捷',INT:'智力',VIT:'體質',LUK:'幸運'};
 const PCT=new Set(['brkcd','detamp','focusatk','answer','mpp','mpreg','healp','faithg','crit','cd','eva','ls','atkp','magp','defp','hpp','regen','mpcut','burn','double','stun','guard','shield','back','thorn','reap']);
 const fmt=(k,v)=>`${STATN[k]} +${v}${PCT.has(k)?'%':''}`;
 const GEAR={};
 const TLV=[1,5,10,15,20,26],TPRICE=[60,300,900,2200,5000,9000];
 const WN={swordsman:['鐵劍','鋼長劍','秘銀劍','寒鐵劍','聖騎士劍','王都名劍'],mage:['橡木杖','水晶杖','刻紋法杖','寒冰杖','星飾法杖','雷擊法杖'],ranger:['獵弓','長弓','樺木長弓','雪原長弓','牛角長弓','雷鷹長弓'],cleric:['木槌','祭司戰錘','銀戰錘','寒鐵戰錘','大教堂戰錘','白塔戰錘']};
-for(const c in WN)WN[c].forEach((n,i)=>{const v=5+i*9;GEAR[`w_${c}_${i}`]=Object.assign({n,slot:'weapon',cls:c,t:i,lv:TLV[i],price:TPRICE[i]},c==='mage'?{mag:v}:c==='cleric'?{atk:Math.round(v*.6),mag:Math.round(v*.85)}:{atk:v})});
+for(const c in WN)WN[c].forEach((n,i)=>{const v=5+i*9;GEAR[`w_${c}_${i}`]=Object.assign({n,slot:'weapon',cls:c,t:i,lv:TLV[i],price:TPRICE[i]},c==='mage'?{mag:Math.round(v*1.15)}:c==='cleric'?{atk:Math.round(v*.6),mag:Math.round(v*.85)}:{atk:v})});
 const ARMOR={head:[['皮帽','鐵盔','秘銀頭盔','寒鐵頭盔','龍角頭盔','白塔頭盔'],i=>({def:2+i*4,hp:8+i*20}),.6],
   body:[['旅人布衣','硬皮甲','鎖子甲','寒鐵鎧甲','龍鱗鎧甲','近衛鎧甲'],i=>({def:3+i*7,hp:10+i*30}),.8],
   feet:[['草鞋','皮靴','獵人短靴','雪地長靴','騎兵長靴','鋼鐵戰靴'],i=>({def:1+i*3,eva:1+i}),.5],
-  ring:[['木戒指','銀戒','礦石戒指','冰晶戒指','紅寶石戒指','金戒指'],i=>({mp:8+i*12,crit:1+i}),.6],
+  ring:[['木戒指','銀戒','礦石戒指','冰晶戒指','紅寶石戒指','金戒指'],i=>({mp:8+i*12,crit:1+i,mag:1+i*2}),.6],
   neck:[['狼牙項鍊','護身符','礦石墜飾','冰晶墜鍊','遠征隊項鍊','王家徽章項鍊'],i=>({hp:15+i*35,cd:5+i*5}),.7]};
 for(const sl in ARMOR){const [ns,f,pm]=ARMOR[sl];ns.forEach((n,i)=>GEAR[SLOTP[sl]+'_'+i]=Object.assign({n,slot:sl,t:i,lv:TLV[i],price:Math.round(TPRICE[i]*pm)},f(i)))}
 /* 附加詞條：數值依裝備階級成長 */
@@ -551,11 +552,11 @@ const SETS=[
   {n:'輕裝',b2:{eva:5},b4:{crit:8},d2:'迴避 +5%',d4:'爆擊率 +8%'},
   {n:'森林',b2:{hpp:10},b4:{regen:3},d2:'HP +10%',d4:'每回合回復 3% HP'},
   {n:'火山',b2:{atkp:10},b4:{burn:25},d2:'攻擊 +10%',d4:'攻擊時 25% 機率灼燒'},
-  {n:'雪地',b2:{magp:12},b4:{mpcut:25},d2:'魔力 +12%',d4:'技能 MP 消耗 -25%'},
-  {n:'遠征隊',b2:{atkp:8,magp:8,defp:8,hpp:8},b4:{cd:40,shield:15},d2:'攻擊、魔力、防禦、HP +8%',d4:'爆擊傷害 +40%、開場護盾 15%'},
+  {n:'雪地',b2:{magp:12},b4:{mpcut:25},d2:'魔攻 +12%',d4:'技能 MP 消耗 -25%'},
+  {n:'遠征隊',b2:{atkp:8,magp:8,defp:8,hpp:8},b4:{cd:40,shield:15},d2:'物攻、魔攻、防禦、HP +8%',d4:'爆擊傷害 +40%、開場護盾 15%'},
   /* 職業套裝：只從異變種、惡夢掉落 */
   {n:'劍士',cls:'swordsman',b2:{atkp:8},b4:{resmax:2,brkcd:5},d2:'攻擊 +8%',d4:'破綻上限 +2，每層破綻爆擊傷害 +5%'},
-  {n:'法師',cls:'mage',b2:{magp:10},b4:{resmax:1,detamp:25},d2:'魔力 +10%',d4:'印記上限 +1，引爆傷害 +25%'},
+  {n:'法師',cls:'mage',b2:{magp:10},b4:{resmax:1,detamp:25},d2:'魔攻 +10%',d4:'印記上限 +1，引爆傷害 +25%'},
   {n:'弓手',cls:'ranger',b2:{crit:6},b4:{resmax:2,focusatk:20},d2:'爆擊率 +6%',d4:'專注上限 +2，專注滿時攻擊 +20%'},
   {n:'祭司',cls:'cleric',b2:{healp:15},b4:{faithg:30,answer:15},d2:'治療量 +15%',d4:'信仰獲得 +30%，神的回應多回復 15% HP'}];
 const CSET={swordsman:5,mage:6,ranger:7,cleric:8};
@@ -565,7 +566,7 @@ Object.assign(GEAR,{
   u_tree:{n:'樹王的心',slot:'ring',t:1,lv:10,price:2000,mp:40,hp:80,uq:{regen:4},ud:'每回合回復 4% HP',uniq:1},
   u_worm:{n:'巨蟲的牙',slot:'neck',t:2,lv:15,price:4000,hp:150,cd:20,uq:{ls:8,burn:15},ud:'吸血 +8%，攻擊時 15% 機率灼燒',uniq:1},
   u_dragon:{n:'冰龍鱗甲',slot:'body',t:3,lv:20,price:7000,def:45,hp:260,uq:{guard:20,shield:10},ud:'受擊 20% 機率傷害減半，開場護盾 10%',uniq:1},
-  u_zenos:{n:'澤諾斯的頭冠',slot:'head',t:4,lv:25,price:12000,def:30,hp:220,uq:{cd:40,resmax:1,atkp:8,magp:8},ud:'爆擊傷害 +40%、資源上限 +1、攻擊與魔力 +8%',uniq:1}});
+  u_zenos:{n:'澤諾斯的頭冠',slot:'head',t:4,lv:25,price:12000,def:30,hp:220,uq:{cd:40,resmax:1,atkp:8,magp:8},ud:'爆擊傷害 +40%、資源上限 +1、物攻與魔攻 +8%',uniq:1}});
 const BOSSU={goblinboss:'u_gob',treeking:'u_tree',worm:'u_worm',icedragon:'u_dragon',zenos:'u_zenos'};
 const GEMS=['gem_r','gem_b','gem_g','gem_y','gem_w'];
 const BGEM={goblinboss:'gem_r',treeking:'gem_g',worm:'gem_y',icedragon:'gem_w',zenos:'gem_b',rabbitking:'gem_y',moonwolf:'gem_w',foreman:'gem_r',giantking:'gem_g',mistgeneral:'gem_b'};
@@ -580,7 +581,7 @@ const ITEMS={
   tok:{n:'霧散祭徽章',d:'活動期間戰鬥掉落，可在活動商店兌換',mat:1},
   dust:{n:'星塵',d:'分解裝備取得，用來洗練詞條',sell:5,mat:1},
   gem_r:{n:'紅玉',d:'鑲嵌寶石：攻擊 +12',gem:{atk:12},sell:60,mat:1},
-  gem_b:{n:'藍玉',d:'鑲嵌寶石：魔力 +12',gem:{mag:12},sell:60,mat:1},
+  gem_b:{n:'藍玉',d:'鑲嵌寶石：魔攻 +12',gem:{mag:12},sell:60,mat:1},
   gem_g:{n:'翠玉',d:'鑲嵌寶石：HP +90',gem:{hp:90},sell:60,mat:1},
   gem_y:{n:'黃玉',d:'鑲嵌寶石：爆擊率 +4%',gem:{crit:4},sell:60,mat:1},
   gem_w:{n:'月石',d:'鑲嵌寶石：迴避 +3%',gem:{eva:3},sell:60,mat:1},
@@ -700,24 +701,24 @@ const LORD=['rabbitking','moonwolf','foreman','giantking','mistgeneral'];
 Object.assign(GEAR,{
   x_bog:{n:'毒沼結晶戒',slot:'ring',t:0,lv:3,price:600,mp:20,uq:{regen:2,thorn:10},ud:'每回合回復 2% HP，被擊中時反彈 10% 傷害',uniq:1},
   x_spark:{n:'雷角兔皮靴',slot:'feet',t:0,lv:4,price:700,def:6,eva:4,uq:{gale:1,eva:3},ud:'每場第一擊必中且爆擊，迴避 +3%',uniq:1},
-  x_soul:{n:'紫菇帽',slot:'head',t:1,lv:7,price:1600,def:10,mp:40,uq:{mpreg:3,magp:6},ud:'每回合回復 3 MP，魔力 +6%',uniq:1},
+  x_soul:{n:'紫菇帽',slot:'head',t:1,lv:7,price:1600,def:10,mp:40,uq:{mpreg:3,magp:6},ud:'每回合回復 3 MP，魔攻 +6%',uniq:1},
   x_shade:{n:'影狼皮甲',slot:'body',t:1,lv:9,price:1900,def:20,hp:60,uq:{eva:6,double:10},ud:'迴避 +6%，普攻 10% 機率追加一擊',uniq:1},
   x_lava:{n:'蝙蝠翼墜飾',slot:'neck',t:2,lv:12,price:3200,hp:120,cd:15,uq:{burn:20,ls:4},ud:'攻擊時 20% 機率灼燒，吸血 +4%',uniq:1},
   x_crystal:{n:'魔像的水晶',slot:'ring',t:2,lv:14,price:3600,mp:50,crit:4,uq:{shield:12,defp:8},ud:'開場護盾 12%，防禦 +8%',uniq:1},
   x_blizzard:{n:'雪狼牙項鍊',slot:'neck',t:3,lv:17,price:5600,hp:180,cd:20,uq:{stun:8,crit:5},ud:'攻擊時 8% 機率暈眩，爆擊率 +5%',uniq:1},
-  x_storm:{n:'冰精靈頭冠',slot:'head',t:3,lv:19,price:6000,def:24,hp:150,uq:{mpcut:15,magp:10},ud:'技能 MP 消耗 -15%，魔力 +10%',uniq:1},
+  x_storm:{n:'冰精靈頭冠',slot:'head',t:3,lv:19,price:6000,def:24,hp:150,uq:{mpcut:15,magp:10},ud:'技能 MP 消耗 -15%，魔攻 +10%',uniq:1},
   x_blood:{n:'黑騎士戰靴',slot:'feet',t:4,lv:23,price:9000,def:18,eva:5,uq:{back:35,reap:8},ud:'HP 低於 35% 時傷害 +35%，擊倒敵人回復 8% HP／MP',uniq:1},
   x_void:{n:'幽魂斗篷',slot:'body',t:4,lv:24,price:9600,def:50,hp:300,uq:{guard:18,hpp:8},ud:'受擊 18% 機率傷害減半，HP +8%',uniq:1}});
 for(const k in GEAR)if(k.startsWith('x_'))GEAR[k].mx=1;
 /* 進階職業專屬武器（Lv.20／26，四階與五階） */
 const ADVW={knight:[['騎士長劍',{defp:8},'防禦 +8%'],['白翼騎士劍',{defp:12,guard:8},'防禦 +12%，受擊 8% 機率傷害減半']],
   berserker:[['狂戰士大劍',{ls:4,back:15},'吸血 +4%，HP 低於 35% 時傷害 +15%'],['屠龍大劍',{ls:6,back:25},'吸血 +6%，HP 低於 35% 時傷害 +25%']],
-  archmage:[['星環長杖',{magp:6,detamp:10},'魔力 +6%，引爆傷害 +10%'],['大魔導士長杖',{magp:8,detamp:20},'魔力 +8%，引爆傷害 +20%']],
-  warlock:[['紫晶杖',{ls:4,magp:4},'吸血 +4%，魔力 +4%'],['咒術師長杖',{ls:6,magp:8},'吸血 +6%，魔力 +8%']],
+  archmage:[['星環長杖',{magp:6,detamp:10},'魔攻 +6%，引爆傷害 +10%'],['大魔導士長杖',{magp:8,detamp:20},'魔攻 +8%，引爆傷害 +20%']],
+  warlock:[['紫晶杖',{ls:4,magp:4},'吸血 +4%，魔攻 +4%'],['咒術師長杖',{ls:6,magp:8},'吸血 +6%，魔攻 +8%']],
   sniper:[['複合弓',{cd:15},'爆擊傷害 +15%'],['神射手長弓',{cd:25,crit:3},'爆擊傷害 +25%，爆擊率 +3%']],
   assassin:[['黑鋼彎刀',{crit:4},'爆擊率 +4%'],['刺客短刀',{crit:6,double:10},'爆擊率 +6%，普攻 10% 機率追加一擊']],
   bishop:[['主教權杖',{healp:8},'治療量 +8%'],['大主教權杖',{healp:15,faithg:15},'治療量 +15%，信仰獲得 +15%']],
-  templar:[['聖殿戰錘',{atkp:5,magp:5},'攻擊、魔力 +5%'],['聖殿大戰錘',{atkp:8,magp:8},'攻擊、魔力 +8%']]};
+  templar:[['聖殿戰錘',{atkp:5,magp:5},'物攻、魔攻 +5%'],['聖殿大戰錘',{atkp:8,magp:8},'物攻、魔攻 +8%']]};
 const ADVB=a=>Object.keys(CLS).find(c=>(CLS[c].adv||[]).includes(a));
 for(const a in ADVW)ADVW[a].forEach(([n,uq,ud],j)=>{const t=4+j,b=GEAR[`w_${ADVB(a)}_${t}`],o={n,slot:'weapon',cls:ADVB(a),adv:a,t,lv:TLV[t],price:Math.round(b.price*1.2),uq,ud};for(const k of ['atk','mag'])if(b[k])o[k]=Math.round(b[k]*1.08);GEAR[`w_${a}_${t}`]=o});
 /* 同階另一系防具：同部位兩種取向，掉落各半 */
@@ -725,7 +726,7 @@ const ARMB={head:[['學徒兜帽','法師頭巾','刻紋頭環','毛皮兜帽','
   body:[['獵人皮衣','遊俠皮甲','黑皮輕甲','雪狐皮衣','輕鋼甲','王都輕甲'],i=>({def:2+i*5,hp:8+i*20,eva:1+i}),.8],
   feet:[['布靴','鐵頭鞋','重裝鐵靴','雪地戰靴','龍骨靴','近衛鐵靴'],i=>({def:2+i*4,hp:6+i*18}),.5],
   ring:[['銅戒','力量戒指','紅水晶戒指','狼牙戒指','戰士戒指','王家戒指'],i=>({atk:1+i*3,crit:1+i}),.6],
-  neck:[['木珠串','智者項鍊','月石墜飾','冰晶念珠','星星項鍊','白塔徽章'],i=>({mp:10+i*14,mag:1+i*3}),.7]};
+  neck:[['木珠串','智者項鍊','月石墜飾','冰晶念珠','星星項鍊','白塔徽章'],i=>({mp:10+i*14,mag:1+i*4}),.7]};
 for(const sl in ARMB){const [ns,f,pm]=ARMB[sl];ns.forEach((n,i)=>GEAR[SLOTP[sl]+'b_'+i]=Object.assign({n,slot:sl,t:i,lv:TLV[i],price:Math.round(TPRICE[i]*pm)},f(i)))}
 const MDROP={bogslime:'x_bog',sparkrabbit:'x_spark',soulshroom:'x_soul',shadewolf:'x_shade',lavabat:'x_lava',crystalgolem:'x_crystal',blizzardwolf:'x_blizzard',stormsprite:'x_storm',bloodknight:'x_blood',voidwraith:'x_void'};
 const mobBase=id=>MVAR[id]?MVAR[id].base:id;
@@ -1006,7 +1007,7 @@ CHTXT.forEach((x,i)=>Object.assign(CH[i],x));
 /* ===== 第二部「霧之彼岸」：P2 開啟後才加入第六章（美術到齊前保持關閉） ===== */
 const P2=true;
 const ASET=t=>t<5?t:9+(t-5);
-SETS.push({n:'雷擊',b2:{crit:6,cd:10},b4:{stun:10,atkp:6,magp:6},d2:'爆擊率 +6%、爆擊傷害 +10%',d4:'攻擊時 10% 機率暈眩，攻擊與魔力 +6%'});
+SETS.push({n:'雷擊',b2:{crit:6,cd:10},b4:{stun:10,atkp:6,magp:6},d2:'爆擊率 +6%、爆擊傷害 +10%',d4:'攻擊時 10% 機率暈眩，物攻與魔攻 +6%'});
 for(const k of ['a','f','h','r','n'])if(ATL['icon_'+k+'_5']==null&&ATL['icon_'+k+'_4']!=null)ATL['icon_'+k+'_5']=ATL['icon_'+k+'_4'];
 for(const c in WN)if(ATL[`icon_w_${c}_5`]==null&&ATL[`icon_w_${c}_4`]!=null)ATL[`icon_w_${c}_5`]=ATL[`icon_w_${c}_4`];
 if(P2){
@@ -1027,7 +1028,7 @@ if(P2){
     m_storm:{n:'狂風三連',mag:1,pow:.7,h:3,hst:{weak:2},fx:'orb',c:'#8fdcff',d:'三道暴風，主角攻擊下降'},
     m_lightning:{n:'雷霆落擊',mag:1,pow:2.2,hst:{stun:1},p:.3,fx:'beam',c:'#ffe45a',d:'巨大落雷，30% 機率暈眩'},
     m_recalib:{n:'雷電護壁',shield:.2,self:{def:.4,t:3},fx:'aura',c:'#ffe45a',d:'護盾 20%，防禦 +40%'}});
-  GEAR.u_storm={n:'氣象院的懷錶',slot:'ring',t:5,lv:30,price:16000,mp:90,crit:7,uq:{cd:30,stun:8,magp:10},ud:'爆擊傷害 +30%、攻擊時 8% 機率暈眩、魔力 +10%',uniq:1};
+  GEAR.u_storm={n:'氣象院的懷錶',slot:'ring',t:5,lv:30,price:16000,mp:90,crit:7,uq:{cd:30,stun:8,magp:10},ud:'爆擊傷害 +30%、攻擊時 8% 機率暈眩、魔攻 +10%',uniq:1};
   BOSSU.weathergolem='u_storm';
   Object.assign(GEAR,{
     x_bandit:{n:'驛站盜賊的煙霧靴',slot:'feet',t:5,lv:26,price:10500,def:20,eva:7,uq:{eva:5,double:8},ud:'迴避 +5%，普攻 8% 機率追加一擊',uniq:1,mx:1},
@@ -1102,10 +1103,10 @@ if(P2&&P3){
     m_seal:{n:'封存印',shield:.18,self:{def:.35,t:3},fx:'aura',c:'#d8c070',d:'護盾 18%，防禦 +35%'},
     m_redact:{n:'塗銷',mag:1,pow:1.3,h:2,hst:{weak:2},fx:'orb',c:'#1a1a1a',d:'把名字塗黑的墨刃，連擊兩次'},
     m_sentence:{n:'機密判決',mag:1,pow:2.4,hst:{stun:1},p:.3,fx:'beam',c:'#e8d27a',d:'宣讀判決的金色光柱，30% 機率暈眩'}});
-  GEAR.u_archive={n:'封存司的鑰匙',slot:'neck',t:5,lv:33,price:18000,hp:420,cd:30,uq:{magp:10,atkp:10,mpcut:15},ud:'攻擊與魔力 +10%、技能 MP 消耗 -15%',uniq:1};
+  GEAR.u_archive={n:'封存司的鑰匙',slot:'neck',t:5,lv:33,price:18000,hp:420,cd:30,uq:{magp:10,atkp:10,mpcut:15},ud:'物攻與魔攻 +10%、技能 MP 消耗 -15%',uniq:1};
   BOSSU.archivist='u_archive';BGEM.archivist='gem_w';
   Object.assign(GEAR,{
-    x_ink:{n:'書蠹墨晶戒',slot:'ring',t:5,lv:30,price:12500,mp:90,crit:6,uq:{magp:8,mpreg:3},ud:'魔力 +8%，每回合回復 3 MP',uniq:1,mx:1},
+    x_ink:{n:'書蠹墨晶戒',slot:'ring',t:5,lv:30,price:12500,mp:90,crit:6,uq:{magp:8,mpreg:3},ud:'魔攻 +8%，每回合回復 3 MP',uniq:1,mx:1},
     x_tide:{n:'積水妖的淚滴',slot:'neck',t:5,lv:31,price:13000,hp:360,cd:25,uq:{regen:3,eva:4},ud:'每回合回復 3% HP，迴避 +4%',uniq:1,mx:1},
     x_rust:{n:'鏽蝕守衛的舊盔',slot:'head',t:5,lv:32,price:13500,def:40,hp:300,uq:{thorn:15,defp:10},ud:'被擊中時反彈 15% 傷害，防禦 +10%',uniq:1,mx:1}});
   Object.assign(MDROP,{bookworm:'x_ink',waterwraith:'x_tide',rustguard:'x_rust'});
@@ -1458,7 +1459,8 @@ function clamp(){const s=stats();S.hp=Math.min(S.hp,s.HP);S.mp=Math.min(S.mp,s.M
 function mySkills(){return Object.keys(SK).filter(k=>(SK[k].c===S.cls||SK[k].c===S.adv)&&S.lv>=SK[k].lv)}
 function learn(quiet){for(const k of mySkills())if(!S.skl[k]){S.skl[k]=1;if(!quiet)toast(`習得技能【${SK[k].n}】`)}}
 function addItem(id,n){S.items[id]=(S.items[id]||0)+n;if(S.items[id]<=0)delete S.items[id]}
-function rollSubs(t,r){return Object.keys(SUBS).sort(()=>Math.random()-.5).slice(0,Math.min(5,r)).map(k=>({k,v:Math.max(1,Math.round(SUBS[k](t)*(.7+Math.random()*.6)))}))}
+const OFFK=()=>{const c=S&&S.cls;return c==='mage'?['atk','atkp','STR']:c==='swordsman'||c==='ranger'?['mag','magp','INT']:[]};
+function rollSubs(t,r){const off=OFFK();return Object.keys(SUBS).filter(k=>!off.includes(k)).sort(()=>Math.random()-.5).slice(0,Math.min(5,r)).map(k=>({k,v:Math.max(1,Math.round(SUBS[k](t)*(.7+Math.random()*.6)))}))}
 function minG(g){if(!g||GEAR[g.id].uniq)return g;g.q=.85;const t=GEAR[g.id].t||0;for(const x of g.sub||[])if(SUBS[x.k])x.v=Math.max(1,Math.round(SUBS[x.k](t)*.7));if(g.sh){g.sh=0}return g}
 function rollQ(){const x=Math.random();return x<.03?+(1.3+Math.random()*.1).toFixed(2):+(0.85+Math.random()*.4).toFixed(2)}
 function addGear(id,r,set){const g={u:S.uid++,id,r,p:0,q:GEAR[id].uniq?1:rollQ(),sub:rollSubs(GEAR[id].t,r+(r>=2&&Math.random()<.2?1:0)),lock:false,sock:r>=4?[null,null]:r>=3?[null]:[]};if(r>=4&&!GEAR[id].uniq)g.sp=pick(Object.keys(SPEC));if(set!=null)g.set=set;S.gear.push(g);if(S.dex)S.dex.g[id]=1;return g}
@@ -1467,7 +1469,7 @@ function makeGear(tier,r,hard){const sl=pick(Object.keys(SLOTS)),alt=Math.random
   const g=addGear(id,r,hard&&r>=3&&Math.random()<.4?CSET[S.cls]:r>=2&&Math.random()<.35?ASET(tier):null);if(r>=1&&Math.random()<.05)shine(g);if((r===2||r===3)&&!g.sp&&!GEAR[id].uniq&&Math.random()<.06)g.sp=pick(Object.keys(SPEC));if(r>=3||g.sh||g.sp)DROPS.push(g);if(r>=3||g.sh||g.sp)sys(`恭喜 ${S.name} 獲得【${gearName(g)}】！`);return g}
 /* 閃耀裝備：多一條詞條、最高詞條 ×1.5 */
 let DROPS=[];
-function shine(g){g.sh=1;const ks=g.sub.map(x=>x.k),k=Object.keys(SUBS).filter(x=>!ks.includes(x)).sort(()=>Math.random()-.5)[0],t=GEAR[g.id].t;if(k)g.sub.push({k,v:Math.max(1,Math.round(SUBS[k](t)))});const top=g.sub.reduce((a,b)=>b.v/SUBS[b.k](t)>a.v/SUBS[a.k](t)?b:a);top.v=Math.round(top.v*1.5)}
+function shine(g){g.sh=1;const ks=g.sub.map(x=>x.k),off=OFFK(),k=Object.keys(SUBS).filter(x=>!ks.includes(x)&&!off.includes(x)).sort(()=>Math.random()-.5)[0],t=GEAR[g.id].t;if(k)g.sub.push({k,v:Math.max(1,Math.round(SUBS[k](t)))});const top=g.sub.reduce((a,b)=>b.v/SUBS[b.k](t)>a.v/SUBS[a.k](t)?b:a);top.v=Math.round(top.v*1.5)}
 function dropFx(){if(!DROPS.length)return '';const h=DROPS.map(g=>`<div class="drop d${g.r}${g.sh?' shn':''}"><span class="ico c${g.r}">${gIco(g.id)}</span><span class="grow"><b class="c${g.r}">${gearName(g)}</b><span class="sub">${g.sh?'閃耀・多一條詞條、最強詞條 ×1.5':g.sp&&g.r<4?`稀有詞綴【${SPEC[g.sp].n}】${specD(g)}`:RAR[g.r].n+'裝備'}</span></span></div>`).join('');const best=Math.max(...DROPS.map(g=>g.r+(g.sh?1:0)));DROPS=[];setTimeout(()=>{try{SFX.holy(0);buzz([30,40,60])}catch(e){}},350);return `<div class="drops">${h}</div>`}
 const rollGear=(tier,minR,bonus,hard)=>makeGear(tier,rollRar(minR||0,bonus),hard);
 function dismantle(g){const d=DIS[g.r][0]+g.p*2,st=DIS[g.r][1];addItem('dust',d);if(st)addItem('stone',st);for(const gm of g.sock||[])if(gm)addItem(gm,1);S.gear=S.gear.filter(x=>x.u!==g.u);return [d,st]}
@@ -1686,7 +1688,7 @@ function vRun(){if(RUN.tower)return vTower();const a=AREAS[RUN.area],v=RUN.view,
   else if(v.type==='gate')body=bossGate(a);
   else if(v.type==='res')body=`<div class="panel">${v.img?`<div class="duo">${art(v.img,'勝利','r34')}${v.mimg?art(v.mimg,'','r11'):''}</div>`:''}<h3>${v.title}</h3>${v.drop||''}<p>${v.text}</p>${v.box?bossBoxHtml(v):''}${v.box===1?'':last?`<button class="btn pri big" data-a="finish">完成冒險</button>`:`<button class="btn pri big" data-a="runNext">繼續前進</button><button class="btn" data-a="retreat">撤退回城（保留戰利品）</button>`}</div>`;
   else if(v.type==='fork')body=`<div class="panel"><h3>岔路</h3><p class="sub">前方的路分成兩條。要往哪邊走？</p>${forkTalk()}<div class="fork">${v.opts.map((o,i)=>(()=>{const tg=((RUN.ftags||[])[RUN.step+1]||[])[i],T=tg&&TAGS[tg];const bl=(RUN.blind||[])[RUN.step+1]===i;if(bl)return `<button class="btn" data-a="pickFork" data-v="${i}"><i>🌫</i><b>濃霧中的路</b><span>霧太濃了，看不清前面有什麼</span><span class="risk">完全未知</span></button>`;return `<button class="btn ${T?'tagged':''}" data-a="pickFork" data-v="${i}"><i>${NODE[o][0]}</i><b>${NODE[o][1]}</b><span>${NODE[o][2]}</span><span class="risk">${NRISK[o]||''}</span>${T?`<span class="ftag">${T[0]} ${T[1]}<small>${T[2]}</small></span>`:''}</button>`})()).join('')}</div><button class="btn" data-a="retreat">撤退回城（保留戰利品）</button></div>`;
-  else if(v.type==='shrine')body=`<div class="panel">${art('event_shrine','古老的祭壇')}<h3>古老的祭壇</h3><p>長滿青苔的石台上刻著三個符號。指尖碰到其中一個時，微弱的光流進了身體。</p>${v.done?`<p>${v.done}</p><button class="btn pri big" data-a="${last?'finish':'runNext'}">${last?'完成冒險':'繼續前進'}</button>`:`<div class="list">${[['atk','劍之紋','本次冒險中，攻擊與魔力 +15%'],['def','盾之紋','本次冒險中，受到的傷害大幅降低'],['luck','星之紋','本次冒險中，金幣 +30%、裝備掉落提升']].map(([k,n,d])=>`<button class="btn opt" data-a="bless" data-v="${k}"><span><b>${n}</b>　<span class="sub">${d}</span></span></button>`).join('')}</div>`}</div>`;
+  else if(v.type==='shrine')body=`<div class="panel">${art('event_shrine','古老的祭壇')}<h3>古老的祭壇</h3><p>長滿青苔的石台上刻著三個符號。指尖碰到其中一個時，微弱的光流進了身體。</p>${v.done?`<p>${v.done}</p><button class="btn pri big" data-a="${last?'finish':'runNext'}">${last?'完成冒險':'繼續前進'}</button>`:`<div class="list">${[['atk','劍之紋','本次冒險中，物攻與魔攻 +15%'],['def','盾之紋','本次冒險中，受到的傷害大幅降低'],['luck','星之紋','本次冒險中，金幣 +30%、裝備掉落提升']].map(([k,n,d])=>`<button class="btn opt" data-a="bless" data-v="${k}"><span><b>${n}</b>　<span class="sub">${d}</span></span></button>`).join('')}</div>`}</div>`;
   else if(v.type==='shop')body=`<div class="panel">${art('event_merchant','旅行商人')}<h3>旅行商人</h3><p>背著巨大背包的商人朝你招手：「出門在外，價錢好商量！」</p><div class="list">${v.items.map(([k,pr],i)=>{const one=k==='box'||k==='hunt',so=one&&(v.bought[k]||(k==='hunt'&&RUN.hunt)),SP={box:['神秘裝備箱','隨機一件本區域裝備，精良以上',ic('mat')],hunt:['懸賞情報','「附近有隻守寶的大傢伙。」下一場普通戰鬥變成精英守寶怪：更危險，但必掉裝備、金幣 ×2',icon('item_tok',ic('mat'))]}[k];return `<div class="item"><span class="ico c${one?3:1}">${SP?SP[2]:icon('item_'+k,ic('potion'))}</span><span class="grow"><b>${SP?SP[0]:ITEMS[k].n}</b><span class="sub">${SP?SP[1]:ITEMS[k].d}</span></span><button class="btn sm ${S.gold>=pr&&!so?'pri':''}" data-a="buyRun" data-v="${i}" ${S.gold<pr||so?'disabled':''}>${so?'售完':pr+' G'}</button></div>`}).join('')}</div><p class="sub">持有 ${S.gold} G</p><button class="btn pri big" data-a="${last?'finish':'runNext'}">${last?'完成冒險':'繼續前進'}</button></div>`;
   else if(v.type==='event'){const e=v.ev;
     body=`<div class="panel">${art(e.img||'event_'+e.id,e.n)}<h3>${e.n}${v.fate?' <span class="tag red">🎲 命運之地</span>':''}</h3><p>${e.t}</p>`;
@@ -1750,7 +1752,7 @@ function vChar(){const s=stats(),sc=setCounts();
   const nxt=Object.keys(SK).filter(k=>(SK[k].c===S.cls||SK[k].c===S.adv)&&S.lv<SK[k].lv).map(k=>`<span class="chip">Lv.${SK[k].lv} ${SK[k].n}</span>`).join('');
   return `<div class="panel"><div class="char-top">${art(HK(),clsName()+'立繪','r34')}
    <div class="list"><h3>${esc(S.name)}</h3><div class="row"><span class="tag">${clsName()}</span><span class="sub">Lv.${S.lv}</span></div>
-   <div class="stat-g"><div><span>HP</span><b>${s.HP}</b></div><div><span>MP</span><b>${s.MP}</b></div><div><span>攻擊</span><b>${s.ATK}</b></div><div><span>魔力</span><b>${s.MAG}</b></div><div><span>防禦</span><b>${s.DEF}</b></div><div><span>爆擊</span><b>${s.CRIT}%</b></div><div><span>迴避</span><b>${s.EVA}%</b></div><div><span>爆傷</span><b>${s.CD}%</b></div><div><span>吸血</span><b>${s.LS}%</b></div><div><span>戰力</span><b>${power()}</b></div></div>
+   <div class="stat-g"><div><span>HP</span><b>${s.HP}</b></div><div><span>MP</span><b>${s.MP}</b></div>${CLS[S.cls].basic==='MAG'?`<div class="main"><span>魔法攻擊</span><b>${s.MAG}</b></div><div><span>物理攻擊</span><b>${s.ATK}</b></div>`:`<div class="main"><span>物理攻擊</span><b>${s.ATK}</b></div><div><span>魔法攻擊</span><b>${s.MAG}</b></div>`}<div><span>防禦</span><b>${s.DEF}</b></div><div><span>爆擊</span><b>${s.CRIT}%</b></div><div><span>迴避</span><b>${s.EVA}%</b></div><div><span>爆傷</span><b>${s.CD}%</b></div><div><span>吸血</span><b>${s.LS}%</b></div><div><span>戰力</span><b>${power()}</b></div></div>
    <p class="sub">下一級還需 ${Math.max(0,need(S.lv)-S.exp)} EXP</p></div></div></div>
   <div class="panel"><h3>職業特色</h3><p class="sub">${CLS[S.cls].f}</p>${Object.keys(PASS).filter(id=>PASS[id].c===S.cls||PASS[id].c===S.adv).map(id=>`<span class="subl row ${hasP(id)?'':'sub'}" style="gap:6px"><span class="ico c4" style="width:30px;height:30px">${icon('pass_'+id,ic('skill'))}</span><span class="grow">被動【${PASS[id].n}】Lv.${PASS[id].lv}：${PASS[id].d}</span></span>`).join('')}${S.adv?`<p class="sub">${ADV[S.adv].n}：${ADV[S.adv].d}</p>`:''}</div>
   <div class="panel"><h3>屬性　<span class="tag ${S.pts?'red':'off'}">可用 ${S.pts} 點</span><button class="btn sm" style="float:right" data-a="respec">重置（${respecCost()} G）</button></h3>${Object.keys(ATTR).map(k=>`<div class="attr"><span>${ATTR[k]}<span class="sub">　${{STR:'物理攻擊',DEX:'迴避・爆擊・連擊',INT:'魔力・MP・技能省 MP',VIT:'HP・防禦・每回合回血',LUK:'爆擊・爆傷・掉寶・金幣'}[k]}</span></span><b>${S.attr[k]}${s.A[k]>S.attr[k]?`<small class="up">+${s.A[k]-S.attr[k]}</small>`:''}</b><button class="btn sm" data-a="addPt" data-v="${k}" ${S.pts?'':'disabled'}>＋</button></div>`).join('')}</div>
@@ -2310,6 +2312,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'8.3',d:'2026-11-20',t:'法師強化',b:'角色面板改為「物理攻擊／魔法攻擊」，職業主攻會標亮。法杖魔攻 +15%，木戒指系列新增魔攻，木珠串系列魔攻提高。隨機詞條不再出現用不到的屬性（法師不會再抽到物理攻擊、力量）。'},
   {v:'8.2',d:'2026-11-20',t:'裝備改名',b:'裝備、套裝與詞綴名稱改得更直白好懂，例如「翠影」套裝改為「森林」、「秘紋頭環」改為「刻紋頭環」、「渴血」改為「吸血」。能力完全不變。'},
   {v:'8.1',d:'2026-11-20',t:'玩家意見回報',b:'城鎮新增「意見回報」：錯誤、建議、平衡、美術都可以留言，所有玩家都看得到，開發者會不定期回覆。'},
   {v:'8.0',d:'2026-11-20',t:'開服大改版',b:'① 全職業立繪、頭像、魔物重新繪製，造型統一。② 第七章「沉沒的檔案館」開放。③ 裝備增加到 116 件，進階職業有專屬武器。④ 每張地圖有自己的探索特性與專屬事件。⑤ 新增五位旅人，冒險途中可能遇見他們。'},
