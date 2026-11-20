@@ -173,6 +173,9 @@ input,textarea{font:inherit;width:100%;padding:8px 10px;border:2px solid var(--l
 .dmg.miss{font-size:20px;-webkit-text-stroke:1.5px var(--navy)}
 @keyframes pop{0%{opacity:0;top:38%;transform:translateX(-50%) scale(2.4)}10%{opacity:1;transform:translateX(-50%) scale(.85)}17%{transform:translateX(-50%) scale(1.15)}24%{transform:translateX(-50%) scale(1)}75%{opacity:1;top:20%}100%{opacity:0;top:6%;transform:translateX(-50%) scale(1)}}
 .cutin{position:absolute;left:0;right:0;top:40%;padding:4px 0;background:linear-gradient(90deg,transparent,var(--navy) 20% 80%,transparent);color:var(--gold);font-family:var(--display);font-weight:900;font-size:20px;text-align:center;letter-spacing:.2em;animation:cut .9s forwards;pointer-events:none;z-index:4}
+.elt{display:inline-block;margin-left:6px;padding:0 6px;border-radius:8px;font-size:11px;background:#fff;border:1px solid currentColor}.el-fire{color:#e0561a}.el-ice{color:#2a8fd0}.el-thunder{color:#b8930a}.el-dark{color:#7a3fc0}
+.elw{display:flex;gap:2px;margin-top:2px}.elw .elt{margin-left:0;font-size:10px}
+.cutin.chain{background:linear-gradient(90deg,transparent,#c2410c 20% 80%,transparent);color:#fff6c8;font-size:24px;text-shadow:0 0 10px #ffb04a}
 .cutin.bad{background:linear-gradient(90deg,transparent,#6b1f2a 20% 80%,transparent);color:#fff}
 @keyframes cut{from{transform:translateX(-100%);opacity:0}20%,75%{transform:none;opacity:1}to{transform:translateX(100%);opacity:0}}
 .msg{background:var(--panel);border:3px double var(--navy);border-radius:8px;padding:8px 12px;min-height:66px;white-space:pre-line;font-size:13px;font-weight:500}
@@ -1449,8 +1452,8 @@ function gearTotals(){const e={},add=o=>{for(const k in o)e[k]=(e[k]||0)+o[k]};
   const c=setCounts();for(const i in c){if(c[i]>=2)add(SETS[i].b2);if(c[i]>=4)add(SETS[i].b4)}
   for(const id in PASS)if(PASS[id].st&&hasP(id))add(PASS[id].st);return e}
 function stats(){const e=gearTotals(),a={},c=CLS[S.cls],v=k=>e[k]||0,p=k=>1+v(k)/100;for(const k in ATTR)a[k]=S.attr[k]+v(k);
-  return{HP:Math.round((60+a.VIT*14+S.lv*8+v('hp'))*p('hpp')),MP:Math.round((20+a.INT*5+S.lv*3+v('mp'))*p('mpp')),ATK:Math.round((a[c.atk]*2+v('atk'))*p('atkp')),MAG:Math.round((a.INT*2.2+v('mag'))*p('magp')),
-    DEF:Math.round((a.VIT*1.4+v('def'))*p('defp')),MRES:Math.round((a.INT*.8+a.VIT*.4+S.lv+v('mres'))*p('mresp')),RF:Math.min(60,v('rfire')),RI:Math.min(60,v('rice')),RT:Math.min(60,v('rthunder')),RD:Math.min(60,v('rdark')),CRIT:Math.min(75,Math.round(5+a.LUK*.6+a.DEX*.2+v('crit'))),CD:150+Math.round(a.LUK*.8)+v('cd'),EVA:Math.min(45,Math.round(a.DEX*.6+v('eva'))),
+  const rgB=S.cls==='ranger'?1.35:1;return{HP:Math.round((60+a.VIT*14+S.lv*8+v('hp'))*p('hpp')*rgB),MP:Math.round((20+a.INT*5+S.lv*3+v('mp'))*p('mpp')),ATK:Math.round((a[c.atk]*2+v('atk'))*p('atkp')),MAG:Math.round((a.INT*2.2+v('mag'))*p('magp')),
+    DEF:Math.round((a.VIT*1.4+v('def'))*p('defp')*rgB),MRES:Math.round((a.INT*.8+a.VIT*.4+S.lv+v('mres'))*p('mresp')),RF:Math.min(60,v('rfire')),RI:Math.min(60,v('rice')),RT:Math.min(60,v('rthunder')),RD:Math.min(60,v('rdark')),CRIT:Math.min(75,Math.round(5+a.LUK*.6+a.DEX*.2+v('crit'))),CD:150+Math.round(a.LUK*.8)+v('cd'),EVA:Math.min(45,Math.round(a.DEX*.6+v('eva'))),
     LS:v('ls'),REGEN:v('regen')+Math.min(3,a.VIT*.03),MPCUT:Math.min(50,Math.round(v('mpcut')+Math.min(20,a.INT*.15))),BURN:v('burn'),DOUBLE:v('double')+Math.min(20,Math.round(a.DEX*.15)),STUN:v('stun'),GUARD:v('guard'),SHIELD:v('shield'),BACK:Math.min(60,v('back')),THORN:Math.min(50,v('thorn')),GALE:v('gale'),REAP:Math.min(25,v('reap')),MPREG:v('mpreg'),RESMAX:v('resmax'),BRKCD:v('brkcd'),DETAMP:v('detamp'),FOCUSATK:v('focusatk'),ANSWER:v('answer'),HEALP:v('healp'),FAITHG:v('faithg'),A:a}}
 function power(){const s=stats();return Math.round(s.HP/4+s.MP/4+s.ATK*3+s.MAG*3+s.DEF*2.5+s.CRIT*4+(s.CD-150)*1.5+s.EVA*3+s.LS*5+(s.BURN+s.DOUBLE+s.STUN+s.GUARD+s.SHIELD+s.BACK+s.THORN+s.REAP)*3+s.GALE*40)}
 const baseAttr=()=>{const a=Object.assign({},CLS[S.cls].base),g=CLS[S.cls].grow;for(const k in g)a[k]+=g[k]*(S.lv-1);if(S.adv){const b=ADV[S.adv].bonus;for(const k in b)a[k]+=b[k]}return a};
@@ -1766,12 +1769,12 @@ function vBattle(){const s=stats(),fx=B.fx||{},intro=B.intro,a=AREAS[RUN.area];B
   else if(B.menu==='item'){const us=Object.keys(S.items).filter(k=>ITEMS[k].use);cmd=`<div class="cmd col">${us.map(k=>`<button class="btn" data-a="bItem" data-v="${k}">${ITEMS[k].n} ×${S.items[k]}<small>${ITEMS[k].d}</small></button>`).join('')||'<p class="empty">沒有可用的道具</p>'}<button class="btn" data-a="bMenu" data-v="main">返回</button></div>`}
   else cmd=`<div class="cmd"><button class="btn pri" data-a="bAtk">攻擊</button><button class="btn" data-a="bMenu" data-v="skill">技能</button><button class="btn" data-a="bMenu" data-v="item">道具</button><button class="btn" data-a="bGuard">防禦</button><button class="btn" data-a="bFlee">逃跑</button><button class="btn ${B.auto?'pri':''}" data-a="bAuto">自動 ${B.auto?'開':'關'}</button></div>`;
   return `<div class="battle"><div class="stage bg-${a.id} ${fx.quake&&!fk?'quake':''} ${(sk&&sk[0]==='meteor')||(fk&&fk.fx==='slam')?'quakel':''}" ${sk?`style="--c:${sk[1]}"`:fk?`style="--c:${fk.c}"`:''}><img class="bg" src="art/battle_${a.id}.webp" alt="" ${MISS.has('battle_'+a.id)?'hidden':''} onerror="reTry(this,'battle_${a.id}')||(MISS.add('battle_${a.id}'),this.remove())">
-   <div class="ibox foe-i" data-a="openM" data-v="foe" role="button" aria-label="查看怪物情報"><div class="nm"><span>${B.name}${B.kind==='boss'?' <span class="tag red">首領</span>':''}</span><span>${(B.adds||[]).length?'<span class="tag">目標</span> ':''}Lv${B.L} ⓘ</span></div>${bbar(B.hp,B.max,fp)}${intentHtml()}${(B.adds||[]).length?`<div class="addrow">${B.adds.map((f,i)=>`<button class="addf" data-a="bTarget" data-v="${i}" aria-label="切換目標：${f.name}">${art('mob_'+f.id,f.m.n,'r11')}<span>${f.m.n}${bbar(f.hp,f.max)}</span></button>`).join('')}</div><div class="sub" style="font-size:10px">點小頭像切換目標</div>`:''}</div>
+   <div class="ibox foe-i" data-a="openM" data-v="foe" role="button" aria-label="查看怪物情報"><div class="nm"><span>${B.name}${B.kind==='boss'?' <span class="tag red">首領</span>':''}</span><span>${(B.adds||[]).length?'<span class="tag">目標</span> ':''}Lv${B.L} ⓘ</span></div>${bbar(B.hp,B.max,fp)}${(()=>{const e=MEL[B.id];if(!e||!(S.dex&&S.dex.m&&S.dex.m[B.id]||B.kind==='boss'))return '';return `<div class="elw">${e[0]?`<span class="elt el-${e[0]}">弱 ${ELI[e[0]]||e[0]}</span>`:''}${e[1]?`<span class="elt" style="color:#777">抗 ${ELI[e[1]]||e[1]}</span>`:''}</div>`})()}${intentHtml()}${(B.adds||[]).length?`<div class="addrow">${B.adds.map((f,i)=>`<button class="addf" data-a="bTarget" data-v="${i}" aria-label="切換目標：${f.name}">${art('mob_'+f.id,f.m.n,'r11')}<span>${f.m.n}${bbar(f.hp,f.max)}</span></button>`).join('')}</div><div class="sub" style="font-size:10px">點小頭像切換目標</div>`:''}</div>
    <div class="spr foe ${B.m.fly?'fly':''} ${B.kind==='boss'?'boss':''} ${MSMALL.has(mobBase(B.id))?'szs':MMID.has(mobBase(B.id))?'szm':''} ${foeC}" data-a="openM" data-v="foe" role="button" aria-label="查看怪物情報" style="cursor:pointer"><div class="plat"></div>${B.id==='shadow'?art(HK(),'試煉之影','r34','shadowimg'):art(fKey0,B.m.n,'r11','','mob_'+B.id)}${foeFx}</div>
    <div class="spr me ${meC}"><div class="plat"></div>${art(mKey0,clsName(),'r34','',HK())}${meFx}</div>
    <div class="ibox me-i"><div class="nm"><span>${esc(S.name)}</span><span>Lv${S.lv}</span></div>${bbar(S.hp,s.HP,pp)}<div class="num">HP ${S.hp}/${s.HP}</div>${bbar(S.mp,s.MP,null,'m')}<div class="num">MP ${S.mp}/${s.MP}</div>${me?`<div class="chips">${me}</div>`:''}</div>
    ${AL?`<div class="ally ${AL.hp<=0?'down':''} ${aD||aH?'aact':''} ${aHit?'ahit':''}">${art('ally_'+AL.id+(AL.hp<=0?'_lose':aHit?'_hurt':aH?'_cast':aD?'_atk':AL.hp<AL.max*.3?'_low':''),AL.n,'r34')}${bbar(AL.hp,AL.max)}${aD?`<span class="dmg sm">⚔${aD}</span>`:aH?`<span class="dmg heal sm">+${aH}</span>`:aHit?`<span class="dmg sm">-${aHit}</span>`:''}</div>`:''}
-   ${sk?skillFx(sk[0],fx.hits||1):fk?foeSkillFx(fx.fsk):''}${fx.cut?`<div class="cutin ${theirs?'bad':''}">${fx.cut}</div>`:''}</div>
+   ${sk?skillFx(sk[0],fx.hits||1):fk?foeSkillFx(fx.fsk):''}${fx.cut?`<div class="cutin ${theirs?'bad':fx.chain?'chain':''}">${fx.cut}</div>`:''}</div>
   <div class="msg" id="msg"></div>${cmd}</div>`}
 function skillFx(t,n){return '<div class="fxl"><div class="dim"></div><div class="mc"><i></i><i></i></div></div>'}
 function foeSkillFx(id){return '<div class="fxl"><div class="dim"></div></div>'}
@@ -2351,7 +2354,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
-  {v:'9.2',d:'2026-11-20',t:'攻防與屬性改版',b:'①魔物防禦與魔抗隨等級成長，破甲、穿透與物理／魔法的選擇更重要。②主角新增「魔抗」，布甲、輕甲、項鍊、戒指提供，重甲防禦高但魔抗低。③新增火、冰、雷、暗抗性，魔物屬性招式會被抗性減傷，森林／火山／雪地／雷擊套裝附帶對應抗性，詞條也會出現。④屬性連鎖：冰凍時火攻「碎冰」、灼燒時冰攻「蒸發」、雷打冰凍「導電」、雷打中毒「毒爆」、聖打虛弱「淨化」、暗打流血「血蝕」，傷害提高。⑤首領 HP +25%；遊俠專注每層攻擊 +6% → +9%，基礎體質提高，神射手、刺客體質 +4。'},
+  {v:'9.2',d:'2026-11-20',t:'攻防與屬性改版',b:'①魔物防禦與魔抗隨等級成長，破甲、穿透與物理／魔法的選擇更重要。②主角新增「魔抗」，布甲、輕甲、項鍊、戒指提供，重甲防禦高但魔抗低。③新增火、冰、雷、暗抗性，魔物屬性招式會被抗性減傷，森林／火山／雪地／雷擊套裝附帶對應抗性，詞條也會出現。④屬性連鎖：冰凍時火攻「碎冰」、灼燒時冰攻「蒸發」、雷打冰凍「導電」、雷打中毒「毒爆」、聖打虛弱「淨化」、暗打流血「血蝕」，傷害提高。'},
   {v:'9.1',d:'2026-11-20',t:'立繪重繪',b:'12 個職業男女的站姿立繪全部重新繪製，手部改為自然放鬆或握住武器。'},
   {v:'9.0',d:'2026-11-20',t:'異常狀態特效',b:'中毒、灼燒、流血、虛弱、再生、暈眩、冰凍都改成發光質感：腳下有脈動光圈，加上毒霧、煙、冰霧、光粒等層次。'},
   {v:'8.9',d:'2026-11-20',t:'物理特效',b:'斬擊、打擊、射擊命中時加上發光火花、斬痕殘光、衝擊波、碎石與地面揚塵，打擊感更強。'},
@@ -2449,6 +2452,7 @@ function vLShop(){const e=liveNow().find(x=>x.shop);if(!e)return{t:'活動商店
     return `<div class="item"><span class="ico c${ITEMS[x.k].gem?3:1}">${icon('item_'+x.k,ic(ITEMS[x.k].gem?'mat':'potion'))}</span><span class="grow"><b>${ITEMS[x.k].n}×${x.n}</b><span class="sub">徽章 ${x.c}・剩餘 ${x.lim-used}/${x.lim}</span></span><button class="btn sm ${ok?'pri':''}" data-a="lbuy" data-v="${i}" ${ok?'':'disabled'}>兌換</button></div>`}).join('')}</div>`}}
 
 /* ============ 戰鬥 ============ */
+var BHP=2.6,BATK=2.0;
 function mkFoe(id,kind){const m=MOBS[id],bs=!!m.boss,el=kind==='elite',nm=!!(RUN&&RUN.nm);
   const mut=!bs&&!nm&&S.main.ch>=1&&Math.random()<.1;
   const L=(RUN&&RUN.tower?RUN.tlv:m.lv)+(nm?10:0)+(mut?3:0);
@@ -2458,8 +2462,8 @@ function mkFoe(id,kind){const m=MOBS[id],bs=!!m.boss,el=kind==='elite',nm=!!(RUN
   const aff=[];if(mut||nm){const ks=Object.keys(AFF).sort(()=>Math.random()-.5);aff.push(...ks.slice(0,bs&&nm?2:1))}
   if(aff.includes('rage'))st.ATK=Math.round(st.ATK*1.4),st.MAG=Math.round(st.MAG*1.4);if(aff.includes('shell'))st.DEF=Math.round(st.DEF*1.8),st.MRES=Math.round(st.MRES*1.8);if(aff.includes('swift'))st.EVA+=15,st.CRIT+=15;
   const pre=(nm?'惡夢・':'')+(mut?'蝕化・':'')+(el?'精英':'');
-  const bdm=bs?(RUN&&!RUN.tower?1.7+RUN.area*.15:1.4):1;
-  return{id,m,L,a:st.a,kind:bs?'boss':kind,mut,nm,aff,name:pre+m.n,hp:Math.round(st.HP*(bs?1.25:1)),max:Math.round(st.HP*(bs?1.25:1)),atk:Math.round(st.ATK*bdm),mag:Math.round(st.MAG*bdm),def:st.DEF,mres:st.MRES,crit:st.CRIT,eva:st.EVA,fb:[],fshield:0,st:{},rage:0,bm}}
+  const bdm=bs?(RUN&&!RUN.tower?1.7+RUN.area*.15:1.4)*BATK:1;
+  return{id,m,L,a:st.a,kind:bs?'boss':kind,mut,nm,aff,name:pre+m.n,hp:Math.round(st.HP*(bs?BHP:1)),max:Math.round(st.HP*(bs?BHP:1)),atk:Math.round(st.ATK*bdm),mag:Math.round(st.MAG*bdm),def:st.DEF,mres:st.MRES,crit:st.CRIT,eva:st.EVA,fb:[],fshield:0,st:{},rage:0,bm}}
 /* 依玩家實力調整魔物：只在玩家太強、會一擊秒殺時才加強，前期不受影響 */
 function hitEst(def){const s=stats(),P=Math.max(s.ATK,s.MAG),best=Math.max(1,...mySkills().map(k=>{const d=SK[k].dmg;return d?d.p*(d.h||1):0})),cr=1+Math.min(1,s.CRIT/100)*Math.max(0,s.CD/100-1);return clsDm()*P*best*100/(100+def)*cr}
 function rareFoe(){const r=Math.random();
@@ -2526,19 +2530,19 @@ function pAct(type,arg){if(!B||B.busy)return;const s=stats();
   if(B.opening&&type!=='guard'&&type!=='item'){B.opn2=1}B.guard=false;B.elHit=null;B.curEl=type==='atk'?basicEl():type==='skill'?(SKEL2[arg]||'phys'):null;
   if(type==='atk'){const c=CLS[S.cls],pw=c.basic==='MAG'?.8:S.cls==='swordsman'?1.15:1,r=hitFoe(c.basic,pw);let d=r.d,cr=r.cr,ex='';
     if(B.hp>0&&s.DOUBLE&&Math.random()*100<s.DOUBLE){const r2=hitFoe(c.basic,pw*.6);d+=r2.d;cr=cr||r2.cr;ex='，觸發連擊'}
-    B.fx={by:'me',d,cr,el:c.basic==='MAG'?'holy':'phys'};SFX[cr?'crit':'hit']();const pr=procs(s,d),C=B.cls,cl=S.cls;
+    B.fx={by:'me',d,cr,el:c.basic==='MAG'?'holy':'phys',cut:B.chain?`${B.chain}！`:undefined,chain:B.chain||null};B.chain=null;SFX[cr?'crit':'hit']();const pr=procs(s,d),C=B.cls,cl=S.cls;
     if(cl==='swordsman'){C.brk=Math.min(rmax(5),C.brk+(d>0&&hasP('sw3')&&Math.random()<.3?2:1));pr.push(`破綻 ${C.brk}`);if(d>0){const g=Math.max(1,Math.round(s.MP*.05));S.mp=Math.min(s.MP,S.mp+g);pr.push(`鬥志 +${g} MP`)}}else if(cl==='ranger'){C.focus=Math.min(rmax(5),C.focus+1);pr.push(`專注 ${C.focus}`)}
     else if(cl==='cleric'){C.faith=Math.min(100,C.faith+8);pr.push(`信仰 ${C.faith}`)}else if(cl==='mage'){const g=Math.max(1,Math.round(s.MP*.06));S.mp=Math.min(s.MP,S.mp+g);pr.push(`回流 ${g} MP`)}
     blog(d===0?`${B.name} 閃開了你的攻擊`:`你發動攻擊，造成 ${d} 傷害${cr?'（爆擊！）':''}${ex}${pr.length?'，'+pr.join('，'):''}`)}
   else if(type==='skill'){try{lunaSkill(arg)}catch(e){}const k=SK[arg],C=B.cls;let mul=1+.15*((S.skl[arg]||1)-1);const ps=[];
     if(k.mark2){C.marks.push('星','星');C.marks=C.marks.slice(-5)}
-    let pw=0;if(k.fin)pw+=k.fin*C.brk;if(k.det)pw+=k.det*C.marks.length*(1+s.DETAMP/100);if(k.aim)pw+=k.aim*C.focus;if(k.faithAmp)pw+=Math.min(1,C.faith/100);if(k.faithSpend)pw+=C.faith/100*1.2;if(hasP('mg2')&&(k.c==='mage'||k.c==='archmage'||k.c==='warlock'))pw+=.08*C.marks.length;if(k.ult)B.ultUsed=1;mul*=1+pw;const fx=B.fx={by:'me',cut:k.n,el:SKEL[arg]||'phys',skill:arg,hits:k.dmg&&k.dmg.h||1};S.mp-=mpCost(arg);playSkillSfx(arg,k);
+    let pw=0;if(k.fin)pw+=k.fin*C.brk;if(k.det)pw+=k.det*C.marks.length*(1+s.DETAMP/100);if(k.aim)pw+=k.aim*C.focus;if(k.faithAmp)pw+=Math.min(1,C.faith/100);if(k.faithSpend)pw+=C.faith/100*1.2;if(hasP('mg2')&&(k.c==='mage'||k.c==='archmage'||k.c==='warlock'))pw+=.08*C.marks.length;if(k.ult)B.ultUsed=1;mul*=1+pw;const fx=B.fx={by:'me',cut:B.chain?`${k.n}・${B.chain}！`:k.n,chain:B.chain||null,el:SKEL[arg]||'phys',skill:arg,hits:k.dmg&&k.dmg.h||1};B.chain=null;S.mp-=mpCost(arg);playSkillSfx(arg,k);
     if(k.cost)S.hp=Math.max(1,S.hp-Math.round(s.HP*k.cost));
     const consume=()=>{if(k.fin&&C.brk){ps.push(`清算 ${C.brk} 層破綻`);C.brk=0}if(k.det&&C.marks.length){ps.push(`引爆 ${C.marks.length} 個印記`);C.marks=[]}
       if(k.aim&&!k.keep&&C.focus){ps.push(`打出 ${C.focus} 層專注`);C.focus=0}if(k.faithSpend&&C.faith){ps.push(`燃燒 ${C.faith} 點信仰`);C.faith=0}};
     if(k.dmg){let tot=0,cr=false;for(let i=0;i<(k.dmg.h||1);i++){const r=hitFoe(k.dmg.s,k.dmg.p*mul,k.dmg);tot+=r.d;cr=cr||r.cr}fx.d=tot;fx.cr=cr;ps.push(`造成 ${tot} 傷害${cr?'（爆擊！）':''}`);ps.push(...procs(s,tot));
       if(k.drain){const h=Math.round(tot*k.drain);S.hp=Math.min(s.HP,S.hp+h);fx.heal=h;ps.push(`吸取 ${h} HP`)}}
-    if(k.heal){const h=Math.round(s.MAG*k.heal*mul*(1+s.HEALP/100));S.hp=Math.min(s.HP,S.hp+h);fx.heal=h;ps.push(`回復 ${h} HP`)}
+    if(k.heal){const h=Math.round(s.MAG*k.heal*mul*.7*(1+s.HEALP/100));S.hp=Math.min(s.HP,S.hp+h);fx.heal=h;ps.push(`回復 ${h} HP`)}
     if(k.shield){B.shield=Math.round(s.MAG*k.shield*mul);ps.push(`獲得 ${B.shield} 點護盾`)}
     if(k.buff){B.buffs=B.buffs.filter(b=>b.id!==arg);B.buffs.push(Object.assign({id:arg,n:k.n},k.buff));ps.push('能力提升')}
     if(k.foe&&B.hp>0)for(const f in k.foe){if(f==='stun'&&B.kind==='boss'&&Math.random()<.5){ps.push('暈眩被抵抗');continue}B.st[f]=k.foe[f];if(f==='stun')B.frozen=k.mark==='凍'?1:0;ps.push(`敵人陷入${f==='stun'&&k.mark==='凍'?'冰凍':FOE[f]}`)}
@@ -2560,8 +2564,9 @@ function pAct(type,arg){if(!B||B.busy)return;const s=stats();
   if(B.hp<=0){setTimeout(win,type==='skill'?1900:1200);return}
   setTimeout(foeTurn,type==='skill'?1750:850)}
 const isDng=k=>!!k&&!!k.pow&&((k.pow||0)>=1.6||(k.h||1)>=3);
+const ELI={fire:'🔥火',ice:'❄冰',thunder:'⚡雷',dark:'🌑暗',holy:'✨聖',poison:'☠毒',phys:'⚔物理'};
 function intentHtml(){if(!B||B.hp<=0)return '';if(B.chg)return `<div class="intent dng">⚠ 下回合：毀滅一擊　<small>防禦減傷 75%</small></div>`;if(B.kind==='boss'&&!B.big&&B.turn>=3&&B.turn%4===3&&!(B.st.stun>0))return `<div class="intent dng">⚠ 下回合：開始蓄力</div>`;if(!('next' in B))return '';const k=B.next&&SKM[B.next];
-  if(!k)return `<div class="intent">⚔ 下回合：普通攻擊</div>`;if(!k.pow){if(k.heal){const pc=Math.round(k.heal*Math.pow(.6,B.hN||0)*(B.st.burn>0?.5:1)*100);return `<div class="intent buff">✚ 下回合：【${k.n}】　<small>回復約 ${pc}%${B.st.burn>0?'（灼燒壓制中）':'・灼燒可減半'}</small></div>`}return `<div class="intent buff">✚ 下回合：【${k.n}】</div>`}return isDng(k)?`<div class="intent dng">⚠ 下回合：【${k.n}】　<small>防禦減傷 75%＋破綻</small></div>`:`<div class="intent sk">✦ 下回合：【${k.n}】</div>`}
+  if(!k)return `<div class="intent">⚔ 下回合：普通攻擊</div>`;if(!k.pow){if(k.heal){const pc=Math.round(k.heal*Math.pow(.6,B.hN||0)*(B.st.burn>0?.5:1)*100);return `<div class="intent buff">✚ 下回合：【${k.n}】　<small>回復約 ${pc}%${B.st.burn>0?'（灼燒壓制中）':'・灼燒可減半'}</small></div>`}return `<div class="intent buff">✚ 下回合：【${k.n}】</div>`}const me=MOBEL(k),st=stats(),rv=me?mobRes(k,st):0,et=me?`<small class="elt el-${me}">${ELI[me]}${rv?`・抗 ${rv}%`:'・無抗性'}</small>`:'';return isDng(k)?`<div class="intent dng">⚠ 下回合：【${k.n}】${et}　<small>防禦減傷 75%＋破綻</small></div>`:`<div class="intent sk">✦ 下回合：【${k.n}】${et}</div>`}
 function foePick(){const ks=(B.m.sk||[]).filter(id=>{const k=SKM[id];return !(k.heal&&(B.hp>B.max*.55||B.hcd>B.turn))&&!(k.self&&B.fb.some(b=>b.id===id))&&!(k.shield&&B.fshield>0)});
   const ch=B.kind==='boss'?.5:(B.kind==='elite'||B.mut||B.nm)?.42:.3;return ks.length&&Math.random()<ch?pick(ks):null}
 function foeTurn(){if(!B)return;if(B.treasure&&B.turn>=3&&B.hp>0){B=null;RUN.view={type:'res',title:'寶藏魔物逃走了',text:'牠抱著閃亮的寶物，一溜煙鑽進草叢裡不見了……下次要更快打倒牠！'};render();return}if(MODAL&&MODAL.k==='foe'){setTimeout(foeTurn,300);return}B.tk=0;const s=stats();
