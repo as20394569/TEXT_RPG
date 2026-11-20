@@ -1651,7 +1651,7 @@ const CAMP=[
   {ch:4,l:[['露娜','{name}。不管明天怎樣——'],['露娜','謝謝{你|妳}，那天在草原答應跟我搭檔。'],['{name}','說得好像要告別一樣。'],['露娜','才、才不是！……只是想說而已。']]}];
 const SOLO=['（篝火劈啪作響。四周好安靜。）','（明天，要往哪邊走呢。）','（把靴子脫下來晾一下……好臭。）','（星星好多。小時候，好像也這樣看過。）','（今天的戰鬥……下次可以打得更好。）'];
 function campTalk(){if(!S)return '';if(withLuna()){S.camp=S.camp||[];const pool=CAMP.map((c,i)=>[c,i]).filter(([c,i])=>S.main.ch>=c.ch&&!S.camp.includes(i));const it=pool.length?pool[0]:null;
-    if(!it){return `<div class="camp"><p><b>露娜</b>「……」</p><p class="sub">她靠著樹幹睡著了，手裡還握著提燈。</p></div>`}
+    if(!it){checkDaily();if(!S.daily.lchat){S.daily.lchat=1;bondGain(.3,'營火閒聊');const l=lunaOut();if(l)return `<div class="camp"><p><b>露娜</b>「${esc(l)}」</p><p class="sub">你們聊了一會兒，火光很暖。</p></div>`}return `<div class="camp"><p><b>露娜</b>「……」</p><p class="sub">她靠著樹幹睡著了，手裡還握著提燈。</p></div>`}
     S.camp.push(it[1]);S.bond=(S.bond||0)+.5;return `<div class="camp">${it[0].l.map(([w,t])=>w==='旁白'?`<p class="sub">${you(tx(t))}</p>`:`<p><b>${w==='{name}'?esc(S.name):w}</b>「${you(tx(t))}」</p>`).join('')}</div>`}
   return `<div class="camp"><p class="sub">${you(tx(pick(SOLO)))}</p></div>`}
 /* 岔路前的一句話 */
@@ -1850,7 +1850,7 @@ function vChar(){const s=stats(),sc=setCounts();
    <p class="sub">下一級還需 ${Math.max(0,need(S.lv)-S.exp)} EXP</p></div></div></div>
   <div class="panel"><h3>職業特色</h3><p class="sub">${CLS[S.cls].f}</p>${Object.keys(PASS).filter(id=>PASS[id].c===S.cls||PASS[id].c===S.adv).map(id=>`<span class="subl row ${hasP(id)?'':'sub'}" style="gap:6px"><span class="ico c4" style="width:30px;height:30px">${icon('pass_'+id,ic('skill'))}</span><span class="grow">被動【${PASS[id].n}】Lv.${PASS[id].lv}：${PASS[id].d}</span></span>`).join('')}${S.adv?`<p class="sub">${ADV[S.adv].n}：${ADV[S.adv].d}</p>`:''}</div>
   <div class="panel"><h3>屬性　<span class="tag ${S.pts?'red':'off'}">可用 ${S.pts} 點</span><button class="btn sm" style="float:right" data-a="respec">重置（${respecCost()} G）</button></h3>${Object.keys(ATTR).map(k=>`<div class="attr"><span>${ATTR[k]}<span class="sub">　${{STR:'物理攻擊',DEX:'迴避・爆擊・連擊',INT:'魔力・MP・技能省 MP',VIT:'HP・防禦・每回合回血',LUK:'爆擊・爆傷・掉寶・金幣'}[k]}</span></span><b>${S.attr[k]}${s.A[k]>S.attr[k]?`<small class="up">+${s.A[k]-S.attr[k]}</small>`:''}</b><button class="btn sm" data-a="addPt" data-v="${k}" ${S.pts?'':'disabled'}>＋</button></div>`).join('')}</div>
-  ${Object.keys(ALLY).some(k=>ALLY[k].open())?`<div class="panel"><h3>同行夥伴</h3><div class="party">${[...Object.keys(ALLY).filter(k=>ALLY[k].open()),'none'].map(k=>`<button class="btn ${(S.party||'none')===k?'on':''}" data-a="setParty" data-v="${k}">${k==='none'?'<b>獨自冒險</b><span class="sub">不帶夥伴</span>':`${art(ALLY[k].img,ALLY[k].n,'r11','mini')}<b>${ALLY[k].n}</b><span class="sub">${ALLY[k].role}</span>`}</button>`).join('')}</div><p class="sub">${S.party&&S.party!=='none'?ALLY[S.party].d+(S.party==='luna'?'　羈絆越深，露娜越強。':''):'不帶夥伴時，所有戰鬥都靠自己。'}</p>${S.party==='luna'?`<div class="gsec"><b>露娜・燈術士　羈絆 ${Math.floor(S.bond||0)}</b>${Object.values(LUNASK).map(k=>`<span class="sub ${k.ok()?'son':''}">${k.ok()?'◆':'◇'} 【${k.n}】${k.d}${k.ok()?'':`（解鎖：${k.need}）`}</span>`).join('')}</div>`:''}</div>`:''}
+  ${Object.keys(ALLY).some(k=>ALLY[k].open())?`<div class="panel"><h3>同行夥伴</h3><div class="party">${[...Object.keys(ALLY).filter(k=>ALLY[k].open()),'none'].map(k=>`<button class="btn ${(S.party||'none')===k?'on':''}" data-a="setParty" data-v="${k}">${k==='none'?'<b>獨自冒險</b><span class="sub">不帶夥伴</span>':`${art(ALLY[k].img,ALLY[k].n,'r11','mini')}<b>${ALLY[k].n}</b><span class="sub">${ALLY[k].role}</span>`}</button>`).join('')}</div><p class="sub">${S.party&&S.party!=='none'?ALLY[S.party].d+(S.party==='luna'?'　羈絆越深，露娜越強。':''):'不帶夥伴時，所有戰鬥都靠自己。'}</p>${S.party==='luna'?`<div class="gsec"><b>露娜・燈術士　羈絆 ${Math.floor(S.bond||0)}</b><span class="sub">下一級進度 ${Math.round(((S.bond||0)%1)*100)}%・今日已累積 ${(S.daily&&S.daily.bond||0).toFixed(2)}／1.5（一起冒險、打首領、營火閒聊）</span>${Object.values(LUNASK).map(k=>`<span class="sub ${k.ok()?'son':''}">${k.ok()?'◆':'◇'} 【${k.n}】${k.d}${k.ok()?'':`（解鎖：${k.need}）`}</span>`).join('')}</div>`:''}</div>`:''}
   <div class="panel"><h3>裝備</h3>${eq}<p class="sub" style="text-align:center">點部位查看裝備詳細資料</p>${setHtml}</div>
   <div class="panel"><h3>技能　<span class="tag ${S.sp?'red':'off'}">技能點 ${S.sp}</span></h3><div class="list">${sk}</div>${nxt?`<div class="chips">${nxt}</div>`:''}</div>`}
 function vBag(){
@@ -2306,7 +2306,9 @@ function applyOut(o,crit,fate){const unit=12+AREAS[RUN.area].base*6,s=stats(),g=
   if(o.loot){const x=rollGear(RUN.area,crit?2:1);g.push(gearName(x));RUN.loot.items.push(gearName(x))}
   if(o.exp){const v=Math.round(unit*o.exp*m);RUN.loot.exp+=v;g.push(`+${v} EXP`);gainExp(v)}
   return g}
-function finish(done){const l=RUN.loot,a=AREAS[RUN.area];let extra='';
+/* 露娜羈絆：一起冒險、打倒首領、每日聊天都能慢慢累積（每天上限 1.5） */
+function bondGain(v,why){if(!S||!withLuna())return;checkDaily();const used=S.daily.bond||0,g=Math.min(v,1.5-used);if(g<=0)return;const b0=Math.floor(S.bond||0);S.daily.bond=used+g;S.bond=Math.round(((S.bond||0)+g)*100)/100;if(Math.floor(S.bond)>b0)setTimeout(()=>toast(`與露娜的羈絆提升到 ${Math.floor(S.bond)}！（${why}）`),1200)}
+function finish(done){const l=RUN.loot,a=AREAS[RUN.area];let extra='';if(done&&!RUN.tower)bondGain(.25,'一起完成冒險');
   if(done){const bonus=Math.round((12+a.base*6)*2);S.gold+=bonus;track('run');extra=`<p>完成獎勵：${bonus} G</p>`}
   RUN=null;B=null;save();TAB='adv';render();
   openM('msg',{t:done?'冒險完成':'撤退回城',b:`<div class="panel"><h3>${a.n}　結算</h3><p>金幣 ${l.gold} G　／　經驗 ${l.exp} EXP</p>${l.items.length?`<p>戰利品：${l.items.join('、')}</p>`:''}${extra}</div><button class="btn pri big" data-a="closeM">確定</button>`})}
@@ -2465,6 +2467,8 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'10.3',d:'2026-11-21',t:'露娜羈絆',b:'修正露娜羈絆在營火對話看完後就無法再提升的問題：現在和露娜一起完成冒險、打倒首領、每天營火閒聊都會累積羈絆（每天上限 1.5）。'},
+  {v:'10.2',d:'2026-11-21',t:'自動戰鬥更積極',b:'自動戰鬥不再過度保守：只有對方大招真的會痛才防禦，反擊與護盾只在預告重擊時使用，增益只對耐打的精英與首領開，回血與喝藥改在血量三成以下（或下回合會被打很痛時）才做。'},
   {v:'10.1',d:'2026-11-21',t:'掉寶一鍵換上＋特級藥水',b:'①打贏後的戰利品卡片，若比身上那件強，會標出強多少，按「換上」直接裝備，不用再翻背包。②第五章起道具店賣「特級治療藥水」（回復 800 HP，240 G），自動戰鬥會依缺血量挑大瓶或小瓶喝。③騎士、遊俠、祭司、大魔導士、咒術師、神射手、刺客、主教的站姿立繪重畫上線。'},
   {v:'10.0',d:'2026-11-21',t:'全自動強化',b:'全自動回城時會自動整備：簽到、領每日、占卜、分配屬性點與技能點、換上更好的裝備、補足藥水；練到下一區等級會自動前往新地區。血量偏低時岔路會優先走營地、避開埋伏；金幣不夠休息但血量還夠時不再停止。'},
   {v:'9.9',d:'2026-11-21',t:'電腦版版面',b:'用電腦寬螢幕開啟時，遊戲畫面自動放大置中，左側顯示角色、裝備與今日任務，右側顯示排行榜、系統訊息與更新公告。'},
@@ -2747,7 +2751,7 @@ function foeTurn(){if(!B)return;if(B.treasure&&B.turn>=3&&B.hp>0){B=null;RUN.vie
 function myPd(k,s){s=s||stats();const x=k&&SK[k],st=x?x.dmg.s:'ATK',v=st==='BOTH'?s.ATK+s.MAG:s[st]||s.ATK,df=st==='MAG'?(B.mres??B.def):B.def;
   return clsDm()*v*(x?x.dmg.p*(x.dmg.h||1)*(1+.15*((S.skl[k]||1)-1)):S.cls==='swordsman'?1.15:1)*100/(100+df)*(1+buffSum('atk'))*(B.opening?1.5:1)*(x&&x.dmg.rend?Math.max(1,elMul(B.id,SKEL2[k]||'phys')):elMul(B.id,x?SKEL2[k]||'phys':'phys'))*.85}
 function autoAct(){if(!B||B.busy||!B.auto)return;if(MODAL&&MODAL.k==='foe')return;const s=stats(),sk=mySkills().filter(k=>S.mp>=mpCost(k)&&!(SK[k].ult&&B.ultUsed));
-  if(S.hp<s.HP*.4){const h=sk.find(k=>SK[k].heal);if(h)return pAct('skill',h);const lk=s.HP-S.hp,p=(lk>=600?['pot3','pot2','pot']:lk>=200?['pot2','pot3','pot']:['pot','pot2','pot3']).find(k=>S.items[k]);if(p)return pAct('item',p)}
+  {const nq=B.next&&SKM[B.next],iq=nq?(nq.mag?B.mag:B.atk)*(nq.pow||1)*(nq.h||1)*100/(100+s.DEF):B.atk*100/(100+s.DEF);const h=sk.find(k=>SK[k].heal);if(h&&(S.hp<s.HP*.45||iq>=S.hp*.8))return pAct('skill',h);if(S.hp<s.HP*.3||(S.hp<s.HP*.5&&iq>=S.hp*.8)){const lk=s.HP-S.hp,p=(lk>=600?['pot3','pot2','pot']:lk>=200?['pot2','pot3','pot']:['pot','pot2','pot3']).find(k=>S.items[k]);if(p)return pAct('item',p)}}
   const C=B.cls,est=k=>{const x=SK[k];return elMul(B.id,SKEL2[k]||'phys')*x.dmg.p*(x.dmg.h||1)*(1+(x.fin||0)*C.brk+(x.det||0)*C.marks.length+(x.aim||0)*C.focus+(x.faithAmp?Math.min(1,C.faith/100):0)+(x.faithSpend?C.faith/100*1.2:0))+dotV(x)};
   const dotV=x=>{if(!x.foe)return 0;const base=Math.max(1,x.dmg.s==='MAG'?s.MAG:s.ATK);let v=0;
     for(const [k,f] of [['poison',.05],['burn',.04]])if(x.foe[k]&&!(B.st[k]>0))v+=Math.min(B.hp*.6,B.max*f*(B.kind==='boss'?.5:1)*x.foe[k])/base;
@@ -2759,11 +2763,13 @@ function autoAct(){if(!B||B.busy||!B.auto)return;if(MODAL&&MODAL.k==='foe')retur
   /* 魔力見底：強敵還很硬、主力招放不出來時喝魔力藥水（缺得多才喝高級的） */
   if(S.mp<s.MP*.25&&(B.kind==='boss'||B.kind==='elite'||B.hp>pd(null)*4)&&mySkills().some(k=>SK[k].dmg&&!SK[k].ult&&mpCost(k)>S.mp)){const lack=s.MP-S.mp,e=lack>=110&&S.items.eth2?'eth2':S.items.eth?'eth':S.items.eth2?'eth2':null;if(e)return pAct('item',e)}
   const nk0=B.next&&SKM[B.next],inc=(nk0&&nk0.mag?B.mag:B.atk)*(nk0&&nk0.pow||1)*(nk0&&nk0.h||1)*100/(100+s.DEF),soft=solo&&!B.chg&&inc<S.hp*.15&&B.hp<=2.2*Math.max(pd(null),...sk.filter(k=>SK[k].dmg).map(pd));
-  if(B.chg||(B.next&&isDng(SKM[B.next])))return pAct('guard');
+  const best=Math.max(pd(null),...sk.filter(k=>SK[k].dmg).map(pd));
+  /* 危險招：真的會痛（三成血以上）或自己血不多才架；打不痛就照打 */
+  if(B.chg||(B.next&&isDng(SKM[B.next]))){if(inc>=S.hp*.3||S.hp<s.HP*.5||B.hp>best*3)return pAct('guard')}
   /* 看預告決定：對方下回合要出傷害招就先架刀；強敵開場先上增益 */
   const nk=B.next&&SKM[B.next],hit=nk?!!nk.pow:'next' in B;
-  if(!B.counter&&hit&&!soft){const g=sk.find(k=>(SK[k].counter||(SK[k].shield&&!(B.shield>0)))&&!SK[k].dmg);if(g&&(nk||Math.random()<.35))return pAct('skill',g)}
-  if(B.kind==='boss'||B.kind==='elite'||B.hp>s.ATK*6){const bf=sk.find(k=>SK[k].buff&&!SK[k].dmg&&!B.buffs.some(b=>b.id===k)&&S.mp>=mpCost(k)+8);if(bf&&S.hp>s.HP*.5)return pAct('skill',bf)}
+  if(!B.counter&&hit&&!soft&&inc>=S.hp*.2){const g=sk.find(k=>(SK[k].counter||(SK[k].shield&&!(B.shield>0)))&&!SK[k].dmg);if(g&&nk)return pAct('skill',g)}
+  if((B.kind==='boss'||B.kind==='elite')&&B.hp>best*3){const bf=sk.find(k=>SK[k].buff&&!SK[k].dmg&&!B.buffs.some(b=>b.id===k)&&S.mp>=mpCost(k)+8);if(bf&&S.hp>s.HP*.5)return pAct('skill',bf)}
   if(nk&&nk.heal&&!(B.st.burn>0)){const f=sk.find(k=>SK[k].dmg&&SK[k].foe&&SK[k].foe.burn);if(f)return pAct('skill',f)}
   const d=sk.filter(k=>SK[k].dmg).sort((a,b)=>est(b)-est(a))[0];
   d?pAct('skill',d):pAct('atk')}
@@ -2781,7 +2787,7 @@ function spoil(){const m=B.m,L=B.L,bs=B.kind==='boss',el=B.kind==='elite',T=B.to
   got.push(...liveDrop(bs));
   track('kill',B.id);S.st.kills++;if(S.dex)S.dex.m[B.id]=(S.dex.m[B.id]||0)+1;if(bs&&B.nm)S.st.nmboss=(S.st.nmboss||0)+1;
   if(bs&&!fld&&!RUN.trial&&!RUN.tower){S.cleared[RUN.area]=1;track('boss',B.id);sys(`${S.name} 討伐了首領【${m.n}】！`)}}
-function win(){if(!B||B.hp>0)return;spoil();try{talk('win')}catch(e){}{const s=stats();if(s.REAP&&S.hp>0){const h=Math.round(s.HP*s.REAP/100),m=Math.round(s.MP*s.REAP/100);S.hp=Math.min(s.HP,S.hp+h);S.mp=Math.min(s.MP,S.mp+m);B.rp=`【收割】回復 ${h} HP、${m} MP`;B.log.push(B.rp)}}
+function win(){if(!B||B.hp>0)return;spoil();if(B.kind==='boss')bondGain(.5,'並肩打倒首領');try{talk('win')}catch(e){}{const s=stats();if(s.REAP&&S.hp>0){const h=Math.round(s.HP*s.REAP/100),m=Math.round(s.MP*s.REAP/100);S.hp=Math.min(s.HP,S.hp+h);S.mp=Math.min(s.MP,S.mp+m);B.rp=`【收割】回復 ${h} HP、${m} MP`;B.log.push(B.rp)}}
   const nx=(B.adds||[]).findIndex(f=>f.hp>0);
   if(nx>=0){const dn=B.name;swapFoe(nx);B.adds=B.adds.filter(f=>f.hp>0);B.log.push(`${dn} 倒下了！${B.name} 衝了上來`);B.fx=null;B.busy=true;B.intro=true;render();setTimeout(foeTurn,900);return}
   SFX.win();const T=B.tot,bs=B.kind==='boss',bid=B.id;
