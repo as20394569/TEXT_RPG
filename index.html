@@ -1029,6 +1029,11 @@ if(P2){
     m_recalib:{n:'雷電護壁',shield:.2,self:{def:.4,t:3},fx:'aura',c:'#ffe45a',d:'護盾 20%，防禦 +40%'}});
   GEAR.u_storm={n:'氣象院的懷錶',slot:'ring',t:5,lv:30,price:16000,mp:90,crit:7,uq:{cd:30,stun:8,magp:10},ud:'爆擊傷害 +30%、攻擊時 8% 機率暈眩、魔力 +10%',uniq:1};
   BOSSU.weathergolem='u_storm';
+  Object.assign(GEAR,{
+    x_bandit:{n:'驛站盜賊的煙霧靴',slot:'feet',t:5,lv:26,price:10500,def:20,eva:7,uq:{eva:5,double:8},ud:'迴避 +5%，普攻 8% 機率追加一擊',uniq:1,mx:1},
+    x_deserter:{n:'舊駐軍的誓約胸甲',slot:'body',t:5,lv:27,price:11000,def:60,hp:360,uq:{guard:15,defp:8},ud:'受擊 15% 機率傷害減半，防禦 +8%',uniq:1,mx:1},
+    x_hawk:{n:'雷鷹尾羽墜',slot:'neck',t:5,lv:28,price:11500,hp:300,cd:25,uq:{stun:6,crit:4},ud:'攻擊時 6% 機率暈眩，爆擊率 +4%',uniq:1,mx:1}});
+  Object.assign(MDROP,{bandit:'x_bandit',deserter:'x_deserter',stormhawk:'x_hawk'});
   AREAS.push({id:'road',n:'灰石街道',lv:'26–30',base:26,d:'通往王都的古老石板路。二十年沒人走，盜賊和逃兵占了驛站。',mobs:['bandit','deserter','stormhawk'],boss:'weathergolem'});
   Object.assign(NPC,{'希瑟':'npc_heather','失控的氣象機兵':'mob_weathergolem','逃兵騎士':'mob_deserter'});
   CH[4].outro[CH[4].outro.length-1]=['旁白','【第一部「北方大道」完】幾天後，一封蓋著王家封蠟的信送到了公會。——第二部「霧之彼岸」開始。'];
@@ -1099,6 +1104,11 @@ if(P2&&P3){
     m_sentence:{n:'機密判決',mag:1,pow:2.4,hst:{stun:1},p:.3,fx:'beam',c:'#e8d27a',d:'宣讀判決的金色光柱，30% 機率暈眩'}});
   GEAR.u_archive={n:'封存司的鑰匙',slot:'neck',t:5,lv:33,price:18000,hp:420,cd:30,uq:{magp:10,atkp:10,mpcut:15},ud:'攻擊與魔力 +10%、技能 MP 消耗 -15%',uniq:1};
   BOSSU.archivist='u_archive';BGEM.archivist='gem_w';
+  Object.assign(GEAR,{
+    x_ink:{n:'書蠹墨晶戒',slot:'ring',t:5,lv:30,price:12500,mp:90,crit:6,uq:{magp:8,mpreg:3},ud:'魔力 +8%，每回合回復 3 MP',uniq:1,mx:1},
+    x_tide:{n:'積水妖的淚滴',slot:'neck',t:5,lv:31,price:13000,hp:360,cd:25,uq:{regen:3,eva:4},ud:'每回合回復 3% HP，迴避 +4%',uniq:1,mx:1},
+    x_rust:{n:'鏽蝕守衛的舊盔',slot:'head',t:5,lv:32,price:13500,def:40,hp:300,uq:{thorn:15,defp:10},ud:'被擊中時反彈 15% 傷害，防禦 +10%',uniq:1,mx:1}});
+  Object.assign(MDROP,{bookworm:'x_ink',waterwraith:'x_tide',rustguard:'x_rust'});
   AREAS.push({id:'archive',n:'王都地下書庫',lv:'30–33',base:30,d:'大教堂底下的舊書庫。地下水滲進來，三百年的紀錄泡在黑水裡。',mobs:['bookworm','waterwraith','rustguard'],boss:'archivist'});
   Object.assign(NPC,{'檔案守門人':'mob_archivist','鏽蝕守衛':'mob_rustguard'});
   CH[5].outro[CH[5].outro.length-1]=['旁白','【第六章 完】'];
@@ -1910,7 +1920,7 @@ function runNext(){const n=RUN.step+1;if(RUN.nodes[n]==='boss'&&!RUN.gate&&RUN.s
   else if(t==='elite'||t==='ambush'){startBattle(pick(a.mobs),'elite',nAdds(1));if(B&&tg==='bounty'){B.gmul=2.5;B.log.push('💰 懸賞目標！金幣 ×2.5')}}
   else if(t==='boss'){const i=RUN.area;if(!RUN.nm&&S.main.acc&&S.main.ch===i&&!S.main.pre&&CH[i].pre){play(CH[i].pre,`story_ch${i+1}_pre`,a.n,()=>{S.main.pre=true;save();startBattle(a.boss,'boss');render()});return}startBattle(a.boss,'boss')}
   else if(t==='story'){const i=RUN.area;play(CH[i].mid,SKEY(i+1,'mid'),a.n,()=>{S.main.mid=true;if(RUN)RUN.view={type:'res',title:'旅途見聞',text:you('你把這件事記在心裡，繼續前進。')};save();render()});return}
-  else if(t==='event'){const seen=RUN.evSeen||(RUN.evSeen=[]),pool=EVENTS.filter(e=>!seen.includes(e.id)),ev=pick(pool.length?pool:EVENTS);seen.push(ev.id);RUN.view={type:'event',ev,phase:'ask',fate:tg==='fate'}}
+  else if(t==='event'){const seen=RUN.evSeen||(RUN.evSeen=[]),ar=AREAS[RUN.area].id,pool=EVENTS.filter(e=>!seen.includes(e.id)&&(!e.ar||e.ar===ar)),loc=pool.filter(e=>e.ar),ev=loc.length&&Math.random()<.5?pick(loc):pick(pool.length?pool:EVENTS.filter(e=>!e.ar));seen.push(ev.id);RUN.view={type:'event',ev,phase:'ask',fate:tg==='fate'}}
   else if(t==='shrine')RUN.view={type:'shrine'};
   else if(t==='merchant'){const u=12+a.base*6;RUN.view={type:'shop',items:[['pot',Math.round(ITEMS.pot.price*.7)],['pot2',Math.round(ITEMS.pot2.price*.7)],['eth',Math.round(ITEMS.eth.price*.7)],['box',u*12],['hunt',u*5]],bought:{}}}
   else if(t==='chest'&&tg==='rich'&&Math.random()<.3){toast('寶箱張開了大嘴——是寶箱怪！');startBattle(pick(a.mobs),'elite',0);if(B){B.hoard=1;B.gmul=2;B.name='寶箱怪・'+B.m.n;B.log.push('👑 寶箱怪！打倒牠，寶物就是你的')}}
@@ -1920,6 +1930,51 @@ function runNext(){const n=RUN.step+1;if(RUN.nodes[n]==='boss'&&!RUN.gate&&RUN.s
     const al=S.party&&S.party!=='none'&&ALLY[S.party]&&ALLY[S.party].open()?S.party:null,talk=al==='luna'?pick(['露娜望著營火：「媽媽做這盞燈的時候，說是為了讓人在霧裡找得到路。」','露娜把烤好的麵包分你一半：「別逞強。累了要說。」','露娜看著北方：「等霧散了，我想帶{你|妳}去看我們村子的麥田。」']):al==='gale'?pick(['蓋爾默默擦著那把短劍，劍柄上的名字被摸得發亮。','蓋爾：「騎士團守夜，第一個睡著的人要請全隊喝酒。……你別睡。」','蓋爾把披風丟給你：「山上的夜很冷。」']):'';
     RUN.view={type:'res',title:sp?'靈泉':'營火休息',text:sp?'清澈的泉水泛著微光。喝下一口，全身的疲憊一掃而空——HP 與 MP 全部回復！':'你找到一處安全的營地稍作休息，回復了 35% 的 HP 與 MP。'+campTalk()+(talk?`<br><span class="sub">${talk}</span>`:'')}}
   save();render();$('#main').scrollTop=0}
+
+/* 各地區專屬探索事件：ar＝地區 id；同地區優先出現 */
+EVENTS.push(
+  {id:'p_sheep',ar:'plain',n:'走散的羊群',t:'草原上幾隻羊咩咩叫著亂跑，脖子上的鈴鐺刻著「阿蕾家」。遠處有哥布林的笑聲。',o:[
+    {l:'把羊趕回牧場',a:'DEX',dc:10,ok:{t:'你繞了一大圈把羊趕齊。牧場的老爺爺塞給你一罐鮮奶和一些零錢。',gold:1.5,exp:1.5,item:['pot',2]},ng:{t:'羊群越跑越散，你被一頭公羊頂了一下。',hp:-.08,exp:.5}},
+    {l:'去嚇跑哥布林',a:'STR',dc:11,ok:{t:'哥布林丟下偷來的東西就跑。',gold:2,loot:1},ng:{t:'牠們人多，你只好撤退。',hp:-.12}}]},
+  {id:'p_windmill',ar:'plain',n:'不轉的風車',t:'山丘上的老風車停了很久，磨坊主人在底下嘆氣：「北邊的霧一來，風就怪怪的。」',o:[
+    {l:'爬上去修扇葉',a:'DEX',dc:12,ok:{t:'卡住的齒輪鬆開，風車又轉了起來。磨坊主人請你吃了一頓熱麵包。',exp:2,hp:.3},ng:{t:'你差點從扇葉上滑下來。',hp:-.1}},
+    {l:'檢查齒輪結構',a:'INT',dc:11,ok:{t:'你找到裂掉的軸承，教他怎麼換。他送你一塊磨得發亮的石頭。',exp:1.5,stone:1},ng:{t:'看不出問題在哪。',exp:.3}}]},
+  {id:'f_mark',ar:'forest',n:'會移動的路標',t:'你明明照著路標走，卻又回到同一棵枯樹前。樹皮上刻著一行字：「霧會讓路跟著走」。',o:[
+    {l:'沿著苔蘚的方向走',a:'INT',dc:12,ok:{t:'苔蘚都長在背霧的那一面。你找到出路，還撿到前人遺落的背包。',exp:2,loot:1},ng:{t:'你在林子裡繞到天黑。',hp:-.1,exp:.5}},
+    {l:'刻下自己的記號',a:'LUK',dc:11,ok:{t:'你的記號真的沒有被霧移動。後來的冒險者會感謝你的。',exp:1.5,gold:1},ng:{t:'記號隔天就不見了。',exp:.3}}]},
+  {id:'f_hunter',ar:'forest',n:'受困的獵人',t:'一名獵人被自己的捕獸夾夾住了腿，黑森狼的嚎叫聲越來越近。',o:[
+    {l:'撬開捕獸夾',a:'STR',dc:12,ok:{t:'夾子彈開。獵人把剛剝好的毛皮送給你。',gold:2.5,exp:1.5},ng:{t:'夾子太緊，你的手也被割傷。',hp:-.12,exp:.5}},
+    {l:'先引開狼群',a:'DEX',dc:13,ok:{t:'你把狼群引到溪邊甩掉。獵人脫困後分了你一包乾肉。',exp:2,item:['pot2',1]},ng:{t:'狼群緊追不放，你受了點傷才甩掉。',hp:-.18}}]},
+  {id:'m_cart',ar:'mine',n:'失控的礦車',t:'軌道上一台礦車轟隆隆衝下來，前面有個年輕礦工正彎腰撿東西。',o:[
+    {l:'衝過去推開他',a:'DEX',dc:12,ok:{t:'千鈞一髮。礦工嚇得說不出話，把剛挖到的礦石塞給你。',exp:2,stone:1},ng:{t:'你們一起滾到旁邊，膝蓋擦破了一大塊。',hp:-.12,exp:1}},
+    {l:'扳動轉轍器',a:'INT',dc:13,ok:{t:'礦車轉進廢棄的支線，撞進土堆停了。',exp:2.5,gold:1},ng:{t:'扳手卡住了，你只能大喊讓他躲開。',exp:.5}}]},
+  {id:'m_echo',ar:'mine',n:'礦坑深處的歌聲',t:'坑道深處傳來低低的歌聲，調子很老，像是很多人一起在哼。',o:[
+    {l:'循著歌聲找過去',a:'VIT',dc:12,ok:{t:'盡頭只有一面刻著壁畫的岩壁，歌聲在你靠近時停了。你在岩縫裡摸到一枚古錢。',gold:3,exp:1.5},ng:{t:'坑道越來越窄，你被落石擦傷。',hp:-.15}},
+    {l:'記下旋律',a:'INT',dc:11,ok:{t:'你把旋律哼給露娜聽，她說跟壁畫上的人嘴型一樣。',exp:2.5},ng:{t:'一轉身就忘了。',exp:.3}}]},
+  {id:'s_hut',ar:'snow',n:'雪中的避難小屋',t:'暴風雪裡出現一間半埋的小屋，門上掛著遠征隊的舊徽章。',o:[
+    {l:'生火過夜',a:'VIT',dc:11,ok:{t:'火光很暖。牆上刻著二十個名字，其中一個旁邊寫著「別等我」。',hp:.4,mp:.4,exp:1.5},ng:{t:'柴火太濕，你冷得一夜沒睡。',hp:-.1}},
+    {l:'翻找遠征隊的補給',a:'LUK',dc:12,ok:{t:'櫃子裡還有一箱封得好好的藥水。',item:['pot2',2],exp:1},ng:{t:'補給早就被雪狼翻光了。',exp:.3}}]},
+  {id:'s_crevasse',ar:'snow',n:'冰縫裡的呼救',t:'冰河裂縫底下傳來呼救聲，一名採冰人卡在冰架上。',o:[
+    {l:'垂繩下去救人',a:'STR',dc:13,ok:{t:'你把他拉了上來。他送你一塊從沒見過的透明冰晶。',exp:2.5,loot:1},ng:{t:'冰架崩了一角，你們都摔得不輕，好在人救上來了。',hp:-.18,exp:1}},
+    {l:'鑿出階梯讓他爬',a:'INT',dc:12,ok:{t:'你算好角度鑿出一排落腳點，他自己爬了上來。',exp:2,gold:1.5},ng:{t:'冰太硬，鑿不動。你只能去找人幫忙。',exp:.5}}]},
+  {id:'c_flag',ar:'castle',n:'城牆上的舊軍旗',t:'要塞城牆上插著一面破爛的王國軍旗，旗下壓著一封沒拆的信。',o:[
+    {l:'爬上城牆取信',a:'DEX',dc:13,ok:{t:'信是寫給家人的，落款二十年前。你決定帶回去交給公會。',exp:3,gold:1},ng:{t:'石磚鬆動，你差點跌下去。',hp:-.15}},
+    {l:'把旗子重新立好',safe:1,ok:{t:'你把旗子扶正，對著北方敬了一個禮。不知道為什麼，風好像停了一下。',exp:1.5}}]},
+  {id:'c_mirror',ar:'castle',n:'霧中的鏡子',t:'走廊盡頭立著一面鏡子，鏡子裡的你在你停下之後，還多走了一步。',o:[
+    {l:'打碎鏡子',a:'STR',dc:12,ok:{t:'鏡子碎開，後面藏著一個暗格。',loot:1,gold:2},ng:{t:'碎片劃傷了你，鏡中的影子在笑。',hp:-.15}},
+    {l:'盯著鏡子不動',a:'VIT',dc:13,ok:{t:'影子終於先移開了視線。你覺得自己好像贏了什麼。',exp:3,mp:.3},ng:{t:'你頭暈目眩，退了好幾步。',mp:-.2,hp:-.08}}]},
+  {id:'r_inn',ar:'road',n:'廢棄驛站的帳本',t:'二十年沒人住的驛站櫃台上，帳本還翻在最後一天。最後一筆是「遠征隊，二十人，房錢未付」。',o:[
+    {l:'仔細翻看帳本',a:'INT',dc:13,ok:{t:'夾頁裡有一張驛站老闆留下的藏寶地圖，你照著找到了地窖。',gold:3,loot:1},ng:{t:'紙頁一碰就碎。',exp:.5}},
+    {l:'替遠征隊付清房錢',safe:1,ok:{t:'你把幾枚金幣放在帳本上，寫下「已付」。這樣他們回來時，就有地方住了。',gold:-.5,exp:2}}]},
+  {id:'r_patrol',ar:'road',n:'王國巡邏隊的盤查',t:'一隊王國巡邏兵攔下你們：「北邊來的？把行李打開。」',o:[
+    {l:'亮出公會證明',a:'LUK',dc:12,ok:{t:'隊長看到「破霧者」三個字，態度一百八十度轉變，還送你們一程。',exp:2,item:['pot2',1]},ng:{t:'他們還是把行李翻得亂七八糟。',gold:-.6}},
+    {l:'跟隊長講道理',a:'INT',dc:13,ok:{t:'隊長被說服，還偷偷告訴你氣象院被封鎖的事。',exp:3},ng:{t:'對方根本不聽，盤查了一個時辰。',exp:.5}}]},
+  {id:'a_shelf',ar:'archive',n:'倒塌的書架',t:'一排書架倒在黑水裡，底下壓著一個還在發光的檔案盒。',o:[
+    {l:'抬起書架',a:'STR',dc:14,ok:{t:'盒子裡是一份沒被刮掉的名冊副本，還有一件陪葬的飾品。',exp:3,loot:1},ng:{t:'書架又滑回水裡，濺了你一身墨水。',hp:-.12}},
+    {l:'從縫隙伸手去撈',a:'DEX',dc:13,ok:{t:'你撈到盒子，裡面有幾枚古金幣。',gold:3.5},ng:{t:'被書蠹咬了一口。',hp:-.1}}]},
+  {id:'a_ink',ar:'archive',n:'自己寫字的羽毛筆',t:'一張桌子上，羽毛筆正在空白的紙上一筆一筆寫著一個名字，寫完就塗黑，再重寫一次。',o:[
+    {l:'握住羽毛筆',a:'VIT',dc:14,ok:{t:'筆在你手中停了。紙上留下一個名字，沒有被塗黑。你覺得肩膀輕了一點。',exp:3.5,mp:.4},ng:{t:'筆尖刺進你的手，墨水滲進傷口。',hp:-.15,mp:-.15}},
+    {l:'把那頁紙收起來',a:'LUK',dc:12,ok:{t:'紙背面寫著書庫暗門的位置。',gold:2,stone:1},ng:{t:'紙一碰就化成了黑水。',exp:.5}}]});
 function evPick(i){const v=RUN.view,o=v.ev.o[i];
   if(o.safe){v.phase='done';v.r=null;v.text=you(o.ok.t);v.gain=applyOut(o.ok,false);save();render();return}
   const d=R(1,20),mod=Math.floor(S.attr[o.a]/4),dc=o.dc+RUN.area*3,ok=d===20||(d!==1&&d+mod>=dc);
@@ -2098,6 +2153,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'7.7',d:'2026-11-20',t:'地區探索事件',b:'每張地圖新增兩個專屬探索事件，例如草原走散的羊群、礦坑深處的歌聲、雪山的遠征隊避難小屋、灰石街道的廢棄驛站帳本，跟該地區的故事有關。灰石街道的三種魔物也有了專屬掉落裝備。'},
   {v:'7.6',d:'2026-11-20',t:'裝備擴充',b:'裝備從 70 件增加到 116 件。8 個進階職業各有兩把專屬武器（Lv.20、Lv.26），附帶職業特色效果；頭、身、腳、戒指、項鍊每一階多一條路線，例如法冠、輕甲、重靴、力量戒、智者項鍊，同一階可以依職業和打法挑選。'},
   {v:'7.5',d:'2026-11-20',t:'美術全面翻新',b:'12 個職業男女全部動作圖與站姿依統一規格重繪：武器、服裝固定，比例與角度一致。10 種新魔物與 5 位區域領主換上正式立繪，魔物專屬裝備也有了專屬圖示。'},
   {v:'7.4',d:'2026-11-19',t:'區域領主',b:'每張地圖新增一位區域領主：巨角兔王、月牙狼王、白骨礦工頭、冰川巨人王、黑霧將軍。岔路上出現「👹 領主巢穴」時才會遇到，首領級強度，每位固定掉落一種寶石（黃玉、月石、紅玉、翠玉、藍玉），也有機會掉裝備。'},
