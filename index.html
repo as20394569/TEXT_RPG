@@ -78,6 +78,7 @@ h3{font-family:var(--display);font-size:16px;color:var(--navy)}
 .tag{display:inline-block;font-size:11px;padding:0 6px;border-radius:8px;background:var(--navy);color:var(--gold);white-space:nowrap}
 .tag.red{background:var(--hp);color:#fff}.tag.ok{background:var(--exp);color:#fff}.tag.off{background:#b9b2a2;color:#fff}
 .chips{display:flex;flex-wrap:wrap;gap:5px}.chip{font-size:11px;padding:1px 7px;border-radius:9px;background:var(--panel2);border:1px solid var(--line)}
+.dup{display:block;font-size:11px;font-weight:700;color:#1f8a4c}.drop .deq{flex:none;position:relative;z-index:2}.drop .deq.done{background:#cfc6b4;color:#5a5245;border-color:#cfc6b4}
 .drops{display:flex;flex-direction:column;gap:6px;margin:6px 0 8px}.drop{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;border:1px solid currentColor;background:rgba(255,255,255,.75);position:relative;overflow:hidden;animation:dropIn .5s cubic-bezier(.2,1.6,.4,1) both}.drop.d3{color:var(--r3);box-shadow:0 0 12px rgba(180,110,255,.45)}.drop.d4{color:var(--r4);box-shadow:0 0 16px rgba(255,200,60,.6)}.drop.shn{color:#1593b3;box-shadow:0 0 14px rgba(60,200,240,.6)}.drop.shn b{color:#1593b3}.drop .grow{display:flex;flex-direction:column}.drop .sub{color:var(--sub);font-size:.85em}.drop::after{content:'';position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.55) 50%,transparent 70%);transform:translateX(-120%);animation:dropShine 1.6s .4s ease-out 2}@keyframes dropIn{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}@keyframes dropShine{to{transform:translateX(120%)}}
 .c0{color:var(--r0)}.c1{color:var(--r1)}.c2{color:var(--r2)}.c3{color:var(--r3)}.c4{color:var(--r4)}
 .ico{flex:none;width:38px;height:38px;border-radius:8px;border:2px solid currentColor;background:#fff;font-family:var(--display);font-size:17px;display:grid;place-items:center}
@@ -601,6 +602,7 @@ const DIS=[[1,0],[3,0],[8,0],[20,1],[50,2]];
 const ITEMS={
   pot:{n:'治療藥水',d:'回復 80 HP',price:20,use:{hp:80}},
   pot2:{n:'高級治療藥水',d:'回復 300 HP',price:90,use:{hp:300}},
+  pot3:{n:'特級治療藥水',d:'回復 800 HP',price:240,use:{hp:800}},
   eth:{n:'魔力藥水',d:'回復 40 MP',price:30,use:{mp:40}},
   eth2:{n:'高級魔力藥水',d:'回復 150 MP',price:120,use:{mp:150}},
   stone:{n:'強化石',d:'鐵匠強化裝備的材料',price:120,mat:1},
@@ -1500,7 +1502,9 @@ function makeGear(tier,r,hard){const sl=pick(Object.keys(SLOTS)),alt=Math.random
 /* 閃耀裝備：多一條詞條、最高詞條 ×1.5 */
 let DROPS=[];
 function shine(g){g.sh=1;const ks=g.sub.map(x=>x.k),off=OFFK(),k=Object.keys(SUBS).filter(x=>!ks.includes(x)&&!off.includes(x)).sort(()=>Math.random()-.5)[0],t=GEAR[g.id].t;if(k)g.sub.push({k,v:Math.max(1,Math.round(SUBS[k](t)))});const top=g.sub.reduce((a,b)=>b.v/SUBS[b.k](t)>a.v/SUBS[a.k](t)?b:a);top.v=Math.round(top.v*1.5)}
-function dropFx(){if(!DROPS.length)return '';const h=DROPS.map(g=>`<div class="drop d${g.r}${g.sh?' shn':''}"><span class="ico c${g.r}">${gIco(g.id)}</span><span class="grow"><b class="c${g.r}">${gearName(g)}</b><span class="sub">${g.sh?'閃耀・多一條詞條、最強詞條 ×1.5':g.sp&&g.r<4?`稀有詞綴【${SPEC[g.sp].n}】${specD(g)}`:RAR[g.r].n+'裝備'}</span></span></div>`).join('');const best=Math.max(...DROPS.map(g=>g.r+(g.sh?1:0)));DROPS=[];setTimeout(()=>{try{SFX.holy(0);buzz([30,40,60])}catch(e){}},350);return `<div class="drops">${h}</div>`}
+/* 掉寶卡片：比身上強就標出來，按一下直接換上 */
+function dropUp(g){const b=GEAR[g.id];if(!b||(b.cls&&b.cls!==S.cls)||(b.adv&&b.adv!==S.adv)||S.lv<b.lv||sealed(g))return 0;const cur=gearBy(S.eq[b.slot]);if(!cur)return 100;const a=gearPower(g),c=gearPower(cur);return a>c?Math.max(1,Math.round((a-c)/Math.max(1,c)*100)):0}
+function dropFx(){if(!DROPS.length)return '';const h=DROPS.map(g=>{const up=dropUp(g);return `<div class="drop d${g.r}${g.sh?' shn':''}"><span class="ico c${g.r}">${gIco(g.id)}</span><span class="grow"><b class="c${g.r}">${gearName(g)}</b><span class="sub">${g.sh?'閃耀・多一條詞條、最強詞條 ×1.5':g.sp&&g.r<4?`稀有詞綴【${SPEC[g.sp].n}】${specD(g)}`:RAR[g.r].n+'裝備'}</span>${up?`<span class="dup">▲ 比身上的強 ${up}%</span>`:''}</span>${up?`<button class="btn sm pri deq" data-a="dropEq" data-v="${g.u}">換上</button>`:''}</div>`}).join('');const best=Math.max(...DROPS.map(g=>g.r+(g.sh?1:0)));DROPS=[];setTimeout(()=>{try{SFX.holy(0);buzz([30,40,60])}catch(e){}},350);return `<div class="drops">${h}</div>`}
 const rollGear=(tier,minR,bonus,hard)=>makeGear(tier,rollRar(minR||0,bonus),hard);
 function dismantle(g){const d=DIS[g.r][0]+g.p*2,st=DIS[g.r][1];addItem('dust',d);if(st)addItem('stone',st);for(const gm of g.sock||[])if(gm)addItem(gm,1);S.gear=S.gear.filter(x=>x.u!==g.u);return [d,st]}
 function gainExp(n){
@@ -1766,7 +1770,7 @@ function doPrep(k){if(!RUN||RUN.prep||!PREP[k])return;const a=AREAS[RUN.area],L=
   else if(k==='trap'){if(!S.items.pot){toast('沒有治療藥水');return}addItem('pot',-1)}
   else{S.hp=Math.min(s.HP,S.hp+Math.round(s.HP*.3));S.mp=Math.min(s.MP,S.mp+Math.round(s.MP*.3))}
   RUN.prep=k;toast(`${PREP[k].n}：準備完成`);save();render()}
-function bossGate(a){const m=MOBS[a.boss],L=m.lv+(RUN.nm?10:0),d=L-S.lv,st=stats(),hp=S.hp/st.HP,pot=(S.items.pot||0)+(S.items.pot2||0);
+function bossGate(a){const m=MOBS[a.boss],L=m.lv+(RUN.nm?10:0),d=L-S.lv,st=stats(),hp=S.hp/st.HP,pot=(S.items.pot||0)+(S.items.pot2||0)+(S.items.pot3||0);
   const [c,t]=d>=3?['var(--hp)','勝算很低']:d>=1?['var(--r4)','硬仗']:d>=-2?['var(--exp)','勢均力敵']:['var(--ok,#7fdc8a)','游刃有餘'];
   const warn=[hp<.5&&'HP 不到一半',S.mp<st.MP*.3&&'MP 見底',!pot&&'身上沒有藥水'].filter(Boolean);
   return `<div class="panel" style="border-color:${c}">${art('mob_'+a.boss,m.n,'r11')}<h3 style="color:${c}">★ 首領前哨：${m.n}　Lv ${L}</h3><p class="sub">你 Lv ${S.lv}・HP ${S.hp}/${st.HP}・MP ${S.mp}/${st.MP}・藥水 ${pot}　→　<b style="color:${c}">${t}</b></p>${warn.length?`<p class="sub" style="color:var(--hp)">⚠ ${warn.join('、')}</p>`:''}<p class="sub">${S.cleared[RUN.area]?'打過的首領，掉寶照樣豐厚。':'撤退不會失去戰利品；輸了會掉 10% 金幣。'}</p>${gatePrep(L)}<button class="btn pri big" data-a="bossGo">挑戰首領</button><button class="btn" data-a="retreat">撤退回城（保留戰利品）</button></div>`}
@@ -1931,7 +1935,7 @@ const MV={
       <button class="btn big" data-a="closeM">返回戰鬥</button>`}},
   msg:v=>v,news(){return vNews()},lshop(){return vLShop()},dex(){return vDex()},ach(){return vAch()},craft(){return vCraft()},
   shop(){const tier=Math.min(AREAS.length-1,S.main.ch);
-    const its=['pot','pot2','eth','eth2','stone'].filter(k=>tier>=2||!k.endsWith('2')).map(k=>`<div class="item"><span class="ico c0">${icon('item_'+k,ic(ITEMS[k].use?'potion':'mat'))}</span><span class="grow"><b>${ITEMS[k].n}</b><span class="sub">${ITEMS[k].d}・持有 ${S.items[k]||0}</span></span><button class="btn sm" data-a="buyItem" data-v="${k}" ${S.gold>=ITEMS[k].price?'':'disabled'}>${ITEMS[k].price} G</button></div>`).join('');
+    const its=['pot','pot2','pot3','eth','eth2','stone'].filter(k=>(tier>=2||!k.endsWith('2'))&&(tier>=4||k!=='pot3')).map(k=>`<div class="item"><span class="ico c0">${icon('item_'+k,ic(ITEMS[k].use?'potion':'mat'))}</span><span class="grow"><b>${ITEMS[k].n}</b><span class="sub">${ITEMS[k].d}・持有 ${S.items[k]||0}</span></span><button class="btn sm" data-a="buyItem" data-v="${k}" ${S.gold>=ITEMS[k].price?'':'disabled'}>${ITEMS[k].price} G</button></div>`).join('');
     const gs=[];for(let t=Math.max(0,tier-1);t<=tier;t++)for(const sl in SLOTS)gs.push(sl==='weapon'?`w_${S.cls}_${t}`:`${SLOTP[sl]}_${t}`);
     const gl=gs.reverse().map(id=>{const g=GEAR[id],f={u:0,id,r:0,p:0};return `<div class="item"><span class="ico c0">${gIco(id)}</span><span class="grow"><b>${g.n}</b><span class="sub">Lv.${g.lv}・${gearDesc(f)}</span></span><button class="btn sm" data-a="buyGear" data-v="${id}" ${S.gold>=g.price?'':'disabled'}>${g.price} G</button></div>`}).join('');
     return{t:'道具商店',b:npcSay('npc_miko','蜜可','歡迎光臨！主線每推進一章，我就會進新貨喔。')+`<h3>消耗品</h3><div class="list">${its}</div><h3>裝備</h3><p class="sub">商店只賣普通裝備。附加詞條、套裝與傳說詞綴要靠冒險掉落或召喚。</p><div class="list">${gl}</div>`}},
@@ -2461,6 +2465,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'10.1',d:'2026-11-21',t:'掉寶一鍵換上＋特級藥水',b:'①打贏後的戰利品卡片，若比身上那件強，會標出強多少，按「換上」直接裝備，不用再翻背包。②第五章起道具店賣「特級治療藥水」（回復 800 HP，240 G），自動戰鬥會依缺血量挑大瓶或小瓶喝。③騎士、遊俠、祭司、大魔導士、咒術師、神射手、刺客、主教的站姿立繪重畫上線。'},
   {v:'10.0',d:'2026-11-21',t:'全自動強化',b:'全自動回城時會自動整備：簽到、領每日、占卜、分配屬性點與技能點、換上更好的裝備、補足藥水；練到下一區等級會自動前往新地區。血量偏低時岔路會優先走營地、避開埋伏；金幣不夠休息但血量還夠時不再停止。'},
   {v:'9.9',d:'2026-11-21',t:'電腦版版面',b:'用電腦寬螢幕開啟時，遊戲畫面自動放大置中，左側顯示角色、裝備與今日任務，右側顯示排行榜、系統訊息與更新公告。'},
   {v:'9.8',d:'2026-11-20',t:'裝置轉移',b:'設定新增「裝置轉移」：舊裝置按「產生轉移碼」得到 6 碼，在新裝置輸入就能搬走進度，24 小時內有效、用一次就失效。原本的存檔碼也還能用。'},
@@ -2742,7 +2747,7 @@ function foeTurn(){if(!B)return;if(B.treasure&&B.turn>=3&&B.hp>0){B=null;RUN.vie
 function myPd(k,s){s=s||stats();const x=k&&SK[k],st=x?x.dmg.s:'ATK',v=st==='BOTH'?s.ATK+s.MAG:s[st]||s.ATK,df=st==='MAG'?(B.mres??B.def):B.def;
   return clsDm()*v*(x?x.dmg.p*(x.dmg.h||1)*(1+.15*((S.skl[k]||1)-1)):S.cls==='swordsman'?1.15:1)*100/(100+df)*(1+buffSum('atk'))*(B.opening?1.5:1)*(x&&x.dmg.rend?Math.max(1,elMul(B.id,SKEL2[k]||'phys')):elMul(B.id,x?SKEL2[k]||'phys':'phys'))*.85}
 function autoAct(){if(!B||B.busy||!B.auto)return;if(MODAL&&MODAL.k==='foe')return;const s=stats(),sk=mySkills().filter(k=>S.mp>=mpCost(k)&&!(SK[k].ult&&B.ultUsed));
-  if(S.hp<s.HP*.4){const h=sk.find(k=>SK[k].heal);if(h)return pAct('skill',h);const p=['pot2','pot'].find(k=>S.items[k]);if(p)return pAct('item',p)}
+  if(S.hp<s.HP*.4){const h=sk.find(k=>SK[k].heal);if(h)return pAct('skill',h);const lk=s.HP-S.hp,p=(lk>=600?['pot3','pot2','pot']:lk>=200?['pot2','pot3','pot']:['pot','pot2','pot3']).find(k=>S.items[k]);if(p)return pAct('item',p)}
   const C=B.cls,est=k=>{const x=SK[k];return elMul(B.id,SKEL2[k]||'phys')*x.dmg.p*(x.dmg.h||1)*(1+(x.fin||0)*C.brk+(x.det||0)*C.marks.length+(x.aim||0)*C.focus+(x.faithAmp?Math.min(1,C.faith/100):0)+(x.faithSpend?C.faith/100*1.2:0))+dotV(x)};
   const dotV=x=>{if(!x.foe)return 0;const base=Math.max(1,x.dmg.s==='MAG'?s.MAG:s.ATK);let v=0;
     for(const [k,f] of [['poison',.05],['burn',.04]])if(x.foe[k]&&!(B.st[k]>0))v+=Math.min(B.hp*.6,B.max*f*(B.kind==='boss'?.5:1)*x.foe[k])/base;
@@ -3447,6 +3452,7 @@ const ACT={
   useItem(k){if(RUN&&B)return;const it=ITEMS[k],s=stats();if(it.use.hp&&S.hp>=s.HP||it.use.mp&&S.mp>=s.MP){toast('已經是滿的');return}
     addItem(k,-1);if(it.use.hp)S.hp=Math.min(s.HP,S.hp+it.use.hp);if(it.use.mp)S.mp=Math.min(s.MP,S.mp+it.use.mp);save();render()},
   sellItem(k){addItem(k,-1);S.gold+=sellPrice(k);save();render()},
+  dropEq(u,el){const g=gearBy(+u);if(!g||!dropUp(g))return;S.eq[GEAR[g.id].slot]=g.u;const s=stats();S.hp=Math.min(S.hp,s.HP);S.mp=Math.min(S.mp,s.MP);toast(`裝備了 ${gearName(g)}`);if(RUN&&RUN.view){const fix=x=>x&&x.replace(new RegExp(`<span class="dup">[^<]*</span></span><button[^>]*data-v="${g.u}">換上</button>`),'</span><button class="btn sm deq done" disabled>已換上</button>');RUN.view.drop=fix(RUN.view.drop);RUN.view.boxR=fix(RUN.view.boxR)}save();if(el){el.textContent='已換上';el.disabled=true;el.classList.add('done');const d=el.closest('.drop');if(d){const x=d.querySelector('.dup');if(x)x.remove()}}},
   equip(u){const g=gearBy(+u);S.eq[GEAR[g.id].slot]=g.u;toast(`裝備了 ${gearName(g)}`);save();closeM();render()},
   unequip(sl){S.eq[sl]=null;save();closeM();render()},
   sellAll(v){const mx=+v||1,eqd=Object.values(S.eq),L=S.gear.filter(g=>g.r<=mx&&!g.lock&&!eqd.includes(g.u)&&!g.sh&&!g.sp);if(!L.length){toast('沒有可販售的裝備');return}const sum=L.reduce((a,g)=>a+gearSell(g),0);if(!confirm(`販售 ${L.length} 件${mx>=2?'稀有以下':'普通、精良'}裝備，共 ${sum} G？（閃耀與稀有詞綴裝備會保留）`))return;const ids=new Set(L.map(g=>g.u));S.gear=S.gear.filter(g=>!ids.has(g.u));S.gold+=sum;toast(`販售 ${L.length} 件，獲得 ${sum} G`);save();render()},
@@ -3537,7 +3543,7 @@ function faTick(){faDraw();if(!FA||!S||FA.busy)return;if(FA.hold&&Date.now()-FA.
   if(MODAL){if(B&&MODAL.k==='foe')return;if(B&&MODAL.k!=='msg'){closeM();return}faClick('#modal .sheet-b [data-a="closeM"].pri')||faClick('#modal .x');return}
   if(B){if(!B.auto){B.auto=AUTO=true;render();setTimeout(autoAct,200)}return}
   if(RUN){if(TAB!=='adv'){TAB='adv';render();return}
-    if(RUN.view&&RUN.view.type==='gate'){const L=MOBS[AREAS[RUN.area].boss].lv+(RUN.nm?10:0),st=stats();if((!S.cleared[RUN.area]&&S.lv<L-1)||(S.hp<st.HP*.35&&!S.items.pot&&!S.items.pot2)){toast('全自動：首領太強，先撤退練功');faClick('#main [data-a="retreat"]')}else{if(!RUN.prep){if(S.hp<st.HP*.6)doPrep('camp');else if(S.gold>=prepCost(L)*3)doPrep('scout');else if((S.items.pot||0)>2)doPrep('trap')}faClick('#main [data-a="bossGo"]')}return}
+    if(RUN.view&&RUN.view.type==='gate'){const L=MOBS[AREAS[RUN.area].boss].lv+(RUN.nm?10:0),st=stats();if((!S.cleared[RUN.area]&&S.lv<L-1)||(S.hp<st.HP*.35&&!S.items.pot&&!S.items.pot2&&!S.items.pot3)){toast('全自動：首領太強，先撤退練功');faClick('#main [data-a="retreat"]')}else{if(!RUN.prep){if(S.hp<st.HP*.6)doPrep('camp');else if(S.gold>=prepCost(L)*3)doPrep('scout');else if((S.items.pot||0)>2)doPrep('trap')}faClick('#main [data-a="bossGo"]')}return}
     faClick('#main [data-a="bossBox"]',1)||(document.querySelector('#main [data-a="pickFork"]')&&(faSmartFork()||faDice('#main [data-a="pickFork"]','岔路')))||(document.querySelector('#main [data-a="evPick"]')&&faDice('#main [data-a="evPick"]','事件抉擇'))||faClick('#main [data-a="evFight"]')||faClick('#main [data-a="bless"]',1)||faClick('#main [data-a="runNext"]')||faClick('#main [data-a="towerNext"]')||faClick('#main [data-a="finish"]');return}
   /* 回城：休息後重新出發同一地區 */
   if(FA.tower){faStop('高塔挑戰結束');return}
@@ -3555,7 +3561,7 @@ function faTown(){const msgs=[];try{checkDaily();
     for(const g of S.gear){const b=GEAR[g.id];if(!b||b.slot!==sl||g===cur)continue;if((b.cls&&b.cls!==S.cls)||(b.adv&&b.adv!==S.adv)||S.lv<b.lv||sealed(g))continue;const p=gearPower(g);if(p>bp*1.02){bp=p;best=g}}
     if(best&&best!==cur){S.eq[sl]=best.u;ch++}}if(ch)msgs.push(`換上 ${ch} 件裝備`);
   const tier=TLV.reduce((a,v,i)=>v<=S.lv?i:a,0),hp=tier>=2?'pot2':'pot',mp=tier>=2?'eth2':'eth',keep=S.lv*4*3;let bought=0;
-  for(const [k,want] of [[hp,6],[mp,3]])while((S.items[k]||0)<want&&ITEMS[k]&&S.gold-ITEMS[k].price>=keep){S.gold-=ITEMS[k].price;addItem(k,1);bought++}
+  for(const [k,want] of [[hp,6],[mp,3],...(S.main.ch>=4?[['pot3',2]]:[])])while((S.items[k]||0)<want&&ITEMS[k]&&S.gold-ITEMS[k].price>=keep){S.gold-=ITEMS[k].price;addItem(k,1);bought++}
   if(bought)msgs.push(`補了 ${bought} 瓶藥`);
   const top=AREAS.reduce((a,A,i)=>S.main.ch>=i&&A.base<=S.lv?i:a,0);if(!FA.nm&&!FA.tower&&top>FA.area&&S.cleared[FA.area]){FA.area=top;msgs.push('前往'+AREAS[top].n)}
   save()}catch(e){}if(msgs.length)toast('全自動整備：'+msgs.join('、'))}
