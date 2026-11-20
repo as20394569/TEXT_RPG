@@ -189,6 +189,16 @@ input,textarea{font:inherit;width:100%;padding:8px 10px;border:2px solid var(--l
 .char-top{display:grid;grid-template-columns:38% 1fr;gap:10px}
 .stat-g{display:grid;grid-template-columns:1fr 1fr;gap:3px 10px;font-size:13px;font-variant-numeric:tabular-nums}
 .stat-g div{display:flex;justify-content:space-between;border-bottom:1px dotted #d8c79b}
+.enhfx{position:absolute;inset:0;z-index:60;background:rgba(10,14,30,.72);display:flex;align-items:center;justify-content:center;animation:efIn .2s}.enhfx.out{opacity:0;transition:opacity .3s}@keyframes efIn{from{opacity:0}}
+.ef-box{position:relative;width:240px;padding:18px 14px;border-radius:14px;background:linear-gradient(#2b3560,#1a2142);border:2px solid var(--gold);color:#fff;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;transition:box-shadow .3s}
+.ef-ico{width:64px;height:64px;font-size:30px;border-radius:12px;background:#fff;border:3px solid currentColor;display:grid;place-items:center}
+.ef-n{font-family:var(--display);font-size:16px;color:var(--gold)}.ef-r{font-size:12px;color:#cfd6ff}
+.ef-h{position:absolute;right:22px;top:20px;font-size:30px;transform-origin:80% 80%}.ef-h.hit{animation:efH .35s}@keyframes efH{0%{transform:rotate(-50deg)}60%{transform:rotate(15deg)}100%{transform:rotate(0)}}
+.ef-box.glow1{box-shadow:0 0 14px #ffe27a}.ef-box.glow2{box-shadow:0 0 26px #ffe27a}.ef-box.glow3{box-shadow:0 0 40px #fff3a0,0 0 70px #ffb04a}
+.ef-res{min-height:40px;font-family:var(--display);font-size:20px;font-weight:900;display:flex;flex-direction:column;align-items:center}.ef-res small{font-family:var(--body);font-size:11px;font-weight:400;color:#cfd6ff;margin-top:2px}
+.ef-box.ok .ef-res{color:#ffe45a;text-shadow:0 0 12px #ff9a2a;animation:efP .5s}.ef-box.great{animation:efG 1s}.ef-box.great .ef-res{color:#fff;font-size:26px;text-shadow:0 0 12px #ff5ad0,0 0 24px #ffd700;animation:efP .6s}
+.ef-box.ng{filter:saturate(.4);animation:quake .4s}.ef-box.ng .ef-res{color:#ff8a8a}
+@keyframes efP{0%{transform:scale(2.2);opacity:0}60%{transform:scale(.9);opacity:1}100%{transform:scale(1)}}@keyframes efG{0%,100%{box-shadow:0 0 40px #ffd700}50%{box-shadow:0 0 90px #ff5ad0,0 0 140px #ffd700}}
 .stat-g .main{font-weight:700;color:#7a3fc0}.stat-g .main b{font-size:15px}
 .attr{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;font-variant-numeric:tabular-nums}
 .step{display:flex;gap:6px;align-items:baseline}.step i{font-style:normal;color:var(--sub)}.step.done{color:var(--exp)}
@@ -1851,7 +1861,14 @@ function drawModal(){setTimeout(()=>{try{tipCheck()}catch(e){}},60);const el=$('
 const npcSay=(key,who,line)=>`<div class="row"><div style="width:64px;flex:none">${art(key,who,'r34')}</div><p class="grow"><b>${who}</b><br>${you(tx(greet(who,line)))}</p></div>`;
 const enhCost=g=>Math.round(40*(g.p+1)*(GEAR[g.id].t+1)*(1+g.p*.1));
 const enhStone=g=>g.p<5?1:g.p<10?2:g.p<13?3:4;
-const enhRate=g=>g.p<3?100:g.p<5?85:g.p<7?65:g.p<10?45:g.p<12?30:20;
+/* 強化演出：鐵鎚敲三下、蓄光、結果爆開 */
+function enhFx(g,p0,rate,cls,msg){const app=$('#app'),o=document.createElement('div');o.className='enhfx';
+  o.innerHTML=`<div class="ef-box"><div class="ico ef-ico c${g.r}">${gIco(g.id)}</div><div class="ef-n">${esc(GEAR[g.id].n)} +${p0}</div><div class="ef-r">成功率 ${rate}%</div><div class="ef-h">🔨</div><div class="ef-res"></div></div>`;app.appendChild(o);
+  const h=o.querySelector('.ef-h'),bx=o.querySelector('.ef-box'),rs=o.querySelector('.ef-res');let n=0;
+  const hit=()=>{n++;h.classList.remove('hit');void h.offsetWidth;h.classList.add('hit');try{SFX.slash(.4,1)}catch(e){}bx.classList.add('glow'+n);if(n<3)setTimeout(hit,n===2?650:420);else setTimeout(done,700)};
+  const done=()=>{bx.classList.add(cls);rs.innerHTML=msg;try{cls==='ng'?SFX.hurt():(SFX.holy(0),buzz([30,40,80]))}catch(e){}setTimeout(()=>{o.classList.add('out');setTimeout(()=>{o.remove();render()},300)},cls==='great'?2200:1500)};
+  setTimeout(hit,250);o.onclick=()=>{if(bx.classList.contains(cls)){o.remove();render()}}}
+const enhRate=g=>Math.min(100,(g.p<3?100:g.p<5?85:g.p<7?65:g.p<10?45:g.p<12?30:20)+(g.fs||0)*5);
 const canEnh=g=>!!g&&g.p<15&&S.gold>=enhCost(g)&&(S.items.stone||0)>=enhStone(g);
 const reforgeCost=g=>({d:10*(GEAR[g.id].t+1),g:100*(GEAR[g.id].t+1)});
 const canReforge=g=>!!g&&g.r>0&&(S.items.dust||0)>=reforgeCost(g).d&&S.gold>=reforgeCost(g).g;
@@ -1920,7 +1937,7 @@ const MV={
      ${set?`<div class="gsec"><b>${set.n}套裝（已裝備 ${sc} 件）</b><span class="sub ${sc>=2?'son':''}">2 件：${set.d2}</span><span class="sub ${sc>=4?'son':''}">4 件：${set.d4}</span></div>`:''}
      ${!on&&cur?`<p class="sub">目前裝備：<b class="c${cur.r}">${gearName(cur)}</b>（評分 ${gearPower(cur)}）</p>`:''}
      ${on?`<button class="btn big" data-a="unequip" data-v="${b.slot}">卸下</button>`:`<button class="btn pri big" data-a="equip" data-v="${u}" ${can?'':'disabled'}>${can?'裝備':'等級或職業不符'}</button>`}
-     <div class="row wrap"><button class="btn grow" data-a="enh" data-v="${u}" ${canEnh(g)?'':'disabled'}>${g.p>=15?'已滿強化':`強化 ${enhRate(g)}%`}</button><button class="btn grow" data-a="reforge" data-v="${u}" ${canReforge(g)?'':'disabled'}>洗練</button><button class="btn grow" data-a="lock" data-v="${u}">${g.lock?'解鎖':'鎖定'}</button></div>
+     <div class="row wrap"><button class="btn grow" data-a="enh" data-v="${u}" ${canEnh(g)?'':'disabled'}>${g.p>=15?'已滿強化':`強化 ${enhRate(g)}%${g.fs?`（累積 +${g.fs*5}%）`:''}`}</button><button class="btn grow" data-a="reforge" data-v="${u}" ${canReforge(g)?'':'disabled'}>洗練</button><button class="btn grow" data-a="lock" data-v="${u}">${g.lock?'解鎖':'鎖定'}</button></div>
      <p class="sub">強化：${g.p>=15?'已達上限':`${enhCost(g)} G＋強化石×${enhStone(g)}（持有 ${S.items.stone||0}）${g.p>=10?'，失敗會降 1 級':''}`}<br>洗練：${g.r?`星塵×${rf.d}（持有 ${S.items.dust||0}）＋${rf.g} G，重新隨機附加詞條`:'普通裝備沒有詞條'}</p>
      ${on||g.lock?'':`<div class="row"><button class="btn grow" data-a="dis" data-v="${u}">分解：星塵×${dz[0]+g.p*2}${dz[1]?`、強化石×${dz[1]}`:''}</button><button class="btn grow" data-a="sellGear" data-v="${u}">出售 ${gearSell(g)} G</button></div>`}`}},
   settings(){return{t:'設定',b:`<div class="panel"><h3>存檔</h3><p class="sub">進度會自動存在這台裝置的瀏覽器。換裝置或清除瀏覽資料前，請先複製存檔碼。</p><button class="btn" data-a="exportSave">產生存檔碼</button><textarea id="saveTxt" class="mono" rows="3" placeholder="存檔碼會顯示在這裡，也可以貼上存檔碼後按「讀取」"></textarea><button class="btn" data-a="importSave">讀取存檔碼</button></div>
@@ -2354,6 +2371,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'9.3',d:'2026-11-20',t:'強化改版',b:'強化加入鐵鎚演出；6% 機率「大成功」直接 +2；失敗會累積，每次失敗下次成功率 +5%，成功後歸零。+7 以上失敗仍會降一級。'},
   {v:'9.2',d:'2026-11-20',t:'攻防與屬性改版',b:'①魔物防禦與魔抗隨等級成長，破甲、穿透與物理／魔法的選擇更重要。②主角新增「魔抗」，布甲、輕甲、項鍊、戒指提供，重甲防禦高但魔抗低。③新增火、冰、雷、暗抗性，魔物屬性招式會被抗性減傷，森林／火山／雪地／雷擊套裝附帶對應抗性，詞條也會出現。④屬性連鎖：冰凍時火攻「碎冰」、灼燒時冰攻「蒸發」、雷打冰凍「導電」、雷打中毒「毒爆」、聖打虛弱「淨化」、暗打流血「血蝕」，傷害提高。'},
   {v:'9.1',d:'2026-11-20',t:'立繪重繪',b:'12 個職業男女的站姿立繪全部重新繪製，手部改為自然放鬆或握住武器。'},
   {v:'9.0',d:'2026-11-20',t:'異常狀態特效',b:'中毒、灼燒、流血、虛弱、再生、暈眩、冰凍都改成發光質感：腳下有脈動光圈，加上毒霧、煙、冰霧、光粒等層次。'},
@@ -3325,9 +3343,11 @@ const ACT={
   sellGear(u){const g=gearBy(+u);S.gold+=gearSell(g);S.gear=S.gear.filter(x=>x.u!==g.u);toast(`出售獲得 ${gearSell(g)} G`);save();closeM();render()},
   buyItem(k){if(S.gold<ITEMS[k].price)return;S.gold-=ITEMS[k].price;addItem(k,1);save();render()},
   buyGear(id){if(S.gold<GEAR[id].price)return;S.gold-=GEAR[id].price;addGear(id,0);toast(`購買了 ${GEAR[id].n}，已放入背包`);save();render()},
-  enh(u){const g=gearBy(+u);if(!canEnh(g))return;S.gold-=enhCost(g);addItem('stone',-enhStone(g));track('enh');
-    if(Math.random()*100<enhRate(g)){g.p++;SFX.buff();toast(`強化成功！${gearName(g)}`);if(g.p>=7)sys(`${S.name} 將【${gearName(g)}】強化成功！`)}
-    else if(g.p>=7){g.p--;SFX.hurt();toast(`強化失敗，降為 +${g.p}`)}else{SFX.miss();toast('強化失敗，材料消失了')}save();render()},
+  enh(u){const g=gearBy(+u);if(!canEnh(g)||document.querySelector('.enhfx'))return;S.gold-=enhCost(g);addItem('stone',-enhStone(g));track('enh');
+    const rate=enhRate(g),p0=g.p,ok=Math.random()*100<rate,great=ok&&g.p<12&&g.p+2<=15&&Math.random()<.06;let msg,cls;
+    if(ok){g.p+=great?2:1;g.fs=0;cls=great?'great':'ok';msg=great?`大成功！+${p0} → +${g.p}`:`成功！+${p0} → +${g.p}`;if(g.p>=7||great)sys(`${S.name} 將【${gearName(g)}】強化${great?'大成功':'成功'}！`)}
+    else{g.fs=(g.fs||0)+1;cls='ng';if(g.p>=7){g.p--;msg=`失敗…… 降為 +${g.p}`}else msg='失敗…… 材料消失了';msg+=`<small>失敗累積 ${g.fs} 次・下次成功率 +${g.fs*5}%</small>`}
+    save();enhFx(g,p0,rate,cls,msg)},
   sockIn(v){const [u,gm]=v.split('|'),g=gearBy(+u);if(!g||!(S.items[gm]>0)||!(g.sock||[]).length)return;let i=g.sock.indexOf(null);if(i<0)i=0;g.sock[i]=gm;addItem(gm,-1);SFX.buff();toast(`鑲入 ${ITEMS[gm].n}`);save();render()},
   lock(u){const g=gearBy(+u);if(!g)return;g.lock=!g.lock;save();render()},
   dis(u){const g=gearBy(+u);if(!g||g.lock||Object.values(S.eq).includes(g.u))return;const [d,st]=dismantle(g);toast(`分解獲得 星塵×${d}${st?`、強化石×${st}`:''}`);save();closeM();render()},
