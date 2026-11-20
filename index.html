@@ -2461,6 +2461,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'10.0',d:'2026-11-21',t:'全自動強化',b:'全自動回城時會自動整備：簽到、領每日、占卜、分配屬性點與技能點、換上更好的裝備、補足藥水；練到下一區等級會自動前往新地區。血量偏低時岔路會優先走營地、避開埋伏；金幣不夠休息但血量還夠時不再停止。'},
   {v:'9.9',d:'2026-11-21',t:'電腦版版面',b:'用電腦寬螢幕開啟時，遊戲畫面自動放大置中，左側顯示角色、裝備與今日任務，右側顯示排行榜、系統訊息與更新公告。'},
   {v:'9.8',d:'2026-11-20',t:'裝置轉移',b:'設定新增「裝置轉移」：舊裝置按「產生轉移碼」得到 6 碼，在新裝置輸入就能搬走進度，24 小時內有效、用一次就失效。原本的存檔碼也還能用。'},
   {v:'9.7',d:'2026-11-20',t:'用道具換結果的新事件',b:'①五張地圖各多一個事件：突來的雷雨、捕獸夾上的狐狸、失控的礦車、凍僵的信鴿、黑霧祭壇。②部分選項可以「消耗藥水」換穩定的報酬，身上沒有就不能選。③要花錢的選項會標出價格，錢不夠時不能選。④修正事件扣魔力時可能變成負數的問題。⑤劍士、法師待機與站姿立繪重畫（手部更自然）。'},
@@ -3515,6 +3516,10 @@ document.addEventListener('click',e=>{
 /* ============ 全自動：隨機路線、自動點擊 ============ */
 let FA=null;
 function faDraw(){const b=$('#fab');if(!b)return;b.hidden=!S||!(FA||(RUN&&TAB==='adv'));b.className=FA?'on':'';b.textContent=FA?'全自動 開':'全自動 關'}
+function faSmartFork(){if(!RUN||!RUN.view||RUN.view.type!=='fork')return false;const st=stats(),o=RUN.view.opts||[],low=S.hp<st.HP*.4||S.mp<st.MP*.15,i=o.findIndex(n=>n==='rest'||(n&&n.t==='rest'));
+  if(low&&i>=0){const b=document.querySelector(`#main [data-a="pickFork"][data-v="${i}"]`);if(b){toast('全自動：狀態不佳，走向營地');b.click();return true}}
+  if(S.hp<st.HP*.5&&o.some(n=>n==='ambush')){const j=o.findIndex(n=>n!=='ambush'&&n!=='battle');const b=j>=0&&document.querySelector(`#main [data-a="pickFork"][data-v="${j}"]`);if(b){toast('全自動：避開埋伏');b.click();return true}}
+  return false}
 function faStop(m){if(!FA)return;FA=null;if(B){B.auto=AUTO=false}faDraw();if(m)toast(m)}
 function faClick(sel,rnd){const bs=[...document.querySelectorAll(sel)].filter(b=>!b.disabled&&b.offsetParent!==null);if(!bs.length)return false;(rnd?pick(bs):bs[0]).click();return true}
 function faDice(sel,lab){const bs=[...document.querySelectorAll(sel)].filter(b=>!b.disabled&&b.offsetParent!==null);if(bs.length<2)return faClick(sel);FA.busy=1;
@@ -3533,15 +3538,31 @@ function faTick(){faDraw();if(!FA||!S||FA.busy)return;if(FA.hold&&Date.now()-FA.
   if(B){if(!B.auto){B.auto=AUTO=true;render();setTimeout(autoAct,200)}return}
   if(RUN){if(TAB!=='adv'){TAB='adv';render();return}
     if(RUN.view&&RUN.view.type==='gate'){const L=MOBS[AREAS[RUN.area].boss].lv+(RUN.nm?10:0),st=stats();if((!S.cleared[RUN.area]&&S.lv<L-1)||(S.hp<st.HP*.35&&!S.items.pot&&!S.items.pot2)){toast('全自動：首領太強，先撤退練功');faClick('#main [data-a="retreat"]')}else{if(!RUN.prep){if(S.hp<st.HP*.6)doPrep('camp');else if(S.gold>=prepCost(L)*3)doPrep('scout');else if((S.items.pot||0)>2)doPrep('trap')}faClick('#main [data-a="bossGo"]')}return}
-    faClick('#main [data-a="bossBox"]',1)||(document.querySelector('#main [data-a="pickFork"]')&&faDice('#main [data-a="pickFork"]','岔路'))||(document.querySelector('#main [data-a="evPick"]')&&faDice('#main [data-a="evPick"]','事件抉擇'))||faClick('#main [data-a="evFight"]')||faClick('#main [data-a="bless"]',1)||faClick('#main [data-a="runNext"]')||faClick('#main [data-a="towerNext"]')||faClick('#main [data-a="finish"]');return}
+    faClick('#main [data-a="bossBox"]',1)||(document.querySelector('#main [data-a="pickFork"]')&&(faSmartFork()||faDice('#main [data-a="pickFork"]','岔路')))||(document.querySelector('#main [data-a="evPick"]')&&faDice('#main [data-a="evPick"]','事件抉擇'))||faClick('#main [data-a="evFight"]')||faClick('#main [data-a="bless"]',1)||faClick('#main [data-a="runNext"]')||faClick('#main [data-a="towerNext"]')||faClick('#main [data-a="finish"]');return}
   /* 回城：休息後重新出發同一地區 */
-  const s=stats();if(S.hp<s.HP*.7||S.mp<s.MP*.5){const c=S.lv*4;if(S.gold<c){faStop('金幣不足以休息，全自動停止');return}ACT.rest();return}
   if(FA.tower){faStop('高塔挑戰結束');return}
-  TAB='adv';startRun(FA.area,FA.nm)}
+  if(!FA.towned){FA.towned=1;faTown();return}
+  const s=stats();if(S.hp<s.HP*.7||S.mp<s.MP*.5){const c=S.lv*4;if(S.gold>=c){ACT.rest();return}if(S.hp<s.HP*.4){faStop('金幣不足以休息，全自動停止');return}}
+  FA.towned=0;TAB='adv';startRun(FA.area,FA.nm)}
+/* 全自動回城整備：配點、技能、換裝、補藥、領每日、換地區 */
+function faTown(){const msgs=[];try{checkDaily();
+  if(!S.daily.sign){ACT.sign();msgs.push('簽到')}
+  for(const d of DAILY)if(!S.daily.got[d.k]&&(S.daily[d.k]||0)>=d.c){ACT.dailyGet(d.k);msgs.push('領每日')}
+  if(typeof fortune==='function'&&!fortune()&&S.main.ch>=1){ACT.fortune()}
+  if(S.pts>0){const main=CLS[S.cls].basic==='MAG'?'INT':CLS[S.cls].atk;let n=0;while(S.pts>0){S.pts--;S.attr[(n++%3===2)?'VIT':main]++}msgs.push('配點')}
+  if(S.sp>0){const ks=mySkills().filter(k=>(S.skl[k]||1)<5&&SK[k].dmg).sort((a,b)=>(S.skl[a]||1)-(S.skl[b]||1));const all=ks.length?ks:mySkills().filter(k=>(S.skl[k]||1)<5);let i=0;while(S.sp>0&&all.length){const k=all[i++%all.length];if((S.skl[k]||1)<5){S.sp--;S.skl[k]=(S.skl[k]||1)+1}else if(all.every(x=>(S.skl[x]||1)>=5))break}msgs.push('升技能')}
+  let ch=0;for(const sl in SLOTS){const cur=gearBy(S.eq[sl]);let best=cur,bp=cur?gearPower(cur):-1;
+    for(const g of S.gear){const b=GEAR[g.id];if(!b||b.slot!==sl||g===cur)continue;if((b.cls&&b.cls!==S.cls)||(b.adv&&b.adv!==S.adv)||S.lv<b.lv||sealed(g))continue;const p=gearPower(g);if(p>bp*1.02){bp=p;best=g}}
+    if(best&&best!==cur){S.eq[sl]=best.u;ch++}}if(ch)msgs.push(`換上 ${ch} 件裝備`);
+  const tier=TLV.reduce((a,v,i)=>v<=S.lv?i:a,0),hp=tier>=2?'pot2':'pot',mp=tier>=2?'eth2':'eth',keep=S.lv*4*3;let bought=0;
+  for(const [k,want] of [[hp,6],[mp,3]])while((S.items[k]||0)<want&&ITEMS[k]&&S.gold-ITEMS[k].price>=keep){S.gold-=ITEMS[k].price;addItem(k,1);bought++}
+  if(bought)msgs.push(`補了 ${bought} 瓶藥`);
+  const top=AREAS.reduce((a,A,i)=>S.main.ch>=i&&A.base<=S.lv?i:a,0);if(!FA.nm&&!FA.tower&&top>FA.area&&S.cleared[FA.area]){FA.area=top;msgs.push('前往'+AREAS[top].n)}
+  save()}catch(e){}if(msgs.length)toast('全自動整備：'+msgs.join('、'))}
 ACT.fullAuto=()=>{if(FA){faStop('全自動已關閉');return}
   if(RUN)FA={area:RUN.area,nm:!!RUN.nm,tower:!!RUN.tower};
   else{let i=0;AREAS.forEach((a,k)=>{if(S.main.ch>=k&&a.base<=S.lv+2)i=k});FA={area:i,nm:false,tower:false}}
-  toast('全自動開啟：隨機選路，自動戰鬥');faDraw();faTick()};
+  toast('全自動開啟：擲骰選路、自動戰鬥，回城會自動整備');faDraw();faTick()};
 {const _lose=lose;lose=function(){_lose.apply(this,arguments);faStop('戰敗，全自動停止')}}
 faLoop();
 document.body.classList.toggle('noshake',SHAKEOFF);
