@@ -2351,6 +2351,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'8.9',d:'2026-11-20',t:'物理特效',b:'斬擊、打擊、射擊命中時加上發光火花、斬痕殘光、衝擊波、碎石與地面揚塵，打擊感更強。'},
   {v:'8.8',d:'2026-11-20',t:'元素特效',b:'冰、雷、聖光、暗、毒等所有元素粒子都改成發光質感；魔物技能也加上元素光粒，不再只是一團簡單的光。'},
   {v:'8.7',d:'2026-11-20',t:'火焰特效',b:'所有火焰類特效改成會發光的火光（點火、火焰風暴、鬥氣、灼燒、魔物火焰技能），火的質感更亮更真。'},
   {v:'8.6',d:'2026-11-20',t:'魔物放大',b:'史萊姆、蝙蝠、角兔、書蠹等小型魔物，以及狼、雷鷹，在戰鬥畫面中放大顯示。「全自動」按鈕改為進入地圖後才出現。'},
@@ -3227,7 +3228,12 @@ const PFX=(()=>{let HS=0,cv,cx,P=[],Q=[],raf=0,W=0,Hh=0,t0=0,SR={x:0,y:0,w:360,h
   /* 物理打擊感：頓幀、擊退、震屏、碎石彈跳、塵土 */
   function impact(side,str,cr,dead,fxn){if(reduce())return;run();locate();str=Math.max(.15,Math.min(1,str));const T=side==='foe'?F:H,gy=T[1]+(T.g!=null?T.g:(side==='foe'?.17:.3)),dir=side==='foe'?1:-1;
     HS=performance.now()+(cr?110:60)+str*60;
-    const hc=side==='foe'?'#fff3c0':'#ff8a7a';hitFx(T,hc,.6+str*.5);{const n=fxn||'',el=/fire|explo/.test(n)?'fire':/ice/.test(n)?'ice':/rock/.test(n)?'rock':/water/.test(n)?'water':/poison/.test(n)?'poison':/dark|purple/.test(n)?'dark':/holy/.test(n)?'holy':/light/.test(n)?'thunder':'';debris(T,el,str*(cr?1.4:1),dir)}if(cr){flash(T,'#ffffff',.3,.3);shock(T,'#ffe27a',.3,.4);spark(T,'#ffe27a',.24,14,.3);scr('rgba(255,255,255,.22)',.12)}
+    const hc=side==='foe'?'#fff3c0':'#ff8a7a';hitFx(T,hc,.6+str*.5);{const n=fxn||'',el=/fire|explo/.test(n)?'fire':/ice/.test(n)?'ice':/rock/.test(n)?'rock':/water/.test(n)?'water':/poison/.test(n)?'poison':/dark|purple/.test(n)?'dark':/holy/.test(n)?'holy':/light/.test(n)?'thunder':'';debris(T,el,str*(cr?1.4:1),dir);if(!el){/* 物理命中：發光火花、斬痕殘光、衝擊波、地面揚塵與碎石 */const P=str*(cr?1.4:1),sl=/slash/.test(n),cw=/claw/.test(n),gc=sl&&/gold/.test(n)?'#ffe27a':sl&&/purple/.test(n)?'#c99aff':cw||side==='me'?'#ff8a7a':'#fff3c0';
+      emit({x:T[0],y:T[1],n:Math.round(10+P*16),a0:dir>0?-1.2:1.9,a1:dir>0?1.2:4.4,s0:.5,s1:1.4+P,l0:.18,l1:.4,z0:.004,z1:.009,c:['#ffffff',gc,gc],drag:3,grow:-.6});
+      if(sl||cw){for(let i=0;i<(cw?3:1);i++)at(i*40,()=>emit({x:T[0]+(i-1)*.03,y:T[1],n:12,a0:-.7+dir*.1,a1:-.55+dir*.1,s0:.6,s1:1.3,l0:.12,l1:.22,z0:.005,z1:.008,c:['#ffffff',gc],drag:6}))}
+      else{shock(T,gc,.18+P*.12,.35);at(60,()=>shock(T,'#ffffff',.1+P*.08,.3))}
+      phys([T[0],T[1]],'chunk',Math.round(2+P*4),{spd:[.4,1],sz:[.004,.009],life:[.6,1],dir:-PI/2+dir*.5,spread:1.1});
+      fog([T[0]-dir*.02,gy-.02],'rgba(225,210,180,.75)',{R:.05+P*.04,n:6,rise:.03,life:.7,a:.55})}}if(cr){flash(T,'#ffffff',.3,.3);shock(T,'#ffe27a',.3,.4);spark(T,'#ffe27a',.24,14,.3);scr('rgba(255,255,255,.22)',.12)}
     if(dead){phys(T,'chunk',8,{spd:[.5,1.2],sz:[.008,.016],life:[.9,1.3],dir:-PI/2+dir*.4,spread:1});phys(T,'smoke',7,{dir:-PI/2,spread:PI,spd:[.05,.25],sz:[.03,.05],life:[.9,1.4],a:.5})}if(dead)at(250,()=>{fog([T[0],gy-.04],'rgba(220,210,190,.8)',{R:.1,n:8,rise:.04});flash(T,'#ffffff',.3,.4)});
     const st=document.querySelector('.stage'),sp=document.querySelector(side==='foe'?'.spr.foe .art img:not(.under)':'.spr.me .art img:not(.under)');
     const hs=HS-performance.now(),A=3+str*9+(cr?4:0);
