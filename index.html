@@ -1682,7 +1682,7 @@ function vRun(){if(RUN.tower)return vTower();const a=AREAS[RUN.area],v=RUN.view,
   else if(v.type==='shrine')body=`<div class="panel">${art('event_shrine','古老的祭壇')}<h3>古老的祭壇</h3><p>長滿青苔的石台上刻著三個符號。指尖碰到其中一個時，微弱的光流進了身體。</p>${v.done?`<p>${v.done}</p><button class="btn pri big" data-a="${last?'finish':'runNext'}">${last?'完成冒險':'繼續前進'}</button>`:`<div class="list">${[['atk','劍之紋','本次冒險中，攻擊與魔力 +15%'],['def','盾之紋','本次冒險中，受到的傷害大幅降低'],['luck','星之紋','本次冒險中，金幣 +30%、裝備掉落提升']].map(([k,n,d])=>`<button class="btn opt" data-a="bless" data-v="${k}"><span><b>${n}</b>　<span class="sub">${d}</span></span></button>`).join('')}</div>`}</div>`;
   else if(v.type==='shop')body=`<div class="panel">${art('event_merchant','旅行商人')}<h3>旅行商人</h3><p>背著巨大背包的商人朝你招手：「出門在外，價錢好商量！」</p><div class="list">${v.items.map(([k,pr],i)=>{const one=k==='box'||k==='hunt',so=one&&(v.bought[k]||(k==='hunt'&&RUN.hunt)),SP={box:['神秘裝備箱','隨機一件本區域裝備，精良以上',ic('mat')],hunt:['懸賞情報','「附近有隻守寶的大傢伙。」下一場普通戰鬥變成精英守寶怪：更危險，但必掉裝備、金幣 ×2',icon('item_tok',ic('mat'))]}[k];return `<div class="item"><span class="ico c${one?3:1}">${SP?SP[2]:icon('item_'+k,ic('potion'))}</span><span class="grow"><b>${SP?SP[0]:ITEMS[k].n}</b><span class="sub">${SP?SP[1]:ITEMS[k].d}</span></span><button class="btn sm ${S.gold>=pr&&!so?'pri':''}" data-a="buyRun" data-v="${i}" ${S.gold<pr||so?'disabled':''}>${so?'售完':pr+' G'}</button></div>`}).join('')}</div><p class="sub">持有 ${S.gold} G</p><button class="btn pri big" data-a="${last?'finish':'runNext'}">${last?'完成冒險':'繼續前進'}</button></div>`;
   else if(v.type==='event'){const e=v.ev;
-    body=`<div class="panel">${art('event_'+e.id,e.n)}<h3>${e.n}${v.fate?' <span class="tag red">🎲 命運之地</span>':''}</h3><p>${e.t}</p>`;
+    body=`<div class="panel">${art(e.img||'event_'+e.id,e.n)}<h3>${e.n}${v.fate?' <span class="tag red">🎲 命運之地</span>':''}</h3><p>${e.t}</p>`;
     if(v.phase==='ask')body+=`<div class="list">${e.o.map((o,i)=>`<button class="btn opt" data-a="evPick" data-v="${i}"><span>${o.l}</span>${o.safe?'<span class="tag off">免檢定</span>':(()=>{const md=Math.floor(S.attr[o.a]/4),dc=o.dc+RUN.area*3,p=Math.max(5,Math.min(95,(21-(dc-md))*5));return `<span class="tag ${p>=60?'ok':p<40?'bad':''}">${ATTR[o.a]} 成功率 ${p}%</span>`})()}</button>`).join('')}</div><p class="sub">檢定：d20 + 屬性修正 ≥ 難度（DC）即成功。骰出 20 必定大成功，1 必定失敗。</p>`;
     else if(v.phase==='roll')body+=`<div class="die" id="die">?</div><p class="calc sub">擲骰中…</p>`;
     else body+=(v.r?`<div class="die ${v.r.ok?'ok':'ng'}">${v.r.d}</div><p class="calc">d20 <b>${v.r.d}</b> + ${ATTR[v.r.a]}修正 <b>${v.r.mod}</b> = <b>${v.r.d+v.r.mod}</b>　／　DC ${v.r.dc}<br><b style="color:var(--${v.r.ok?'exp':'hp'})">${v.r.d===20?'大成功！':v.r.d===1?'大失敗…':v.r.ok?'檢定成功':'檢定失敗'}</b></p>`:'')+
@@ -1932,7 +1932,7 @@ function runNext(){const n=RUN.step+1;if(RUN.nodes[n]==='boss'&&!RUN.gate&&RUN.s
   else if(t==='elite'||t==='ambush'){startBattle(pick(a.mobs),'elite',nAdds(1));if(B&&tg==='bounty'){B.gmul=2.5;B.log.push('💰 懸賞目標！金幣 ×2.5')}}
   else if(t==='boss'){const i=RUN.area;if(!RUN.nm&&S.main.acc&&S.main.ch===i&&!S.main.pre&&CH[i].pre){play(CH[i].pre,`story_ch${i+1}_pre`,a.n,()=>{S.main.pre=true;save();startBattle(a.boss,'boss');render()});return}startBattle(a.boss,'boss')}
   else if(t==='story'){const i=RUN.area;play(CH[i].mid,SKEY(i+1,'mid'),a.n,()=>{S.main.mid=true;if(RUN)RUN.view={type:'res',title:'旅途見聞',text:you('你把這件事記在心裡，繼續前進。')};save();render()});return}
-  else if(t==='event'){const seen=RUN.evSeen||(RUN.evSeen=[]),ar=AREAS[RUN.area].id,pool=EVENTS.filter(e=>!seen.includes(e.id)&&(!e.ar||e.ar===ar)),loc=pool.filter(e=>e.ar),ev=loc.length&&Math.random()<.75?pick(loc):pick(pool.length?pool:EVENTS.filter(e=>!e.ar));seen.push(ev.id);RUN.view={type:'event',ev,phase:'ask',fate:tg==='fate'}}
+  else if(t==='event'){const wid=Math.random()<.3?wanderPick():null;if(wid){RUN.wSeen=1;RUN.view={type:'event',ev:wanderEv(wid),phase:'ask',fate:false}}else{const seen=RUN.evSeen||(RUN.evSeen=[]),ar=AREAS[RUN.area].id,pool=EVENTS.filter(e=>!seen.includes(e.id)&&(!e.ar||e.ar===ar)),loc=pool.filter(e=>e.ar),ev=loc.length&&Math.random()<.75?pick(loc):pick(pool.length?pool:EVENTS.filter(e=>!e.ar));seen.push(ev.id);RUN.view={type:'event',ev,phase:'ask',fate:tg==='fate'}}}
   else if(t==='shrine')RUN.view={type:'shrine'};
   else if(t==='merchant'){const u=12+a.base*6;RUN.view={type:'shop',items:[['pot',Math.round(ITEMS.pot.price*.7)],['pot2',Math.round(ITEMS.pot2.price*.7)],['eth',Math.round(ITEMS.eth.price*.7)],['box',u*12],['hunt',u*5]],bought:{}}}
   else if(t==='chest'&&tg==='rich'&&Math.random()<.3){toast('寶箱張開了大嘴——是寶箱怪！');startBattle(pick(a.mobs),'elite',0);if(B){B.hoard=1;B.gmul=2;B.name='寶箱怪・'+B.m.n;B.log.push('👑 寶箱怪！打倒牠，寶物就是你的')}}
@@ -2030,8 +2030,97 @@ EVENTS.push(
   {id:'a_seal',ar:'archive',n:'上了封蠟的箱子',t:'一個鐵箱上貼滿紅色封蠟，每一張都寫著「永久封存」。',o:[
     {l:'撬開封蠟',a:'STR',dc:14,ok:{t:'箱子裡是氣象院的舊儀器和一件裝備。',loot:1,stone:1},ng:{t:'封蠟一破，警報般的金光閃過，你被震退。',hp:-.18}},
     {l:'抄下封蠟上的日期',a:'INT',dc:12,ok:{t:'封存的日期全都是同一天——遠征隊出發的隔天。艾德溫沉默了很久。',exp:3.5},ng:{t:'字跡被水泡糊了。',exp:.5}}]});
+/* ===== 旅人劇情線：在對應地圖的事件格有機會遇到；該張劇情插圖到了才會出現 ===== */
+const WMAP=['plain','forest','mine','snow','castle'];
+const TRAV={
+ toby:{n:'托比',s:[
+  {t:'一個戴著過大郵差帽的少年從草叢裡衝出來，後面追著三隻哥布林。帆布郵包裡的信撒了一地。「拜託！別讓牠們踩到那封信！」',o:[
+   {l:'擋住哥布林',ok:{t:'哥布林被你嚇跑了。少年抱著一封泛黃的信喘氣：「我叫托比，郵差。這封信……我一定要送到北方要塞。」',exp:1.5},aff:1},
+   {l:'幫他撿信',ok:{t:'你撿回所有的信。最舊的那封寫著「北方要塞・遠征隊收」。托比把它塞回最裡層：「是我爸沒送出去的。」',gold:1},aff:1}]},
+  {t:'霧邊的林道上排著一列小石頭。托比蹲在地上，一顆一顆往前擺。「霧會讓路跑掉，可是石頭不會。」',o:[
+   {l:'陪他一起排',ok:{t:'你們排了很長一段。托比說他爸以前也是這樣送信的，「郵差的路，要自己做記號」。',exp:2},aff:1},
+   {l:'問他為什麼非送不可',ok:{t:'「二十年前，我爸替遠征隊送補給。這是他回來後說好要送的最後一封。可是他後來生病了……」托比低頭擺下一顆石頭。',exp:1.5},aff:0}]},
+  {t:'礦坑口，托比正跟一個礦工比手畫腳。礦工搖頭：「要塞？小鬼，那裡的路三十年前就塌了。」',o:[
+   {l:'替他問清楚路線',ok:{t:'你問出一條舊軍道。托比把路線抄在信封背面，字歪歪扭扭的。',exp:2},aff:1},
+   {l:'勸他先回家',ok:{t:'「我知道危險。」托比把帽子壓低，「可是信在我手上，就是我的工作。」',gold:1},aff:0}]},
+  {t:'暴風雪裡，一團毯子在雪地上慢慢移動。是托比，臉凍得通紅，郵包緊緊抱在胸前。',o:[
+   {l:'把他拉進避風處',ok:{t:'你生了火。托比捧著熱湯說：「謝謝……我差點以為，這封信要跟我一起停在雪裡了。」',hp:.2,exp:2},aff:1},
+   {l:'把自己的斗篷給他',ok:{t:'托比裹著你的斗篷，小聲地說：「等我送完信，一定還你。這是郵差的承諾。」',exp:1.5},aff:2}]},
+  {t:'要塞的廢墟裡，立著一個生鏽的遠征隊信箱。托比站在前面，手上的信抖個不停。',o:[
+   {l:'陪他把信投進去',ok:{t:'信落進信箱，發出很輕的一聲。托比對著信箱敬了一個郵差的禮：「送達了。」',exp:3,gold:2},aff:1,end:'托比抹了抹眼睛，把信箱的蓋子擦亮：「爸，你沒做完的，我幫你做完了。」他把你的名字寫在郵差工作簿最後一頁，說以後你的信，他免費送。'},
+   {l:'建議他拆開來看',ok:{t:'信是寫給艾德溫的：「對不起，那天我沒有等你們回來。」托比把信重新折好：「我回去親手交給他。」',exp:3},aff:0,end:'回程的路上，托比一直在練習要怎麼把信交給艾德溫。他說，有些信要送到人手上，才算送達。'}]}]},
+ greta:{n:'葛蕾塔',s:[
+  {t:'草原酒館的角落，一個臉上有疤的灰髮女人翻著一本破舊名冊，見人就問：「認不認識一個叫雷歐的年輕人？二十年前在霧邊站崗。」',o:[
+   {l:'請她喝一杯',ok:{t:'「葛蕾塔，前傭兵教官。」她一口乾了酒，「當年是我下令撤退的。害他們背了二十年的逃兵罪名。」',exp:1.5},aff:1},
+   {l:'幫她問酒館老闆',ok:{t:'老闆說雷歐好像往北邊去了。葛蕾塔把這行字記在名冊上，用力畫了一個圈。',gold:1},aff:1}]},
+  {t:'森林裡，葛蕾塔拄著缺口的戰斧，正替一個迷路的年輕獵人帶路。「跟緊，別看霧。」',o:[
+   {l:'一起護送獵人',ok:{t:'獵人平安出林。葛蕾塔說：「以前我也這樣帶著一群毛頭小子。後來，我把他們丟在霧邊。」',exp:2},aff:1},
+   {l:'問她戰斧的缺口',ok:{t:'「撤退那天砍斷的旗桿。」她摸著缺口，「我要他們走，自己最後一個走。這是我唯一做對的事。」',exp:1.5},aff:1}]},
+  {t:'礦坑深處，葛蕾塔和一個滿臉煤灰的礦工對望。礦工手上的十字鎬掉在地上：「……教官？」',o:[
+   {l:'讓他們好好談',ok:{t:'你退到坑道口。很久以後，葛蕾塔走出來，名冊上「雷歐」兩個字旁邊多了一個勾。',exp:2.5},aff:1},
+   {l:'告訴雷歐撤退的真相',ok:{t:'你說出第六章驛站裡老騎士說的事。雷歐哭了：「原來不是我們丟下崗位……」葛蕾塔拍拍他的肩膀。',exp:2},aff:2}]},
+  {t:'雪山上的舊哨站，牆上刻著一排名字。葛蕾塔用斧刃在最後補上一個新的。',o:[
+   {l:'問她刻的是誰',ok:{t:'「我自己。」她說，「當年的哨站名單上，唯獨沒有寫指揮官的名字。現在補上了。」',exp:2},aff:1},
+   {l:'幫她把名字刻深一點',ok:{t:'兩個人一起刻，刻到手都麻了。她笑了：「這樣，風雪二十年也刮不掉。」',exp:2,hp:-.05},aff:1}]},
+  {t:'黑霧要塞的城牆上，葛蕾塔望著重新開通的北方大道。身後站著幾個當年的部下。',o:[
+   {l:'向她敬禮',ok:{t:'她回了一個標準的軍禮：「破霧者，你替我們把路打通了。」',exp:3,gold:2},aff:1,end:'葛蕾塔把名冊交給你：「上面的人，我都找到了。這本，替我交給王都。告訴他們，我們沒有逃。」她和部下們一起，站在城牆上守了最後一次夜。'},
+   {l:'問她以後打算怎麼辦',ok:{t:'「回草原開個訓練場。」她笑，「這次教的，是怎麼活著回家。」',exp:3},aff:0,end:'後來，晨星鎮外多了一座傭兵訓練場。門口掛著一面舊軍旗，旗桿上有一道缺口。'}]}]},
+ milo:{n:'米洛',s:[
+  {t:'草原上，一個戴眼鏡的青年被野兔撞翻在地，捲軸散了一地。「啊啊我的比例尺！」',o:[
+   {l:'幫他撿捲軸',ok:{t:'「謝謝！我叫米洛，王都學院的……呃，算是逃學的製圖學生。我要畫第一張霧退以後的北方地圖！」',exp:1.5},aff:1},
+   {l:'趕走那隻野兔',ok:{t:'野兔被你趕跑。米洛扶好眼鏡：「牠已經撞了我三次了。我懷疑牠討厭地圖。」',gold:1},aff:1}]},
+  {t:'森林裡，米洛盯著自己剛畫的地圖發呆。「不可能……這條路昨天在左邊，今天跑到右邊了。」',o:[
+   {l:'告訴他霧會讓路移動',ok:{t:'米洛眼睛一亮：「所以要用霧不會碰的東西當基準……星星！我晚上再來量！」',exp:2.5},aff:1},
+   {l:'問他為什麼要畫地圖',ok:{t:'「我老師想重畫北方地圖，被學院開除了。他說地圖不該說謊。我想替他畫完。」',exp:1.5},aff:1}]},
+  {t:'礦坑壁畫前，米洛一邊抄寫一邊碎碎唸：「三百年前的人，比例畫得比學院教授還準……」',o:[
+   {l:'幫他舉燈',ok:{t:'你舉燈照亮整面壁畫。米洛發現壁畫其實是一張地圖，標著霧最早出現的位置。',exp:3},aff:1},
+   {l:'叫他小心落石',ok:{t:'一塊石頭剛好砸在他剛才站的地方。米洛臉色發白：「……我會記得在地圖上標『危險』。」',exp:1.5},aff:0}]},
+  {t:'雪山營火邊，米洛攤開地圖，手凍得發抖。「你知道嗎，學院的地圖，北方那一塊是空白的。」',o:[
+   {l:'跟他聊路上的見聞',ok:{t:'你說了一整晚。米洛把你說的每一個地名都畫了進去：「這張地圖，有一半是你的。」',exp:2.5},aff:2},
+   {l:'把火生旺一點',ok:{t:'火光照亮了地圖。米洛說：「等我畫完，第一份送給你。」',hp:.2,exp:1.5},aff:1}]},
+  {t:'黑霧要塞的城頭，米洛握著筆，在地圖最上方畫下最後一筆。',o:[
+   {l:'看他畫完',ok:{t:'「完成了。霧退以後的北方。」米洛把地圖舉起來，手在發抖。',exp:3,gold:2},aff:1,end:'米洛把第一份副本送給你，地圖角落寫著一行小字：「與破霧者同行繪製」。他說要帶著正本回學院，替老師討一個公道。'},
+   {l:'問他要不要回學院',ok:{t:'「回去，然後讓他們把地圖掛在大廳。」米洛笑了，「就算會被罵也一樣。」',exp:3},aff:0,end:'幾個月後，王都學院的大廳掛上了一張新的北方地圖。作者欄寫著兩個名字：米洛，和他的老師。'}]}]},
+ are:{n:'阿蕾',s:[
+  {t:'一個紅褐色辮子的牧羊女，舉著彎頭牧羊杖，正跟一群哥布林對峙。腳邊一隻白山羊咩咩叫。「把我家的羊還來！」',o:[
+   {l:'站到她旁邊',ok:{t:'哥布林丟下兩隻羊跑了。「我叫阿蕾，這是雪球。」她摸著山羊，「牠們拿羊去換那種紫色石頭。」',exp:1.5},aff:1},
+   {l:'用乾糧跟哥布林交換',ok:{t:'哥布林收了乾糧就放羊走。阿蕾氣鼓鼓的：「你太好心了！」但還是道了謝。',gold:-.3,exp:1},aff:1}]},
+  {t:'森林的霧邊，雪球一直用鼻子嗅著地面，不肯走。阿蕾蹲下來：「雪球，是哥哥的味道嗎？」',o:[
+   {l:'跟著雪球走',ok:{t:'雪球帶你們找到一頂舊草帽。阿蕾抱著帽子很久沒說話：「哥哥兩年前追羊追進霧裡……」',exp:2.5},aff:1},
+   {l:'拉住她別靠近霧',ok:{t:'「我知道。」阿蕾停下來，「我只是想知道，他是不是也『停住』了。」',exp:1.5},aff:1}]},
+  {t:'礦坑的貨箱堆裡，阿蕾翻出一條舊項鍊，手在發抖。「這是我送給哥哥的……怎麼會在這裡？」',o:[
+   {l:'幫她查貨箱的來源',ok:{t:'貨箱烙著「王立氣象院」。阿蕾握緊項鍊：「所以他們也收霧裡的東西……」',exp:2.5},aff:1},
+   {l:'安慰她',ok:{t:'「項鍊在，就代表他還有一部分在這裡。」阿蕾點點頭，把項鍊戴上。',exp:1.5},aff:2}]},
+  {t:'雪山的懸崖邊，阿蕾腳下一滑，雪球死命咬住她的裙角。',o:[
+   {l:'衝過去拉她上來',ok:{t:'你把她拉了上來。雪球累得趴在雪地上，阿蕾抱著牠哭了又笑。',exp:2.5,hp:-.06},aff:1},
+   {l:'丟繩子給她',ok:{t:'她抓住繩子爬了上來。「謝謝……還有雪球，今晚給你吃最好的草。」',exp:2},aff:1}]},
+  {t:'黑霧要塞前，霧退去後留下一大片空地。阿蕾坐在地上，雪球靠在她身邊。',o:[
+   {l:'陪她坐一下',ok:{t:'「露娜說，霧裡的人可能還活著，只是停住了。」阿蕾看著北方，「那我就在這裡等他。」',exp:3,gold:2},aff:1,end:'阿蕾在要塞前搭了一個小牧場。每天傍晚，她都會朝北方吹一聲口哨，那是她和哥哥小時候約好的回家信號。'},
+   {l:'勸她回家',ok:{t:'「爸媽也在等我。」她站起來拍拍裙子，「好，回家。可是我每年都會回來。」',exp:3},aff:0,end:'阿蕾回到草原牧場。她在牧場最北邊插了一根木樁，上面掛著哥哥的草帽，說等他回來時，一眼就能找到家。'}]}]},
+ simon:{n:'老賽門',s:[
+  {t:'草原的篝火邊，一個白鬍子老人彈著魯特琴，唱著一首沒人聽過的老歌。曲子很慢，像是在等誰。',o:[
+   {l:'坐下來聽',ok:{t:'老人唱完一段，朝你點點頭，什麼都沒說，又開始唱第二遍。',exp:1.5,mp:.2},aff:1},
+   {l:'丟一枚硬幣',ok:{t:'他收下硬幣，在琴桿上刻了一道痕。你發現琴桿上已經刻滿了痕。',gold:-.2,exp:1},aff:1}]},
+  {t:'倒下的樹王旁，老賽門閉著眼睛唱歌。這次是不同的一段，歌詞提到「綠色的門」。',o:[
+   {l:'問他歌詞的意思',ok:{t:'他搖搖頭，指了指自己的喉嚨，又指了指北方。好像是在說：答案在那裡。',exp:2},aff:1},
+   {l:'跟著哼',ok:{t:'你哼對了調子。老人第一次睜開眼睛看你，嘴角動了一下。',exp:2},aff:1}]},
+  {t:'礦坑壁畫前，老賽門停下腳步，手指輕輕撫過畫裡那些微笑的人。他開口了，聲音沙啞：「……就是這裡。」',o:[
+   {l:'等他說下去',ok:{t:'「我家族代代唱這首歌。三百年，沒人知道是什麼意思。」他看著壁畫，「原來，他們是笑著走進去的。」',exp:3},aff:2},
+   {l:'把壁畫抄給他',ok:{t:'他接過你抄的圖，看了很久：「謝謝。我眼睛不好，一直看不清楚。」',exp:2},aff:1}]},
+  {t:'雪山的避難小屋裡，老賽門把一張寫滿歌詞的紙遞給露娜。「妳研究霧。妳會懂的。」',o:[
+   {l:'讓露娜唸出來',ok:{t:'露娜唸到一半停住了：「這段……跟霧晶裡錄到的聲音，是同一個節奏。」',exp:3},aff:1},
+   {l:'問他為什麼現在才說',ok:{t:'「以前沒人問。」老人笑了，「大家只當我是賣唱的瘋老頭。」',exp:2},aff:1}]},
+  {t:'夕陽下的黑霧要塞城牆，老賽門抱著魯特琴，準備唱最後一段。',o:[
+   {l:'安靜地聽完',ok:{t:'最後一句是：「我們沒有死，我們在等。」老人放下琴，眼淚流進鬍子裡。',exp:3.5,gold:2},aff:1,end:'老賽門把魯特琴交給你：「歌唱完了，琴就留給你吧。哪天門打開了，替我唱給他們聽。」他說他終於可以回家，不用再走了。'},
+   {l:'和他一起唱',ok:{t:'你們一起唱完了最後一段。風停了，像是有很多人在聽。',exp:3.5},aff:1,end:'從那天起，北方大道上的旅人常說，黃昏時城牆上會傳來歌聲。老賽門說，那不是他，是三百年前的人在回應。'}]}]}};
+function wanderPick(){const ar=AREAS[RUN.area].id,st=WMAP.indexOf(ar);if(st<0||RUN.wSeen||!S)return null;S.wander=S.wander||{};
+  const c=Object.keys(TRAV).filter(id=>{const w=S.wander[id]||{st:0};return w.st===st&&ARTSET&&ARTSET.has(`story_w_${id}_${ar}`)});return c.length?pick(c):null}
+function wanderEv(id){S.wander=S.wander||{};const w=(S.wander[id]=S.wander[id]||{st:0,aff:0}),T=TRAV[id],sc=T.s[w.st];
+  return {id:'w_'+id,n:`旅人・${T.n}`,img:`story_w_${id}_${WMAP[w.st]}`,t:sc.t,w:id,o:sc.o.map(o=>Object.assign({safe:1},o))}}
+function wanderDone(ev,o){const w=S.wander[ev.w];w.aff=(w.aff||0)+(o.aff||0);const last=w.st===4;w.st++;
+  if(last){const hi=w.aff>=5;S.wander[ev.w].done=1;return (hi&&o.end?o.end:o.ok.t)+(hi?'\n（羈絆深厚的結局）':'')}return null}
 function evPick(i){const v=RUN.view,o=v.ev.o[i];
-  if(o.safe){v.phase='done';v.r=null;v.text=you(o.ok.t);v.gain=applyOut(o.ok,false);save();render();return}
+  if(o.safe){v.phase='done';v.r=null;v.text=you(o.ok.t);v.gain=applyOut(o.ok,false);if(v.ev.w){const e=wanderDone(v.ev,o);if(e){v.text=you(e);const g=applyOut({gold:4,exp:4,stone:2},false);v.gain=v.gain.concat(g)}}save();render();return}
   const d=R(1,20),mod=Math.floor(S.attr[o.a]/4),dc=o.dc+RUN.area*3,ok=d===20||(d!==1&&d+mod>=dc);
   v.phase='roll';render();let n=0;
   const tm=setInterval(()=>{const el=$('#die');if(el)el.textContent=R(1,20);
