@@ -2467,6 +2467,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'10.4',d:'2026-11-21',t:'自動戰鬥再調整',b:'①自動戰鬥先判斷能不能收掉對手：一擊能打倒就直接攻擊；兩回合內能打倒、又不會被反殺時，不再防禦、反擊或上增益。②自動戰鬥與全自動的節奏加快 25%。'},
   {v:'10.3',d:'2026-11-21',t:'露娜羈絆',b:'修正露娜羈絆在營火對話看完後就無法再提升的問題：現在和露娜一起完成冒險、打倒首領、每天營火閒聊都會累積羈絆（每天上限 1.5）。'},
   {v:'10.2',d:'2026-11-21',t:'自動戰鬥更積極',b:'自動戰鬥不再過度保守：只有對方大招真的會痛才防禦，反擊與護盾只在預告重擊時使用，增益只對耐打的精英與首領開，回血與喝藥改在血量三成以下（或下回合會被打很痛時）才做。'},
   {v:'10.1',d:'2026-11-21',t:'掉寶一鍵換上＋特級藥水',b:'①打贏後的戰利品卡片，若比身上那件強，會標出強多少，按「換上」直接裝備，不用再翻背包。②第五章起道具店賣「特級治療藥水」（回復 800 HP，240 G），自動戰鬥會依缺血量挑大瓶或小瓶喝。③騎士、遊俠、祭司、大魔導士、咒術師、神射手、刺客、主教的站姿立繪重畫上線。'},
@@ -2613,7 +2614,7 @@ function startBattle(id,kind,nAdds){const F=mkFoe(id,kind),m=F.m,bs=F.kind==='bo
     else if(p==='camp'){B.atk=Math.round(B.atk*1.12);B.mag=Math.round(B.mag*1.12);B.log.push('🔥 營火的光驚動了首領，牠怒氣沖沖（攻擊 +12%）')}}
   if(hasP('cl2'))B.cls.faith=30;
   const s0=stats();if(s0.SHIELD){B.shield=Math.round(s0.HP*s0.SHIELD/100);B.log.push(`裝備效果：獲得 ${B.shield} 點護盾`)}
-  if(B.auto)setTimeout(autoAct,700)}
+  if(B.auto)setTimeout(autoAct,AS(700))}
 const rmax=b=>b+(stats().RESMAX||0);
 const fbSum=k=>B.fb.reduce((a,b)=>a+(b[k]||0),0);
 const blog=t=>B.log.push(you(t));
@@ -2687,7 +2688,7 @@ function pAct(type,arg){if(!B||B.busy)return;const s=stats();
   else if(type==='flee'){if(Math.random()<.6+S.attr.DEX*.005){B=null;RUN.view={type:'res',title:'成功逃離',text:'你甩開了魔物，繼續趕路。'};render();return}blog('逃跑失敗！')}
   B.menu='main';B.busy=true;render();
   if(B.hp<=0){setTimeout(win,type==='skill'?1900:1200);return}
-  setTimeout(foeTurn,type==='skill'?1750:850)}
+  setTimeout(foeTurn,AS(type==='skill'?1750:850))}
 const isDng=k=>!!k&&!!k.pow&&((k.pow||0)>=1.6||(k.h||1)>=3);
 const ELI={fire:'🔥火',ice:'❄冰',thunder:'⚡雷',dark:'🌑暗',holy:'✨聖',poison:'☠毒',phys:'⚔物理'};
 function intentHtml(){if(!B||B.hp<=0)return '';if(B.chg)return `<div class="intent dng">⚠ 下回合：毀滅一擊　<small>防禦減傷 75%</small></div>`;if(B.kind==='boss'&&!B.big&&B.turn>=3&&B.turn%4===3&&!(B.st.stun>0))return `<div class="intent dng">⚠ 下回合：開始蓄力</div>`;if(!('next' in B))return '';const k=B.next&&SKM[B.next];
@@ -2746,11 +2747,15 @@ function foeTurn(){if(!B)return;if(B.treasure&&B.turn>=3&&B.hp>0){B=null;RUN.vie
   B.buffs.forEach(b=>b.t--);B.buffs=B.buffs.filter(b=>b.t>0);B.turn++;
   if(S.hp<=0){render();setTimeout(lose,1100);return}
   const wait=fx.fsk?1300:0;
-  if(B.pst.stun>0){B.pst.stun--;blog(`你${HST.stun}了，這回合無法行動`);B.busy=true;render();setTimeout(foeTurn,wait+1100);return}
-  B.busy=!!wait;render();setTimeout(()=>{if(!B)return;B.busy=false;if(B.auto)autoAct()},wait+(B.auto?(FA?2000+wait:1000):0))}
+  if(B.pst.stun>0){B.pst.stun--;blog(`你${HST.stun}了，這回合無法行動`);B.busy=true;render();setTimeout(foeTurn,AS(wait+1100));return}
+  B.busy=!!wait;render();setTimeout(()=>{if(!B)return;B.busy=false;if(B.auto)autoAct()},AS(wait+(B.auto?(FA?2000+wait:1000):0)))}
 function myPd(k,s){s=s||stats();const x=k&&SK[k],st=x?x.dmg.s:'ATK',v=st==='BOTH'?s.ATK+s.MAG:s[st]||s.ATK,df=st==='MAG'?(B.mres??B.def):B.def;
   return clsDm()*v*(x?x.dmg.p*(x.dmg.h||1)*(1+.15*((S.skl[k]||1)-1)):S.cls==='swordsman'?1.15:1)*100/(100+df)*(1+buffSum('atk'))*(B.opening?1.5:1)*(x&&x.dmg.rend?Math.max(1,elMul(B.id,SKEL2[k]||'phys')):elMul(B.id,x?SKEL2[k]||'phys':'phys'))*.85}
+/* 自動模式節奏加快 25% */
+const AS=ms=>B&&B.auto?Math.round(ms*.8):ms;
 function autoAct(){if(!B||B.busy||!B.auto)return;if(MODAL&&MODAL.k==='foe')return;const s=stats(),sk=mySkills().filter(k=>S.mp>=mpCost(k)&&!(SK[k].ult&&B.ultUsed));
+  /* 先算能不能贏：這招收得掉就直接打，不防禦也不補血 */
+  {const sl=!(B.adds||[]).some(f=>f.hp>0);if(sl){const k1=[null,...sk.filter(k=>SK[k].dmg)].filter(k=>myPd(k,s)>=B.hp).sort((a,b)=>(a?mpCost(a):0)-(b?mpCost(b):0))[0];if(k1!==undefined)return k1?pAct('skill',k1):pAct('atk')}}
   {const nq=B.next&&SKM[B.next],iq=nq?(nq.mag?B.mag:B.atk)*(nq.pow||1)*(nq.h||1)*100/(100+s.DEF):B.atk*100/(100+s.DEF);const h=sk.find(k=>SK[k].heal);if(h&&(S.hp<s.HP*.45||iq>=S.hp*.8))return pAct('skill',h);if(S.hp<s.HP*.3||(S.hp<s.HP*.5&&iq>=S.hp*.8)){const lk=s.HP-S.hp,p=(lk>=600?['pot3','pot2','pot']:lk>=200?['pot2','pot3','pot']:['pot','pot2','pot3']).find(k=>S.items[k]);if(p)return pAct('item',p)}}
   const C=B.cls,est=k=>{const x=SK[k];return elMul(B.id,SKEL2[k]||'phys')*x.dmg.p*(x.dmg.h||1)*(1+(x.fin||0)*C.brk+(x.det||0)*C.marks.length+(x.aim||0)*C.focus+(x.faithAmp?Math.min(1,C.faith/100):0)+(x.faithSpend?C.faith/100*1.2:0))+dotV(x)};
   const dotV=x=>{if(!x.foe)return 0;const base=Math.max(1,x.dmg.s==='MAG'?s.MAG:s.ATK);let v=0;
@@ -2765,11 +2770,12 @@ function autoAct(){if(!B||B.busy||!B.auto)return;if(MODAL&&MODAL.k==='foe')retur
   const nk0=B.next&&SKM[B.next],inc=(nk0&&nk0.mag?B.mag:B.atk)*(nk0&&nk0.pow||1)*(nk0&&nk0.h||1)*100/(100+s.DEF),soft=solo&&!B.chg&&inc<S.hp*.15&&B.hp<=2.2*Math.max(pd(null),...sk.filter(k=>SK[k].dmg).map(pd));
   const best=Math.max(pd(null),...sk.filter(k=>SK[k].dmg).map(pd));
   /* 危險招：真的會痛（三成血以上）或自己血不多才架；打不痛就照打 */
-  if(B.chg||(B.next&&isDng(SKM[B.next]))){if(inc>=S.hp*.3||S.hp<s.HP*.5||B.hp>best*3)return pAct('guard')}
+  const toKill=Math.ceil(B.hp/Math.max(1,best)),race=solo&&toKill<=2&&inc<S.hp*.9;
+  if(!race&&(B.chg||(B.next&&isDng(SKM[B.next])))){if(inc>=S.hp*.3||S.hp<s.HP*.5||B.hp>best*3)return pAct('guard')}
   /* 看預告決定：對方下回合要出傷害招就先架刀；強敵開場先上增益 */
   const nk=B.next&&SKM[B.next],hit=nk?!!nk.pow:'next' in B;
-  if(!B.counter&&hit&&!soft&&inc>=S.hp*.2){const g=sk.find(k=>(SK[k].counter||(SK[k].shield&&!(B.shield>0)))&&!SK[k].dmg);if(g&&nk)return pAct('skill',g)}
-  if((B.kind==='boss'||B.kind==='elite')&&B.hp>best*3){const bf=sk.find(k=>SK[k].buff&&!SK[k].dmg&&!B.buffs.some(b=>b.id===k)&&S.mp>=mpCost(k)+8);if(bf&&S.hp>s.HP*.5)return pAct('skill',bf)}
+  if(!race&&!B.counter&&hit&&!soft&&inc>=S.hp*.2){const g=sk.find(k=>(SK[k].counter||(SK[k].shield&&!(B.shield>0)))&&!SK[k].dmg);if(g&&nk)return pAct('skill',g)}
+  if(!race&&(B.kind==='boss'||B.kind==='elite')&&B.hp>best*3){const bf=sk.find(k=>SK[k].buff&&!SK[k].dmg&&!B.buffs.some(b=>b.id===k)&&S.mp>=mpCost(k)+8);if(bf&&S.hp>s.HP*.5)return pAct('skill',bf)}
   if(nk&&nk.heal&&!(B.st.burn>0)){const f=sk.find(k=>SK[k].dmg&&SK[k].foe&&SK[k].foe.burn);if(f)return pAct('skill',f)}
   const d=sk.filter(k=>SK[k].dmg).sort((a,b)=>est(b)-est(a))[0];
   d?pAct('skill',d):pAct('atk')}
@@ -3536,12 +3542,12 @@ function faStop(m){if(!FA)return;FA=null;if(B){B.auto=AUTO=false}faDraw();if(m)t
 function faClick(sel,rnd){const bs=[...document.querySelectorAll(sel)].filter(b=>!b.disabled&&b.offsetParent!==null);if(!bs.length)return false;(rnd?pick(bs):bs[0]).click();return true}
 function faDice(sel,lab){const bs=[...document.querySelectorAll(sel)].filter(b=>!b.disabled&&b.offsetParent!==null);if(bs.length<2)return faClick(sel);FA.busy=1;
   const ov=document.createElement('div');ov.className='fadice';ov.innerHTML=`<div class="fd-box"><div class="fd-t">${lab||'命運的骰子'}</div><div class="fd-die">1</div><div class="fd-r">1～3 走左邊　4～6 走右邊</div></div>`;document.body.appendChild(ov);
-  const die=ov.querySelector('.fd-die'),d=1+Math.floor(Math.random()*6);let n=0;FA.dv={ov};const iv=FA.dv.iv=setInterval(()=>{die.textContent=1+Math.floor(Math.random()*6);die.style.transform=`rotate(${Math.random()*40-20}deg) scale(${.9+Math.random()*.2})`;if(++n>=16){clearInterval(iv);die.textContent=d;die.style.transform='';die.classList.add('done');const right=d>3,b=right?bs[bs.length-1]:bs[0];ov.querySelector('.fd-r').innerHTML=`擲出 <b>${d}</b>　→　<b>${right?'右邊':'左邊'}</b>`;b.classList.add('fd-pick');
-    FA.dv.tm=setTimeout(()=>{ov.remove();if(FA){FA.busy=0;FA.dv=null;if(b.isConnected)b.click()}},1300)}},90);return true}
+  const die=ov.querySelector('.fd-die'),d=1+Math.floor(Math.random()*6);let n=0;FA.dv={ov};const iv=FA.dv.iv=setInterval(()=>{die.textContent=1+Math.floor(Math.random()*6);die.style.transform=`rotate(${Math.random()*40-20}deg) scale(${.9+Math.random()*.2})`;if(++n>=13){clearInterval(iv);die.textContent=d;die.style.transform='';die.classList.add('done');const right=d>3,b=right?bs[bs.length-1]:bs[0];ov.querySelector('.fd-r').innerHTML=`擲出 <b>${d}</b>　→　<b>${right?'右邊':'左邊'}</b>`;b.classList.add('fd-pick');
+    FA.dv.tm=setTimeout(()=>{ov.remove();if(FA){FA.busy=0;FA.dv=null;if(b.isConnected)b.click()}},1050)}},90);return true}
 /* 全自動中玩家自己點了選項：取消骰子，照玩家的選擇走 */
 function faCancelDice(){if(!FA||!FA.dv)return;clearInterval(FA.dv.iv);clearTimeout(FA.dv.tm);FA.dv.ov.remove();FA.dv=null;FA.busy=0}
 document.addEventListener('click',e=>{if(!e.isTrusted||!FA)return;const t=e.target.closest&&e.target.closest('[data-a="pickFork"],[data-a="evPick"],[data-a="storyPick"]');if(t){faCancelDice();FA.hold=Date.now()}},true);
-function faDelay(){if(!FA)return 1100;if(MODAL||($('#story')&&!$('#story').hidden))return 4400;if(RUN&&RUN.view&&['fork','event','shrine','gate'].includes(RUN.view.type))return 4400;return 2200}
+function faDelay(){if(!FA)return 1100;if(MODAL||($('#story')&&!$('#story').hidden))return 3500;if(RUN&&RUN.view&&['fork','event','shrine','gate'].includes(RUN.view.type))return 3500;return 1750}
 function faLoop(){try{faTick()}catch(e){}setTimeout(faLoop,faDelay())}
 function faTick(){faDraw();if(!FA||!S||FA.busy)return;if(FA.hold&&Date.now()-FA.hold<1500)return;
   if(faClick('#tip [data-a="tipOk"]'))return;
