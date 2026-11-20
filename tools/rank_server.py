@@ -1,5 +1,5 @@
 """蒼藍誓約 Online 排行榜伺服器（只用 Python 標準函式庫）
-GET  /api/top?n=50   -> 依戰力排序的玩家列表
+GET  /api/top?n=50   -> 依戰力排序的玩家列表（最多 300）
 POST /api/submit     -> {"id","name","cls","lv","power"} 新增或更新自己的紀錄
 GET  /api/fb?n=50    -> 玩家意見回報（新到舊），與排行榜資料分開存放
 POST /api/fb         -> {"id","name","cls","lv","cat","text"} 送出意見（每人 60 秒一則）
@@ -83,7 +83,7 @@ class H(BaseHTTPRequestHandler):
         u = urlparse(self.path)
         if u.path == '/api/top':
             try:
-                n = max(1, min(100, int(parse_qs(u.query).get('n', ['50'])[0])))
+                n = max(1, min(300, int(parse_qs(u.query).get('n', ['50'])[0])))
             except ValueError:
                 n = 50
             with LOCK:
@@ -177,6 +177,9 @@ class H(BaseHTTPRequestHandler):
                     else:
                         out.append(None)
                 row['eq'] = out
+            ex = d.get('ex')
+            if isinstance(ex, dict):
+                row['ex'] = {k: max(0, min(9999999, int(ex[k]))) for k in ('ch', 'kills', 'enh', 'nm', 'boss') if k in ex and str(ex[k]).lstrip('-').isdigit()}
             st = d.get('st')
             if isinstance(st, list) and len(st) <= 8:
                 row['st'] = [max(0, min(9999999, int(v))) for v in st]

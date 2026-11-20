@@ -199,6 +199,7 @@ input,textarea{font:inherit;width:100%;padding:8px 10px;border:2px solid var(--l
 .ef-box.ok .ef-res{color:#ffe45a;text-shadow:0 0 12px #ff9a2a;animation:efP .5s}.ef-box.great{animation:efG 1s}.ef-box.great .ef-res{color:#fff;font-size:26px;text-shadow:0 0 12px #ff5ad0,0 0 24px #ffd700;animation:efP .6s}
 .ef-box.ng{filter:saturate(.4);animation:quake .4s}.ef-box.ng .ef-res{color:#ff8a8a}
 @keyframes efP{0%{transform:scale(2.2);opacity:0}60%{transform:scale(.9);opacity:1}100%{transform:scale(1)}}@keyframes efG{0%,100%{box-shadow:0 0 40px #ffd700}50%{box-shadow:0 0 90px #ff5ad0,0 0 140px #ffd700}}
+.tabs.rk{margin-bottom:0}.rkme{font-size:13px;padding:4px 8px;border-radius:8px;background:var(--panel2)}.rkrow{gap:8px}.rkn{width:26px;text-align:center;font-family:var(--display);font-weight:900;font-size:15px;color:var(--navy)}.rkav{width:34px;height:34px;border-radius:50%;overflow:hidden;flex:none;border:1px solid var(--line);background:#fff}.rkav .art{height:100%;border:0}.rkrow.top{background:linear-gradient(90deg,#fff6d8,#fff)}.rkv{font-variant-numeric:tabular-nums;color:var(--navy)}
 .stat-g .main{font-weight:700;color:#7a3fc0}.stat-g .main b{font-size:15px}
 .attr{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;font-variant-numeric:tabular-nums}
 .step{display:flex;gap:6px;align-items:baseline}.step i{font-style:normal;color:var(--sub)}.step.done{color:var(--exp)}
@@ -1548,6 +1549,7 @@ const GREET={
 let RANKURL=null,RANKTOP=null,RANKERR=0,RANKT=0;
 async function rankUrl(){if(RANKURL)return RANKURL;try{const r=await fetch('rank.json?'+Date.now(),{cache:'no-store'});const j=await r.json();if(j&&j.url)RANKURL=j.url.replace(/\/$/,'')}catch(e){}return RANKURL}
 /* 玩家意見回報：與排行榜共用伺服器，資料分開 */
+let RKTAB='power',RKCLS='all';
 let FBL=null,FBERR=0,FBT=0;const FBCAT={bug:'🐞 錯誤回報',idea:'💡 建議',balance:'⚖ 平衡',art:'🎨 美術',other:'💬 其他'};
 async function fbLoad(){const u=await rankUrl();if(!u){FBERR=1;if(MODAL&&MODAL.k==='fb')drawModal();return}try{const ctl=new AbortController();setTimeout(()=>ctl.abort(),8000);const r=await fetch(u+'/api/fb?n=50',{cache:'no-store',signal:ctl.signal});FBL=await r.json();FBERR=0;FBT=Date.now()}catch(e){FBERR=1}if(MODAL&&MODAL.k==='fb'&&!document.activeElement?.closest?.('#modal textarea'))drawModal()}
 async function fbSend(){const ta=$('#fbText'),cat=$('#fbCat');const text=(ta&&ta.value||'').trim();if(text.length<4){toast('請至少寫 4 個字');return}
@@ -1557,8 +1559,8 @@ async function fbSend(){const ta=$('#fbText'),cat=$('#fbCat');const text=(ta&&ta
 async function rankSync(force){if(!S||!S.cls)return;if(!force&&Date.now()-RANKT<5*60e3)return;RANKT=Date.now();const u=await rankUrl();if(!u){RANKERR=1;return}
   if(!S.pid){S.pid=Math.random().toString(36).slice(2,10);save()}
   try{const ctl=new AbortController();setTimeout(()=>ctl.abort(),6000);
-    await fetch(u+'/api/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:S.pid,name:S.name,cls:clsName(),lv:S.lv,power:power(),hk:HK(),eq:Object.keys(SLOTS).map(sl=>{const g=gearBy(S.eq[sl]);return g?[g.id,g.r,g.p||0,g.sh?1:0,g.set!=null?g.set:-1]:null}),st:(()=>{const s=stats();return[s.HP,s.MP,s.ATK,s.MAG,s.DEF,s.CRIT]})()}),signal:ctl.signal});
-    const r=await fetch(u+'/api/top?n=50',{signal:ctl.signal});RANKTOP=await r.json();RANKERR=0;if(MODAL&&MODAL.k==='rank')drawModal()}catch(e){RANKERR=1;RANKURL=null}}
+    await fetch(u+'/api/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:S.pid,name:S.name,cls:clsName(),lv:S.lv,power:power(),hk:HK(),eq:Object.keys(SLOTS).map(sl=>{const g=gearBy(S.eq[sl]);return g?[g.id,g.r,g.p||0,g.sh?1:0,g.set!=null?g.set:-1]:null}),st:(()=>{const s=stats();return[s.HP,s.MP,s.ATK,s.MAG,s.DEF,s.CRIT]})(),ex:{ch:S.main.done?CH.length:S.main.ch,kills:S.st.kills||0,enh:Math.max(0,...(S.gear||[]).map(g=>g.p||0)),nm:S.st.nmboss||0}}),signal:ctl.signal});
+    const r=await fetch(u+'/api/top?n=300',{signal:ctl.signal});RANKTOP=await r.json();RANKERR=0;if(MODAL&&MODAL.k==='rank')drawModal()}catch(e){RANKERR=1;RANKURL=null}}
 setInterval(()=>rankSync(),60e3);setTimeout(()=>rankSync(true),8000);
 function myCode(){if(!S.pid){S.pid=Math.random().toString(36).slice(2,10);save()}const j=JSON.stringify({i:S.pid,n:S.name,c:clsName(),l:S.lv,p:power(),t:Date.now()});return 'AO1-'+btoa(unescape(encodeURIComponent(j)))}
 function readCode(c){try{c=(c||'').trim();if(!c.startsWith('AO1-'))return null;const o=JSON.parse(decodeURIComponent(escape(atob(c.slice(4)))));if(!o.i||!o.n||typeof o.p!=='number')return null;return o}catch(e){return null}}
@@ -1924,11 +1926,19 @@ const MV={
       <textarea id="fbText" maxlength="300" rows="4" placeholder="寫下你的意見（最多 300 字）" style="width:100%;box-sizing:border-box;border:2px solid var(--line);border-radius:8px;padding:8px;font:inherit;resize:vertical"></textarea>
       <button class="btn pri big" data-a="fbSend">送出意見</button></div>
       <div class="list">${L.length?L.map(x=>`<div class="item" style="display:block"><div class="row"><b class="grow">${esc(x.name)}</b><span class="tag">${FBCAT[x.cat]||FBCAT.other}</span></div><span class="sub">${esc(x.cls||'')}・Lv.${x.lv}・${new Date(x.ts).toLocaleString()}</span><p style="white-space:pre-wrap;margin:6px 0 0">${esc(x.text)}</p>${x.reply?`<p class="gsec" style="margin-top:6px"><b>開發者回覆</b><span class="sub" style="white-space:pre-wrap">${esc(x.reply)}</span></p>`:''}</div>`).join(''):`<p class="empty">${FBERR?'⚪ 伺服器暫時連不上，稍後再試。':FBL?'還沒有人留言，來當第一個吧！':'讀取中……'}</p>`}</div>`}},
-  rank(){if(!RANKTOP||Date.now()-RANKT>60e3)rankSync(true);const online=Array.isArray(RANKTOP);const P=[];P.push({n:S.name,p:power(),me:1,c:clsName(),l:S.lv});
-    if(online){const seen={};RANKTOP.filter(x=>x.id!==S.pid&&!(x.name===S.name&&x.cls===clsName())).sort((a,b)=>b.ts-a.ts).forEach(x=>{const k=x.name+'|'+x.cls;if(seen[k])return;seen[k]=1;P.push({n:x.name,p:x.power,c:x.cls,l:x.lv,t:x.ts,on:1,id:x.id})})}
-    P.sort((a,b)=>b.p-a.p);
-    return{t:'戰力排行榜',b:`<div class="list">${P.map((x,i)=>`<div class="item" data-a="pview" data-v="${x.me?'me':x.id}" style="cursor:pointer${x.me?';border:2px solid var(--navy);background:var(--panel2)':''}"><span class="ico c${i<3?4:0}">${i+1}</span><span class="grow"><b>${esc(x.n)}</b>${x.me?' <span class="tag">我</span>':''}<span class="sub">${esc(x.c||'')}・Lv.${x.l}${x.t?`・${new Date(x.t).toLocaleDateString()} 更新`:''}</span></span><b>${x.p}</b></div>`).join('')}</div>
-      <p class="sub">${online?`🟢 線上排行榜・共 ${P.length} 位玩家。點玩家可查看裝備，你的戰力每 5 分鐘自動上傳。`:'⚪ 排行榜伺服器暫時連不上，稍後再試。'}</p>`}},
+  rank(){if(!RANKTOP||Date.now()-RANKT>60e3)rankSync(true);const online=Array.isArray(RANKTOP);const tab=RKTAB||'power',cf=RKCLS||'all';
+    const base=c=>{for(const k in CLS){if(CLS[k].n===c)return k;if((CLS[k].adv||[]).some(a=>ADV[a].n===c))return k}return ''};
+    const P=[{n:S.name,p:power(),me:1,c:clsName(),l:S.lv,hk:HK(),ex:{ch:S.main.done?CH.length:S.main.ch,kills:S.st.kills||0,enh:Math.max(0,...(S.gear||[]).map(g=>g.p||0))}}];
+    if(online){const seen={};RANKTOP.filter(x=>x.id!==S.pid&&!(x.name===S.name&&x.cls===clsName())).sort((a,b)=>b.ts-a.ts).forEach(x=>{const k=x.name+'|'+x.cls;if(seen[k])return;seen[k]=1;P.push({n:x.name,p:x.power,c:x.cls,l:x.lv,t:x.ts,on:1,id:x.id,hk:x.hk,ex:x.ex||{}})})}
+    const TABS={power:['戰力',x=>x.p,x=>x.p],lv:['等級',x=>x.l*1e7+x.p,x=>'Lv.'+x.l],kills:['討伐',x=>(x.ex.kills||0),x=>(x.ex.kills||0)+' 隻'],enh:['強化',x=>(x.ex.enh||0)*1e7+x.p,x=>'+'+(x.ex.enh||0)]};
+    const T=TABS[tab],L=P.filter(x=>cf==='all'||base(x.c)===cf).sort((a,b)=>T[1](b)-T[1](a));const myi=L.findIndex(x=>x.me);
+    const ago=t=>{const m=(Date.now()-t)/6e4;return m<60?'剛剛上線':m<1440?Math.floor(m/60)+' 小時前':Math.floor(m/1440)+' 天前'};
+    const medal=i=>i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1;
+    return{t:'排行榜',b:`<div class="tabs rk">${Object.entries(TABS).map(([k,v])=>`<button class="${k===tab?'on':''}" data-a="rkTab" data-v="${k}">${v[0]}</button>`).join('')}</div>
+      <div class="panel" style="gap:6px"><div class="fchips">${[['all','全部'],...Object.keys(CLS).map(k=>[k,CLS[k].n+'系'])].map(([k,n])=>`<button class="${k===cf?'on':''}" data-a="rkCls" data-v="${k}">${n}</button>`).join('')}</div>
+      <div class="rkme">你的名次：<b>${myi>=0?myi+1:'-'}</b> / ${L.length}　${T[0]} <b>${T[2](P[0])}</b></div>
+      <div class="list">${L.slice(0,100).map((x,i)=>`<div class="item rkrow${i<3?' top':''}" data-a="pview" data-v="${x.me?'me':x.id}" style="cursor:pointer${x.me?';border:2px solid var(--navy);background:var(--panel2)':''}"><span class="rkn">${medal(i)}</span><span class="rkav">${x.hk?art(x.hk.replace('class_','portrait_'),x.n,'r11','mini'):''}</span><span class="grow"><b>${esc(x.n)}</b>${x.me?' <span class="tag">我</span>':''}<span class="sub">${esc(x.c||'')}・Lv.${x.l}${x.ex&&x.ex.ch?`・第 ${Math.min(x.ex.ch+1,CH.length)} 章`:''}${x.t?`・${ago(x.t)}`:''}</span></span><b class="rkv">${T[2](x)}</b></div>`).join('')}</div>
+      <p class="sub">${online?`🟢 線上排行榜・共 ${P.length} 位玩家，顯示前 100 名。點玩家可查看裝備，你的資料每分鐘自動上傳。`:'⚪ 排行榜伺服器暫時連不上，稍後再試。'}</p></div>`}},
   gear(u){const g=gearBy(u);if(!g)return{t:'裝備',b:'<p class="empty">這件裝備已不存在</p>'};const b=GEAR[g.id],on=S.eq[b.slot]===u,cur=gearBy(S.eq[b.slot]);
     const can=(!b.cls||b.cls===S.cls)&&(!b.adv||b.adv===S.adv)&&S.lv>=b.lv,cmp=!on&&cur?gearPower(g)-gearPower(cur):null,set=g.set!=null?SETS[g.set]:null,sc=set?setCounts()[g.set]||0:0,rf=reforgeCost(g),dz=DIS[g.r];
     return{t:gearName(g),b:`<div class="row"><span class="ico c${g.r}">${gIco(g.id)}</span><div class="grow"><b class="c${g.r}">${RAR[g.r].n}・${SLOTS[b.slot]}</b><div class="sub">需求 Lv.${b.lv}${b.adv?'・'+ADV[b.adv].n+'專用':b.cls?'・'+CLS[b.cls].n+'專用':''}・評分 ${gearPower(g)}${g.q&&g.q!==1?`・品質 <b style="color:${g.q>=1.3?'#e0a020':g.q>=1.1?'#2a7a2a':g.q<.95?'#a05a3a':'inherit'}">${Math.round(g.q*100)}%${g.q>=1.3?' 完美':''}</b>`:''}${cmp!=null?` <b class="${cmp>=0?'up':'down'}">${cmp>=0?'▲':'▼'} ${Math.abs(cmp)}</b>`:''}</div></div>${g.lock?'<span class="tag">已鎖定</span>':''}</div>${sealed(g)?`<div class="gsec" style="border-color:#c0262d"><b style="color:#c0262d">🔒 封印中</b><span class="sub">這件裝備來自比主線進度更遠的地區，能力被封印（屬性降低、稀有詞綴與專屬效果暫時無效）。推進主線到「${AREAS[Math.min(b.t,AREAS.length-1)].n}」就會完全解除。</span></div>`:''}
@@ -2374,6 +2384,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'9.5',d:'2026-11-20',t:'排行榜改版',b:'排行榜顯示前 100 名，新增戰力／等級／討伐／強化四種排行與職業篩選，顯示頭像、主線章節、最後上線時間與你的名次。'},
   {v:'9.5',d:'2026-11-20',t:'自動戰鬥會喝魔力藥水',b:'自動／全自動戰鬥遇到首領、精英等硬敵時，魔力見底會自動喝魔力藥水（缺得多才用高級版），不再只能普攻硬磨。'},
   {v:'9.4',d:'2026-11-20',t:'生活機能調整',b:'①占星師新增「每日星象」：每天免費占卜一次，抽一個整天有效的祝福（經驗、金幣、掉寶、爆擊、屬性連鎖）。②每日任務獎勵大幅提高，三項全完成再送寶石與強化石。③裝備強化到 +10 會多開一個寶石孔，精英魔物也會掉寶石。'},
   {v:'9.3',d:'2026-11-20',t:'強化改版',b:'強化加入鐵鎚演出；6% 機率「大成功」直接 +2。+7 以上失敗仍會降一級。'},
@@ -3385,6 +3396,7 @@ const ACT={
   sqAccept(id){S.side[id]={prog:0,done:false};toast('已接受委託');save();render()},
   sqDone(id){const q=SQ.find(x=>x.id===id);if(sqProg(q)<q.c)return;if(q.type==='item')addItem(q.item,-q.c);S.side[id].done=true;const t=give(q.rw);toast(`委託完成：${t}`);save();render()},
   fortune(){if(fortune())return;const k=pick(Object.keys(FORT));S.fort={d:new Date().toDateString(),k};SFX.holy(0);toast(`今日星象：${FORT[k].n}（${FORT[k].d}）`);save();render()},
+  rkTab(v){RKTAB=v;drawModal()},rkCls(v){RKCLS=v;drawModal()},
   dailyGet(k){const d=DAILY.find(x=>x.k===k);if(S.daily.got[k]||S.daily[k]<d.c)return;S.daily.got[k]=true;toast('獲得 '+give(d.rw));if(DAILY.every(x=>S.daily.got[x.k])&&!S.daily.all){S.daily.all=1;const gm=pick(GEMS);addItem(gm,1);addItem('stone',3);setTimeout(()=>toast(`每日全部完成！額外獲得 ${ITEMS[gm].n}、強化石×3`),900)}save();render()},
   bgmT(){BGMOFF=!BGMOFF;try{localStorage.setItem(KEY+'_bgm',BGMOFF?'0':'1')}catch(e){}if(BGMOFF)bgm(null);else bgmAuto();drawModal()},
   shakeT(){SHAKEOFF=!SHAKEOFF;try{localStorage.setItem(KEY+'_shake',SHAKEOFF?'0':'1')}catch(e){}document.body.classList.toggle('noshake',SHAKEOFF);drawModal()},
