@@ -1560,6 +1560,42 @@ const BT={
     guard:[['被我看穿了。',null]],
     win:[['好，下一個。',null],['呼，手都麻了。',null],['（今天的晚餐有著落了。）',null]],
     reply:[['知道啦，別一直盯著我。',null],['{你|妳}也是，別跑太前面。',null],['嗯，交給我。',null],['……謝了。',null]]}};
+
+/* 露娜台詞依主角職業、進階職、技能、性別變化 */
+const cI=k=>()=>S.cls===k,aI=k=>()=>S.adv===k,sF=()=>S.sex==='f',sM=()=>S.sex==='m';
+[['start',[['劍士打前面，燈術士躲後面——分工很清楚嘛。',cI('swordsman')],['{你|妳}的劍剛磨過吧？燈照上去會反光。',cI('swordsman')],
+  ['同樣是靠火吃飯，我的燈可比不上{你|妳}的火球。',cI('mage')],['法師站那麼前面幹嘛？……好啦，我後面還有空位。',cI('mage')],
+  ['{你|妳}先找角度，我幫{你|妳}把牠照亮。',cI('ranger')],['風往左吹，{你|妳}瞄的時候記得偏一點。',cI('ranger')],
+  ['兩個後排……今天誰負責挨打啊？',cI('cleric')],['有神官在，我就敢衝前面一點了。',cI('cleric')],
+  ['盾舉好，我躲{你|妳}後面最安全。',aI('knight')],['又要拿血換傷害？打完我幫{你|妳}包紮。',aI('berserker')],
+  ['大魔導士的魔力，連測霧燈都會發抖。',aI('archmage')],['{你|妳}的咒術……跟霧有點像。別靠太近喔。',aI('warlock')],
+  ['神射手的話，牠還沒看到{你|妳}就倒了吧。',aI('sniper')],['刺客大人，記得留一隻給我研究。',aI('assassin')],
+  ['主教大人，祈禱完再上也不遲。',aI('bishop')],['聖殿騎士……一手錘一手禱詞，好忙。',aI('templar')],
+  ['女孩子一起出門，被魔物纏上也太掃興了。',sF],['{name}，等一下別又一個人衝出去。',sM]]],
+ ['boss',[['{name}，破綻交給{你|妳}堆，我負責看牠什麼時候倒。',cI('swordsman')],['印記多留幾個，我幫{你|妳}拖時間！',cI('mage')],['專注到最高再放，別急。',cI('ranger')],['神會回應{你|妳}的，我信。',cI('cleric')]]],
+ ['crit',[['那一劍連霧都劈開了！',cI('swordsman')],['好燙！……我是說，好厲害！',cI('mage')],['正中要害，{你|妳}眼睛到底多好？',cI('ranger')],['神官打人也這麼痛的嗎……',cI('cleric')]]],
+ ['low',[['法師不能被貼身！我把牠引開！',cI('mage')],['劍士倒下，我們就沒有前排了！撐住！',cI('swordsman')],['先別管專注了，拉開距離！',cI('ranger')],['先治療自己！不要只顧著我！',cI('cleric')],['{name}！……我才剛有一個可以說話的朋友。',sF]]],
+ ['win',[['劍上的霧擦乾淨再收，不然會生鏽。',cI('swordsman')],['魔力還夠嗎？我包包裡有魔力藥水。',cI('mage')],['箭我幫{你|妳}撿回來了，少了兩支。',cI('ranger')],['謝謝{你|妳}的祝福，手不痛了。',cI('cleric')]]]
+].forEach(([ev,ls])=>BT.luna[ev].push(...ls));
+/* 主角放技能時露娜的反應：先看技能，再看進階職、職業 */
+const LSK={whirl:['十字裂斬！破綻全清掉了！','漂亮的收尾！'],skyslash:['那一刀……空氣都裂開了。'],warcry:['{你|妳}的鬥氣，我在後面都感覺得到。'],
+  fire:['點火了，記得接著引雷！','火光一亮，測霧燈都變暗了。'],ice:['霜針插上去了，再一個印記！'],thunder:['引爆了——全部炸開！','印記一起爆，好壯觀！'],barrier:['冰鏡好漂亮，借我照一下。'],collapse:['元素崩解……{你|妳}到底藏了多少魔力？'],meteor:['星星掉下來了！？'],drain:['{你|妳}吸走的那個……真的只是魔力嗎？'],
+  snipe:['屏息——中了！','我連呼吸都不敢出聲。'],arrowstorm:['下箭雨了，大家趴下！'],trap:['陷阱什麼時候放的？我完全沒看到。'],dodge:['伏得好低，像隻貓。'],
+  heal:['謝謝，燈也跟著亮了一點。','溫暖的光……跟媽媽的燈很像。'],holy:['審光！牠的霧被燒掉了！'],miracle:['神蹟……原來真的存在。'],bless:['晨禱的時候，{你|妳}的側臉很安靜。'],purify:['霧氣散了，呼吸輕鬆多了。'],
+  bash:['盾牌撞上去的聲音好響！'],rage:['又拿血換傷害！等下我要罵{你|妳}。'],stab:['影子一閃就結束了……'],sanct:['庇護所裡，霧進不來。'],judge:['天秤傾斜了——牠完了。']};
+const LCL={swordsman:['好重的一擊！','前排就交給{你|妳}了！'],mage:['魔法的光，比我的燈還亮。','好強的魔力波動！'],ranger:['好準！','風剛好停了，時機完美。'],cleric:['神聖的光……牠在發抖。','{你|妳}祈禱的聲音好好聽。'],
+  knight:['{你|妳}站在那裡，就像一面牆。'],berserker:['別打到忘記自己還在流血！'],archmage:['這才是大魔導士。'],warlock:['黑色的魔力……還好是站在我們這邊。'],sniper:['一箭一隻，乾淨俐落。'],assassin:['我根本看不到{你|妳}的刀。'],bishop:['主教的光，連霧都會讓路。'],templar:['錘子加禱詞，好吵但好可靠。']};
+function lunaSkill(id){if(!B||!withLuna()||B.ally&&B.ally.hp<=0||(B.talkN||0)>=3||Math.random()>.3)return;const L=LSK[id]||LCL[S.adv]||LCL[S.cls];if(!L)return;B.talkN=(B.talkN||0)+1;setTimeout(()=>{if(B)bub('luna',pick(L))},1100)}
+/* 非戰鬥：出發、營火時依職業與性別說話 */
+const LOUT=[['出發前檢查一下：藥水、繩子、{你|妳}的劍。',cI('swordsman')],['今天也要靠{你|妳}的劍開路了。',cI('swordsman')],
+  ['{你|妳}的法杖上沾了霧晶粉，借我刮一點下來研究？',cI('mage')],['法師跟燈術士一起走，晚上都不用生火了。',cI('mage')],
+  ['{你|妳}走路都沒聲音，我常常以為{你|妳}不見了。',cI('ranger')],['幫我看看前面那棵樹上有沒有東西？{你|妳}眼睛比我好。',cI('ranger')],
+  ['出發前，可以幫我也祈禱一下嗎？',cI('cleric')],['神官大人，今天也請多關照。',cI('cleric')],
+  ['騎士的盔甲好重，背包我幫{你|妳}揹吧。',aI('knight')],['今天不准再拿血換傷害喔。',aI('berserker')],['大魔導士也會迷路嗎？……地圖給我。',aI('archmage')],['{你|妳}的咒術書，可以借我看一頁就好嗎？',aI('warlock')],
+  ['神射手，今天的目標是什麼？',aI('sniper')],['刺客出門都不打招呼的嗎？嚇我一跳。',aI('assassin')],['主教的袍子拖地了，小心踩到。',aI('bishop')],['聖殿騎士今天也要邊打邊唸經？',aI('templar')],
+  ['等這件事結束，我們去晨星鎮那間甜點店吧，就我們兩個女生。',sF],['{name}，你的披風破了，回來我幫你補。',sM]];
+{const _sr=startRun;startRun=function(){const r=_sr.apply(this,arguments);try{if(withLuna()&&Math.random()<.4){const l=lunaOut();if(l)setTimeout(()=>toast('露娜：「'+l+'」'),600)}}catch(e){}return r}}
+function lunaOut(){if(!withLuna())return '';const l=pickC(LOUT);return l?you(tx(l)):''}
 function bub(who,text){try{const el=document.querySelector(who==='luna'?'.stage .ally':'.stage .spr.me'),app=$('#app');if(!el||!app||!text)return;const r=el.getBoundingClientRect(),a=app.getBoundingClientRect();
   const d=document.createElement('div');d.className='spb '+(who==='luna'?'bubL':'bubM');d.innerHTML=`<b>${who==='luna'?'露娜':esc(S.name)}</b>${esc(you(tx(text)))}`;d.style.left=Math.max(4,Math.min(a.width-200,r.left-a.left+r.width*(who==='luna'?.1:.35)))+'px';d.style.top=Math.max(4,r.top-a.top-8)+'px';app.appendChild(d);setTimeout(()=>d.classList.add('out'),2300);setTimeout(()=>d.remove(),2700)}catch(e){}}
 function talk(ev,force){if(!B||!S)return;B.talkN=B.talkN||0;if(B.talkN>=3&&!force)return;const ch={start:.35,boss:1,crit:.3,low:1,guard:.8,win:.5}[ev]||.3;if(!force&&Math.random()>ch)return;
@@ -1954,7 +1990,7 @@ function runNext(){const n=RUN.step+1;if(RUN.nodes[n]==='boss'&&!RUN.gate&&RUN.s
   else if(t==='chest'){const g=Math.round((12+a.base*6)*(1.5+Math.random())*(tg==='rich'?2:1));S.gold+=g;RUN.loot.gold+=g;let x=`你在岩縫中發現一只小寶箱，獲得 ${g} G`;
     if(Math.random()<.5){addItem('pot',1);x+='、治療藥水'}if(Math.random()<.15){addItem('stone',1);x+='、強化石'}if(tg==='rich'||Math.random()<.15){const gg=rollGear(RUN.area,tg==='rich'?2:1);if(tg==='rich')minG(gg);x+='、'+gearName(gg);RUN.loot.items.push(gearName(gg))}RUN.view={type:'res',title:'發現寶箱',drop:dropFx(),text:x+'。'}}
   else{const sp=tg==='spring';S.hp=Math.min(s.HP,S.hp+Math.round(s.HP*(sp?1:.35)));S.mp=Math.min(s.MP,S.mp+Math.round(s.MP*(sp?1:.35)));
-    const al=S.party&&S.party!=='none'&&ALLY[S.party]&&ALLY[S.party].open()?S.party:null,talk=al==='luna'?pick(['露娜望著營火：「媽媽做這盞燈的時候，說是為了讓人在霧裡找得到路。」','露娜把烤好的麵包分你一半：「別逞強。累了要說。」','露娜看著北方：「等霧散了，我想帶{你|妳}去看我們村子的麥田。」']):al==='gale'?pick(['蓋爾默默擦著那把短劍，劍柄上的名字被摸得發亮。','蓋爾：「騎士團守夜，第一個睡著的人要請全隊喝酒。……你別睡。」','蓋爾把披風丟給你：「山上的夜很冷。」']):'';
+    const al=S.party&&S.party!=='none'&&ALLY[S.party]&&ALLY[S.party].open()?S.party:null,lo=al==='luna'&&Math.random()<.5?lunaOut():'',talk=al==='luna'?(lo?'露娜：「'+lo+'」':pick(['露娜望著營火：「媽媽做這盞燈的時候，說是為了讓人在霧裡找得到路。」','露娜把烤好的麵包分你一半：「別逞強。累了要說。」','露娜看著北方：「等霧散了，我想帶{你|妳}去看我們村子的麥田。」'])):al==='gale'?pick(['蓋爾默默擦著那把短劍，劍柄上的名字被摸得發亮。','蓋爾：「騎士團守夜，第一個睡著的人要請全隊喝酒。……你別睡。」','蓋爾把披風丟給你：「山上的夜很冷。」']):'';
     RUN.view={type:'res',title:sp?'靈泉':'營火休息',text:sp?'清澈的泉水泛著微光。喝下一口，全身的疲憊一掃而空——HP 與 MP 全部回復！':'你找到一處安全的營地稍作休息，回復了 35% 的 HP 與 MP。'+campTalk()+(talk?`<br><span class="sub">${talk}</span>`:'')}}
   save();render();$('#main').scrollTop=0}
 
@@ -2312,6 +2348,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'8.5',d:'2026-11-20',t:'露娜新台詞',b:'露娜會依你的職業、進階職、性別說不同的話；你放技能時她也會即時反應。出發與營火時也有專屬閒聊。'},
   {v:'8.4',d:'2026-11-20',t:'全自動與站位',b:'全自動時自己點岔路或選項，就不會再擲骰子，直接照你的選擇走。露娜改站在主角後方。'},
   {v:'8.3',d:'2026-11-20',t:'法師強化',b:'角色面板改為「物理攻擊／魔法攻擊」，職業主攻會標亮。法杖魔攻 +15%，木戒指系列新增魔攻，木珠串系列魔攻提高。隨機詞條不再出現用不到的屬性（法師不會再抽到物理攻擊、力量）。'},
   {v:'8.2',d:'2026-11-20',t:'裝備改名',b:'裝備、套裝與詞綴名稱改得更直白好懂，例如「翠影」套裝改為「森林」、「秘紋頭環」改為「刻紋頭環」、「渴血」改為「吸血」。能力完全不變。'},
@@ -2480,7 +2517,7 @@ function pAct(type,arg){if(!B||B.busy)return;const s=stats();
     if(cl==='swordsman'){C.brk=Math.min(rmax(5),C.brk+(d>0&&hasP('sw3')&&Math.random()<.3?2:1));pr.push(`破綻 ${C.brk}`);if(d>0){const g=Math.max(1,Math.round(s.MP*.05));S.mp=Math.min(s.MP,S.mp+g);pr.push(`鬥志 +${g} MP`)}}else if(cl==='ranger'){C.focus=Math.min(rmax(5),C.focus+1);pr.push(`專注 ${C.focus}`)}
     else if(cl==='cleric'){C.faith=Math.min(100,C.faith+8);pr.push(`信仰 ${C.faith}`)}else if(cl==='mage'){const g=Math.max(1,Math.round(s.MP*.06));S.mp=Math.min(s.MP,S.mp+g);pr.push(`回流 ${g} MP`)}
     blog(d===0?`${B.name} 閃開了你的攻擊`:`你發動攻擊，造成 ${d} 傷害${cr?'（爆擊！）':''}${ex}${pr.length?'，'+pr.join('，'):''}`)}
-  else if(type==='skill'){const k=SK[arg],C=B.cls;let mul=1+.15*((S.skl[arg]||1)-1);const ps=[];
+  else if(type==='skill'){try{lunaSkill(arg)}catch(e){}const k=SK[arg],C=B.cls;let mul=1+.15*((S.skl[arg]||1)-1);const ps=[];
     if(k.mark2){C.marks.push('星','星');C.marks=C.marks.slice(-5)}
     let pw=0;if(k.fin)pw+=k.fin*C.brk;if(k.det)pw+=k.det*C.marks.length*(1+s.DETAMP/100);if(k.aim)pw+=k.aim*C.focus;if(k.faithAmp)pw+=Math.min(1,C.faith/100);if(k.faithSpend)pw+=C.faith/100*1.2;if(hasP('mg2')&&(k.c==='mage'||k.c==='archmage'||k.c==='warlock'))pw+=.08*C.marks.length;if(k.ult)B.ultUsed=1;mul*=1+pw;const fx=B.fx={by:'me',cut:k.n,el:SKEL[arg]||'phys',skill:arg,hits:k.dmg&&k.dmg.h||1};S.mp-=mpCost(arg);playSkillSfx(arg,k);
     if(k.cost)S.hp=Math.max(1,S.hp-Math.round(s.HP*k.cost));
