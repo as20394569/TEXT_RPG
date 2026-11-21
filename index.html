@@ -1858,7 +1858,7 @@ function vBattle(){const s=stats(),fx=B.fx||{},intro=B.intro,a=AREAS[RUN.area];B
   const foeFx=foeFx0+(()=>{const x=(B.pops||[]).slice(-4).map((p,i)=>`<span class="dmg pop p-${POPK[p.k]}" style="animation-delay:${(sk?1.1:.35)+i*.22}s;margin-left:${(i%2?1:-1)*(18+i*6)}px">-${p.d}<small>${p.k}</small></span>`).join('');B.pops=[];return x})();
   const meFx=(theirs?(fx.miss?'<span class="dmg miss">MISS</span>':fx.d>0?(fk?`<span class="dmg late ${fx.cr?'cr':''}">-${fx.d}</span>`:`<span class="dmg">-${fx.d}</span>`):fx.d===0?'<span class="dmg miss">擋下</span>':''):'')+(fx.heal?`<span class="dmg heal ${sk?'late':''}">+${fx.heal}</span>`:'');
   /* 動作依時間發生：先出手，命中瞬間才受傷／倒地，之後回到待機 */
-  const fB='mob_'+B.id,fIdle=h=>fB+(h<=0?'_lose':B.chg&&ARTSET&&ARTSET.has(fB+'_charge')?'_charge':h<30?'_low':''),mB=HK(),mIdle=h=>mB+(h<30?'_low':'');
+  const fB='mob_'+B.id,fIdle=h=>fB+(h<=0?'_lose':(B.chg||(B.next&&SKM[B.next]&&isDng(SKM[B.next])))&&ARTSET&&ARTSET.has(fB+'_charge')?'_charge':h<30?'_low':''),mB=HK(),mIdle=h=>mB+(h<30?'_low':'');
   const fHit=atk&&fx.d>0,mHit=theirs&&fx.d>0,tF=sk?950:250,tM=fk?950:250;
   const fKey0=theirs&&!fx.stun?fB+'_atk':fHit?fIdle(fp??100):B.hp<=0?fB+'_lose':fIdle(B.fhp);
   const mKey0=sk?mB+'_sk_'+fx.skill:atk?mB+'_atk':mHit?mIdle(pp??100):mIdle(B.php);
@@ -2532,6 +2532,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'11.4',d:'2026-11-21',t:'魔物蓄力姿勢',b:'全部魔物與首領新增「蓄力姿勢」：牠們準備放大招時會擺出預備動作並泛紅光，看到就該防禦或搶先打斷。'},
   {v:'11.3',d:'2026-11-21',t:'戰鬥演出再升級',b:'多段技能會一下一下跳出每段傷害與連段數；大傷害數字更大；灼燒、連擊、引爆等效果以標籤跳出；擊破魔物有「擊破」大字、首領登場有警示橫幅；HP 低於三成畫面邊緣泛紅；戰鬥背景會緩緩移動。'},
   {v:'11.2',d:'2026-11-21',t:'戰鬥表現強化',b:'爆擊與最後一擊會頓格並推近鏡頭；灼燒、中毒、荊棘、守護反擊、露娜等額外傷害改用不同顏色的數字跳出；魔物蓄力時全身泛紅光；奧義技能會出現角色頭像特寫。'},
   {v:'11.1',d:'2026-11-21',t:'狂戰士新造型',b:'狂戰士全套立繪重新設計：獸皮披肩、紅色戰紋、尖刺肩甲與缺口巨劍，更有野性；另修正多個職業站姿。'},
@@ -2673,7 +2674,7 @@ function scaleFoe(){if(!B||B.id==='shadow')return;{const ar=RUN?RUN.area:0,bs=B.
 const BTRAIT={iron:{n:'鋼皮',d:'沒有暈眩時受到的傷害 -35%',tip:'震擊流、控場'},undying:{n:'不死',d:'每回合回復 5% HP；灼燒或中毒時無法再生',tip:'烈焰流、毒'},ward:{n:'魔障',d:'魔法傷害 -40%；被爆擊後魔障破除 2 回合',tip:'物理、疾風流、高爆擊'},enrage:{n:'狂怒',d:'第 8 回合起攻擊 +80%',tip:'速攻、連擊流'},spike:{n:'尖刺',d:'每次受到攻擊反彈 20% 傷害',tip:'吸血流、先機護盾、守護'}};
 const weekNo=()=>Math.floor((Date.now()/864e5+3)/7);
 const weekTrait=id=>{const ks=Object.keys(BTRAIT),i=Math.max(0,AREAS.findIndex(a=>a.boss===id));return ks[(weekNo()+i)%ks.length]};
-function startBattle(id,kind,nAdds){const F=mkFoe(id,kind),m=F.m,bs=F.kind==='boss';try{preload(['','_atk','_hurt','_low','_lose'].map(x=>'mob_'+id+x))}catch(e){}
+function startBattle(id,kind,nAdds){const F=mkFoe(id,kind),m=F.m,bs=F.kind==='boss';try{preload(['','_atk','_hurt','_low','_lose','_charge'].filter(x=>x!=='_charge'||(ARTSET&&ARTSET.has('mob_'+id+'_charge'))).map(x=>'mob_'+id+x))}catch(e){}
   const pool=RUN?AREAS[RUN.area].mobs:[id],adds=[];for(let i=0;i<(nAdds||0);i++){const f=mkFoe(pick(pool),'');f.hp=f.max=Math.round(f.max*.75);adds.push(f)}
   preload([...['','_hurt','_low','_win','_lose','_atk','_skill','_cast'].map(x=>HK()+x),...(id==='shadow'?[]:['','_hurt','_low','_win','_lose'].map(x=>'mob_'+id+x)),...adds.map(f=>'mob_'+f.id),'battle_'+(AREAS.find(a=>a.boss===id||a.mobs.includes(id))||{id:'plain'}).id]);
   allyAuto();const ally=id==='shadow'?null:mkAlly();if(ally)ally.hp=ally.max;
