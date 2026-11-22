@@ -1,6 +1,7 @@
 """蒼藍誓約 Online 排行榜伺服器（只用 Python 標準函式庫）
 GET  /api/top?n=50   -> 依戰力排序的玩家列表（最多 300）
 POST /api/submit     -> {"id","name","cls","lv","power"} 新增或更新自己的紀錄
+POST /api/acc/register|login|load|save|logout -> 雲端帳號（帳號＋密碼，多裝置共用存檔）
 POST /api/xfer        -> {"id","name","lv","data"} 上傳存檔換 6 碼轉移碼（24 小時）
 POST /api/xfer/get    -> {"code","take"} 用轉移碼取回存檔（take=1 取用後刪除）
 GET  /api/fb?n=50    -> 玩家意見回報（新到舊），與排行榜資料分開存放
@@ -43,6 +44,31 @@ def fb_token():
 XF_DATA = os.path.join(HERE, 'xfer_data.json')
 XF_LAST = {}
 XF_GET = {}
+
+# ---- 雲端帳號：帳號＋密碼，多台裝置共用同一份存檔（每個帳號一個檔案，密碼只存 PBKDF2 雜湊） ----
+import hashlib, hmac, secrets as _sec
+ACC_DIR = os.path.join(HERE, 'accounts')
+ACC_TRY = {}
+def acc_path(name):
+    return os.path.join(ACC_DIR, hashlib.sha256(name.lower().encode('utf-8')).hexdigest()[:32] + '.json')
+def acc_read(name):
+    try:
+        with open(acc_path(name), encoding='utf-8') as f:
+            return json.load(f)
+    except Exception:
+        return None
+def acc_write(name, a):
+    os.makedirs(ACC_DIR, exist_ok=True)
+    tmp = acc_path(name) + '.tmp'
+    with open(tmp, 'w', encoding='utf-8') as f:
+        json.dump(a, f, ensure_ascii=False)
+    os.replace(tmp, acc_path(name))
+def acc_hash(pw, salt):
+    return hashlib.pbkdf2_hmac('sha256', pw.encode('utf-8'), bytes.fromhex(salt), 120000).hex()
+def acc_ok_name(n):
+    return isinstance(n, str) and re.fullmatch(r'[A-Za-z0-9_\u4e00-\u9fff]{3,16}', n) is not None
+def acc_ok_data(d):
+    return isinstance(d, str) and d.startswith('AO1.') and len(d) <= 780000
 XF_CH = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
 def xf_load():
     try:
@@ -135,6 +161,62 @@ class H(BaseHTTPRequestHandler):
 
     def do_POST(self):
         path = urlparse(self.path).path
+        if path.startswith('/api/acc/'):
+            try:
+                d = self.body(800000)
+                name = d.get('name'); now = time.time(); ip = self.ip()
+                if not acc_ok_name(name):
+                    return self.reply(400, {'error': 'bad name'})
+                act = path[len('/api/acc/'):]
+                if act in ('register', 'login'):
+                    hist = [t for t in ACC_TRY.get(ip, []) if now - t < 600]
+                    if len(hist) >= 12:
+                        return self.reply(429, {'error': 'too many tries'})
+                    hist.append(now); ACC_TRY[ip] = hist
+                    pw = d.get('pw')
+                    if not isinstance(pw, str) or not (6 <= len(pw) <= 64):
+                        return self.reply(400, {'error': 'bad password'})
+                with LOCK:
+                    a = acc_read(name)
+                    if act == 'register':
+                        if a:
+                            return self.reply(409, {'error': 'exists'})
+                        if not acc_ok_data(d.get('data')):
+                            return self.reply(400, {'error': 'bad data'})
+                        salt = _sec.token_hex(16); tok = _sec.token_hex(24)
+                        a = {'name': name, 'salt': salt, 'hash': acc_hash(pw, salt), 'toks': [tok], 'data': d['data'], 'ts': int(now * 1000), 'dev': clean(d.get('dev'), 24)}
+                        acc_write(name, a)
+                        return self.reply(200, {'token': tok, 'ts': a['ts']})
+                    if not a:
+                        return self.reply(404, {'error': 'not found'})
+                    if act == 'login':
+                        if not hmac.compare_digest(acc_hash(pw, a['salt']), a['hash']):
+                            return self.reply(403, {'error': 'wrong password'})
+                        tok = _sec.token_hex(24)
+                        a['toks'] = (a.get('toks') or [])[-7:] + [tok]
+                        acc_write(name, a)
+                        return self.reply(200, {'token': tok, 'ts': a['ts'], 'data': a['data'], 'dev': a.get('dev', '')})
+                    if d.get('token') not in (a.get('toks') or []):
+                        return self.reply(403, {'error': 'bad token'})
+                    if act == 'load':
+                        if d.get('meta'):
+                            return self.reply(200, {'ts': a['ts'], 'dev': a.get('dev', '')})
+                        return self.reply(200, {'ts': a['ts'], 'data': a['data'], 'dev': a.get('dev', '')})
+                    if act == 'save':
+                        if not acc_ok_data(d.get('data')):
+                            return self.reply(400, {'error': 'bad data'})
+                        if not d.get('force') and int(d.get('base', 0)) != a['ts']:
+                            return self.reply(409, {'error': 'conflict', 'ts': a['ts'], 'dev': a.get('dev', '')})
+                        a['data'] = d['data']; a['ts'] = int(now * 1000); a['dev'] = clean(d.get('dev'), 24)
+                        acc_write(name, a)
+                        return self.reply(200, {'ts': a['ts']})
+                    if act == 'logout':
+                        a['toks'] = [t for t in (a.get('toks') or []) if t != d.get('token')]
+                        acc_write(name, a)
+                        return self.reply(200, {'ok': True})
+                return self.reply(404, {'error': 'unknown'})
+            except Exception:
+                return self.reply(400, {'error': 'bad request'})
         if path == '/api/xfer':
             try:
                 d = self.body(800000)

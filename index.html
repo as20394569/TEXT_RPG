@@ -1361,7 +1361,7 @@ const DAILY=[{k:'kill',c:10,n:'擊敗 10 隻魔物',rw:{gold:800,items:{stone:2}
 const KEY='azure_oath_save_v1';
 let S=null,TAB='town',RUN=null,B=null,MODAL=null,STORY=null;
 let NEWCLS='swordsman',NEWSEX='m',BAGF='all',NEWNAME='',BAGTAB='gear',QTAB='main',AUTO=false,CHATQ=[];
-let BAKT=0;function save(){try{if(S&&S.ach)checkAch()}catch(e){}try{const j=JSON.stringify(S);localStorage.setItem(KEY,j);if(Date.now()-BAKT>300000){BAKT=Date.now();localStorage.setItem(KEY+'_bak',j)}}catch(e){}}
+let BAKT=0;function save(){try{if(S&&S.ach)checkAch()}catch(e){}try{const j=JSON.stringify(S);localStorage.setItem(KEY,j);try{accDirty()}catch(e){}if(Date.now()-BAKT>300000){BAKT=Date.now();localStorage.setItem(KEY+'_bak',j)}}catch(e){}}
 function load(){try{const s=localStorage.getItem(KEY);if(s)S=JSON.parse(s)}catch(e){S=null}if(!S||!S.cls){try{const b=localStorage.getItem(KEY+'_bak');if(b){S=JSON.parse(b);setTimeout(()=>toast('主存檔損壞，已從備份還原'),800)}}catch(e){}}}
 function newGame(name,cls,sex){
   S={created:Date.now(),v:2,name,cls,sex,adv:null,lv:1,exp:0,gold:100,attr:Object.assign({},CLS[cls].base),pts:0,sp:0,skl:{},hp:1,mp:1,
@@ -1614,6 +1614,7 @@ const GREET={
 let RANKURL=null,RANKTOP=null,RANKERR=0,RANKT=0;
 async function rankUrl(){if(RANKURL)return RANKURL;try{const r=await fetch('rank.json?'+Date.now(),{cache:'no-store'});const j=await r.json();if(j&&j.url)RANKURL=j.url.replace(/\/$/,'')}catch(e){}return RANKURL}
 /* 玩家意見回報：與排行榜共用伺服器，資料分開 */
+let ACCOK=null;
 let RKTAB='power',RKCLS='all',XFC=null,XFOK=null;
 let FBL=null,FBERR=0,FBT=0;const FBCAT={bug:'🐞 錯誤回報',idea:'💡 建議',balance:'⚖ 平衡',art:'🎨 美術',other:'💬 其他'};
 async function fbLoad(){const u=await rankUrl();if(!u){FBERR=1;if(MODAL&&MODAL.k==='fb')drawModal();return}try{const ctl=new AbortController();setTimeout(()=>ctl.abort(),8000);const r=await fetch(u+'/api/fb?n=50',{cache:'no-store',signal:ctl.signal});FBL=await r.json();FBERR=0;FBT=Date.now()}catch(e){FBERR=1}if(MODAL&&MODAL.k==='fb'&&!document.activeElement?.closest?.('#modal textarea'))drawModal()}
@@ -1746,6 +1747,37 @@ function pcDraw(){if(!PCW)return;const L=$('#pcL'),Rr=$('#pcR');if(!L||!Rr)retur
     <div class="pcc pclog"><h4>系統訊息</h4>${CHATH.length?CHATH.slice(0,12).map(c=>`<p class="sub"><small>${new Date(c.ts).toLocaleTimeString().slice(0,-3)}</small> ${esc(c.t)}</p>`).join(''):'<p class="sub">歡迎來到晨星鎮。</p>'}</div>`+pcNews()}
 function pcNews(){return `<div class="pcc"><h4>更新公告 <button class="btn sm" data-a="pcOpen" data-v="news">全部</button></h4>${NEWS.slice(0,4).map(n=>`<div class="pcnw"><b>v${n.v}　${esc(n.t)}</b><p class="sub">${esc(n.b).slice(0,70)}${n.b.length>70?'…':''}</p></div>`).join('')}</div>`}
 addEventListener('resize',()=>{clearTimeout(window.__pcT);window.__pcT=setTimeout(pcLayout,150)});setInterval(()=>{if(PCW)pcDraw()},4000);setTimeout(()=>pcLayout(true),50);
+
+
+/* ===== 雲端帳號：手機與電腦登入同一個帳號，自動同步同一份進度 ===== */
+const ACCK='ao_acc';let ACC=null,ACCST='',ACCT=0,ACCBUSY=false,ACCCONF=null;
+try{ACC=JSON.parse(localStorage.getItem(ACCK)||'null')}catch(e){ACC=null}
+const accStore=()=>{try{ACC?localStorage.setItem(ACCK,JSON.stringify(ACC)):localStorage.removeItem(ACCK)}catch(e){}};
+const accDev=()=>/Mobi|Android|iPhone|iPad/.test(navigator.userAgent)?'手機':'電腦';
+async function accApi(act,body){const u=await rankUrl();if(!u)throw new Error('offline');const r=await fetch(u+'/api/acc/'+act,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});let j={};try{j=await r.json()}catch(e){}return{st:r.status,j}}
+function accDirty(){if(!ACC||!S)return;ACC.dirty=1;clearTimeout(ACCT);ACCT=setTimeout(accPush,B?20000:6000)}
+async function accPush(force){if(!ACC||!S||ACCBUSY||ACCCONF&&!force)return;if(B&&!force){ACCT=setTimeout(accPush,15000);return}ACCBUSY=true;
+  try{const {st,j}=await accApi('save',{name:ACC.n,token:ACC.tk,data:saveCode(),base:ACC.ts||0,force:force?1:0,dev:accDev()});
+    if(st===200){ACC.ts=j.ts;ACC.dirty=0;ACCST='已同步 '+new Date().toLocaleTimeString().slice(0,-3);ACCCONF=null;accStore()}
+    else if(st===409){ACCCONF=j;ACCST='另一台裝置有較新的進度';toast(`雲端有來自${j.dev||'另一台裝置'}的較新進度，請到「設定 → 雲端帳號」選擇要保留哪一份`)}
+    else if(st===403){ACCST='登入已失效，請重新登入';ACC=null;accStore()}else ACCST='同步失敗，稍後自動重試'}catch(e){ACCST='連不上伺服器，稍後自動重試'}
+  ACCBUSY=false;if(MODAL&&MODAL.k==='settings')drawModal()}
+function accApply(code){const o=loadCode(code);if(!o)return false;S=o;migrate();RUN=null;B=null;try{checkDaily()}catch(e){}const j=JSON.stringify(S);try{localStorage.setItem(KEY,j)}catch(e){}return true}
+async function accPull(){if(!ACC)return;try{const {st,j}=await accApi('load',{name:ACC.n,token:ACC.tk});if(st===200&&j.data&&accApply(j.data)){ACC.ts=j.ts;ACC.dirty=0;ACCCONF=null;ACCST='已下載雲端進度';accStore();MODAL=null;TAB='town';render();toast(`已載入雲端進度：${S.name} Lv.${S.lv}`)}else toast(st===403?'登入已失效，請重新登入':'下載失敗')}catch(e){toast('連不上伺服器')}}
+/* 開啟遊戲時：雲端比這台新就自動下載，否則把這台的變更上傳 */
+async function accBoot(){if(!ACC)return;try{const {st,j}=await accApi('load',{name:ACC.n,token:ACC.tk,meta:1});if(st===403){ACC=null;accStore();toast('雲端帳號登入已失效，請重新登入');return}if(st!==200)return;
+    if(j.ts!==(ACC.ts||0)){if(ACC.dirty&&S){ACCCONF=j;ACCST='另一台裝置有較新的進度';toast('雲端與這台裝置的進度不同，請到「設定 → 雲端帳號」選擇要保留哪一份')}else await accPull()}
+    else if(ACC.dirty)accPush()}catch(e){}}
+setTimeout(accBoot,1500);setInterval(()=>{if(ACC&&ACC.dirty&&!ACCBUSY)accPush()},60000);
+document.addEventListener('visibilitychange',()=>{if(document.hidden){if(ACC&&ACC.dirty&&!B)accPush()}else if(ACC&&!ACC.dirty&&!B&&!RUN)accBoot()});
+function accPanel(){if(ACC)return `<div class="panel"><h3>雲端帳號　<span class="tag ok">已登入</span></h3><p class="sub">帳號 <b>${esc(ACC.n)}</b>　${ACCST||'進度會自動同步'}</p>
+    <p class="sub">在其他手機或電腦登入同一個帳號，就會接續同一份進度。請不要兩台同時玩。</p>
+    ${ACCCONF?`<p class="sub" style="color:#c2410c">⚠ 雲端有${esc(ACCCONF.dev||'另一台裝置')}在 ${new Date(ACCCONF.ts).toLocaleString()} 存的進度，和這台不同。</p><div class="row"><button class="btn pri grow" data-a="accPull">用雲端的進度</button><button class="btn grow" data-a="accForce">用這台的進度覆蓋</button></div>`:`<div class="row"><button class="btn grow" data-a="accSync">立即同步</button><button class="btn grow" data-a="accOut">登出</button></div>`}</div>`;
+  return `<div class="panel"><h3>雲端帳號</h3><p class="sub">註冊一個帳號，手機和電腦登入後共用同一份進度、自動同步。</p>
+    <input id="acN" class="mono" maxlength="16" placeholder="帳號（3～16 字，中英數）" autocomplete="username" style="padding:8px;border:2px solid var(--line);border-radius:8px">
+    <input id="acP" type="password" maxlength="64" placeholder="密碼（至少 6 字）" autocomplete="current-password" style="padding:8px;border:2px solid var(--line);border-radius:8px;margin-top:4px">
+    <div class="row" style="margin-top:6px"><button class="btn pri grow" data-a="accReg">註冊（上傳這台的進度）</button><button class="btn grow" data-a="accLogin">登入（下載雲端進度）</button></div>
+    <p class="sub">密碼不會明文儲存。請不要使用和其他網站相同的密碼。</p></div>`}
 
 function chatTick(){if(!S)return;const el=$('#chat');
   if(CHATQ.length)el.innerHTML=CHATQ.shift();else if(!el.innerHTML)el.innerHTML='<span><b class="sys">[系統]</b> 歡迎來到晨星鎮，祝你冒險愉快。</span>'}
@@ -2069,7 +2101,8 @@ const MV={
      <div class="row wrap"><button class="btn grow" data-a="enh" data-v="${u}" ${canEnh(g)?'':'disabled'}>${g.p>=15?'已滿強化':`強化 ${enhRate(g)}%`}</button><button class="btn grow" data-a="reforge" data-v="${u}" ${canReforge(g)?'':'disabled'}>洗練</button>${g.r>=2&&!GEAR[g.id].uniq?`<button class="btn grow" data-a="inscribe" data-v="${u}">銘刻詞綴</button>`:''}<button class="btn grow" data-a="lock" data-v="${u}">${g.lock?'解鎖':'鎖定'}</button></div>
      <p class="sub">強化：${g.p>=15?'已達上限':`${enhCost(g)} G＋強化石×${enhStone(g)}（持有 ${S.items.stone||0}）${g.p>=10?'，失敗會降 1 級':''}`}<br>洗練：${g.r?`星塵×${rf.d}（持有 ${S.items.dust||0}）＋${rf.g} G，重新隨機附加詞條`:'普通裝備沒有詞條'}</p>
      ${on||g.lock?'':`<div class="row"><button class="btn grow" data-a="dis" data-v="${u}">分解：星塵×${dz[0]+g.p*2}${dz[1]?`、強化石×${dz[1]}`:''}</button><button class="btn grow" data-a="sellGear" data-v="${u}">出售 ${gearSell(g)} G</button></div>`}`}},
-  settings(){return{t:'設定',b:`<div class="panel"><h3>裝置轉移</h3><p class="sub">把進度搬到另一台手機或電腦：這台按「產生轉移碼」，在新裝置輸入 6 碼即可，24 小時內有效、只能使用一次。</p>
+  settings(){return{t:'設定',b:`${accPanel()}
+    <div class="panel"><h3>裝置轉移</h3><p class="sub">把進度搬到另一台手機或電腦：這台按「產生轉移碼」，在新裝置輸入 6 碼即可，24 小時內有效、只能使用一次。</p>
       ${XFC?`<div class="xfcode">${XFC.code.split('').join(' ')}</div><p class="sub" style="text-align:center">有效到 ${new Date(XFC.exp).toLocaleString()}・在新裝置的「設定 → 裝置轉移」輸入</p>`:''}
       <button class="btn pri" data-a="xferUp">${XFC?'重新產生轉移碼':'產生轉移碼'}</button>
       <div class="row" style="margin-top:6px"><input id="xfIn" class="grow mono" maxlength="8" placeholder="輸入 6 碼轉移碼" style="text-transform:uppercase;font-size:18px;letter-spacing:.2em;padding:8px;border:2px solid var(--line);border-radius:8px"><button class="btn" data-a="xferGet">接收</button></div></div>
@@ -2546,6 +2579,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'11.7',d:'2026-11-23',t:'雲端帳號',b:'設定新增「雲端帳號」：註冊帳號和密碼後，手機和電腦登入同一個帳號就會共用同一份進度並自動同步。原本的轉移碼和存檔碼也還能用。'},
   {v:'11.6',d:'2026-11-22',t:'霧核：中段強敵的戰利品',b:'打倒冒險中段的強敵後，牠會留下三顆「霧核」讓你帶走一顆，效果持續到這趟冒險結束：獵牙（對滿血敵人更痛）、斷罪（收尾更狠）、沸血（殘血反擊）、磐石（開場護盾）、湧泉（每回合回魔）、餘燼（敵人開場灼燒虛弱）、貪婪（金幣與掉寶變多，但敵人更兇）。配合自己的流派挑，後面兩段路和首領的打法會不一樣。'},
   {v:'11.5',d:'2026-11-22',t:'冒險路線加長',b:'每次冒險從 6 段加長為 8 段：中段固定出現一隻強敵，打完後的岔路一定有營地可以休息，再走兩段才到首領。獎勵也跟著變多。'},
   {v:'11.4',d:'2026-11-21',t:'魔物蓄力姿勢',b:'全部魔物與首領新增「蓄力姿勢」：牠們準備放大招時會擺出預備動作並泛紅光，看到就該防禦或搶先打斷。'},
@@ -3633,6 +3667,13 @@ const ACT={
   importSave(){const t=$('#saveTxt').value.trim();let o=loadCode(t);if(!o){try{o=JSON.parse(decodeURIComponent(escape(atob(t))));if(!o||!o.cls||!o.attr)o=null}catch(e){o=null}}
     if(!o){toast('存檔碼無效，請確認是否完整貼上');return}if(IMPOK!==t){IMPOK=t;toast(`讀到「${o.name}」Lv.${o.lv}。會覆蓋目前進度，確定的話再按一次`);return}
     IMPOK=null;S=o;migrate();RUN=null;B=null;checkDaily();save();closeM();TAB='town';render();toast('讀取成功')},
+  async accReg(){const n=($('#acN').value||'').trim(),p=$('#acP').value||'';if(!/^[A-Za-z0-9_\u4e00-\u9fff]{3,16}$/.test(n)){toast('帳號要 3～16 字，只能用中文、英文、數字、底線');return}if(p.length<6){toast('密碼至少 6 個字');return}save();
+    try{const {st,j}=await accApi('register',{name:n,pw:p,data:saveCode(),dev:accDev()});if(st===200){ACC={n,tk:j.token,ts:j.ts,dirty:0};ACCST='已同步';accStore();toast('註冊成功，這台的進度已上傳');drawModal()}else toast(st===409?'這個帳號已經有人使用':st===429?'嘗試太多次，請 10 分鐘後再試':'註冊失敗')}catch(e){toast('連不上伺服器，請稍後再試')}},
+  async accLogin(){const n=($('#acN').value||'').trim(),p=$('#acP').value||'';if(!n||p.length<6){toast('請輸入帳號和密碼');return}
+    if(S&&ACCOK!==n){ACCOK=n;toast('登入後會用雲端進度覆蓋這台裝置的進度，確定的話再按一次「登入」');return}ACCOK=null;
+    try{const {st,j}=await accApi('login',{name:n,pw:p});if(st===200&&j.data&&accApply(j.data)){ACC={n,tk:j.token,ts:j.ts,dirty:0};ACCST='已下載雲端進度';accStore();MODAL=null;TAB='town';render();toast(`登入成功：${S.name} Lv.${S.lv}`)}else toast(st===404?'沒有這個帳號':st===403?'密碼錯誤':st===429?'嘗試太多次，請 10 分鐘後再試':'登入失敗')}catch(e){toast('連不上伺服器，請稍後再試')}},
+  accSync(){if(!ACC)return;ACC.dirty=1;accPush().then(()=>toast(ACCST||'已同步'))},accPull(){accPull()},accForce(){accPush(true).then(()=>toast(ACCST||'已覆蓋'))},
+  async accOut(){if(!ACC)return;if(ACC.dirty)await accPush();try{await accApi('logout',{name:ACC.n,token:ACC.tk})}catch(e){}ACC=null;ACCCONF=null;accStore();toast('已登出，這台的進度仍保留在本機');drawModal()},
   async xferUp(){const u=await rankUrl();if(!u){toast('轉移伺服器暫時連不上，請改用下方存檔碼');return}if(!S.pid){S.pid=Math.random().toString(36).slice(2,10)}save();
     try{const r=await fetch(u+'/api/xfer',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:S.pid,name:S.name,lv:S.lv,data:saveCode()})});const j=await r.json();
       if(j.code){XFC=j;S.lastExport=Date.now();save();toast('轉移碼已產生，24 小時內有效');drawModal()}else toast(r.status===429?'太頻繁了，請 30 秒後再試':'產生失敗，請改用存檔碼')}catch(e){toast('連線失敗，請改用存檔碼')}},
