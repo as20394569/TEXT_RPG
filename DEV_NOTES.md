@@ -18,6 +18,7 @@
 - 文字一律繁體中文，自然、不老套。招式名稱要像真的遊戲招式。
 
 ## 美術流程（Codex 畫圖）
+- **授權規則（製作人 2026-11-23 指定）**：電腦操作或資料夾存取若需要製作人在電腦上按「允許」而當下沒人按，**直接略過該部分**（不重複發請求、不想辦法繞過），其餘工作照做，回報中寫明哪些在等授權；等製作人起床後一次處理。
 - Codex 在使用者電腦的 ChatGPT 桌面 App（Codex）裡，對話串「繪製蒼藍誓約 Online 插畫」。輸出資料夾：`C:\Users\Administrator\Documents\ChatGPT\cluade畫圖\azure-oath\art_v3\`
 - 下指令：computer_resolve_access(["ChatGPT"], clipboardWrite) → request_access → 寫剪貼簿 → 開 ChatGPT → 截圖 → 點輸入框 → ctrl+v → 放大確認 → Enter → release_lock。輸入框裡若是灰字是提示文字；若是使用者自己打的草稿，**不要覆蓋**，改天再送。
 - 審圖：stage 新圖、拼接圖放大逐張檢查，畫錯就退回並寫清楚哪張、哪裡錯、要怎麼改。
