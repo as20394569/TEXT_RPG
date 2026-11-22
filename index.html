@@ -2108,7 +2108,8 @@ function startRun(i,nm){DROPS=[];const POOL=[['battle',5],['event',4],['chest',2
   const AW=(AFX[AREAS[i].id]||{}).w||{};for(const p of POOL)if(AW[p[0]])p[1]*=AW[p[0]];
   const wp=ex=>{const P=POOL.filter(p=>p[0]!==ex);let r=Math.random()*P.reduce((a,b)=>a+b[1],0);for(const p of P)if((r-=p[1])<0)return p[0];return 'battle'};
   const F=AFX[AREAS[i].id]||{},tg2=t=>{const r=rTag(t);if(r)return r;if(F.curse&&t==='battle'&&Math.random()<F.curse)return 'cursed';if(F.bounty&&(t==='battle'||t==='ambush')&&Math.random()<F.bounty)return 'bounty';return null};
-  const nodes=['battle'],forks=[null],ftags=[null],blind=[null];for(let k=1;k<5;k++){const x=wp(),y=wp(x);nodes.push(null);forks.push([x,y]);ftags.push([tg2(x),tg2(y)]);blind.push(F.blind&&Math.random()<F.blind?Math.floor(Math.random()*2):null)}
+  const nodes=['battle'],forks=[null],ftags=[null],blind=[null];/* 路線加長：前段 3 個岔路 → 中段強敵 → 後段 2 個岔路（第一個必有營地）→ 首領 */
+  for(let k=1;k<7;k++){if(k===4){nodes.push('elite');forks.push(null);ftags.push(null);blind.push(null);continue}let x=wp(),y=wp(x);if(k===5){x='rest';y=wp('rest')}nodes.push(null);forks.push([x,y]);ftags.push([tg2(x),tg2(y)]);blind.push(k!==5&&F.blind&&Math.random()<F.blind?Math.floor(Math.random()*2):null)}
   if(!nm&&S.main.acc&&S.main.ch===i&&!S.main.mid&&CH[i].mid){nodes[2]='story';forks[2]=null}
   nodes.push(nm||bossReady(i)?'boss':'elite');forks.push(null);
   RUN={area:i,nm:!!nm,step:-1,nodes,forks,ftags,blind,tagAt:{},bless:null,loot:{gold:0,exp:0,items:[]},view:{type:'start'}};render();$('#main').scrollTop=0}
@@ -2532,6 +2533,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'11.5',d:'2026-11-22',t:'冒險路線加長',b:'每次冒險從 6 段加長為 8 段：中段固定出現一隻強敵，打完後的岔路一定有營地可以休息，再走兩段才到首領。獎勵也跟著變多。'},
   {v:'11.4',d:'2026-11-21',t:'魔物蓄力姿勢',b:'全部魔物與首領新增「蓄力姿勢」：牠們準備放大招時會擺出預備動作並泛紅光，看到就該防禦或搶先打斷。'},
   {v:'11.3',d:'2026-11-21',t:'戰鬥演出再升級',b:'多段技能會一下一下跳出每段傷害與連段數；大傷害數字更大；灼燒、連擊、引爆等效果以標籤跳出；擊破魔物有「擊破」大字、首領登場有警示橫幅；HP 低於三成畫面邊緣泛紅；戰鬥背景會緩緩移動。'},
   {v:'11.2',d:'2026-11-21',t:'戰鬥表現強化',b:'爆擊與最後一擊會頓格並推近鏡頭；灼燒、中毒、荊棘、守護反擊、露娜等額外傷害改用不同顏色的數字跳出；魔物蓄力時全身泛紅光；奧義技能會出現角色頭像特寫。'},
