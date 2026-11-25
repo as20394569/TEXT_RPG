@@ -584,9 +584,9 @@ function toast(t){const T=$('#toast');while(T.children.length>=3)T.firstChild.re
 /* ============ 資料 ============ */
 const ATTR={STR:'力量',DEX:'敏捷',INT:'智力',VIT:'體質',LUK:'幸運'};
 const CLS={
-  swordsman:{n:'劍士',d:'站在最前面的人。血厚、防高，越打越順手。',f:'破綻：普攻與「裂甲擊」會在敵人身上堆疊破綻（最多 5 層），每層讓你的攻擊 +6%；再用「十字裂斬」全部清算。普攻較重，命中時燃起鬥志回復少量 MP。',base:{STR:8,DEX:5,INT:3,VIT:8,LUK:4},grow:{STR:1,VIT:1},atk:'STR',basic:'ATK',adv:['knight','berserker']},
+  swordsman:{n:'劍士',d:'站在最前面的人。血與防禦是四職之首，越打越順手。',f:'破綻：普攻與「裂甲擊」會在敵人身上堆疊破綻（最多 5 層），每層讓你的攻擊 +6%；再用「十字裂斬」全部清算。普攻較重，命中時燃起鬥志回復少量 MP。',base:{STR:8,DEX:5,INT:3,VIT:8,LUK:4},grow:{STR:1,VIT:1},atk:'STR',basic:'ATK',adv:['knight','berserker']},
   mage:{n:'法師',d:'火力最高，身體最脆。靠順序取勝的人。',f:'印記：「點火」「霜針」會在敵人身上留下印記（最多 3 個），再用「引雷」全部引爆。普攻會回流少量 MP。',base:{STR:2,DEX:4,INT:10,VIT:5,LUK:5},grow:{INT:2},atk:'STR',basic:'MAG',adv:['archmage','warlock']},
-  ranger:{n:'遊俠',d:'不硬碰硬，等對方露出空檔。',f:'專注：普攻、閃過攻擊都會累積專注（最多 5 層），每層讓你的攻擊 +9%；「屏息」一箭把專注全部打出去。',base:{STR:4,DEX:10,INT:3,VIT:9,LUK:6},grow:{DEX:1,LUK:1},atk:'DEX',basic:'ATK',adv:['sniper','assassin']},
+  ranger:{n:'遊俠',d:'不硬碰硬，等對方露出空檔。',f:'專注：普攻、閃過攻擊都會累積專注（最多 5 層），每層讓你的攻擊 +10%；「屏息」一箭把專注全部打出去。',base:{STR:4,DEX:10,INT:3,VIT:9,LUK:6},grow:{DEX:1,LUK:1},atk:'DEX',basic:'ATK',adv:['sniper','assassin']},
   cleric:{n:'神官',d:'打得慢，但很難倒下。',f:'信仰：治療、祈禱與普攻會累積信仰，滿 100 時神會「回應」——自動回復 25% HP 並降下聖光。',base:{STR:4,DEX:4,INT:8,VIT:8,LUK:4},grow:{INT:1,VIT:1},atk:'STR',basic:'MAG',adv:['bishop','templar']}
 };
 const ADV={
@@ -601,42 +601,42 @@ const ADV={
 };
 const SK={
   slash:{n:'裂甲擊',c:'swordsman',lv:1,mp:4,dmg:{s:'ATK',p:1.55,rend:1},brk:2,d:'踏前一步重砍，敵人破綻 +2。劈開護甲：無視物理抗性。'},
-  guard:{n:'招架反擊',c:'swordsman',lv:1,mp:5,counter:1,d:'擺好架勢。下次被攻擊只受 30% 傷害，並反擊 150%。'},
+  guard:{n:'招架反擊',c:'swordsman',lv:1,mp:4,counter:1,brk:1,d:'擺好架勢，破綻 +1。下次被攻擊只受 30% 傷害，並反擊 150%。'},
   whirl:{n:'十字裂斬',c:'swordsman',lv:3,mp:8,dmg:{s:'ATK',p:1.2},fin:.6,d:'清算所有破綻，每層傷害 +60%。'},
-  warcry:{n:'鬥氣解放',c:'swordsman',lv:8,mp:8,buff:{atk:.35,t:3},endure:1,d:'3 回合攻擊 +35%，受到致命傷時以 1 HP 撐住一次。'},
+  warcry:{n:'鬥氣解放',c:'swordsman',lv:8,mp:8,buff:{atk:.35,def:.2,t:3},endure:1,d:'3 回合攻擊 +35%、防禦 +20%，受到致命傷時以 1 HP 撐住一次。'},
   bash:{n:'重盾衝擊',c:'knight',lv:20,mp:12,dmg:{s:'ATK',p:2},foe:{stun:1},brk:2,d:'舉盾撞上去：暈眩 1 回合，破綻 +2。'},
   rage:{n:'捨身猛擊',c:'berserker',lv:20,mp:10,dmg:{s:'ATK',p:2.6},cost:.1,fin:.8,d:'燒掉 10% HP，清算破綻，每層傷害 +80%。'},
   fire:{n:'點火',c:'mage',lv:1,mp:5,dmg:{s:'MAG',p:1.4},foe:{burn:2},mark:'灼',d:'留下「灼」印記，灼燒 2 回合。'},
   ice:{n:'霜針',c:'mage',lv:1,mp:7,dmg:{s:'MAG',p:1.5},foe:{weak:2},mark:'凍',d:'留下「凍」印記，敵人攻擊下降 2 回合。'},
-  barrier:{n:'薄冰鏡',c:'mage',lv:3,mp:8,shield:1.5,d:'凝出一面冰鏡，吸收傷害。'},
+  barrier:{n:'薄冰鏡',c:'mage',lv:3,mp:8,shield:1.5,mark:'凍',d:'凝出一面冰鏡吸收傷害，寒氣在敵人身上留下「凍」印記。'},
   thunder:{n:'引雷',c:'mage',lv:8,mp:12,dmg:{s:'MAG',p:1.8},det:.9,d:'引爆所有印記，每個印記傷害 +90%。'},
   meteor:{n:'墜星',c:'archmage',lv:20,mp:20,dmg:{s:'MAG',p:2.4},mark2:1,det:.5,d:'先留下兩個印記，再連同既有印記一起引爆，每個 +50%。'},
   drain:{n:'汲魂',c:'warlock',lv:20,mp:14,dmg:{s:'MAG',p:2.2},drain:.5,mark:'蝕',d:'傷害的 50% 轉為 HP，留下「蝕」印記。'},
   dshot:{n:'雙矢',c:'ranger',lv:1,mp:4,dmg:{s:'ATK',p:1,h:2},focus:1,d:'連射兩箭，專注 +1。'},
-  pshot:{n:'蛇牙箭',c:'ranger',lv:1,mp:6,dmg:{s:'ATK',p:1.1},foe:{poison:3},focus:1,d:'淬毒的箭，中毒 3 回合，專注 +1。'},
-  dodge:{n:'伏身',c:'ranger',lv:3,mp:6,buff:{eva:40,t:3},d:'3 回合迴避 +40%。每次閃過攻擊，專注 +2。'},
-  snipe:{n:'屏息',c:'ranger',lv:5,mp:10,dmg:{s:'ATK',p:1.6,cr:30},aim:.45,d:'耗盡專注，每層傷害 +45%，爆擊率 +30%。'},
+  pshot:{n:'蛇牙箭',c:'ranger',lv:1,mp:6,dmg:{s:'ATK',p:1.2},foe:{poison:3},focus:1,d:'淬毒的箭，中毒 3 回合，專注 +1。'},
+  dodge:{n:'伏身',c:'ranger',lv:3,mp:6,buff:{eva:40,t:3},focus:1,d:'3 回合迴避 +40%，專注 +1。每次閃過攻擊，專注再 +2。'},
+  snipe:{n:'屏息',c:'ranger',lv:5,mp:10,dmg:{s:'ATK',p:1.7,cr:30},aim:.55,d:'耗盡專注，每層傷害 +55%，爆擊率 +30%。'},
   rain:{n:'驟雨',c:'sniper',lv:20,mp:16,dmg:{s:'ATK',p:.8,h:4},aim:.15,keep:1,d:'連射四箭，每層專注讓每一箭 +15%，不消耗專注。'},
   stab:{n:'影縫',c:'assassin',lv:20,mp:12,dmg:{s:'ATK',p:2,sure:1},aim:.3,d:'必定爆擊，耗盡專注，每層傷害 +30%。'},
   heal:{n:'微光',c:'cleric',lv:1,mp:6,heal:2,faith:25,d:'回復 HP，信仰 +25。'},
-  holy:{n:'審光',c:'cleric',lv:1,mp:6,dmg:{s:'MAG',p:1.5},faithAmp:1,faith:10,d:'信仰越高越痛（最多 +100%），信仰 +10。'},
+  holy:{n:'審光',c:'cleric',lv:1,mp:6,dmg:{s:'MAG',p:1.6},faithAmp:1,faith:10,d:'信仰越高越痛（最多 +100%），信仰 +10。'},
   bless:{n:'晨禱',c:'cleric',lv:3,mp:8,buff:{atk:.25,def:.25,t:4},faith:20,d:'4 回合攻防 +25%，信仰 +20。'},
-  purify:{n:'洗禮',c:'cleric',lv:8,mp:6,heal:1,cleanse:1,faith:30,d:'回復 HP、解除中毒，信仰 +30。'},
+  purify:{n:'洗禮',c:'cleric',lv:8,mp:6,heal:1,cleanse:1,faith:30,d:'回復 HP，解除中毒、灼燒與流血，信仰 +30。'},
   sanct:{n:'庇護所',c:'bishop',lv:20,mp:18,heal:3,regen:3,faith:40,d:'大量回復並持續再生 3 回合，信仰 +40。'},
   judge:{n:'天秤',c:'templar',lv:20,mp:14,dmg:{s:'BOTH',p:1.8},faithSpend:1,d:'耗盡信仰，每 10 點傷害 +12%。'}
 };
 Object.assign(SK,{
-  charge:{n:'衝鋒突刺',c:'swordsman',lv:10,mp:9,dmg:{s:'ATK',p:1.5},brk:1,foe:{weak:2},d:'衝上去一記突刺，敵人攻擊下降 2 回合，破綻 +1。'},
+  charge:{n:'衝鋒突刺',c:'swordsman',lv:10,mp:9,dmg:{s:'ATK',p:1.7},brk:1,foe:{weak:2},d:'衝上去一記突刺，敵人攻擊下降 2 回合，破綻 +1。'},
   flurry:{n:'疾風連斬',c:'swordsman',lv:12,mp:10,dmg:{s:'ATK',p:.6,h:3},brk:3,d:'三連斬，破綻 +3。'},
   skyslash:{n:'斷空斬',c:'swordsman',lv:18,mp:0,ult:1,dmg:{s:'ATK',p:3},fin:.5,d:'【奧義・每場一次】橫斷全場的一刀，清算破綻，每層 +50%。'},
-  nova:{n:'冰霜新星',c:'mage',lv:10,mp:11,dmg:{s:'MAG',p:1.3},foe:{stun:1},mark:'凍',d:'寒氣炸開，暈眩 1 回合，留下「凍」印記。'},
+  nova:{n:'冰霜新星',c:'mage',lv:10,mp:11,dmg:{s:'MAG',p:1.5},foe:{stun:1},mark:'凍',d:'寒氣炸開，暈眩 1 回合，留下「凍」印記。'},
   firestorm:{n:'火焰風暴',c:'mage',lv:12,mp:13,dmg:{s:'MAG',p:.6,h:3},foe:{burn:3},mark:'灼',d:'三道火柱落下，灼燒 3 回合，留下「灼」印記。'},
   collapse:{n:'元素崩解',c:'mage',lv:18,mp:0,ult:1,dmg:{s:'MAG',p:2.8},det:1.2,d:'【奧義・每場一次】引爆所有印記，每個 +120%。'},
-  pierce:{n:'穿透箭',c:'ranger',lv:10,mp:8,dmg:{s:'ATK',p:1.5,pierce:.6},focus:1,d:'無視 60% 防禦的一箭，專注 +1。'},
+  pierce:{n:'穿透箭',c:'ranger',lv:10,mp:8,dmg:{s:'ATK',p:1.7,pierce:.6},focus:1,d:'無視 60% 防禦的一箭，專注 +1。'},
   trap:{n:'捕獸陷阱',c:'ranger',lv:12,mp:9,dmg:{s:'ATK',p:.8},foe:{stun:1},focus:2,d:'踩中陷阱的敵人暈眩 1 回合，專注 +2。'},
   arrowstorm:{n:'萬箭齊發',c:'ranger',lv:18,mp:0,ult:1,dmg:{s:'ATK',p:.5,h:8},aim:.08,keep:1,d:'【奧義・每場一次】八連射，每層專注讓每箭 +8%。'},
   aegis:{n:'聖盾',c:'cleric',lv:10,mp:9,shield:2,faith:15,d:'張開聖光護盾，信仰 +15。'},
-  smite:{n:'制裁之光',c:'cleric',lv:12,mp:10,dmg:{s:'MAG',p:1.6},faithAmp:1,foe:{weak:2},faith:10,d:'信仰越高越痛，敵人攻擊下降 2 回合。'},
+  smite:{n:'制裁之光',c:'cleric',lv:12,mp:10,dmg:{s:'MAG',p:1.8},faithAmp:1,foe:{weak:2},faith:10,d:'信仰越高越痛，敵人攻擊下降 2 回合。'},
   miracle:{n:'神蹟',c:'cleric',lv:18,mp:0,ult:1,heal:3,dmg:{s:'MAG',p:2},faith:100,d:'【奧義・每場一次】大量回復並降下聖光，信仰直接補滿。'},
   hold:{n:'堅守',c:'knight',lv:23,mp:10,buff:{def:.8,t:3},counter:1,d:'3 回合防禦 +80%，並進入招架姿勢。'},
   holycharge:{n:'聖騎衝鋒',c:'knight',lv:26,mp:16,dmg:{s:'ATK',p:2.8},foe:{stun:1},brk:3,d:'全力衝鋒，暈眩 1 回合，破綻 +3。'},
@@ -676,6 +676,13 @@ const PASS={
   as:{n:'暗殺術',c:'assassin',lv:20,st:{crit:10},d:'爆擊率 +10%。'},
   bp:{n:'慈悲',c:'bishop',lv:20,st:{healp:30,faithg:50},d:'治療量 +30%，信仰獲得 +50%。'},
   tp:{n:'信念之鎚',c:'templar',lv:20,st:{atkp:10,magp:10},d:'物攻、魔攻 +10%。'}};
+/* 職業流派：每個職業兩種打法，戰鬥外可隨時切換，改變職業資源的用途 */
+const STN={
+  swordsman:[{n:'破陣',d:'破綻每層讓你的攻擊 +6%，用清算招式一口氣打出去。'},{n:'鐵壁',d:'破綻不再加攻擊，改成每層讓你受到的傷害 -9%、攻擊 +4%；招架反擊的傷害 150%→260%，反擊後破綻再 +1。清算招式的每層加成減半。'}],
+  mage:[{n:'引爆',d:'留下印記，再用引爆招式全部炸掉。'},{n:'延燒',d:'引爆招式不會清掉印記（每個印記的加成變成三成五）；每個印記讓敵人身上的灼燒、中毒傷害 +45%。'}],
+  ranger:[{n:'狙擊',d:'專注每層讓攻擊 +10%，用屏息一箭全部打出去。'},{n:'連射',d:'專注不再加攻擊，改成每層連擊率 +7%；連擊追加的那一箭傷害提高到 100%。打出專注的招式不消耗專注，但每層加成變成四成。'}],
+  cleric:[{n:'祈禱',d:'信仰滿 100 時神會回應：回復 25% HP 並降下聖光。'},{n:'審判',d:'信仰滿 100 時不回血，改成降下 4.5 倍威力的聖光；信仰獲得 +30%，治療量 -20%。'}]};
+const stn=()=>(S&&S.stn===1)?1:0;
 const hasP=id=>{const p=PASS[id];return !!S&&S.lv>=p.lv&&(p.c===S.cls||p.c===S.adv)};
 const SKA={charge:['slash','#cfe0ff'],flurry:['slash','#dfe8ff'],skyslash:['slash','#ffffff'],nova:['ice','#8fdcff'],firestorm:['fire','#ff8a2a'],collapse:['meteor','#e0b8ff'],pierce:['arrow','#ffffff'],trap:['arrow','#c9b08a'],arrowstorm:['arrow','#cfff9a'],
   aegis:['shield','#ffd34a'],smite:['holy','#fff1a8'],miracle:['heal','#fff1a8'],hold:['buff','#9fd0ff'],holycharge:['slash','#ffd34a'],berserk:['buff','#ff4a4a'],feast:['slash','#ff4a4a'],missiles:['fire','#e0b8ff'],field:['buff','#e0b8ff'],
@@ -1660,7 +1667,7 @@ const MS={
   LUK:[{n:'強運',d:'爆擊率 +6%',f:r=>{r.CRIT+=6}},{n:'奇蹟',d:'擊倒敵人回復 5% HP 與 MP',f:r=>{r.REAP+=5}}]
 };
 function stats(){const e=gearTotals(),a={},c=CLS[S.cls],v=k=>e[k]||0,p=k=>1+v(k)/100;for(const k in ATTR)a[k]=S.attr[k]+v(k);
-  const rgB=S.cls==='ranger'?1.35:1;const R={HP:Math.round((60+a.VIT*14+S.lv*8+v('hp'))*p('hpp')*rgB),MP:Math.round((20+a.INT*5+S.lv*3+v('mp'))*p('mpp')),ATK:Math.round((a[c.atk]*2+v('atk'))*p('atkp')),MAG:Math.round((a.INT*2.2+v('mag'))*p('magp')),
+  const rgB=S.cls==='ranger'?1.35:S.cls==='swordsman'?1.3:1;const R={HP:Math.round((60+a.VIT*14+S.lv*8+v('hp'))*p('hpp')*rgB),MP:Math.round((20+a.INT*5+S.lv*3+v('mp'))*p('mpp')),ATK:Math.round((a[c.atk]*2+v('atk'))*p('atkp')),MAG:Math.round((a.INT*2.2+v('mag'))*p('magp')),
     DEF:Math.round((a.VIT*1.4+v('def'))*p('defp')*rgB),MRES:Math.round((a.INT*.8+a.VIT*.4+S.lv+v('mres'))*p('mresp')),RF:Math.min(60,v('rfire')),RI:Math.min(60,v('rice')),RT:Math.min(60,v('rthunder')),RD:Math.min(60,v('rdark')),CRIT:Math.min(75,Math.round(5+a.LUK*.6+a.DEX*.2+v('crit')+(fortK('crit')?8:0))),CD:150+Math.round(a.LUK*.8)+v('cd'),EVA:Math.min(45,Math.round(a.DEX*.6+v('eva'))),
     LS:v('ls'),REGEN:v('regen')+Math.min(3,a.VIT*.03),MPCUT:Math.min(50,Math.round(v('mpcut')+Math.min(20,a.INT*.15))),BURN:v('burn'),DOUBLE:v('double')+Math.min(20,Math.round(a.DEX*.15)),STUN:v('stun'),GUARD:v('guard'),SHIELD:v('shield'),BACK:Math.min(60,v('back')),THORN:Math.min(50,v('thorn')),GALE:v('gale'),REAP:Math.min(25,v('reap')),MPREG:v('mpreg'),RESMAX:v('resmax'),BRKCD:v('brkcd'),DETAMP:v('detamp'),FOCUSATK:v('focusatk'),ANSWER:v('answer'),HEALP:v('healp'),FAITHG:v('faithg'),KW:kwCount(),A:a};for(const k in MS)MS[k].forEach((m,i)=>{if(a[k]>=MSAT[i])m.f(R)});R.CRIT=Math.min(75,R.CRIT);R.EVA=Math.min(45,R.EVA);R.BACK=Math.min(60,R.BACK);R.THORN=Math.min(50,R.THORN);R.REAP=Math.min(25,R.REAP);return R}
 
@@ -2169,7 +2176,7 @@ function vChar(){const s=stats(),sc=setCounts();
    <div class="stat-g"><div><span>HP</span><b>${s.HP}</b></div><div><span>MP</span><b>${s.MP}</b></div>${CLS[S.cls].basic==='MAG'?`<div class="main"><span>魔法攻擊</span><b>${s.MAG}</b></div><div><span>物理攻擊</span><b>${s.ATK}</b></div>`:`<div class="main"><span>物理攻擊</span><b>${s.ATK}</b></div><div><span>魔法攻擊</span><b>${s.MAG}</b></div>`}<div><span>防禦</span><b>${s.DEF}</b></div><div><span>魔抗</span><b>${s.MRES}</b></div><div><span>爆擊</span><b>${s.CRIT}%</b></div><div><span>迴避</span><b>${s.EVA}%</b></div><div><span>爆傷</span><b>${s.CD}%</b></div><div><span>吸血</span><b>${s.LS}%</b></div><div><span>戰力</span><b>${power()}</b></div></div>${s.RF||s.RI||s.RT||s.RD?`<p class="sub" style="margin-top:4px">抗性：火 ${s.RF}%　冰 ${s.RI}%　雷 ${s.RT}%　暗 ${s.RD}%</p>`:''}
    <p class="sub">下一級還需 ${Math.max(0,need(S.lv)-S.exp)} EXP</p></div></div></div>
   ${buildPanel()}
-  <div class="panel"><h3>職業特色</h3><p class="sub">${CLS[S.cls].f}</p>${Object.keys(PASS).filter(id=>PASS[id].c===S.cls||PASS[id].c===S.adv).map(id=>`<span class="subl row ${hasP(id)?'':'sub'}" style="gap:6px"><span class="ico c4" style="width:30px;height:30px">${icon('pass_'+id,ic('skill'))}</span><span class="grow">被動【${PASS[id].n}】Lv.${PASS[id].lv}：${PASS[id].d}</span></span>`).join('')}${S.adv?`<p class="sub">${ADV[S.adv].n}：${ADV[S.adv].d}</p>`:''}</div>
+  <div class="panel"><h3>職業特色</h3><p class="sub">${CLS[S.cls].f}</p><div class="gsec"><b>戰法（戰鬥外可隨時切換）</b><div style="display:flex;flex-direction:column;gap:6px;margin-top:6px">${STN[S.cls].map((x,i)=>`<button class="btn ${stn()===i?'pri':''}" style="display:block;height:auto;text-align:left;white-space:normal;padding:8px 10px;line-height:1.5" data-a="setStn" data-v="${i}"><b>${stn()===i?'✔ ':''}${x.n}</b><br><span style="font-size:12px;font-weight:400;opacity:.9">${x.d}</span></button>`).join('')}</div></div>${Object.keys(PASS).filter(id=>PASS[id].c===S.cls||PASS[id].c===S.adv).map(id=>`<span class="subl row ${hasP(id)?'':'sub'}" style="gap:6px"><span class="ico c4" style="width:30px;height:30px">${icon('pass_'+id,ic('skill'))}</span><span class="grow">被動【${PASS[id].n}】Lv.${PASS[id].lv}：${PASS[id].d}</span></span>`).join('')}${S.adv?`<p class="sub">${ADV[S.adv].n}：${ADV[S.adv].d}</p>`:''}</div>
   <div class="panel"><h3>屬性　<span class="tag ${S.pts?'red':'off'}">可用 ${S.pts} 點</span><button class="btn sm" style="float:right" data-a="respec">重置（${respecCost()} G）</button></h3>${Object.keys(ATTR).map(k=>`<div class="attr"><span>${ATTR[k]}<span class="sub">　${{STR:'物理攻擊',DEX:'迴避・爆擊・連擊',INT:'魔力・MP・技能省 MP',VIT:'HP・防禦・每回合回血',LUK:'爆擊・爆傷・掉寶・金幣'}[k]}</span></span><b>${S.attr[k]}${s.A[k]>S.attr[k]?`<small class="up">+${s.A[k]-S.attr[k]}</small>`:''}</b><button class="btn sm" data-a="addPt" data-v="${k}" ${S.pts?'':'disabled'}>＋</button></div><div class="chips" style="margin:-2px 0 6px">${MS[k].map((m,i)=>`<span class="tag ${s.A[k]>=MSAT[i]?'red':'off'}">${MSAT[i]}【${m.n}】${m.d}</span>`).join('')}</div>`).join('')}<p class="sub">屬性專精：單一屬性（含裝備加成）達 30／60 解鎖。</p></div>
   ${Object.keys(ALLY).some(k=>ALLY[k].open())?`<div class="panel"><h3>同行夥伴</h3><div class="party">${[...Object.keys(ALLY).filter(k=>ALLY[k].open()),'none'].map(k=>`<button class="btn ${(S.party||'none')===k?'on':''}" data-a="setParty" data-v="${k}">${k==='none'?'<b>獨自冒險</b><span class="sub">不帶夥伴</span>':`${art(ALLY[k].img,ALLY[k].n,'r11','mini')}<b>${ALLY[k].n}</b><span class="sub">${ALLY[k].role}</span>`}</button>`).join('')}</div><p class="sub">${S.party&&S.party!=='none'?ALLY[S.party].d+(S.party==='luna'?'　羈絆越深，露娜越強。':''):'不帶夥伴時，所有戰鬥都靠自己。'}</p>${S.party==='luna'?`<div class="gsec"><b>露娜・燈術士　羈絆 ${Math.floor(S.bond||0)}</b><span class="sub">下一級進度 ${Math.round(((S.bond||0)%1)*100)}%・今日已累積 ${(S.daily&&S.daily.bond||0).toFixed(2)}／1.5（一起冒險、打首領、營火閒聊）</span>${Object.values(LUNASK).map(k=>`<span class="sub ${k.ok()?'son':''}">${k.ok()?'◆':'◇'} 【${k.n}】${k.d}${k.ok()?'':`（解鎖：${k.need}）`}</span>`).join('')}</div>`:''}</div>`:''}
   <div class="panel"><h3>裝備</h3>${eq}<p class="sub" style="text-align:center">點部位查看裝備詳細資料</p>${setHtml}</div>
@@ -2860,6 +2867,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'14.2',d:'2026-11-25',t:'職業重製：戰法、基礎數值與技能調整',b:'【職業戰法】每個職業新增兩種打法，在「角色」頁的職業特色裡切換（戰鬥外隨時可換，不用錢）。劍士：破陣（破綻加攻擊、清算爆發）／鐵壁（破綻改成每層減傷 9%、攻擊 +4%，招架反擊 150%→260%）。法師：引爆（照舊）／延燒（引爆不清印記，每個印記讓灼燒中毒 +45%）。遊俠：狙擊（專注加攻擊、屏息一箭打出）／連射（專注改成每層連擊率 +7%，連擊追加箭傷害提高，打出專注的招式不消耗專注）。神官：祈禱（信仰滿了回血加聖光）／審判（不回血，改成 4.5 倍聖光，信仰累積 +30%、治療 -20%）。【基礎數值】劍士的 HP 與防禦 ×1.3（原本比遊俠還薄），等級傷害成長提高；遊俠與法師的等級傷害成長提高，遊俠專注每層 +9%→+10%。【技能調整】劍士：招架反擊 MP 5→4 並 +1 破綻、鬥氣解放多給防禦 +20%、衝鋒突刺 150%→170%。法師：薄冰鏡會留下凍印記、冰霜新星 130%→150%。遊俠：伏身 +1 專注、蛇牙箭 110%→120%、穿透箭 150%→170%、屏息 160%→170% 且每層 +45%→+55%。神官：審光 150%→160%、制裁之光 160%→180%、洗禮可解除灼燒與流血。【大副本難度】依實測重新調整：首領在困難／煉獄只高 1／3 級；煉獄的攻防 ×1.27、HP ×1.55。自動戰鬥、未強化稀有裝的通關率大約是普通九成以上、困難七成、煉獄四成。'},
   {v:'14.1',d:'2026-11-25',t:'霧蝕、共鳴改寫技能、魔物放大',b:'【霧蝕】霧終於會真的出現在魔物身上：蝕化怪與第二章起的首領身上纏著紫霧（名字下方有霧的層數）。霧散之前牠受到的傷害 -25%，技能的暈眩與虛弱無效；每次攻擊驅 1 層（每回合最多 2 層，爆擊再多 1 層），露娜的測霧燈每回合再照散 1 層。霧散的瞬間牠會變回原本的顏色、僵住 1 回合，2 回合內多受 20% 傷害；首領的霧會再纏回來一次。【露娜台詞】跟霧有關的話只會在真的有霧的魔物身上說；燈沒反應時她會說是普通魔物，霧散時會喊你追擊。【共鳴改寫技能】同一種詞綴湊到 2 件，會改寫符合條件的招式：烈焰讓傷害招附帶灼燒、連擊讓多段招多打一段、震擊讓奧義附帶暈眩、吸血讓清算／引爆招吸血、守護讓強化多 1 回合、先機讓治療強化招附帶護盾、絕境讓單發招在半血以下 +25%、荊棘讓招架同時加防、疾風讓單發招爆擊 +15%、收割讓異常多 1 回合。到「角色」頁的技能清單可以看到哪些招被改寫。【核心傳說裝】大副本再加 5 件：震雷護符、磐石指環、背水墜飾、迅風指環、收穫之月，十種共鳴都有核心裝了。【畫面】戰鬥中的魔物放大約兩成。'},
   {v:'14.0',d:'2026-11-25',t:'大副本內容包與裝備重製（第一階段）',b:'【新魔物與機制】大副本「翠原迷森」加入 8 隻新魔物，各帶一種機制：荊棘野豬（尖刺：反彈傷害，剋多段攻擊）、苔殼蟹（反震：單發太重會震回來，剋爆發）、淨風妖精（淨化：清掉灼燒中毒，剋持續傷害）、孢子母菇（召喚幫手）、鏡翅蛾（魔障：魔法減傷，爆擊可破）、盤根守衛（不死：要靠灼燒或中毒壓制再生），以及兩隻中首領：哥布林狼騎兵（第 8 回合狂怒）與古樹祭司（淨化＋召喚）。【難度】大副本分普通、困難、煉獄，通關後解鎖下一級：怪更高等、機制怪更多、掉寶略好。【流派核心傳說裝】五件只在大副本掉的傳說裝：餘燼之心、雙生獠牙、荊棘王冠、晨霧斗篷、渴血指環。各帶一個詞綴，而且算作 2 件共鳴——三件裝備就能同時湊出兩種共鳴。中首領 3%、首領 5%。【裝備平衡】特殊玩法只出現在稀有以上的裝備；各階武器的基礎數值拉平（低階提高）；強化每級加成由 8% 改為 6%，讓刷到新裝比死命強化舊裝更有感。【補償】在這之前建立、Lv.5 以上的角色，可到冒險頁自選一套同等級的新版稀有套裝（六件）。【屬性專精】五種屬性各有兩段專精（30／60 點，含裝備加成）：力量給爆傷與暈眩、敏捷給連擊與反擊、智力給回魔與魔攻、體質給反彈與血量、幸運給爆擊與擊倒回復——配點也能決定玩法，到「角色」頁查看。職業與技能本身的重製會在下一階段進行。'},
   {v:'13.7',d:'2026-11-25',t:'魔物與掉落等級自適應',b:'魔物等級會跟著你的等級走：在牠原本的等級往上一段區間內調整（一般魔物最多 +8 級、首領最多 +6 級），不會比原本低，並且永遠比你低至少 1 級，所以回到前面的地區不再是一刀一隻。掉落的裝備階級也跟著你的等級：最多比該地區高一階，且不超過目前章節解封的階級。高塔與試煉不變。'},
@@ -3010,9 +3018,9 @@ const dropTier=ar=>{const base=Math.min(ar,TLV.length-1);let t=0;for(let i=0;i<T
 const TRX=t=>ETRAIT[t]||BTRAIT[t]||null;
 function mkFoe(id,kind){const m=MOBS[id],bs=!!m.boss,el=kind==='elite',nm=!!(RUN&&RUN.nm);
   const mut=!bs&&!nm&&S.main.ch>=1&&Math.random()<.1;
-  const dgd=RUN&&RUN.dg?(RUN.dg.diff||0):0;const L=(RUN&&RUN.tower?RUN.tlv:RUN&&RUN.trial?m.lv:adLv(m,bs))+(nm?10:0)+(mut?3:0)+[0,2,4][dgd];
+  const dgd=RUN&&RUN.dg?(RUN.dg.diff||0):0;const L=(RUN&&RUN.tower?RUN.tlv:RUN&&RUN.trial?m.lv:adLv(m,bs))+(nm?10:0)+(mut?3:0)+(bs?[0,1,3]:[0,2,4])[dgd];
   const mult=(bs?(RUN&&!RUN.tower?1.05+RUN.area*.05:1.25):el?1.12:1)*(nm?1.35:1)*(mut?1.45:1),kh=(bs?(RUN&&!RUN.tower?(RUN.area===0&&!nm?2.8:3.3+RUN.area*.6)*(RUN.area===3?1.4:RUN.area>=4?1.25:RUN.area>=1?1.1:1):4.5):el?1.8:1)*(nm?1.6:1)*(mut?2.2:1);
-  const st=mobBuild(m,L,mult*[1,1.1,1.22][dgd],kh*[1,1.2,1.45][dgd]);
+  const st=mobBuild(m,L,mult*[1,1.1,1.27][dgd],kh*[1,1.2,1.55][dgd]);
   const BMOD={goblinboss:'scout',zenos:'galeAlly'},bm=bs&&!nm&&S.flags[BMOD[id]]&&S.main.ch===RUN.area;if(bm)st.HP=Math.round(st.HP*.8);
   const aff=[];if(mut||nm){const ks=Object.keys(AFF).sort(()=>Math.random()-.5);aff.push(...ks.slice(0,bs&&nm?2:1))}
   if(aff.includes('rage'))st.ATK=Math.round(st.ATK*1.4),st.MAG=Math.round(st.MAG*1.4);if(aff.includes('shell'))st.DEF=Math.round(st.DEF*1.8),st.MRES=Math.round(st.MRES*1.8);if(aff.includes('swift'))st.EVA+=15,st.CRIT+=15;
@@ -3078,7 +3086,7 @@ function procs(s,d){const ps=[];
   if(B.aff.includes('reflect')&&d>0){const r=Math.max(1,Math.round(d*.15));S.hp=Math.max(1,S.hp-r);ps.push(`被反射 ${r} 傷害`)}
   return ps}
 const buffSum=k=>B.buffs.reduce((a,b)=>a+(b[k]||0),0);
-const CDM={swordsman:.013,cleric:.011,ranger:.005,mage:0};const clsDm=()=>1+(CDM[S.cls]||0)*S.lv;
+const CDM={swordsman:.017,cleric:.011,ranger:.011,mage:.003};const clsDm=()=>1+(CDM[S.cls]||0)*S.lv;
 
 /* 屬性弱點：w=弱點（×1.5）、r=抗性（×0.6） */
 const ELN={phys:'物理',fire:'火',ice:'冰',thunder:'雷',holy:'聖',dark:'闇',poison:'毒',arcane:'奧術'};
@@ -3099,7 +3107,7 @@ function bossPhase(){if(B&&B.kind==='boss'&&!B.ph2&&B.hp>0&&B.hp<=B.max*.5){B.ph
 const FOGN=(mut,bs)=>mut?3:(bs&&RUN&&!RUN.tower&&!RUN.trial&&RUN.area>=1)?5:0;
 function fogStrip(n,who){if(!B||!(B.fog>0)||B.hp<=0)return;B.fog=Math.max(0,B.fog-n);if(who==='luna')B.log.push(`露娜的測霧燈照散了霧（剩 ${B.fog} 層）`);
   if(B.fog===0){B.fogBrkT=B.turn;B.fogV=B.turn+2;B.st.stun=Math.max(B.st.stun||0,1);B.frozen=0;B.log.push(`【霧散】纏著 ${B.name} 的霧散開了！牠僵住 1 回合，2 回合內多受 20% 傷害`);if(B.kind==='boss'&&!B.fogRd){B.fogRd=1;B.fogRe=B.turn+5}try{talk('fogbrk',true)}catch(e){}}}
-function hitFoe(stat,pow,o){o=o||{};const s=stats();if(s.GALE){const gt=(s.KW.gale||0);const tr=!B.gale||(gt>=2&&(B.gale||0)<2)||(gt>=3&&B.turn>0&&B.turn%4===0&&B.galeT!==B.turn);if(tr){B.gale=(B.gale||0)+1;if(B.gale>2)B.galeT=B.turn;o=Object.assign({},o,{sure:1});B.log.push('【疾風】先發制人！')}}if(!o.sure&&Math.random()*100<(B.eva+fbSum('eva'))*.6)return{d:0,cr:false,miss:true};let base=clsDm()*coreM()*(B.opening?1.5:1)*(S.cls==='swordsman'&&B.cls&&B.cls.brk?1+.06*B.cls.brk:1)*(S.cls==='ranger'&&B.cls&&B.cls.focus?1+.09*B.cls.focus:1)*(stat==='BOTH'?s.ATK+s.MAG:s[stat])*(1+buffSum('atk')+(s.FOCUSATK&&B.cls.focus>=rmax(5)?s.FOCUSATK/100:0))*(B.pst.weak>0?.75:1)*(s.BACK&&S.hp<s.HP*((s.KW.back||0)>=2?.5:.35)?1+s.BACK/100:1)*((s.KW.burn||0)>=3&&B.st.burn>0?1.25:1)*((s.KW.stun||0)>=2&&B.st.stun>0?1.3:1)*((s.KW.shield||0)>=2&&B.shield>0?1.15:1)*(B.gdUp?(B.gdUp=0,1.3):1);
+function hitFoe(stat,pow,o){o=o||{};const s=stats();if(s.GALE){const gt=(s.KW.gale||0);const tr=!B.gale||(gt>=2&&(B.gale||0)<2)||(gt>=3&&B.turn>0&&B.turn%4===0&&B.galeT!==B.turn);if(tr){B.gale=(B.gale||0)+1;if(B.gale>2)B.galeT=B.turn;o=Object.assign({},o,{sure:1});B.log.push('【疾風】先發制人！')}}if(!o.sure&&Math.random()*100<(B.eva+fbSum('eva'))*.6)return{d:0,cr:false,miss:true};let base=clsDm()*coreM()*(B.opening?1.5:1)*(S.cls==='swordsman'&&B.cls&&B.cls.brk?1+(stn()?.04:.06)*B.cls.brk:1)*(S.cls==='ranger'&&B.cls&&B.cls.focus&&!stn()?1+.1*B.cls.focus:1)*(stat==='BOTH'?s.ATK+s.MAG:s[stat])*(1+buffSum('atk')+(s.FOCUSATK&&B.cls.focus>=rmax(5)?s.FOCUSATK/100:0))*(B.pst.weak>0?.75:1)*(s.BACK&&S.hp<s.HP*((s.KW.back||0)>=2?.5:.35)?1+s.BACK/100:1)*((s.KW.burn||0)>=3&&B.st.burn>0?1.25:1)*((s.KW.stun||0)>=2&&B.st.stun>0?1.3:1)*((s.KW.shield||0)>=2&&B.shield>0?1.15:1)*(B.gdUp?(B.gdUp=0,1.3):1);
   const fdef=stat==='MAG'?(B.mres??B.def):stat==='BOTH'?((B.mres??B.def)+B.def)/2:B.def;let em=elMul(B.id,B.curEl);{const ce=B.curEl,st=B.st||{};let cm=0,cn='';if(ce==='fire'&&B.frozen&&st.stun>0){cm=.5;cn='碎冰';st.stun=0;B.frozen=0}else if(ce==='ice'&&st.burn>0){cm=.3;cn='蒸發';st.burn=0}else if(ce==='thunder'&&B.frozen&&st.stun>0){cm=.3;cn='導電'}else if(ce==='thunder'&&st.poison>0){cm=.25;cn='毒爆';st.poison=Math.max(0,st.poison-1)}else if(ce==='holy'&&st.weak>0){cm=.2;cn='淨化'}else if(ce==='dark'&&st.bleed>0){cm=.25;cn='血蝕'}if(cm){if(fortK('chain'))cm+=.2;em*=1+cm;B.chain=cn;B.log.push(`【${cn}】屬性連鎖！傷害 +${Math.round(cm*100)}%`)}}if(o.rend&&em<1){em=1;B.elHit='rend'}else if(em!==1)B.elHit=em>1?'w':'r';let d=em*base*pow*100/(100+fdef*(1+fbSum('def'))*(1-(o.pierce||0)))*(.9+Math.random()*.2);const cr=!!o.sure||Math.random()*100<-(B.tough||0)+s.CRIT+(o.cr||0)+(hasP('sw1')&&B.cls.brk>=3?15:0);if(cr){const cdm=(s.CD+(hasP('rg3')&&B.cls.focus>=5?30:0)+s.BRKCD*B.cls.brk)/100;d*=1+(cdm-1)*(1-(B.cdr||0))}
   if(B.trait==='iron'&&!(B.st.stun>0))d*=.65;if(B.trait==='plate'){if(B.plT!==B.turn){B.plT=B.turn;B.plN=0}d*=Math.max(.4,1-.15*B.plN);B.plN++;if(B.plN===2)B.log.push('【疊甲】甲殼越打越硬，這回合後續傷害遞減')}if(B.trait==='veil'&&B.vlT!==B.turn){B.vlT=B.turn;if(B.st.burn>0||B.st.poison>0||B.st.bleed>0){if(!B.vlX){B.vlX=1;B.log.push('【霧隱】被持續傷害逼出原形，失效了')}}else{d*=.5;B.elHit=B.elHit||'r';B.log.push('【霧隱】第一擊打進霧裡，傷害減半')}}if(B.trait==='ward'&&stat==='MAG'&&!((B.wardBrk||0)>B.turn))d*=.6;if(B.trait==='ward'&&cr&&!((B.wardBrk||0)>B.turn)){B.wardBrk=B.turn+2;B.log.push('【魔障】被爆擊打碎了！2 回合內失效')}
   if(B.fog>0)d*=.75;else if(B.fogMax&&(B.fogV||0)>=B.turn)d*=1.2;
@@ -3116,21 +3124,21 @@ function pAct(type,arg){if(!B||B.busy)return;const s=stats();
   if(type==='flee'&&B.kind==='boss'){toast('首領戰無法逃跑');return}
   if(B.opening&&type!=='guard'&&type!=='item'){B.opn2=1}B.guard=false;B.elHit=null;B.curEl=type==='atk'?basicEl():type==='skill'?(SKEL2[arg]||'phys'):null;
   if(type==='atk'){B.srcNow='普攻';const c=CLS[S.cls],pw=c.basic==='MAG'?.8:S.cls==='swordsman'?1.15:1,r=hitFoe(c.basic,pw);let d=r.d,cr=r.cr,ex='';
-    if(B.hp>0&&s.DOUBLE&&Math.random()*100<s.DOUBLE){B.srcNow='連擊';const r2=hitFoe(c.basic,pw*((s.KW.double||0)>=3?1:.6));d+=r2.d;cr=cr||r2.cr;ex='，觸發連擊';B.srcNow='普攻'}
+    const rs=S.cls==='ranger'&&stn(),dbl=s.DOUBLE+(rs?7*B.cls.focus:0);if(B.hp>0&&dbl&&Math.random()*100<dbl){B.srcNow='連擊';const r2=hitFoe(c.basic,pw*((s.KW.double||0)>=3||rs?1:.6));d+=r2.d;cr=cr||r2.cr;ex='，觸發連擊';B.srcNow='普攻'}
     B.fx={by:'me',d,cr,el:c.basic==='MAG'?'holy':'phys',cut:B.chain?`${B.chain}！`:undefined,chain:B.chain||null};B.chain=null;SFX[cr?'crit':'hit']();const pr=procs(s,d),C=B.cls,cl=S.cls;
     if(cl==='swordsman'){C.brk=Math.min(rmax(5),C.brk+(d>0&&hasP('sw3')&&Math.random()<.3?2:1));pr.push(`破綻 ${C.brk}`);if(d>0){const g=Math.max(1,Math.round(s.MP*.05));S.mp=Math.min(s.MP,S.mp+g);pr.push(`鬥志 +${g} MP`)}}else if(cl==='ranger'){C.focus=Math.min(rmax(5),C.focus+1);pr.push(`專注 ${C.focus}`)}
-    else if(cl==='cleric'){C.faith=Math.min(100,C.faith+8);pr.push(`信仰 ${C.faith}`)}else if(cl==='mage'){const g=Math.max(1,Math.round(s.MP*.06));S.mp=Math.min(s.MP,S.mp+g);pr.push(`回流 ${g} MP`)}
+    else if(cl==='cleric'){C.faith=Math.min(100,C.faith+(stn()?11:8));pr.push(`信仰 ${C.faith}`)}else if(cl==='mage'){const g=Math.max(1,Math.round(s.MP*.06));S.mp=Math.min(s.MP,S.mp+g);pr.push(`回流 ${g} MP`)}
     blog(d===0?`${B.name} 閃開了你的攻擊`:`你發動攻擊，造成 ${d} 傷害${cr?'（爆擊！）':''}${ex}${pr.length?'，'+pr.join('，'):''}`)}
   else if(type==='skill'){try{lunaSkill(arg)}catch(e){}const k=skx(arg,s.KW),C=B.cls;let mul=1+.15*((S.skl[arg]||1)-1);const ps=[];if(k.backp&&S.hp<s.HP*.5){mul*=1+k.backp;ps.push('【絕境改寫】威力 +25%')}
     if(k.mark2){C.marks.push('星','星');C.marks=C.marks.slice(-5)}
-    let pw=0;if(k.fin)pw+=k.fin*C.brk;if(k.det)pw+=k.det*C.marks.length*(1+s.DETAMP/100);if(k.aim)pw+=k.aim*C.focus;if(k.faithAmp)pw+=Math.min(1,C.faith/100);if(k.faithSpend)pw+=C.faith/100*1.2;if(hasP('mg2')&&(k.c==='mage'||k.c==='archmage'||k.c==='warlock'))pw+=.08*C.marks.length;if(k.ult)B.ultUsed=1;mul*=1+pw;const fx=B.fx={by:'me',cut:B.chain?`${k.n}・${B.chain}！`:k.n,chain:B.chain||null,el:SKEL[arg]||'phys',skill:arg,hits:k.dmg&&k.dmg.h||1};B.chain=null;if(S.reapFree){S.reapFree=0;ps.push('【收割共鳴】這招不消耗 MP')}else S.mp-=mpCost(arg);playSkillSfx(arg,k);
+    const sn=stn(),cl0=S.cls;let pw=0;if(k.fin)pw+=k.fin*C.brk*(sn&&cl0==='swordsman'?.5:1);if(k.det)pw+=k.det*C.marks.length*(1+s.DETAMP/100)*(sn&&cl0==='mage'?.35:1);if(k.aim)pw+=k.aim*C.focus*(sn&&cl0==='ranger'?.4:1);if(k.faithAmp)pw+=Math.min(1,C.faith/100);if(k.faithSpend)pw+=C.faith/100*1.2;if(hasP('mg2')&&(k.c==='mage'||k.c==='archmage'||k.c==='warlock'))pw+=.08*C.marks.length;if(k.ult)B.ultUsed=1;mul*=1+pw;const fx=B.fx={by:'me',cut:B.chain?`${k.n}・${B.chain}！`:k.n,chain:B.chain||null,el:SKEL[arg]||'phys',skill:arg,hits:k.dmg&&k.dmg.h||1};B.chain=null;if(S.reapFree){S.reapFree=0;ps.push('【收割共鳴】這招不消耗 MP')}else S.mp-=mpCost(arg);playSkillSfx(arg,k);
     if(k.cost)S.hp=Math.max(1,S.hp-Math.round(s.HP*k.cost));
-    const consume=()=>{if(k.fin&&C.brk){ps.push(`清算 ${C.brk} 層破綻`);C.brk=0}if(k.det&&C.marks.length){ps.push(`引爆 ${C.marks.length} 個印記`);C.marks=[]}
-      if(k.aim&&!k.keep&&C.focus){ps.push(`打出 ${C.focus} 層專注`);C.focus=0}if(k.faithSpend&&C.faith){ps.push(`燃燒 ${C.faith} 點信仰`);C.faith=0}};
+    const consume=()=>{if(k.fin&&C.brk){ps.push(`清算 ${C.brk} 層破綻`);C.brk=0}if(k.det&&C.marks.length){if(sn&&cl0==='mage')ps.push(`【延燒】${C.marks.length} 個印記繼續燒`);else{ps.push(`引爆 ${C.marks.length} 個印記`);C.marks=[]}}
+      if(k.aim&&!k.keep&&C.focus&&!(sn&&cl0==='ranger')){ps.push(`打出 ${C.focus} 層專注`);C.focus=0}if(k.faithSpend&&C.faith){ps.push(`燃燒 ${C.faith} 點信仰`);C.faith=0}};
     if(k.dmg){let tot=0,cr=false;B.srcNow=k.n;const hl=[];for(let i=0;i<(k.dmg.h||1);i++){const r=hitFoe(k.dmg.s,k.dmg.p*mul,k.dmg);tot+=r.d;cr=cr||r.cr;hl.push(r.d)}if(hl.length>1)fx.hl=hl;
-       {const dk=s.KW.double||0;if(dk>=2&&B.hp>0&&s.DOUBLE&&Math.random()*100<s.DOUBLE*.5){B.srcNow='連擊';const r2=hitFoe(k.dmg.s,k.dmg.p*mul*(dk>=3?1:.4),k.dmg);tot+=r2.d;cr=cr||r2.cr;ps.push(`觸發連擊 +${r2.d}`)}}fx.d=tot;fx.cr=cr;ps.push(`造成 ${tot} 傷害${cr?'（爆擊！）':''}`);ps.push(...procs(s,tot));
+       {const dk=s.KW.double||0,rs=cl0==='ranger'&&sn,dbl=s.DOUBLE+(rs?7*C.focus:0);if((dk>=2||rs)&&B.hp>0&&dbl&&Math.random()*100<dbl*.5){B.srcNow='連擊';const r2=hitFoe(k.dmg.s,k.dmg.p*mul*(dk>=3?1:rs?.6:.4),k.dmg);tot+=r2.d;cr=cr||r2.cr;ps.push(`觸發連擊 +${r2.d}`)}}fx.d=tot;fx.cr=cr;ps.push(`造成 ${tot} 傷害${cr?'（爆擊！）':''}`);ps.push(...procs(s,tot));
       if(k.drain){const h=Math.round(tot*k.drain);S.hp=Math.min(s.HP,S.hp+h);fx.heal=h;ps.push(`吸取 ${h} HP`)}}
-    if(k.heal){const h=Math.round(s.MAG*k.heal*mul*.7*(1+s.HEALP/100));S.hp=Math.min(s.HP,S.hp+h);fx.heal=h;ps.push(`回復 ${h} HP`)}
+    if(k.heal){const h=Math.round(s.MAG*k.heal*mul*.7*(1+s.HEALP/100)*(sn&&cl0==='cleric'?.8:1));S.hp=Math.min(s.HP,S.hp+h);fx.heal=h;ps.push(`回復 ${h} HP`)}
     if(k.shield){B.shield=Math.round(s.MAG*k.shield*mul);ps.push(`獲得 ${B.shield} 點護盾`)}
     if(k.shp){const v=Math.round(s.HP*k.shp);B.shield=(B.shield||0)+v;ps.push(`【先機改寫】護盾 +${v}`)}
     if(k.buff){B.buffs=B.buffs.filter(b=>b.id!==arg);B.buffs.push(Object.assign({id:arg,n:k.n},k.buff));ps.push('能力提升')}
@@ -3140,10 +3148,10 @@ function pAct(type,arg){if(!B||B.busy)return;const s=stats();
     if(k.brk){C.brk=Math.min(rmax(5),C.brk+k.brk);ps.push(`破綻 ${C.brk}`)}
     if(k.mark&&B.hp>0){C.marks.push(k.mark);C.marks=C.marks.slice(-rmax(3));ps.push(`留下「${k.mark}」印記`)}
     if(k.focus){C.focus=Math.min(rmax(5),C.focus+k.focus);ps.push(`專注 ${C.focus}`)}
-    if(k.faith){C.faith=Math.min(100,C.faith+Math.round(k.faith*(1+s.FAITHG/100)));ps.push(`信仰 ${C.faith}`)}
+    if(k.faith){C.faith=Math.min(100,C.faith+Math.round(k.faith*(1+s.FAITHG/100)*(sn&&cl0==='cleric'?1.3:1)));ps.push(`信仰 ${C.faith}`)}
     if(k.counter){B.counter=1;ps.push('進入招架姿勢')}
     if(k.endure){B.endure=1}
-    if(k.cleanse){B.pst.poison=0;ps.push('解除中毒')}
+    if(k.cleanse){B.pst.poison=0;B.pst.burn=0;B.pst.bleed=0;ps.push('解除異常')}
     if(k.regen){B.pst.regen=k.regen;ps.push('獲得再生')}
     blog(`你施展【${k.n}】，${ps.join('，')}`)}
   else if(type==='item'){const it=ITEMS[arg];if(!S.items[arg])return;addItem(arg,-1);
@@ -3162,7 +3170,7 @@ function intentHtml(){if(!B||B.hp<=0)return '';if(B.chg){const nd=B.chgNeed||0,d
 function foePick(){const ks=(B.m.sk||[]).filter(id=>{const k=SKM[id];return !(k.heal&&(B.hp>B.max*.55||B.hcd>B.turn))&&!(k.self&&B.fb.some(b=>b.id===id))&&!(k.shield&&B.fshield>0)});
   const ch=B.kind==='boss'?.5:(B.kind==='elite'||B.mut||B.nm)?.42:.3;return ks.length&&Math.random()<ch?pick(ks):null}
 function foeTurn(){if(!B)return;if(B.treasure&&B.turn>=3&&B.hp>0){B=null;RUN.view={type:'res',title:'寶藏魔物逃走了',text:'牠抱著閃亮的寶物，一溜煙鑽進草叢裡不見了……下次要更快打倒牠！'};render();return}if(MODAL&&MODAL.k==='foe'){setTimeout(foeTurn,300);return}B.tk=0;const s=stats();
-  for(const k of ['poison','burn'])if(B.st[k]>0){const st=k==='burn'?(B.burnS||1):1,d=Math.max(1,Math.round(B.max*(k==='poison'?.05:.04)*(B.kind==='boss'?.5:1)*st));B.hp=Math.max(0,B.hp-d);dsrc(k==='burn'?'灼燒':'中毒',d);B.st[k]--;if(k==='burn'&&B.st.burn<=0)B.burnS=0;blog(`${B.name} 受到${FOE[k]}${st>1?`（${st} 層）`:''}傷害 ${d}`)}
+  for(const k of ['poison','burn'])if(B.st[k]>0){const st=k==='burn'?(B.burnS||1):1,d=Math.max(1,Math.round(B.max*(k==='poison'?.05:.04)*(B.kind==='boss'?.5:1)*st*(S.cls==='mage'&&stn()&&B.cls?1+.45*B.cls.marks.length:1)));B.hp=Math.max(0,B.hp-d);dsrc(k==='burn'?'灼燒':'中毒',d);B.st[k]--;if(k==='burn'&&B.st.burn<=0)B.burnS=0;blog(`${B.name} 受到${FOE[k]}${st>1?`（${st} 層）`:''}傷害 ${d}`)}
   if(B.stunHit&&!(B.st.stun>0)&&B.hp>0){B.stunHit=0;B.srcNow='震擊共鳴';const r=hitFoe(CLS[S.cls].basic,1.2);blog(`【震擊共鳴】暈眩結束的瞬間追加重擊 ${r.d}`)}
   {const kw=s.KW||{};if((kw.shield||0)>=3&&B.turn>0&&B.turn%4===0&&s.SHIELD){const sh=Math.round(s.HP*s.SHIELD/200);B.shield=Math.max(B.shield||0,sh);blog(`【先機共鳴】重新張開護盾 ${sh}`)}}
   addsDot();
@@ -3195,7 +3203,7 @@ function foeTurn(){if(!B)return;if(B.treasure&&B.turn>=3&&B.hp>0){B=null;RUN.vie
         const res=mb?100/(100+s.MRES+s.DEF*.2):k&&k.mag?100/(100+s.MRES+s.DEF*.2)*(1-mobRes(k,s)/100):100/(100+s.DEF*(1+buffSum('def'))*(1-(k&&k.pierce||0)));
         let d=base*res*(.9+Math.random()*.2);if(Math.random()*100<B.crit+fbSum('crit')+(k&&k.cr||0)){d*=1.5;cr=true}tot+=d}
       if(!hit){fx.miss=1;SFX.miss();blog(`你閃開了 ${B.name} 的${nm}！`);setTimeout(()=>{try{talk('dodge')}catch(e){}},500);if(S.cls==='ranger'){B.cls.focus=Math.min(rmax(5),B.cls.focus+2);blog(`專注 ${B.cls.focus}`)}}
-      else{let d=tot;if(B.lunaWard){d*=.6;B.lunaWard=0;blog('魔法護盾擋下了部分衝擊')}if(B.guard)d*=(big||dng)?.25:.5;if(B.guard&&(big||dng)){B.opening=1;blog('✦ 完美防禦！看穿破綻，下次攻擊傷害 +50%');setTimeout(()=>talk('guard'),600)}let gd=false;if(s.GUARD&&Math.random()*100<s.GUARD){d*=.5;gd=true;if((s.KW.guard||0)>=2&&B.hp>0){B.srcNow='守護反擊';const r=hitFoe(CLS[S.cls].basic==='MAG'?'MAG':'ATK',.5,{sure:1});blog(`【守護共鳴】順勢反擊 ${r.d}`)}}d=Math.max(1,Math.round(d));let ctr=false;if(B.counter){d=Math.max(1,Math.round(d*.3));B.counter=0;ctr=true}
+      else{let d=tot;if(B.lunaWard){d*=.6;B.lunaWard=0;blog('魔法護盾擋下了部分衝擊')}if(B.guard)d*=(big||dng)?.25:.5;if(B.guard&&(big||dng)){B.opening=1;blog('✦ 完美防禦！看穿破綻，下次攻擊傷害 +50%');setTimeout(()=>talk('guard'),600)}let gd=false;if(s.GUARD&&Math.random()*100<s.GUARD){d*=.5;gd=true;if((s.KW.guard||0)>=2&&B.hp>0){B.srcNow='守護反擊';const r=hitFoe(CLS[S.cls].basic==='MAG'?'MAG':'ATK',.5,{sure:1});blog(`【守護共鳴】順勢反擊 ${r.d}`)}}if(S.cls==='swordsman'&&stn()&&B.cls.brk)d*=1-.09*Math.min(5,B.cls.brk);d=Math.max(1,Math.round(d));let ctr=false;if(B.counter){d=Math.max(1,Math.round(d*.3));B.counter=0;ctr=true}
         let ab=0;if(B.shield>0){ab=Math.min(B.shield,d);B.shield-=ab;d-=ab}
         fx.d=d;fx.cr=cr;fx.quake=!!k||d>s.HP*.15;SFX.hurt(k?.85:0);buzz(k?120:50);S.hp=Math.max(0,S.hp-d);
         blog(`${B.name} 的${nm}造成 ${d} 傷害${cr?'（爆擊）':''}${ab?`（護盾吸收 ${ab}）`:''}${gd?'（格擋）':''}${ctr?'（招架成功）':''}`);
@@ -3204,7 +3212,7 @@ function foeTurn(){if(!B)return;if(B.treasure&&B.turn>=3&&B.hp>0){B=null;RUN.vie
         const dr=(k&&k.drain||0)+(B.aff.includes('leech')?.3:0);if(dr&&d>0){const h=Math.round(d*dr);B.hp=Math.min(B.max,B.hp+h);fx.fheal=h;blog(`${B.name} 吸取了 ${h} HP`)}
         if(k&&k.hst&&Math.random()<(k.p||1))for(const h in k.hst){B.pst[h]=Math.max(1,k.hst[h]-(hasP('cl3')?1:0));blog(`你陷入${HST[h]}（${k.hst[h]} 回合）`)}
         if(B.aff.includes('venom')&&d>0){B.pst.poison=Math.max(B.pst.poison,2)}
-        if(ctr&&S.hp>0){const r=hitFoe('ATK',1.5);B.cls.brk=Math.min(rmax(5),B.cls.brk+1);blog(`招架反擊，造成 ${r.d} 傷害，破綻 ${B.cls.brk}`)}}}}
+        if(ctr&&S.hp>0){const r=hitFoe('ATK',stn()&&S.cls==='swordsman'?2.6:1.5);B.cls.brk=Math.min(rmax(5),B.cls.brk+(stn()&&S.cls==='swordsman'?2:1));blog(`招架反擊，造成 ${r.d} 傷害，破綻 ${B.cls.brk}`)}}}}
   if(B.st.weak>0)B.st.weak--;
   if(B.opn2){B.opening=0;B.opn2=0}
   if(B.brkP){B.brkP=0;if(B.hp>0&&S.hp>0){B.opening=1;B.brkFx=1;blog(`✴【崩解霧核】${B.name} 的架勢崩解了！你的下一次行動傷害 +50%`)}}
@@ -3213,7 +3221,7 @@ function foeTurn(){if(!B)return;if(B.treasure&&B.turn>=3&&B.hp>0){B=null;RUN.vie
   for(const [h,r,n] of [['poison',.04,'毒素發作'],['burn',.05,'灼燒'],['bleed',.035,'流血']])if(S.hp>0&&B.pst[h]>0){const d=Math.max(1,Math.round(s.HP*r));S.hp=Math.max(0,S.hp-d);B.pst[h]--;blog(`${n}，損失 ${d} HP`)}
   if(B.pst.weak>0)B.pst.weak--;
   if(S.hp>0&&B.pst.regen>0){const h=Math.round(s.HP*.08);S.hp=Math.min(s.HP,S.hp+h);B.pst.regen--;blog(`再生效果回復 ${h} HP`)}
-  if(S.hp>0&&B.cls.faith>=100){B.cls.faith=0;const h=Math.round(s.HP*(.25+s.ANSWER/100));S.hp=Math.min(s.HP,S.hp+h);const r=hitFoe('MAG',1.2);SFX.holy(0);blog(`神回應了祈禱：回復 ${h} HP，聖光造成 ${r.d} 傷害`)}
+  if(S.hp>0&&B.cls.faith>=100){B.cls.faith=0;if(S.cls==='cleric'&&stn()){B.srcNow='審判';const r=hitFoe('MAG',4.5*(1+s.ANSWER/100));SFX.holy(0);blog(`【審判】神降下裁決的聖光，造成 ${r.d} 傷害`)}else{const h=Math.round(s.HP*(.25+s.ANSWER/100));S.hp=Math.min(s.HP,S.hp+h);const r=hitFoe('MAG',1.2);SFX.holy(0);blog(`神回應了祈禱：回復 ${h} HP，聖光造成 ${r.d} 傷害`)}}
   if(B.hp<=0){render();setTimeout(win,1200);return}
   if(S.hp>0&&s.REGEN){const h=Math.max(1,Math.round(s.HP*s.REGEN/100));S.hp=Math.min(s.HP,S.hp+h);blog(`裝備效果回復 ${h} HP`)}
   if(S.hp>0&&s.MPREG){S.mp=Math.min(s.MP,S.mp+Math.max(1,Math.round(s.MP*s.MPREG/100)))}
@@ -3936,7 +3944,7 @@ const ACT={
   startRun(v){if(S.hp<=1){toast('HP 太低，先到旅店休息');return}startRun(+v)},
   trial(){if(S.adv||S.trial||S.lv<TRIAL.lv)return;if(S.hp<=1){toast('HP 太低，先到旅店休息');return}const sh=SHADOW[S.cls];MOBS.shadow.ty=sh[0];MOBS.shadow.sk=sh[1];
     closeM();TAB='adv';RUN={area:Math.min(4,Math.max(0,S.main.ch)),trial:true,nm:false,step:0,nodes:['boss'],loot:{gold:0,exp:0,items:[]},view:{type:'start'}};startBattle('shadow','boss');render()},
-  startDg(v){if(S.hp<=1){toast('HP 太低，先到旅店休息');return}const [d,k]=String(v).split(':').map(Number);startDg(d,k)},dgNext(){dgNext()},gift14(v){gift14(+v)},dgDiff(v){DGDIFF=+v;render()},
+  startDg(v){if(S.hp<=1){toast('HP 太低，先到旅店休息');return}const [d,k]=String(v).split(':').map(Number);startDg(d,k)},dgNext(){dgNext()},gift14(v){gift14(+v)},setStn(v){if(B){toast('戰鬥中不能切換戰法');return}S.stn=+v?1:0;save();render();toast(`切換為【${STN[S.cls][stn()].n}】`)},dgDiff(v){DGDIFF=+v;render()},
   startNm(v){if(S.hp<=1){toast('HP 太低，先到旅店休息');return}startRun(+v,true)},
   runNext(){runNext()},bossGo(){if(!RUN)return;RUN.gate=1;runNext()},gatePrep(v){doPrep(v)},bossBox(v){bossBox(v)},core(v){corePick(v)},kiln(v){kilnPick(v)},camp(v){campPick(v)},retreat(){if(!RUN)return;if(RUN.step<0){RUN=null;render()}else finish(false)},retreatAsk(){if(!RUN||B)return;if(confirm('要撤退回城嗎？\n已獲得的金幣、經驗與戰利品都會保留。'))ACT.retreat()},finish(){finish(true)},
   evPick(v){evPick(+v)},
