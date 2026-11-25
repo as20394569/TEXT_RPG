@@ -511,6 +511,7 @@ body.pc #app{margin:0;flex:none;box-shadow:0 0 40px rgba(0,0,0,.45)}
 @keyframes v2kb{0%,100%{transform:none}25%{transform:translate(-7%,5%) rotate(-6deg);filter:brightness(2.2)}55%{transform:translate(4%,-2%) rotate(3deg)}}
 .stage.v2 .spr.foe.lunge-foe{animation:v2lg2 .44s}
 @keyframes v2lg2{0%{transform:none}22%{transform:translateY(-7%) scale(1.06)}58%{transform:translateY(24%) scale(1.3)}100%{transform:none}}
+body.noanim *{transition:none!important}
 </style>
 </head>
 <body>
@@ -1588,7 +1589,8 @@ const BGM={
     {w:'nz',v:.08,n:rep('k . s k k . s s',8)}]}};
 let BGMCUR=null,BGMT=0,BGMI=0,BGMTIMER=null;
 function drum(k,t){if(k==='k'){sq(160,.09,.22,t-ctx().currentTime,40,'tri',BG)}else if(k==='s')nz(.1,.16,t-ctx().currentTime,0,.8,BG);else if(k==='h')nz(.03,.07,t-ctx().currentTime,0,2,BG)}
-function bgmTick(){const a=ctx();if(!a||!BGMCUR)return;const tr=BGM[BGMCUR],st=60/tr.bpm/2;
+function bgmTick(){const a=ctx();if(!a||!BGMCUR||document.hidden)return;const tr=BGM[BGMCUR],st=60/tr.bpm/2;
+  if(BGMT<a.currentTime-.25)BGMT=a.currentTime+.08;/* 切出再回來：不補播積欠的音符（會一次爆出來造成卡頓） */
   while(BGMT<a.currentTime+.15){tr.ch.forEach(c=>{const tk=c._t||(c._t=c.n.trim().split(/\s+/)),i=BGMI%tk.length,x=tk[i];
       if(c.w==='nz'){if(x!=='.'&&x!=='-')drum(x,BGMT);return}
       if(x==='.'||x==='-')return;let L=1;while(tk[(i+L)%tk.length]==='-'&&L<16)L++;const f=NOTE(x);if(f)sq(f,st*L*.92,c.v,BGMT-a.currentTime,0,c.w,BG)});
@@ -1596,7 +1598,7 @@ function bgmTick(){const a=ctx();if(!a||!BGMCUR)return;const tr=BGM[BGMCUR],st=6
 function bgm(name){if(BGMOFF)name=null;if(name===BGMCUR)return;BGMCUR=name;clearInterval(BGMTIMER);BGMTIMER=null;
   if(!name)return;const a=ctx();if(!a)return;BGMT=a.currentTime+.08;BGMI=0;BGMTIMER=setInterval(bgmTick,30);bgmTick()}
 function bgmAuto(){let n='title';if(S)n=B?(B.kind==='boss'||B.id==='shadow'?'boss':'battle'):RUN?(RUN.tower?'f_tower':BGM['f_'+(AREAS[RUN.area]||{}).id]?'f_'+AREAS[RUN.area].id:'field'):'town';bgm(n)}
-document.addEventListener('visibilitychange',()=>{if(!AC)return;document.hidden?AC.suspend():AC.resume()});
+document.addEventListener('visibilitychange',()=>{try{if(!document.hidden){window.__back=performance.now();document.body.classList.add('noanim');setTimeout(()=>document.body.classList.remove('noanim'),120)}}catch(e){}if(!AC)return;if(document.hidden)AC.suspend();else{try{AC.resume().then(()=>{BGMT=AC.currentTime+.08})}catch(e){}}});
 ['pointerdown','keydown'].forEach(e=>document.addEventListener(e,()=>{if(!BGMOFF&&!BGMCUR&&typeof S!=='undefined')bgmAuto();else if(AC&&AC.state==='suspended')AC.resume()},{passive:true}));
 
 /* ============ 計算 ============ */
@@ -1881,7 +1883,7 @@ async function accBoot(){if(!ACC)return;try{const {st,j}=await accApi('load',{na
     if(j.ts!==(ACC.ts||0)){if(ACC.dirty&&S){ACCCONF=j;ACCST='另一台裝置有較新的進度';toast('雲端與這台裝置的進度不同，請到「設定 → 雲端帳號」選擇要保留哪一份')}else await accPull()}
     else if(ACC.dirty)accPush()}catch(e){}}
 setTimeout(accBoot,1500);setInterval(()=>{if(ACC&&ACC.dirty&&!ACCBUSY)accPush()},60000);
-document.addEventListener('visibilitychange',()=>{if(document.hidden){if(ACC&&ACC.dirty&&!B)accPush()}else if(ACC&&!ACC.dirty&&!B&&!RUN)accBoot()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){if(ACC&&ACC.dirty&&!B)accPush()}else if(ACC&&!ACC.dirty&&!B&&!RUN&&Date.now()-(window.__accT||0)>300000){window.__accT=Date.now();accBoot()}});
 function accPanel(){if(ACC)return `<div class="panel"><h3>雲端帳號　<span class="tag ok">已登入</span></h3><p class="sub">帳號 <b>${esc(ACC.n)}</b>　${ACCST||'進度會自動同步'}</p>
     <p class="sub">在其他手機或電腦登入同一個帳號，就會接續同一份進度。請不要兩台同時玩。</p>
     ${ACCCONF?`<p class="sub" style="color:#c2410c">⚠ 雲端有${esc(ACCCONF.dev||'另一台裝置')}在 ${new Date(ACCCONF.ts).toLocaleString()} 存的進度，和這台不同。</p><div class="row"><button class="btn pri grow" data-a="accPull">用雲端的進度</button><button class="btn grow" data-a="accForce">用這台的進度覆蓋</button></div>`:`<div class="row"><button class="btn grow" data-a="accSync">立即同步</button><button class="btn grow" data-a="accOut">登出</button></div>`}</div>`;
@@ -2763,7 +2765,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
-  {v:'13.3',d:'2026-11-25',t:'露娜台詞調整',b:'露娜放招時不再喊口號（像「照路之光・撐住！」這類），只顯示招式名。另外拿掉、改寫了一批比較尷尬的台詞（戰鬥喊話、出發前的話、營火閒聊與戰敗後的安慰），讓她說話更自然。'},
+  {v:'13.3',d:'2026-11-25',t:'露娜台詞調整、切回分頁不再卡頓',b:'切到別的 App 或分頁再回來時，不會再把積欠的音樂音符與戰鬥特效一口氣播出來而卡住。露娜放招時不再喊口號（像「照路之光・撐住！」這類），只顯示招式名。另外拿掉、改寫了一批比較尷尬的台詞（戰鬥喊話、出發前的話、營火閒聊與戰敗後的安慰），讓她說話更自然。'},
   {v:'13.2',d:'2026-11-25',t:'旅途插圖換新畫風',b:'旅途中遇到的五位人物（阿蕾、葛蕾塔、米洛、賽門、托比）的插圖換成新畫風，共 25 張。第三章首領預告圖重畫完成。露娜的「燈光術」演出換成新姿勢。'},
   {v:'13.1',d:'2026-11-25',t:'露娜立繪重畫、NPC 與蓋爾換新畫風',b:'露娜的全身立繪與招式圖重畫：提燈掛在腰間，招式改為放出燈光與祈禱治癒（不再揮拳）；治癒時出現祈禱演出，攻擊時偶爾出現燈光術演出。晨星鎮 9 位 NPC（含三種表情）、5 位旅途中遇到的人物、夥伴蓋爾都換成新畫風；蓋爾在戰鬥中改用頭像表情並有出招演出。章節首領預告圖 6 張與牧羊女阿蕾的旅途插圖也換新。其餘旅途插圖繪製中。'},
   {v:'13.0',d:'2026-11-25',t:'冒險途中重新整理不再丟進度',b:'冒險到一半關掉或重新整理頁面，回來會自動接回同一趟路線：已拿到的金幣、經驗、戰利品、祝福與霧核都保留。如果是在戰鬥中離開，會回到那場戰鬥之前，需要重新打一次（HP、MP 維持離開時的狀態）。戰敗畫面改用新畫風的負傷插圖。'},
@@ -3227,6 +3229,7 @@ const PFX=(()=>{let HS=0,cv,cx,P=[],Q=[],raf=0,W=0,Hh=0,t0=0,SR={x:0,y:0,w:360,h
     case 'line':{cx.strokeStyle=p.c;cx.lineWidth=Math.max(1,s*(1-k));cx.lineCap='round';cx.beginPath();cx.moveTo(p.x0,p.y0);cx.lineTo(p.x,p.y);cx.stroke();cx.strokeStyle='#fff';cx.lineWidth=Math.max(1,s*.35*(1-k));cx.stroke();break}
     }cx.shadowBlur=0}
   function loop(now){raf=requestAnimationFrame(loop);stage();
+    if(t0&&now-t0>700){Q.length=0;P.length=0;t0=now}/* 分頁切回：丟掉積欠的特效，不要一口氣全播 */
     for(let i=Q.length-1;i>=0;i--)if(now>=Q[i].t){const f=Q[i].fn;Q.splice(i,1);try{f()}catch(e){}}
     const dt=now<HS?0:Math.min(.05,t0?(now-t0)/1000:.016);t0=now;cx.clearRect(0,0,W,Hh);
     for(let i=P.length-1;i>=0;i--){const p=P[i];p.age+=dt;if(p.age>=p.life){P.splice(i,1);continue}
