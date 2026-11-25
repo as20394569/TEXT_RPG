@@ -791,6 +791,15 @@ const ITEMS={
 const MTY={brute:{n:'力量型',w:{STR:.32,DEX:.12,INT:.06,VIT:.34,LUK:.16}},swift:{n:'敏捷型',w:{STR:.14,DEX:.36,INT:.06,VIT:.2,LUK:.24}},
   caster:{n:'魔法型',w:{STR:.06,DEX:.16,INT:.4,VIT:.22,LUK:.16}},tank:{n:'防禦型',w:{STR:.24,DEX:.08,INT:.08,VIT:.48,LUK:.12}}};
 const MOBS={
+  cursearmor:{n:'咒縛鎧甲',lv:22,ty:'tank',dg:1,mech:'rebound',sk:['m_darkblade','m_blackshield']},
+  shadowpriest:{n:'影祭司',lv:23,ty:'caster',dg:1,mech:'summon',sk:['m_soul','m_pact']},
+  gatewarden:{n:'守門魔將',lv:24,ty:'brute',hpM:1.3,dg:1,mech:'undying',sk:['m_hellfire','m_darkblade','m_pact']},
+  mistcrow:{n:'霧鴉',lv:27,ty:'swift',hpM:.9,fly:1,dg:1,mech:'veil',sk:['m_galewing','m_knife']},
+  shieldbandit:{n:'重盾逃兵',lv:28,ty:'tank',dg:1,mech:'plate',sk:['m_shieldbash','m_oldoath']},
+  tollcaptain:{n:'驛站頭目',lv:29,ty:'brute',hpM:1.3,dg:1,mech:'enrage',sk:['m_knife','m_smoke','m_shieldbash']},
+  inkslime:{n:'墨水史萊姆',lv:31,ty:'caster',dg:1,mech:'swell',sk:['m_inkspit','m_drown']},
+  pagewraith:{n:'書頁幽靈',lv:32,ty:'caster',hpM:.9,fly:1,dg:1,mech:'ward',sk:['m_redact','m_mistveil']},
+  sealguard:{n:'封印守衛',lv:33,ty:'tank',hpM:1.3,dg:1,mech:'grove',sk:['m_seal','m_rustblade','m_sentence']},
   orebeetle:{n:'礦甲蟲',lv:11,ty:'tank',dg:1,mech:'plate',sk:['m_boulder','m_bone']},
   gasbat:{n:'瘴氣蝠',lv:12,ty:'swift',hpM:.9,fly:1,dg:1,mech:'veil',sk:['m_sonic','m_suck']},
   lampghost:{n:'提燈礦靈',lv:13,ty:'caster',fly:1,dg:1,mech:'grudge',sk:['m_bone','m_hellfire']},
@@ -942,7 +951,7 @@ const ARMB={head:[['學徒兜帽','法師頭巾','刻紋頭環','毛皮兜帽','
 for(const sl in ARMB){const [ns,f,pm]=ARMB[sl];ns.forEach((n,i)=>GEAR[SLOTP[sl]+'b_'+i]=Object.assign({n,slot:sl,t:i,lv:TLV[i],price:Math.round(TPRICE[i]*pm)},f(i)))}
 const MDROP={bogslime:'x_bog',sparkrabbit:'x_spark',soulshroom:'x_soul',shadewolf:'x_shade',lavabat:'x_lava',crystalgolem:'x_crystal',blizzardwolf:'x_blizzard',stormsprite:'x_storm',bloodknight:'x_blood',voidwraith:'x_void'};
 /* 原圖較小的魔物在戰鬥畫面放大 */
-const MSMALL=new Set(['bat','bogslime','bookworm','hornrabbit','icesprite','lavabat','slime','sparkrabbit']),MMID=new Set(['wolf','shadewolf','blizzardwolf','stormhawk','snowwolf','wolfrider','elderdruid','windfairy','mirrormoth','gasbat','lampghost','snowshaman','yetichief','drillmole']);
+const MSMALL=new Set(['bat','bogslime','bookworm','hornrabbit','icesprite','lavabat','slime','sparkrabbit']),MMID=new Set(['wolf','shadewolf','blizzardwolf','stormhawk','snowwolf','wolfrider','elderdruid','windfairy','mirrormoth','gasbat','lampghost','snowshaman','yetichief','drillmole','mistcrow','pagewraith','gatewarden','tollcaptain','sealguard','shadowpriest','shieldbandit','cursearmor']);
 const mobBase=id=>MVAR[id]?MVAR[id].base:id;
 const AREAS=[
   {id:'plain',n:'微風草原',lv:'1–5',base:1,d:'晨星鎮外的遼闊草原，新手冒險者的起點。',mobs:['slime','hornrabbit','goblin','bogslime','sparkrabbit'],boss:'goblinboss'},
@@ -1679,7 +1688,7 @@ const MS={
   LUK:[{n:'強運',d:'爆擊率 +6%',f:r=>{r.CRIT+=6}},{n:'奇蹟',d:'擊倒敵人回復 5% HP 與 MP',f:r=>{r.REAP+=5}}]
 };
 function stats(){const e=gearTotals(),a={},c=CLS[S.cls],v=k=>e[k]||0,p=k=>1+v(k)/100;for(const k in ATTR)a[k]=S.attr[k]+v(k);
-  const rgB=S.cls==='ranger'?1.35:S.cls==='swordsman'?1.3:1;const R={HP:Math.round((60+a.VIT*14+S.lv*8+v('hp'))*p('hpp')*rgB),MP:Math.round((20+a.INT*5+S.lv*3+v('mp'))*p('mpp')),ATK:Math.round((a[c.atk]*2+v('atk'))*p('atkp')),MAG:Math.round((a.INT*2.2+v('mag'))*p('magp')),
+  const rgB=S.cls==='ranger'?1.35:S.cls==='swordsman'?1.3:S.cls==='mage'?1.2:1;const R={HP:Math.round((60+a.VIT*14+S.lv*8+Math.max(0,S.lv-10)*(S.cls==='mage'?14:S.cls==='ranger'?11:0)+v('hp'))*p('hpp')*rgB),MP:Math.round((20+a.INT*5+S.lv*3+v('mp'))*p('mpp')),ATK:Math.round((a[c.atk]*2+v('atk'))*p('atkp')),MAG:Math.round((a.INT*2.2+v('mag'))*p('magp')),
     DEF:Math.round((a.VIT*1.4+v('def'))*p('defp')*rgB),MRES:Math.round((a.INT*.8+a.VIT*.4+S.lv+v('mres'))*p('mresp')),RF:Math.min(60,v('rfire')),RI:Math.min(60,v('rice')),RT:Math.min(60,v('rthunder')),RD:Math.min(60,v('rdark')),CRIT:Math.min(75,Math.round(5+a.LUK*.6+a.DEX*.2+v('crit')+(fortK('crit')?8:0))),CD:150+Math.round(a.LUK*.8)+v('cd'),EVA:Math.min(45,Math.round(a.DEX*.6+v('eva'))),
     LS:v('ls'),REGEN:v('regen')+Math.min(3,a.VIT*.03),MPCUT:Math.min(50,Math.round(v('mpcut')+Math.min(20,a.INT*.15))),BURN:v('burn'),DOUBLE:v('double')+Math.min(20,Math.round(a.DEX*.15)),STUN:v('stun'),GUARD:v('guard'),SHIELD:v('shield'),BACK:Math.min(60,v('back')),THORN:Math.min(50,v('thorn')),GALE:v('gale'),REAP:Math.min(25,v('reap')),MPREG:v('mpreg'),RESMAX:v('resmax'),BRKCD:v('brkcd'),DETAMP:v('detamp'),FOCUSATK:v('focusatk'),ANSWER:v('answer'),HEALP:v('healp'),FAITHG:v('faithg'),KW:kwCount(),A:a};for(const k in MS)MS[k].forEach((m,i)=>{if(a[k]>=MSAT[i])m.f(R)});R.CRIT=Math.min(75,R.CRIT);R.EVA=Math.min(45,R.EVA);R.BACK=Math.min(60,R.BACK);R.THORN=Math.min(50,R.THORN);R.REAP=Math.min(25,R.REAP);return R}
 
@@ -2691,8 +2700,8 @@ function bondGain(v,why){if(!S||!withLuna())return;checkDaily();const used=S.dai
 /* ============ 大副本：把幾個區域串成一趟，只往前打 ============
    每一段內部仍是原本的區域（地區特性、首領、劇情照舊）；打倒該段首領後可直接深入下一段，不回城、不回血。
    連續深入每段：稀有以上機率加成 +15%、首領專屬裝備機率 ×1.2。 */
-const DG=[{id:'dg1',n:'翠原迷森',d:'從草原一路打進森林深處。',segs:[0,1]},{id:'dg2',n:'凍脈深坑',d:'穿過廢棄礦坑，爬上霜雪山脈。',segs:[2,3]}];
-const DGX={plain:{mobs:['thornboar','mosscrab','windfairy'],mid:'wolfrider'},forest:{mobs:['sporemother','mirrormoth','rootguard'],mid:'elderdruid'},mine:{mobs:['orebeetle','gasbat','lampghost'],mid:'drillmole'},snow:{mobs:['icebear','snowshaman','icethorn'],mid:'yetichief'}};
+const DG=[{id:'dg1',n:'翠原迷森',d:'從草原一路打進森林深處。',segs:[0,1]},{id:'dg2',n:'凍脈深坑',d:'穿過廢棄礦坑，爬上霜雪山脈。',segs:[2,3]},{id:'dg3',n:'霧都長征',d:'攻破要塞，沿著石板路走進王都地下。',segs:[4,5,6]}];
+const DGX={plain:{mobs:['thornboar','mosscrab','windfairy'],mid:'wolfrider'},forest:{mobs:['sporemother','mirrormoth','rootguard'],mid:'elderdruid'},mine:{mobs:['orebeetle','gasbat','lampghost'],mid:'drillmole'},snow:{mobs:['icebear','snowshaman','icethorn'],mid:'yetichief'},castle:{mobs:['cursearmor','shadowpriest'],mid:'gatewarden'},road:{mobs:['mistcrow','shieldbandit'],mid:'tollcaptain'},archive:{mobs:['inkslime','pagewraith'],mid:'sealguard'}};
 const DGDN=['普通','困難','煉獄'];let DGDIFF=0;
 const dgMax=d=>Math.min(2,(S.dgc&&S.dgc[d])||0);
 const dgB=()=>RUN&&RUN.dg?1+.15*(RUN.dg.depth||0)+.1*(RUN.dg.diff||0):1;
@@ -2701,7 +2710,7 @@ const dgNextArea=()=>{const D=dgOf();if(!D)return -1;const na=D.segs[RUN.dg.k+1]
 const dgCanGo=()=>dgNextArea()>=0&&RUN.nodes[RUN.nodes.length-1]==='boss'&&!!S.cleared[RUN.area];
 function startDg(d,k){const D=DG[d];if(!D||D.segs[k]==null)return;const ar=D.segs[k];if(S.main.ch<ar||(k>0&&!S.cleared[D.segs[k-1]])){toast('這一段還沒解鎖');return}const df=Math.min(DGDIFF,dgMax(d));RUN={dg:{diff:df}};startRun(ar);if(RUN){RUN.dg={d,k,depth:0,diff:df};save();render()}}
 function dgEnter(){const o=RUN,D=dgOf(),nk=o.dg.k+1,na=D.segs[nk],a=AREAS[o.area];const bonus=Math.round((12+a.base*6)*2);S.gold+=bonus;o.loot.gold+=bonus;track('run');bondGain(.25,'一起完成冒險');
-  RUN={dg:{diff:o.dg.diff||0}};startRun(na,o.nm);if(!RUN)return;RUN.loot=o.loot;RUN.bless=o.bless;RUN.core=o.core;RUN.coreUp=o.coreUp;RUN.coreN=o.coreN;RUN.dg={d:o.dg.d,k:nk,depth:(o.dg.depth||0)+1,diff:o.dg.diff||0};save();render();toast(`深入第 ${nk+1} 段：${AREAS[na].n}（掉寶加成 +${Math.round((dgB()-1)*100)}%）`)}
+  RUN={dg:{diff:o.dg.diff||0}};startRun(na,o.nm);if(!RUN)return;RUN.loot=o.loot;RUN.bless=o.bless;RUN.core=o.core;RUN.coreUp=o.coreUp;RUN.coreN=o.coreN;RUN.dg={d:o.dg.d,k:nk,depth:(o.dg.depth||0)+1,diff:o.dg.diff||0};if(D.segs.length>=3){const st=stats();S.hp=Math.min(st.HP,S.hp+Math.round(st.HP*.4));S.mp=Math.min(st.MP,S.mp+Math.round(st.MP*.4))}save();render();toast(`深入第 ${nk+1} 段：${AREAS[na].n}（掉寶加成 +${Math.round((dgB()-1)*100)}%）`)}
 function dgNext(){if(!RUN||!RUN.dg||B||!dgCanGo())return;const na=dgNextArea(),m=S.main;
   const s2=()=>{if(S.main.ch<na){toast('下一段還沒開放');render();return}if(m.ch===na&&!m.acc&&CH[na]&&chLvOk()){const c=CH[na];play(c.intro,SKEY(na+1,'intro'),c.t+' 開場',()=>{m.acc=true;m.step=0;m.prog=0;save();toast('已接受主線任務');dgEnter()})}else dgEnter()};
   if(m.ch===RUN.area&&mainReady()){const c=CH[m.ch];play(c.outro,SKEY(m.ch+1,'outro'),c.t+' 結尾',()=>{const t=give(c.rw);m.ch++;m.acc=false;m.step=0;m.prog=0;m.mid=false;m.pre=false;sys(`${S.name} 完成了「${c.t}」！`);toast(`章節完成，獲得：${t}`);save();s2()})}else s2()}
@@ -2714,7 +2723,7 @@ function gift14(i){if(!giftOk()||!SETS[i]||(SETS[i].cls&&SETS[i].cls!==S.cls))re
 function vGift(){if(!giftOk())return '';return `<div class="panel" style="border-color:var(--exp)"><div class="row"><h3 class="grow">重製補償</h3><span class="tag red">限領一次</span></div><p class="sub">裝備重製了。選一套同階稀有套裝帶走。</p><div class="list">${giftSets().map(([x,i])=>`<div class="item"><span class="grow"><b>${x.n}套裝</b><span class="sub">2 件：${x.d2}</span><span class="sub">4 件：${x.d4}</span></span><button class="btn pri sm" data-a="gift14" data-v="${i}">選這套</button></div>`).join('')}</div></div>`}
 function vDg(){return DG.map((D,d)=>{
   return `<div class="panel area" style="border-color:var(--exp)">${art('area_'+AREAS[D.segs[D.segs.length-1]].id,D.n)}<div class="row"><h3 class="grow">${D.n}</h3><span class="tag red">大副本</span></div><p class="sub">${D.d}</p>
-  <div class="gsec"><b>規則</b><span class="sub">打倒首領可直接深入：不回城、不回血。越深掉得越好。</span></div>
+  <div class="gsec"><b>規則</b><span class="sub">打倒首領可直接深入：不回城、不回血。越深掉得越好。${D.segs.length>=3?'路太長，每段之間能喘口氣。':''}</span></div>
   <div class="lbl">難度</div><div class="chips">${DGDN.map((n,i)=>`<button class="chip ${Math.min(DGDIFF,dgMax(d))===i?'on':''}" data-a="dgDiff" data-v="${i}" ${i>dgMax(d)?'disabled':''}>${n}${i>dgMax(d)?' 🔒':''}</button>`).join('')}</div>
   <p class="sub">有些傳說裝只在這裡掉。</p>
   <div class="list">${D.segs.map((ar,k)=>{const a=AREAS[ar],open=S.main.ch>=ar&&(k===0||S.cleared[D.segs[k-1]]),u=BOSSU[a.boss]&&GEAR[BOSSU[a.boss]];
@@ -2879,6 +2888,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'14.5',d:'2026-11-26',t:'大副本「霧都長征」',b:'第三個大副本開放：要塞、石板路、地下書庫連成一趟，共三段。這三個地區的戰鬥背景也各多了三張。法師與遊俠後期變耐打了；後期首領下手輕了一點。'},
   {v:'14.4',d:'2026-11-25',t:'大副本「凍脈深坑」、戰鬥背景',b:'第二個大副本開放：穿過礦坑、爬上雪山，有新魔物與中首領。草原、森林、礦坑、雪山的戰鬥背景各多了三張，一趟冒險裡每場都不一樣。'},
   {v:'14.3',d:'2026-11-25',t:'進階職重製、文字精簡',b:'八個進階職的被動會隨戰法改變，部分招式加強。戰鬥訊息與說明改短，不再附攻略建議——自己試出來吧。'},
   {v:'14.2',d:'2026-11-25',t:'職業重製',b:'每個職業多了第二種戰法，到角色頁切換。劍士變硬了；遊俠、法師、神官的部分招式加強。大副本難度重新調整。'},
@@ -3040,7 +3050,7 @@ function mkFoe(id,kind){const m=MOBS[id],bs=!!m.boss,el=kind==='elite',nm=!!(RUN
   if(aff.includes('rage'))st.ATK=Math.round(st.ATK*1.4),st.MAG=Math.round(st.MAG*1.4);if(aff.includes('shell'))st.DEF=Math.round(st.DEF*1.8),st.MRES=Math.round(st.MRES*1.8);if(aff.includes('swift'))st.EVA+=15,st.CRIT+=15;
   const pre=(nm?'惡夢・':'')+(mut?'蝕化・':'')+(el?'精英':'');
   /* v12.2 平衡：草原首領打的時候還沒有露娜幫忙，攻擊 1.7→1.38、HP 係數 3.3→2.8（惡夢不變） */
-  const bdm=bs?(RUN&&!RUN.tower?(RUN.area===0&&!nm?1.38:1.7+RUN.area*.15)*(RUN.area===3?1.55:RUN.area>=4?1.33:RUN.area>=1?1.15:1):1.4)*BATK:1;
+  const bdm=bs?(RUN&&!RUN.tower?(RUN.area===0&&!nm?1.38:1.7+Math.min(4,RUN.area)*.15)*(RUN.area===3?1.55:RUN.area>=4?1.2:RUN.area>=1?1.15:1):1.4)*BATK:1;
   return{id,m,L,a:st.a,kind:bs?'boss':kind,mut,nm,aff,name:pre+m.n,hp:Math.round(st.HP*(bs?BHP:1)),max:Math.round(st.HP*(bs?BHP:1)),atk:Math.round(st.ATK*bdm),mag:Math.round(st.MAG*bdm),def:st.DEF,mres:st.MRES,crit:st.CRIT,eva:st.EVA,fb:[],fshield:0,st:{},rage:0,bm,trait:m.mech||undefined,fog:FOGN(mut,bs),fogMax:FOGN(mut,bs)}}
 /* 依玩家實力調整魔物：只在玩家太強、會一擊秒殺時才加強，前期不受影響 */
 function hitEst(def){const s=stats(),P=Math.max(s.ATK,s.MAG),best=Math.max(1,...battleSkills().map(k=>{const d=SK[k].dmg;return d?d.p*(d.h||1):0})),cr=1+Math.min(1,s.CRIT/100)*Math.max(0,s.CD/100-1);return clsDm()*P*best*100/(100+def)*cr}
@@ -3103,7 +3113,7 @@ function procs(s,d){const ps=[];
   if(B.aff.includes('reflect')&&d>0){const r=Math.max(1,Math.round(d*.15));S.hp=Math.max(1,S.hp-r);ps.push(`被反射 ${r} 傷害`)}
   return ps}
 const buffSum=k=>B.buffs.reduce((a,b)=>a+(b[k]||0),0);
-const CDM={swordsman:.017,cleric:.011,ranger:.011,mage:.003};const clsDm=()=>1+(CDM[S.cls]||0)*S.lv;
+const CDM={swordsman:.017,cleric:.011,ranger:.014,mage:.008};const clsDm=()=>1+(CDM[S.cls]||0)*S.lv;
 
 /* 屬性弱點：w=弱點（×1.5）、r=抗性（×0.6） */
 const ELN={phys:'物理',fire:'火',ice:'冰',thunder:'雷',holy:'聖',dark:'闇',poison:'毒',arcane:'奧術'};
