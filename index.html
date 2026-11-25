@@ -758,6 +758,10 @@ Object.assign(GEAR,{
   c_reap:{n:'收穫之月',slot:'neck',t:1,lv:5,price:3000,hp:60,mp:30,uq:{reap:10},ud:'每擊倒一個敵人回復 10% HP 與 MP。算作 2 件「收割」共鳴',uniq:1,core:1},
   c_ls:{n:'渴血指環',slot:'ring',t:1,lv:5,price:3000,atk:9,hp:60,uq:{ls:8},ud:'吸血 +8%。算作 2 件「吸血」共鳴',uniq:1,core:1}});
 const DGCORE=['c_burn','c_double','c_thorn','c_shield','c_ls','c_stun','c_guard','c_back','c_gale','c_reap'];
+/* 核心傳說裝的高階版：每個大副本一階，基礎數值照倍率放大，詞綴不變 */
+const DGCT=[[1,5,1,''],[3,15,2.1,'・貳'],[5,26,3.4,'・參']];
+for(let d=1;d<DGCT.length;d++)for(const k of DGCORE){const g=Object.assign({},GEAR[k]),[t,lv,m,sf]=DGCT[d];for(const f of ['atk','mag','def','hp','mp'])if(g[f])g[f]=Math.round(g[f]*m);g.n+=sf;g.t=t;g.lv=lv;g.price=Math.round(g.price*m);GEAR[k+'_'+(d+1)]=g}
+const dgCore=d=>DGCORE.map(k=>d>0?k+'_'+(d+1):k);
 const BOSSU={goblinboss:'u_gob',treeking:'u_tree',worm:'u_worm',icedragon:'u_dragon',zenos:'u_zenos'};
 const GEMS=['gem_r','gem_b','gem_g','gem_y','gem_w'];
 const BGEM={goblinboss:'gem_r',treeking:'gem_g',worm:'gem_y',icedragon:'gem_w',zenos:'gem_b',rabbitking:'gem_y',moonwolf:'gem_w',foreman:'gem_r',giantking:'gem_g',mistgeneral:'gem_b'};
@@ -787,6 +791,14 @@ const ITEMS={
 const MTY={brute:{n:'力量型',w:{STR:.32,DEX:.12,INT:.06,VIT:.34,LUK:.16}},swift:{n:'敏捷型',w:{STR:.14,DEX:.36,INT:.06,VIT:.2,LUK:.24}},
   caster:{n:'魔法型',w:{STR:.06,DEX:.16,INT:.4,VIT:.22,LUK:.16}},tank:{n:'防禦型',w:{STR:.24,DEX:.08,INT:.08,VIT:.48,LUK:.12}}};
 const MOBS={
+  orebeetle:{n:'礦甲蟲',lv:11,ty:'tank',dg:1,mech:'plate',sk:['m_boulder','m_bone']},
+  gasbat:{n:'瘴氣蝠',lv:12,ty:'swift',hpM:.9,fly:1,dg:1,mech:'veil',sk:['m_sonic','m_suck']},
+  lampghost:{n:'提燈礦靈',lv:13,ty:'caster',fly:1,dg:1,mech:'grudge',sk:['m_bone','m_hellfire']},
+  drillmole:{n:'鑽地巨鼴',lv:14,ty:'brute',hpM:1.3,dg:1,mech:'swell',sk:['m_quake','m_burrow','m_boulder']},
+  icebear:{n:'冰甲熊',lv:16,ty:'tank',dg:1,mech:'iron',sk:['m_frostfang','m_icebody']},
+  snowshaman:{n:'雪兔祈禱師',lv:17,ty:'caster',dg:1,mech:'cleanse',sk:['m_icicle','m_fog']},
+  icethorn:{n:'冰棘刺蝟',lv:18,ty:'brute',dg:1,mech:'spike',sk:['m_icicle','m_avalanche']},
+  yetichief:{n:'雪怪酋長',lv:19,ty:'brute',hpM:1.3,dg:1,mech:'enrage',sk:['m_avalanche','m_howl','m_icebody']},
   thornboar:{n:'荊棘野豬',lv:3,ty:'brute',dg:1,mech:'spike',sk:['m_horn','m_rock']},
   mosscrab:{n:'苔殼蟹',lv:4,ty:'tank',hpM:1.2,dg:1,mech:'rebound',sk:['m_goo','m_rock']},
   windfairy:{n:'淨風妖精',lv:4,ty:'caster',dg:1,mech:'cleanse',fly:1,sk:['m_spore','m_hop']},
@@ -930,7 +942,7 @@ const ARMB={head:[['學徒兜帽','法師頭巾','刻紋頭環','毛皮兜帽','
 for(const sl in ARMB){const [ns,f,pm]=ARMB[sl];ns.forEach((n,i)=>GEAR[SLOTP[sl]+'b_'+i]=Object.assign({n,slot:sl,t:i,lv:TLV[i],price:Math.round(TPRICE[i]*pm)},f(i)))}
 const MDROP={bogslime:'x_bog',sparkrabbit:'x_spark',soulshroom:'x_soul',shadewolf:'x_shade',lavabat:'x_lava',crystalgolem:'x_crystal',blizzardwolf:'x_blizzard',stormsprite:'x_storm',bloodknight:'x_blood',voidwraith:'x_void'};
 /* 原圖較小的魔物在戰鬥畫面放大 */
-const MSMALL=new Set(['bat','bogslime','bookworm','hornrabbit','icesprite','lavabat','slime','sparkrabbit']),MMID=new Set(['wolf','shadewolf','blizzardwolf','stormhawk','snowwolf','wolfrider','elderdruid','windfairy','mirrormoth']);
+const MSMALL=new Set(['bat','bogslime','bookworm','hornrabbit','icesprite','lavabat','slime','sparkrabbit']),MMID=new Set(['wolf','shadewolf','blizzardwolf','stormhawk','snowwolf','wolfrider','elderdruid','windfairy','mirrormoth','gasbat','lampghost','snowshaman','yetichief','drillmole']);
 const mobBase=id=>MVAR[id]?MVAR[id].base:id;
 const AREAS=[
   {id:'plain',n:'微風草原',lv:'1–5',base:1,d:'晨星鎮外的遼闊草原，新手冒險者的起點。',mobs:['slime','hornrabbit','goblin','bogslime','sparkrabbit'],boss:'goblinboss'},
@@ -2138,7 +2150,7 @@ function vBattle(){const s=stats(),fx=B.fx||{},intro=B.intro,a=AREAS[RUN.area];B
   if(B.menu==='skill')cmd=`<div class="cmd col">${battleSkills().map(k=>{const lv=S.skl[k]||1;return `<button class="btn" data-a="bSkill" data-v="${k}" ${S.mp<mpCost(k)||(SK[k].ult&&B.ultUsed)?'disabled':''} ${SK[k].ult?'style="border-color:var(--r4);color:var(--r4)"':''}>${('skill_'+k) in ATL?`<i class="bi at" style="background-position:${(ATL['skill_'+k]%ATC)/(ATC-1)*100}% ${Math.floor(ATL['skill_'+k]/ATC)/(ATR-1)*100}%"></i>`:''}${SK[k].n}${skxOn(k,stats().KW).map(w=>RZ[w].ic).join('')} Lv${lv}<small>${SK[k].ult?(B.ultUsed?'已使用':'奧義'):'MP '+mpCost(k)}</small></button>`}).join('')}<button class="btn" data-a="bMenu" data-v="main">返回</button></div>`;
   else if(B.menu==='item'){const us=Object.keys(S.items).filter(k=>ITEMS[k].use);cmd=`<div class="cmd col">${us.map(k=>`<button class="btn" data-a="bItem" data-v="${k}">${ITEMS[k].n} ×${S.items[k]}<small>${ITEMS[k].d}</small></button>`).join('')||'<p class="empty">沒有可用的道具</p>'}<button class="btn" data-a="bMenu" data-v="main">返回</button></div>`}
   else cmd=`<div class="cmd"><button class="btn pri" data-a="bAtk">攻擊</button><button class="btn" data-a="bMenu" data-v="skill">技能</button><button class="btn" data-a="bMenu" data-v="item">道具</button><button class="btn" data-a="bGuard">防禦</button><button class="btn" data-a="bFlee">逃跑</button><button class="btn ${B.auto?'pri':''}" data-a="bAuto">自動 ${B.auto?'開':'關'}</button></div>`;
-  return `<div class="battle"><div class="stage v2 ${AL?'hasal':''} bg-${a.id} ${S.hp>0&&S.hp<stats().HP*.3?'danger':''} ${atk&&fx.d>0&&(fx.cr||B.hp<=0)?(sk?'punchl':'punch'):''} ${fx.quake&&!fk?'quake':''} ${(sk&&sk[0]==='meteor')||(fk&&fk.fx==='slam')?'quakel':''}" ${sk?`style="--c:${sk[1]}"`:fk?`style="--c:${fk.c}"`:''}><img class="bg" src="art/battle_${a.id}.webp" alt="" ${MISS.has('battle_'+a.id)?'hidden':''} onerror="reTry(this,'battle_${a.id}')||(MISS.add('battle_${a.id}'),this.remove())">
+  return `<div class="battle"><div class="stage v2 ${AL?'hasal':''} bg-${a.id} ${S.hp>0&&S.hp<stats().HP*.3?'danger':''} ${atk&&fx.d>0&&(fx.cr||B.hp<=0)?(sk?'punchl':'punch'):''} ${fx.quake&&!fk?'quake':''} ${(sk&&sk[0]==='meteor')||(fk&&fk.fx==='slam')?'quakel':''}" ${sk?`style="--c:${sk[1]}"`:fk?`style="--c:${fk.c}"`:''}><img class="bg" src="art/${bgKey(a)}.webp" alt="" ${MISS.has(bgKey(a))?'hidden':''} onerror="reTry(this,'${bgKey(a)}')||(MISS.add('${bgKey(a)}'),this.remove())">
    <div class="ibox foe-i" data-a="openM" data-v="foe" role="button" aria-label="查看怪物情報"><div class="nm"><span>${B.name}${B.kind==='boss'?' <span class="tag red">首領</span>':''}${B.trait&&TRX(B.trait)?` <span class="tag">${TRX(B.trait).n}</span>`:''}</span><span>${(B.adds||[]).length?'<span class="tag">目標</span> ':''}Lv${B.L} ⓘ</span></div>${bbar(B.hp,B.max,fp)}${(()=>{const e=MEL[B.id];if(!e||!(S.dex&&S.dex.m&&S.dex.m[B.id]||B.kind==='boss'))return '';return `<div class="elw">${e[0]?`<span class="elt el-${e[0]}">弱 ${ELI[e[0]]||e[0]}</span>`:''}${e[1]?`<span class="elt" style="color:#777">抗 ${ELI[e[1]]||e[1]}</span>`:''}</div>`})()}${B.fogMax?`<div class="elw"><span class="fogp">${B.fog>0?'霧蝕':'霧散'} ${Array.from({length:B.fogMax},(_,i)=>`<i class="${i<B.fog?'on':''}"></i>`).join('')}</span></div>`:''}${B.trait?`<div class="elw"><span class="elt" style="color:#c2410c">${trIc(B.trait,16)}${TRX(B.trait).n}${(B.trait==='grudge'||B.trait==='swell')&&grudgeM()>1?' +'+Math.round((grudgeM()-1)*100)+'%':''}</span></div>`:''}${intentHtml()}${(B.adds||[]).length?`<div class="addrow">${B.adds.map((f,i)=>`<button class="addf" data-a="bTarget" data-v="${i}" aria-label="切換目標：${f.name}">${art('mob_'+f.id,f.m.n,'r11')}<span>${f.m.n}${bbar(f.hp,f.max)}</span></button>`).join('')}</div><div class="sub" style="font-size:10px">點小頭像切換目標</div>`:''}</div>
    <div class="spr foe ${B.m.fly?'fly':''} ${B.kind==='boss'?'boss':''} ${MSMALL.has(mobBase(B.id))?'szs':MMID.has(mobBase(B.id))?'szm':''} ${foeC}" data-a="openM" data-v="foe" role="button" aria-label="查看怪物情報" style="cursor:pointer"><div class="plat"></div>${B.id==='shadow'?art(HK(),'試煉之影','r34','shadowimg'):art(fKey0,B.m.n,'r11','','mob_'+B.id)}${foeFx}</div>
    <div class="spr me ${meC}"><div class="plat"></div>${art(mKey0,clsName(),'r11','',mB+'_fn')}${meFx}</div>
@@ -2679,8 +2691,8 @@ function bondGain(v,why){if(!S||!withLuna())return;checkDaily();const used=S.dai
 /* ============ 大副本：把幾個區域串成一趟，只往前打 ============
    每一段內部仍是原本的區域（地區特性、首領、劇情照舊）；打倒該段首領後可直接深入下一段，不回城、不回血。
    連續深入每段：稀有以上機率加成 +15%、首領專屬裝備機率 ×1.2。 */
-const DG=[{id:'dg1',n:'翠原迷森',d:'從微風草原一路打進迷霧森林深處。中途不回城，越深入掉的東西越好。',segs:[0,1]}];
-const DGX={plain:{mobs:['thornboar','mosscrab','windfairy'],mid:'wolfrider'},forest:{mobs:['sporemother','mirrormoth','rootguard'],mid:'elderdruid'}};
+const DG=[{id:'dg1',n:'翠原迷森',d:'從草原一路打進森林深處。',segs:[0,1]},{id:'dg2',n:'凍脈深坑',d:'穿過廢棄礦坑，爬上霜雪山脈。',segs:[2,3]}];
+const DGX={plain:{mobs:['thornboar','mosscrab','windfairy'],mid:'wolfrider'},forest:{mobs:['sporemother','mirrormoth','rootguard'],mid:'elderdruid'},mine:{mobs:['orebeetle','gasbat','lampghost'],mid:'drillmole'},snow:{mobs:['icebear','snowshaman','icethorn'],mid:'yetichief'}};
 const DGDN=['普通','困難','煉獄'];let DGDIFF=0;
 const dgMax=d=>Math.min(2,(S.dgc&&S.dgc[d])||0);
 const dgB=()=>RUN&&RUN.dg?1+.15*(RUN.dg.depth||0)+.1*(RUN.dg.diff||0):1;
@@ -2706,7 +2718,7 @@ function vDg(){return DG.map((D,d)=>{
   <div class="lbl">難度</div><div class="chips">${DGDN.map((n,i)=>`<button class="chip ${Math.min(DGDIFF,dgMax(d))===i?'on':''}" data-a="dgDiff" data-v="${i}" ${i>dgMax(d)?'disabled':''}>${n}${i>dgMax(d)?' 🔒':''}</button>`).join('')}</div>
   <p class="sub">有些傳說裝只在這裡掉。</p>
   <div class="list">${D.segs.map((ar,k)=>{const a=AREAS[ar],open=S.main.ch>=ar&&(k===0||S.cleared[D.segs[k-1]]),u=BOSSU[a.boss]&&GEAR[BOSSU[a.boss]];
-    return `<div class="item"><span class="grow"><b>第 ${k+1} 段　${a.n}</b>　<span class="sub">Lv ${a.lv}・首領 ${MOBS[a.boss].n}${S.cleared[ar]?'・已通關':''}</span>${u?`<span class="sub">首領專屬：<b class="c4">${u.n}</b></span>`:''}</span>${open?`<button class="btn ${k===0?'pri':''} sm" data-a="startDg" data-v="${d}:${k}">${k===0?'從頭挑戰':'從這段開始'}</button>`:`<span class="sub">打倒上一段首領後解鎖</span>`}</div>`}).join('')}</div></div>`}).join('')}
+    return `<div class="item"><span class="grow"><b>第 ${k+1} 段　${a.n}</b>　<span class="sub">Lv ${a.lv}・首領 ${MOBS[a.boss].n}${S.cleared[ar]?'・已通關':''}</span>${u?`<span class="sub">首領專屬：<b class="c4">${u.n}</b></span>`:''}</span>${open?`<button class="btn ${k===0?'pri':''} sm" data-a="startDg" data-v="${d}:${k}">${k===0?'從頭挑戰':'從這段開始'}</button>`:`<span class="sub">${k===0?'主線到這裡後解鎖':'打倒上一段首領後解鎖'}</span>`}</div>`}).join('')}</div></div>`}).join('')}
 function finish(done){const l=RUN.loot,a=AREAS[RUN.area];let extra='';if(done&&RUN.dg){const D=DG[RUN.dg.d];if(RUN.dg.k===D.segs.length-1&&RUN.nodes[RUN.nodes.length-1]==='boss'&&S.cleared[RUN.area]){S.dgc=S.dgc||{};const df=RUN.dg.diff||0;if((S.dgc[RUN.dg.d]||0)<df+1){S.dgc[RUN.dg.d]=df+1;if(df<2)extra+=`<p style="color:var(--exp)">「${D.n}」${DGDN[df]}難度通關！解鎖${DGDN[df+1]}難度。</p>`}}}if(done&&!RUN.tower)bondGain(.25,'一起完成冒險');
   if(done){const bonus=Math.round((12+a.base*6)*2);S.gold+=bonus;track('run');extra+=`<p>完成獎勵：${bonus} G</p>`}
   RUN=null;B=null;save();TAB='adv';render();
@@ -2867,6 +2879,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'14.4',d:'2026-11-25',t:'大副本「凍脈深坑」、戰鬥背景',b:'第二個大副本開放：穿過礦坑、爬上雪山，有新魔物與中首領。草原、森林、礦坑、雪山的戰鬥背景各多了三張，一趟冒險裡每場都不一樣。'},
   {v:'14.3',d:'2026-11-25',t:'進階職重製、文字精簡',b:'八個進階職的被動會隨戰法改變，部分招式加強。戰鬥訊息與說明改短，不再附攻略建議——自己試出來吧。'},
   {v:'14.2',d:'2026-11-25',t:'職業重製',b:'每個職業多了第二種戰法，到角色頁切換。劍士變硬了；遊俠、法師、神官的部分招式加強。大副本難度重新調整。'},
   {v:'14.1',d:'2026-11-25',t:'霧蝕',b:'被霧纏住的魔物變得更難打——把霧打散看看。露娜的燈也幫得上忙。同種詞綴湊 2 件會改寫部分招式。戰鬥中的魔物放大了。'},
@@ -3047,9 +3060,12 @@ const TRT=k=>BTRAIT[k]||ETRAIT[k];
 const trIc=(k,z)=>('icon_trait_'+k) in ATL?`<i class="bi at" style="width:${z||18}px;height:${z||18}px;margin-right:3px;vertical-align:middle;background-position:${(ATL['icon_trait_'+k]%ATC)/(ATC-1)*100}% ${Math.floor(ATL['icon_trait_'+k]/ATC)/(ATR-1)*100}%"></i>`:'⚠ ';
 const grudgeM=()=>B&&B.trait==='grudge'?1+.12*Math.min(3,Math.floor((1-B.hp/B.max)/.25+1e-9)):B&&B.trait==='swell'?1+.12*Math.min(6,Math.max(0,B.turn-1)):1;
 const weekTrait=id=>{const ks=Object.keys(BTRAIT),i=Math.max(0,AREAS.findIndex(a=>a.boss===id));return ks[(weekNo()+i)%ks.length]};
+/* 戰鬥背景：每個地區有多張，一趟冒險裡每個節點換一張，同一趟不重複（用完才輪回） */
+function bgList(a){const l=['battle_'+a.id];for(let i=2;i<=6;i++){const k='battle_'+a.id+'_'+i;if(ARTSET&&ARTSET.has(k)&&!MISS.has(k))l.push(k)}return l}
+function bgKey(a){try{if(B&&B.bg&&B.bgA===a.id)return B.bg;const l=bgList(a);let k=l[0];if(RUN&&l.length>1){if(!RUN.bgO||RUN.bgA!==a.id||RUN.bgO.length!==l.length){RUN.bgO=l.slice().sort(()=>Math.random()-.5);RUN.bgA=a.id}k=RUN.bgO[Math.max(0,RUN.step||0)%l.length]}if(B){B.bg=k;B.bgA=a.id}return k}catch(e){return 'battle_'+a.id}}
 function startBattle(id,kind,nAdds){const F=mkFoe(id,kind),m=F.m,bs=F.kind==='boss';try{preload(['','_atk','_hurt','_low','_lose','_charge','_a1','_a2','_a3'].filter(x=>!/_charge|_a\d/.test(x)||(ARTSET&&ARTSET.has('mob_'+id+x))).map(x=>'mob_'+id+x))}catch(e){}
   const pool=RUN?AREAS[RUN.area].mobs:[id],adds=[];for(let i=0;i<(nAdds||0);i++){const f=mkFoe(pick(pool),'');f.hp=f.max=Math.round(f.max*.75);adds.push(f)}
-  preload([...['','_hurt','_low','_win','_lose','_atk','_skill','_cast'].map(x=>HK()+x),...(id==='shadow'?[]:['','_hurt','_low','_win','_lose'].map(x=>'mob_'+id+x)),...adds.map(f=>'mob_'+f.id),'battle_'+(AREAS.find(a=>a.boss===id||a.mobs.includes(id))||{id:'plain'}).id]);
+  preload([...['','_hurt','_low','_win','_lose','_atk','_skill','_cast'].map(x=>HK()+x),...(id==='shadow'?[]:['','_hurt','_low','_win','_lose'].map(x=>'mob_'+id+x)),...adds.map(f=>'mob_'+f.id),...(RUN&&AREAS[RUN.area]?bgList(AREAS[RUN.area]):['battle_plain'])]);
   allyAuto();const ally=id==='shadow'?null:mkAlly();if(ally)ally.hp=ally.max;
   B=Object.assign({cls:{brk:0,marks:[],focus:0,faith:0},counter:0,endure:0,adds,ally,taunt:0,
      buffs:[],shield:0,pst:{poison:0,regen:0,burn:0,bleed:0,weak:0,stun:0},guard:false,
@@ -3279,7 +3295,7 @@ function spoil(){const m=B.m,L=B.L,bs=B.kind==='boss',el=B.kind==='elite',T=B.to
   {const tw=RUN.tower,gt=tw?Math.min(RUN.area,S.main.ch):dropTier(RUN.area),hard=B.mut||B.nm,hd=B.hoard?1:0,n=(FA&&!bs&&!B.hoard&&Math.random()<.5)?0:hd+(bs?(Math.random()<(tw?.15:B.nm?.3:.2)?1:0)+(!tw&&B.nm&&Math.random()<.15?1:0):(Math.random()<(B.mut?.5:el?.25:B.nm?.15:lk||(RUN&&RUN.core==='greed')?.1:.06)*(tw?.6:1)?1:0));for(let i=0;i<n;i++){const g=rollGear(gt,bs?(tw?1:B.nm?3:2):hard?2:el?1:0,(bs||hard?(tw?1.3:2):1)*dgB(),hard);if(i<hd||(B.mut&&!bs))minG(g);got.push(gearName(g))}if(tw&&RUN.area>S.main.ch&&Math.random()<.5){addItem('stone',1);got.push('強化石')}
     if(MDROP[B.id]&&Math.random()<(B.wander?.25:B.treasure?.15:B.kind==='elite'?.06:B.nm?.05:.02)*(FA?.5:1)){const u=addGear(MDROP[B.id],3);DROPS.push(u);got.push(gearName(u));sys(`${S.name} 取得魔物專屬裝備【${GEAR[u.id].n}】！`)}
     if(bs&&BOSSU[B.id]&&(!RUN.tower||S.cleared[AREAS.findIndex(a=>a.boss===B.id)])&&Math.random()<(RUN.tower?.015:B.nm?.1:.04)*(RUN.dg&&RUN.dg.depth?1.2:1)){const u=addGear(BOSSU[B.id],4);DROPS.push(u);got.push(gearName(u));sys(`${S.name} 取得首領專屬裝備【${GEAR[u.id].n}】！`)}
-    if(RUN.dg&&(bs||String(B.name).startsWith('中首領'))&&Math.random()<(bs?.05:.03)*(1+.5*(RUN.dg.diff||0))*(RUN.dg.depth?1.2:1)){const u=addGear(pick(DGCORE),4);DROPS.push(u);got.push(gearName(u));sys(`${S.name} 取得流派核心裝備【${GEAR[u.id].n}】！`)}
+    if(RUN.dg&&(bs||String(B.name).startsWith('中首領'))&&Math.random()<(bs?.05:.03)*(1+.5*(RUN.dg.diff||0))*(RUN.dg.depth?1.2:1)){const u=addGear(pick(dgCore(RUN.dg.d||0)),4);DROPS.push(u);got.push(gearName(u));sys(`${S.name} 取得流派核心裝備【${GEAR[u.id].n}】！`)}
     if(!bs&&B.kind==='elite'&&Math.random()<.03){const gm=pick(GEMS);addItem(gm,1);got.push(ITEMS[gm].n)}
     if(bs&&Math.random()<(RUN.tower?.3:1)){const n=1+(B.nm&&Math.random()<.5?1:0);for(let i=0;i<n;i++){const gm=BGEM[B.id]||pick(GEMS);addItem(gm,1);got.push(ITEMS[gm].n)}}}
   got.push(...liveDrop(bs));
