@@ -586,7 +586,7 @@ const ATTR={STR:'力量',DEX:'敏捷',INT:'智力',VIT:'體質',LUK:'幸運'};
 const CLS={
   swordsman:{n:'劍士',d:'站在最前面的人。血與防禦是四職之首，越打越順手。',f:'破綻：普攻與「裂甲擊」會在敵人身上堆疊破綻（最多 5 層），每層讓你的攻擊 +6%；再用「十字裂斬」全部清算。普攻較重，命中時燃起鬥志回復少量 MP。',base:{STR:8,DEX:5,INT:3,VIT:8,LUK:4},grow:{STR:1,VIT:1},atk:'STR',basic:'ATK',adv:['knight','berserker']},
   mage:{n:'法師',d:'火力最高，身體最脆。靠順序取勝的人。',f:'印記：「點火」「霜針」會在敵人身上留下印記（最多 3 個），再用「引雷」全部引爆。普攻會回流少量 MP。',base:{STR:2,DEX:4,INT:10,VIT:5,LUK:5},grow:{INT:2},atk:'STR',basic:'MAG',adv:['archmage','warlock']},
-  ranger:{n:'遊俠',d:'不硬碰硬，等對方露出空檔。',f:'專注：普攻、閃過攻擊都會累積專注（最多 5 層），每層讓你的攻擊 +10%；「屏息」一箭把專注全部打出去。',base:{STR:4,DEX:10,INT:3,VIT:9,LUK:6},grow:{DEX:1,LUK:1},atk:'DEX',basic:'ATK',adv:['sniper','assassin']},
+  ranger:{n:'遊俠',d:'不硬碰硬，等對方露出空檔。',f:'專注：普攻、閃過攻擊都會累積專注（最多 5 層），每層讓你的攻擊 +12%；「屏息」一箭把專注全部打出去。',base:{STR:4,DEX:10,INT:3,VIT:9,LUK:6},grow:{DEX:1,LUK:1},atk:'DEX',basic:'ATK',adv:['sniper','assassin']},
   cleric:{n:'神官',d:'打得慢，但很難倒下。',f:'信仰：治療、祈禱與普攻會累積信仰，滿 100 時神會「回應」——自動回復 25% HP 並降下聖光。',base:{STR:4,DEX:4,INT:8,VIT:8,LUK:4},grow:{INT:1,VIT:1},atk:'STR',basic:'MAG',adv:['bishop','templar']}
 };
 const ADV={
@@ -604,7 +604,7 @@ const SK={
   guard:{n:'招架反擊',c:'swordsman',lv:1,mp:4,counter:1,brk:1,d:'擺好架勢，破綻 +1。下次被攻擊只受 30% 傷害，並反擊 150%。'},
   whirl:{n:'十字裂斬',c:'swordsman',lv:3,mp:8,dmg:{s:'ATK',p:1.2},fin:.6,d:'清算所有破綻，每層傷害 +60%。'},
   warcry:{n:'鬥氣解放',c:'swordsman',lv:8,mp:8,buff:{atk:.35,def:.2,t:3},endure:1,d:'3 回合攻擊 +35%、防禦 +20%，受到致命傷時以 1 HP 撐住一次。'},
-  bash:{n:'重盾衝擊',c:'knight',lv:20,mp:12,dmg:{s:'ATK',p:2},foe:{stun:1},brk:2,d:'舉盾撞上去：暈眩 1 回合，破綻 +2。'},
+  bash:{n:'重盾衝擊',c:'knight',lv:20,mp:12,dmg:{s:'ATK',p:2.2},foe:{stun:1},brk:2,d:'舉盾撞上去：暈眩 1 回合，破綻 +2。'},
   rage:{n:'捨身猛擊',c:'berserker',lv:20,mp:10,dmg:{s:'ATK',p:2.6},cost:.1,fin:.8,d:'燒掉 10% HP，清算破綻，每層傷害 +80%。'},
   fire:{n:'點火',c:'mage',lv:1,mp:5,dmg:{s:'MAG',p:1.4},foe:{burn:2},mark:'灼',d:'留下「灼」印記，灼燒 2 回合。'},
   ice:{n:'霜針',c:'mage',lv:1,mp:7,dmg:{s:'MAG',p:1.5},foe:{weak:2},mark:'凍',d:'留下「凍」印記，敵人攻擊下降 2 回合。'},
@@ -623,7 +623,7 @@ const SK={
   bless:{n:'晨禱',c:'cleric',lv:3,mp:8,buff:{atk:.25,def:.25,t:4},faith:20,d:'4 回合攻防 +25%，信仰 +20。'},
   purify:{n:'洗禮',c:'cleric',lv:8,mp:6,heal:1,cleanse:1,faith:30,d:'回復 HP，解除中毒、灼燒與流血，信仰 +30。'},
   sanct:{n:'庇護所',c:'bishop',lv:20,mp:18,heal:3,regen:3,faith:40,d:'大量回復並持續再生 3 回合，信仰 +40。'},
-  judge:{n:'天秤',c:'templar',lv:20,mp:14,dmg:{s:'BOTH',p:1.8},faithSpend:1,d:'耗盡信仰，每 10 點傷害 +12%。'}
+  judge:{n:'天秤',c:'templar',lv:20,mp:14,dmg:{s:'BOTH',p:2},faithSpend:1,d:'耗盡信仰，每 10 點傷害 +12%。'}
 };
 Object.assign(SK,{
   charge:{n:'衝鋒突刺',c:'swordsman',lv:10,mp:9,dmg:{s:'ATK',p:1.7},brk:1,foe:{weak:2},d:'衝上去一記突刺，敵人攻擊下降 2 回合，破綻 +1。'},
@@ -638,21 +638,21 @@ Object.assign(SK,{
   aegis:{n:'聖盾',c:'cleric',lv:10,mp:9,shield:2,faith:15,d:'張開聖光護盾，信仰 +15。'},
   smite:{n:'制裁之光',c:'cleric',lv:12,mp:10,dmg:{s:'MAG',p:1.8},faithAmp:1,foe:{weak:2},faith:10,d:'信仰越高越痛，敵人攻擊下降 2 回合。'},
   miracle:{n:'神蹟',c:'cleric',lv:18,mp:0,ult:1,heal:3,dmg:{s:'MAG',p:2},faith:100,d:'【奧義・每場一次】大量回復並降下聖光，信仰直接補滿。'},
-  hold:{n:'堅守',c:'knight',lv:23,mp:10,buff:{def:.8,t:3},counter:1,d:'3 回合防禦 +80%，並進入招架姿勢。'},
+  hold:{n:'堅守',c:'knight',lv:23,mp:10,buff:{def:.8,t:3},counter:1,brk:2,d:'3 回合防禦 +80%，進入招架姿勢，破綻 +2。'},
   holycharge:{n:'聖騎衝鋒',c:'knight',lv:26,mp:16,dmg:{s:'ATK',p:2.8},foe:{stun:1},brk:3,d:'全力衝鋒，暈眩 1 回合，破綻 +3。'},
-  berserk:{n:'狂暴化',c:'berserker',lv:23,mp:8,cost:.1,buff:{atk:.6,t:3},d:'燒掉 10% HP，3 回合攻擊 +60%。'},
-  feast:{n:'血之饗宴',c:'berserker',lv:26,mp:14,dmg:{s:'ATK',p:2.4},drain:.4,fin:.5,d:'清算破綻，吸取 40% 傷害。'},
-  missiles:{n:'奧術飛彈',c:'archmage',lv:23,mp:14,dmg:{s:'MAG',p:.45,h:5},mark:'奧',d:'五發追蹤飛彈，留下「奧」印記。'},
-  field:{n:'元素領域',c:'archmage',lv:26,mp:16,buff:{atk:.5,t:3},d:'3 回合物攻與魔攻 +50%。'},
-  curse:{n:'詛咒',c:'warlock',lv:23,mp:10,dmg:{s:'MAG',p:.8},foe:{weak:3,poison:3},mark:'蝕',d:'虛弱與中毒 3 回合，留下「蝕」印記。'},
+  berserk:{n:'狂暴化',c:'berserker',lv:23,mp:8,cost:.1,buff:{atk:.6,t:3},brk:2,d:'燒掉 10% HP，3 回合攻擊 +60%，破綻 +2。'},
+  feast:{n:'血之饗宴',c:'berserker',lv:26,mp:14,dmg:{s:'ATK',p:2.4},drain:.5,fin:.5,d:'清算破綻，吸取 50% 傷害。'},
+  missiles:{n:'奧術飛彈',c:'archmage',lv:23,mp:14,dmg:{s:'MAG',p:.5,h:5},mark:'奧',d:'五發追蹤飛彈，留下「奧」印記。'},
+  field:{n:'元素領域',c:'archmage',lv:26,mp:16,buff:{atk:.5,t:4},mark:'奧',d:'4 回合物攻與魔攻 +50%，留下「奧」印記。'},
+  curse:{n:'詛咒',c:'warlock',lv:23,mp:10,dmg:{s:'MAG',p:1.1},foe:{weak:3,poison:3},mark:'蝕',d:'虛弱與中毒 3 回合，留下「蝕」印記。'},
   reap:{n:'靈魂收割',c:'warlock',lv:26,mp:18,dmg:{s:'MAG',p:2.4},det:.7,drain:.3,d:'引爆印記，每個 +70%，吸取 30% 傷害。'},
-  explo:{n:'爆裂箭',c:'sniper',lv:23,mp:12,dmg:{s:'ATK',p:2},foe:{burn:3},focus:1,d:'命中後爆炸，灼燒 3 回合，專注 +1。'},
+  explo:{n:'爆裂箭',c:'sniper',lv:23,mp:12,dmg:{s:'ATK',p:2.2},foe:{burn:3},focus:1,d:'命中後爆炸，灼燒 3 回合，專注 +1。'},
   deadshot:{n:'致命狙擊',c:'sniper',lv:26,mp:16,dmg:{s:'ATK',p:2.2,cr:50},aim:.6,d:'耗盡專注，每層 +60%，爆擊率 +50%。'},
-  smoke:{n:'煙霧彈',c:'assassin',lv:23,mp:8,buff:{eva:50,t:2},focus:2,d:'2 回合迴避 +50%，專注 +2。'},
-  thousand:{n:'千刃',c:'assassin',lv:26,mp:16,dmg:{s:'ATK',p:.5,h:6},aim:.1,keep:1,d:'六連斬，每層專注讓每刀 +10%。'},
-  revive:{n:'復活之光',c:'bishop',lv:23,mp:14,heal:1.5,endure:1,faith:20,d:'回復 HP，受到致命傷時以 1 HP 撐住一次。'},
+  smoke:{n:'煙霧彈',c:'assassin',lv:23,mp:8,buff:{eva:50,t:3},focus:2,d:'3 回合迴避 +50%，專注 +2。'},
+  thousand:{n:'千刃',c:'assassin',lv:26,mp:16,dmg:{s:'ATK',p:.55,h:6},aim:.1,keep:1,d:'六連斬，每層專注讓每刀 +10%。'},
+  revive:{n:'復活之光',c:'bishop',lv:23,mp:14,heal:2,endure:1,faith:20,d:'回復 HP，受到致命傷時以 1 HP 撐住一次。'},
   wrath:{n:'天罰',c:'bishop',lv:26,mp:16,dmg:{s:'MAG',p:2.6},faithAmp:1,faith:10,d:'信仰越高越痛的天雷。'},
-  hammer:{n:'聖光鎚擊',c:'templar',lv:23,mp:12,dmg:{s:'BOTH',p:1.5},foe:{stun:1},faith:20,d:'暈眩 1 回合，信仰 +20。'},
+  hammer:{n:'聖光鎚擊',c:'templar',lv:23,mp:12,dmg:{s:'BOTH',p:1.7},foe:{stun:1},faith:20,d:'暈眩 1 回合，信仰 +20。'},
   doom:{n:'審判之日',c:'templar',lv:26,mp:20,dmg:{s:'BOTH',p:2.8},faithSpend:1,d:'耗盡信仰，每 10 點傷害 +12%。'}});
 /* 被動技能：達到等級自動生效 */
 const PASS={
@@ -668,20 +668,20 @@ const PASS={
   cl1:{n:'堅定信仰',c:'cleric',lv:6,st:{healp:20},d:'治療量 +20%。'},
   cl2:{n:'神佑',c:'cleric',lv:15,d:'戰鬥開始時信仰 30。'},
   cl3:{n:'聖光護體',c:'cleric',lv:25,st:{defp:15},d:'防禦 +15%，受到的異常狀態少 1 回合。'},
-  kn:{n:'守護者',c:'knight',lv:20,st:{defp:20},d:'防禦 +20%。'},
-  bk:{n:'嗜血',c:'berserker',lv:20,st:{ls:8},d:'吸血 +8%。'},
-  am:{n:'奧術精通',c:'archmage',lv:20,st:{magp:15},d:'魔攻 +15%。'},
-  wl:{n:'黑暗契約',c:'warlock',lv:20,st:{ls:5,magp:8},d:'吸血 +5%、魔攻 +8%。'},
-  sn:{n:'穩定瞄準',c:'sniper',lv:20,st:{cd:30},d:'爆擊傷害 +30%。'},
-  as:{n:'暗殺術',c:'assassin',lv:20,st:{crit:10},d:'爆擊率 +10%。'},
-  bp:{n:'慈悲',c:'bishop',lv:20,st:{healp:30,faithg:50},d:'治療量 +30%，信仰獲得 +50%。'},
-  tp:{n:'信念之鎚',c:'templar',lv:20,st:{atkp:10,magp:10},d:'物攻、魔攻 +10%。'}};
+  kn:{n:'守護者',c:'knight',lv:20,sx:[{st:{atkp:12},d:'攻擊 +12%'},{st:{guard:15,thorn:10},d:'受擊 15% 機率傷害減半、反彈 10%'}],st:{defp:20},d:'防禦 +20%。'},
+  bk:{n:'嗜血',c:'berserker',lv:20,sx:[{st:{cd:30},d:'爆擊傷害 +30%'},{st:{ls:6,regen:2},d:'吸血再 +6%、每回合回復 2% HP'}],st:{ls:8},d:'吸血 +8%。'},
+  am:{n:'奧術精通',c:'archmage',lv:20,sx:[{st:{detamp:25},d:'引爆加成 +25%'},{st:{burn:20,magp:5},d:'攻擊 20% 機率灼燒、魔攻再 +5%'}],st:{magp:15},d:'魔攻 +15%。'},
+  wl:{n:'黑暗契約',c:'warlock',lv:20,sx:[{st:{detamp:15,cd:15},d:'引爆加成 +15%、爆擊傷害 +15%'},{st:{ls:8,regen:1.5},d:'吸血再 +8%、每回合回復 1.5% HP'}],st:{ls:5,magp:8},d:'吸血 +5%、魔攻 +8%。'},
+  sn:{n:'穩定瞄準',c:'sniper',lv:20,sx:[{st:{cd:15,crit:5},d:'爆擊傷害再 +15%、爆擊率 +5%'},{st:{double:12},d:'連擊率 +12%'}],st:{cd:30},d:'爆擊傷害 +30%。'},
+  as:{n:'暗殺術',c:'assassin',lv:20,sx:[{st:{gale:1},d:'每場第一擊必定命中且爆擊'},{st:{eva:8,double:8},d:'迴避 +8%、連擊率 +8%'}],st:{crit:10},d:'爆擊率 +10%。'},
+  bp:{n:'慈悲',c:'bishop',lv:20,sx:[{st:{answer:10},d:'神回應時多回復 10% HP'},{st:{faithg:30,magp:10},d:'信仰獲得再 +30%、魔攻 +10%'}],st:{healp:30,faithg:50},d:'治療量 +30%，信仰獲得 +50%。'},
+  tp:{n:'信念之鎚',c:'templar',lv:20,sx:[{st:{guard:10,defp:10},d:'受擊 10% 機率傷害減半、防禦 +10%'},{st:{atkp:8,magp:8},d:'物攻、魔攻再 +8%'}],st:{atkp:10,magp:10},d:'物攻、魔攻 +10%。'}};
 /* 職業流派：每個職業兩種打法，戰鬥外可隨時切換，改變職業資源的用途 */
 const STN={
-  swordsman:[{n:'破陣',d:'破綻每層讓你的攻擊 +6%，用清算招式一口氣打出去。'},{n:'鐵壁',d:'破綻不再加攻擊，改成每層讓你受到的傷害 -9%、攻擊 +4%；招架反擊的傷害 150%→260%，反擊後破綻再 +1。清算招式的每層加成減半。'}],
-  mage:[{n:'引爆',d:'留下印記，再用引爆招式全部炸掉。'},{n:'延燒',d:'引爆招式不會清掉印記（每個印記的加成變成三成五）；每個印記讓敵人身上的灼燒、中毒傷害 +45%。'}],
-  ranger:[{n:'狙擊',d:'專注每層讓攻擊 +10%，用屏息一箭全部打出去。'},{n:'連射',d:'專注不再加攻擊，改成每層連擊率 +7%；連擊追加的那一箭傷害提高到 100%。打出專注的招式不消耗專注，但每層加成變成四成。'}],
-  cleric:[{n:'祈禱',d:'信仰滿 100 時神會回應：回復 25% HP 並降下聖光。'},{n:'審判',d:'信仰滿 100 時不回血，改成降下 4.5 倍威力的聖光；信仰獲得 +30%，治療量 -20%。'}]};
+  swordsman:[{n:'破陣',d:'破綻越多打越痛，清算一次爆發。'},{n:'鐵壁',d:'破綻改成減傷，招架反擊更痛。'}],
+  mage:[{n:'引爆',d:'留下印記，再一次引爆。'},{n:'延燒',d:'印記不引爆，讓灼燒中毒燒得更兇。'}],
+  ranger:[{n:'狙擊',d:'專注加攻擊，屏息一箭打出。'},{n:'連射',d:'專注改成連擊率，箭越射越多。'}],
+  cleric:[{n:'祈禱',d:'信仰滿了，神會治療你。'},{n:'審判',d:'信仰滿了，神改為降下重擊。'}]};
 const stn=()=>(S&&S.stn===1)?1:0;
 const hasP=id=>{const p=PASS[id];return !!S&&S.lv>=p.lv&&(p.c===S.cls||p.c===S.adv)};
 const SKA={charge:['slash','#cfe0ff'],flurry:['slash','#dfe8ff'],skyslash:['slash','#ffffff'],nova:['ice','#8fdcff'],firestorm:['fire','#ff8a2a'],collapse:['meteor','#e0b8ff'],pierce:['arrow','#ffffff'],trap:['arrow','#c9b08a'],arrowstorm:['arrow','#cfff9a'],
@@ -1656,7 +1656,7 @@ function setCounts(){const c={};for(const sl in SLOTS){const g=gearBy(S.eq[sl]);
 function gearTotals(){const e={},add=o=>{for(const k in o)e[k]=(e[k]||0)+o[k]};
   for(const sl in SLOTS){const g=gearBy(S.eq[sl]);if(g)add(gearAll(g))}
   const c=setCounts();for(const i in c){if(c[i]>=2)add(SETS[i].b2);if(c[i]>=4)add(SETS[i].b4)}
-  for(const id in PASS)if(PASS[id].st&&hasP(id))add(PASS[id].st);return e}
+  for(const id in PASS)if(hasP(id)){if(PASS[id].st)add(PASS[id].st);if(PASS[id].sx)add(PASS[id].sx[stn()].st)}return e}
 /* 屬性專精：單一屬性（含裝備加成）達 30／60 時解鎖特殊效果，讓配點也能決定玩法 */
 const MSAT=[30,60];
 const MS={
@@ -2068,7 +2068,7 @@ function campPick(k){const v=RUN&&RUN.view;if(!v||v.type!=='camp')return;const a
   save();render();$('#main').scrollTop=0}
 const coreRoll=()=>{const ks=Object.keys(MCORE).filter(k=>k!=='temper'||RUN.step<RUN.nodes.length-3),o=[];while(o.length<3){const k=pick(ks);if(!o.includes(k))o.push(k)}return o};
 function coreHtml(v){if(RUN.core)return `<p class="sub" style="color:var(--exp)">${coreIc(RUN.core)}你帶走了【${coreNm(RUN.core)}】：${coreDs(RUN.core)}（本趟冒險生效）${RUN.coreUp?'':'<br>路上的營地有霧窯可以重鍛它——但那一晚就不能休息。'}</p>`;
-  return `<div class="lbl">強敵倒下後留下三顆霧核（只能帶走一顆，本趟冒險生效）</div><div class="list">${v.core.filter(k=>MCORE[k]).map(k=>`<button class="btn" style="text-align:left;white-space:normal;line-height:1.5" data-a="core" data-v="${k}"${coreFit(k)?' data-fit="1"':''}><b>${coreIc(k,34)}${MCORE[k].n}</b>${coreFit(k)?' <span class="tag" style="background:#1f6b5a;color:#fff">✦ 與你的流派契合</span>':''}<br><span class="sub">${MCORE[k].d}</span><br><span class="sub" style="opacity:.7">適合：${MCORE[k].tip}</span></button>`).join('')}</div>`}
+  return `<div class="lbl">強敵倒下後留下三顆霧核（只能帶走一顆，本趟冒險生效）</div><div class="list">${v.core.filter(k=>MCORE[k]).map(k=>`<button class="btn" style="text-align:left;white-space:normal;line-height:1.5" data-a="core" data-v="${k}"${coreFit(k)?' data-fit="1"':''}><b>${coreIc(k,34)}${MCORE[k].n}</b>${coreFit(k)?' <span class="tag" style="background:#1f6b5a;color:#fff">✦ 與你的流派契合</span>':''}<br><span class="sub">${MCORE[k].d}</span></button>`).join('')}</div>`}
 function corePick(k){const v=RUN&&RUN.view;if(!v||!v.core||RUN.core||!MCORE[k]||!v.core.includes(k))return;RUN.core=k;try{SFX.holy(0)}catch(e){}toast(`${MCORE[k].i} 取得【${MCORE[k].n}】`);save();render()}
 function bossBoxHtml(v){if(v.box===2)return v.boxR||'';return `<div class="lbl">首領的寶物堆（只能帶走一箱）</div><div class="list">${Object.keys(BBOX).map(k=>`<button class="btn" style="text-align:left" data-a="bossBox" data-v="${k}"><b>${BBOX[k].n}</b><br><span class="sub">${BBOX[k].d}</span></button>`).join('')}</div>`}
 function bossBox(k){const v=RUN&&RUN.view;if(!v||v.box!==1||!BBOX[k])return;const L=v.boxL||S.lv,t=dropTier(RUN.area);let x='';DROPS=[];
@@ -2106,7 +2106,7 @@ function vRun(){if(RUN.tower)return vTower();const a=AREAS[RUN.area],v=RUN.view,
     else body+=(v.r?`<div class="die ${v.r.ok?'ok':'ng'}">${v.r.d}</div><p class="calc">d20 <b>${v.r.d}</b> + ${ATTR[v.r.a]}修正 <b>${v.r.mod}</b> = <b>${v.r.d+v.r.mod}</b>　／　DC ${v.r.dc}<br><b style="color:var(--${v.r.ok?'exp':'hp'})">${v.r.d===20?'大成功！':v.r.d===1?'大失敗…':v.r.ok?'檢定成功':'檢定失敗'}</b></p>`:'')+
       `<p>${v.text}</p>${v.gain.length?`<div class="chips">${v.gain.map(g=>`<span class="chip">${g}</span>`).join('')}</div>`:''}${v.amb?'<button class="btn pri big" data-a="evFight">迎戰！</button>':`<button class="btn pri big" data-a="${last?'finish':'runNext'}">${last?'完成冒險':'繼續前進'}</button>`}`;
     body+='</div>'}
-  return `<div class="row"><h2 class="grow">${a.n}</h2><span class="sub">已獲得 ${RUN.loot.gold} G・${RUN.loot.exp} EXP</span>${RUN.step>=0&&!RUN.tower&&!RUN.trial?'<button class="btn sm" data-a="retreatAsk" style="margin-left:6px">撤退</button>':''}</div>${pips}${RUN.etr&&ETRAIT[RUN.etr]&&RUN.step<4&&RUN.nodes[4]==='elite'&&!RUN.tower&&!RUN.trial?`<p class="sub" style="margin:2px 0 6px;color:#c2410c">${trIc(RUN.etr,22)}中段強敵帶著霧紋【${ETRAIT[RUN.etr].n}】：${ETRAIT[RUN.etr].d}　<span style="opacity:.75">建議：${ETRAIT[RUN.etr].tip}</span></p>`:''}${RUN.hone&&!RUN.tower?`<p class="sub" style="margin:2px 0 6px;color:var(--exp)">⚔ 磨刃：本趟冒險傷害 +${RUN.hone*12}%</p>`:''}${RUN.raid&&!RUN.tower?`<p class="sub" style="margin:2px 0 6px;color:var(--exp)">🌙 夜探：下一場強敵或首領戰由你奇襲</p>`:''}${RUN.core&&MCORE[RUN.core]?`<p class="sub" style="margin:2px 0 6px;color:var(--exp)">${coreIc(RUN.core)}${coreNm(RUN.core)}：${coreDs(RUN.core)}${RUN.core==='temper'?(RUN.coreN>=1?'（已淬鍊完成）':'（淬鍊中）'):''}</p>`:''}${body}`}
+  return `<div class="row"><h2 class="grow">${a.n}</h2><span class="sub">已獲得 ${RUN.loot.gold} G・${RUN.loot.exp} EXP</span>${RUN.step>=0&&!RUN.tower&&!RUN.trial?'<button class="btn sm" data-a="retreatAsk" style="margin-left:6px">撤退</button>':''}</div>${pips}${RUN.etr&&ETRAIT[RUN.etr]&&RUN.step<4&&RUN.nodes[4]==='elite'&&!RUN.tower&&!RUN.trial?`<p class="sub" style="margin:2px 0 6px;color:#c2410c">${trIc(RUN.etr,22)}中段強敵帶著霧紋【${ETRAIT[RUN.etr].n}】：${ETRAIT[RUN.etr].d}</p>`:''}${RUN.hone&&!RUN.tower?`<p class="sub" style="margin:2px 0 6px;color:var(--exp)">⚔ 磨刃：本趟冒險傷害 +${RUN.hone*12}%</p>`:''}${RUN.raid&&!RUN.tower?`<p class="sub" style="margin:2px 0 6px;color:var(--exp)">🌙 夜探：下一場強敵或首領戰由你奇襲</p>`:''}${RUN.core&&MCORE[RUN.core]?`<p class="sub" style="margin:2px 0 6px;color:var(--exp)">${coreIc(RUN.core)}${coreNm(RUN.core)}：${coreDs(RUN.core)}${RUN.core==='temper'?(RUN.coreN>=1?'（已淬鍊完成）':'（淬鍊中）'):''}</p>`:''}${body}`}
 const hpCls=(v,m)=>v/m>.5?'g':v/m>.2?'y':'r';
 function bbar(v,m,prev,c){const p=Math.max(0,Math.min(100,v/m*100));return `<div class="bbar ${c?'s':''}"><i class="${c||hpCls(v,m)}" style="width:${prev==null?p:prev}%" data-w="${p}"></i></div>`}
 function vBattle(){const s=stats(),fx=B.fx||{},intro=B.intro,a=AREAS[RUN.area];B.fx=null;B.intro=false;const AL=B.ally,aD=B.allyD,aH=B.allyH,aHit=B.allyHit;B.allyD=B.allyH=B.allyHit=0;
@@ -2176,8 +2176,8 @@ function vChar(){const s=stats(),sc=setCounts();
    <div class="stat-g"><div><span>HP</span><b>${s.HP}</b></div><div><span>MP</span><b>${s.MP}</b></div>${CLS[S.cls].basic==='MAG'?`<div class="main"><span>魔法攻擊</span><b>${s.MAG}</b></div><div><span>物理攻擊</span><b>${s.ATK}</b></div>`:`<div class="main"><span>物理攻擊</span><b>${s.ATK}</b></div><div><span>魔法攻擊</span><b>${s.MAG}</b></div>`}<div><span>防禦</span><b>${s.DEF}</b></div><div><span>魔抗</span><b>${s.MRES}</b></div><div><span>爆擊</span><b>${s.CRIT}%</b></div><div><span>迴避</span><b>${s.EVA}%</b></div><div><span>爆傷</span><b>${s.CD}%</b></div><div><span>吸血</span><b>${s.LS}%</b></div><div><span>戰力</span><b>${power()}</b></div></div>${s.RF||s.RI||s.RT||s.RD?`<p class="sub" style="margin-top:4px">抗性：火 ${s.RF}%　冰 ${s.RI}%　雷 ${s.RT}%　暗 ${s.RD}%</p>`:''}
    <p class="sub">下一級還需 ${Math.max(0,need(S.lv)-S.exp)} EXP</p></div></div></div>
   ${buildPanel()}
-  <div class="panel"><h3>職業特色</h3><p class="sub">${CLS[S.cls].f}</p><div class="gsec"><b>戰法（戰鬥外可隨時切換）</b><div style="display:flex;flex-direction:column;gap:6px;margin-top:6px">${STN[S.cls].map((x,i)=>`<button class="btn ${stn()===i?'pri':''}" style="display:block;height:auto;text-align:left;white-space:normal;padding:8px 10px;line-height:1.5" data-a="setStn" data-v="${i}"><b>${stn()===i?'✔ ':''}${x.n}</b><br><span style="font-size:12px;font-weight:400;opacity:.9">${x.d}</span></button>`).join('')}</div></div>${Object.keys(PASS).filter(id=>PASS[id].c===S.cls||PASS[id].c===S.adv).map(id=>`<span class="subl row ${hasP(id)?'':'sub'}" style="gap:6px"><span class="ico c4" style="width:30px;height:30px">${icon('pass_'+id,ic('skill'))}</span><span class="grow">被動【${PASS[id].n}】Lv.${PASS[id].lv}：${PASS[id].d}</span></span>`).join('')}${S.adv?`<p class="sub">${ADV[S.adv].n}：${ADV[S.adv].d}</p>`:''}</div>
-  <div class="panel"><h3>屬性　<span class="tag ${S.pts?'red':'off'}">可用 ${S.pts} 點</span><button class="btn sm" style="float:right" data-a="respec">重置（${respecCost()} G）</button></h3>${Object.keys(ATTR).map(k=>`<div class="attr"><span>${ATTR[k]}<span class="sub">　${{STR:'物理攻擊',DEX:'迴避・爆擊・連擊',INT:'魔力・MP・技能省 MP',VIT:'HP・防禦・每回合回血',LUK:'爆擊・爆傷・掉寶・金幣'}[k]}</span></span><b>${S.attr[k]}${s.A[k]>S.attr[k]?`<small class="up">+${s.A[k]-S.attr[k]}</small>`:''}</b><button class="btn sm" data-a="addPt" data-v="${k}" ${S.pts?'':'disabled'}>＋</button></div><div class="chips" style="margin:-2px 0 6px">${MS[k].map((m,i)=>`<span class="tag ${s.A[k]>=MSAT[i]?'red':'off'}">${MSAT[i]}【${m.n}】${m.d}</span>`).join('')}</div>`).join('')}<p class="sub">屬性專精：單一屬性（含裝備加成）達 30／60 解鎖。</p></div>
+  <div class="panel"><h3>職業特色</h3><p class="sub">${CLS[S.cls].f}</p><div class="gsec"><b>戰法（戰鬥外可隨時切換）</b><div style="display:flex;flex-direction:column;gap:6px;margin-top:6px">${STN[S.cls].map((x,i)=>`<button class="btn ${stn()===i?'pri':''}" style="display:block;height:auto;text-align:left;white-space:normal;padding:8px 10px;line-height:1.5" data-a="setStn" data-v="${i}"><b>${stn()===i?'✔ ':''}${x.n}</b><br><span style="font-size:12px;font-weight:400;opacity:.9">${x.d}</span></button>`).join('')}</div></div>${Object.keys(PASS).filter(id=>PASS[id].c===S.cls||PASS[id].c===S.adv).map(id=>`<span class="subl row ${hasP(id)?'':'sub'}" style="gap:6px"><span class="ico c4" style="width:30px;height:30px">${icon('pass_'+id,ic('skill'))}</span><span class="grow">被動【${PASS[id].n}】Lv.${PASS[id].lv}：${PASS[id].d}${PASS[id].sx?PASS[id].sx.map((x,i)=>`<br><span style="${stn()===i?'color:var(--r4);font-weight:700':'opacity:.6'}">${stn()===i?'✔ ':''}${STN[S.cls][i].n}：${x.d}</span>`).join(''):''}</span></span>`).join('')}${S.adv?`<p class="sub">${ADV[S.adv].n}：${ADV[S.adv].d}</p>`:''}</div>
+  <div class="panel"><h3>屬性　<span class="tag ${S.pts?'red':'off'}">可用 ${S.pts} 點</span><button class="btn sm" style="float:right" data-a="respec">重置（${respecCost()} G）</button></h3>${Object.keys(ATTR).map(k=>`<div class="attr"><span>${ATTR[k]}<span class="sub">　${{STR:'物理攻擊',DEX:'迴避・爆擊・連擊',INT:'魔力・MP・技能省 MP',VIT:'HP・防禦・每回合回血',LUK:'爆擊・爆傷・掉寶・金幣'}[k]}</span></span><b>${S.attr[k]}${s.A[k]>S.attr[k]?`<small class="up">+${s.A[k]-S.attr[k]}</small>`:''}</b><button class="btn sm" data-a="addPt" data-v="${k}" ${S.pts?'':'disabled'}>＋</button></div><div class="chips" style="margin:-2px 0 6px">${MS[k].map((m,i)=>`<span class="tag ${s.A[k]>=MSAT[i]?'red':'off'}">${MSAT[i]}【${m.n}】${m.d}</span>`).join('')}</div>`).join('')}</div>
   ${Object.keys(ALLY).some(k=>ALLY[k].open())?`<div class="panel"><h3>同行夥伴</h3><div class="party">${[...Object.keys(ALLY).filter(k=>ALLY[k].open()),'none'].map(k=>`<button class="btn ${(S.party||'none')===k?'on':''}" data-a="setParty" data-v="${k}">${k==='none'?'<b>獨自冒險</b><span class="sub">不帶夥伴</span>':`${art(ALLY[k].img,ALLY[k].n,'r11','mini')}<b>${ALLY[k].n}</b><span class="sub">${ALLY[k].role}</span>`}</button>`).join('')}</div><p class="sub">${S.party&&S.party!=='none'?ALLY[S.party].d+(S.party==='luna'?'　羈絆越深，露娜越強。':''):'不帶夥伴時，所有戰鬥都靠自己。'}</p>${S.party==='luna'?`<div class="gsec"><b>露娜・燈術士　羈絆 ${Math.floor(S.bond||0)}</b><span class="sub">下一級進度 ${Math.round(((S.bond||0)%1)*100)}%・今日已累積 ${(S.daily&&S.daily.bond||0).toFixed(2)}／1.5（一起冒險、打首領、營火閒聊）</span>${Object.values(LUNASK).map(k=>`<span class="sub ${k.ok()?'son':''}">${k.ok()?'◆':'◇'} 【${k.n}】${k.d}${k.ok()?'':`（解鎖：${k.need}）`}</span>`).join('')}</div>`:''}</div>`:''}
   <div class="panel"><h3>裝備</h3>${eq}<p class="sub" style="text-align:center">點部位查看裝備詳細資料</p>${setHtml}</div>
   <div class="panel"><h3>技能　<span class="tag ${S.sp?'red':'off'}">技能點 ${S.sp}</span></h3><div class="list">${sk}</div>${nxt?`<div class="chips">${nxt}</div>`:''}</div>`}
@@ -2280,7 +2280,7 @@ const MV={
       <div class="list">${gs.map(g=>`<div class="item"><span class="ico c${g.r}">${gIco(g.id)}</span><span class="grow" data-a="openGear" data-v="${g.u}"><b class="c${g.r}">${gearName(g)}</b><span class="sub">${g.p>=15?'已達強化上限':`${enhCost(g)} G・強化石×${enhStone(g)}・成功率 ${enhRate(g)}%`}${eqd.includes(g.u)?'・裝備中':''}</span></span><button class="btn sm pri" data-a="enh" data-v="${g.u}" ${canEnh(g)?'':'disabled'}>強化</button></div>`).join('')}</div>
       <p class="sub">每 +1 提升 8% 主屬性，上限 +15。點裝備名稱可以洗練詞條、鎖定或分解。</p>`}},
   inn(){const c=S.lv*4;return{t:'旅店',b:npcSay('npc_martha','瑪莎','累了吧？睡一覺就能恢復精神。')+`<button class="btn pri big" data-a="rest" ${S.gold>=c?'':'disabled'}>休息一晚（${c} G）</button>`}},
-  altar(){const rows=AREAS.map((A,i)=>{const lock=i>=S.main.ch+1&&!S.main.done;return `<div class="gsec"><b>${A.n}　<small class="sub">Lv.${A.lv}</small></b>${lock?'<span class="sub">星象尚未顯現……推進主線後再來。</span>':`<span class="subl" style="color:#c2410c">⚠ 本週惡夢首領特性【${BTRAIT[weekTrait(A.boss)].n}】${BTRAIT[weekTrait(A.boss)].d}（建議：${BTRAIT[weekTrait(A.boss)].tip}）</span><span class="subl">◆ 地區套裝【${SETS[ASET(i)].n}】：此地魔物掉落（稀有以上）</span><span class="subl">◆ 首領專屬【${GEAR[BOSSU[A.boss]].n}】：${MOBS[A.boss].n}，掉落率 8%（惡夢 20%）</span>`}</div>`}).join('');
+  altar(){const rows=AREAS.map((A,i)=>{const lock=i>=S.main.ch+1&&!S.main.done;return `<div class="gsec"><b>${A.n}　<small class="sub">Lv.${A.lv}</small></b>${lock?'<span class="sub">星象尚未顯現……推進主線後再來。</span>':`<span class="subl" style="color:#c2410c">⚠ 本週惡夢首領特性【${BTRAIT[weekTrait(A.boss)].n}】${BTRAIT[weekTrait(A.boss)].d}</span><span class="subl">◆ 地區套裝【${SETS[ASET(i)].n}】：此地魔物掉落（稀有以上）</span><span class="subl">◆ 首領專屬【${GEAR[BOSSU[A.boss]].n}】：${MOBS[A.boss].n}，掉落率 8%（惡夢 20%）</span>`}</div>`}).join('');
     const cs=SETS[CSET[S.cls]];
     const ft=fortune(),FI=FORT[ft&&ft.k];
     return{t:'星象台',b:npcSay('npc_oracle','占星師',FI?`今天的星象是【${FI.n}】。${FI.say}`:'星辰不賣裝備，只告訴你去哪裡找。……要看看今天的星象嗎？')+`<div class="gsec"><b>今日星象</b>${FI?`<span class="subl">✦ ${FI.n}：${FI.d}（今天有效）</span>`:`<span class="sub">每天免費占卜一次，抽一個整天有效的祝福。</span><button class="btn pri" data-a="fortune">占卜今天的星象</button>`}</div>`+rows+`<div class="gsec"><b>職業套裝【${cs.n}】</b><span class="subl">◆ 只從<b class="c3">異變種</b>與<b class="c4">惡夢模式</b>的魔物身上掉落</span><span class="sub">2 件：${cs.d2}　4 件：${cs.d4}</span></div>`}},
@@ -2404,7 +2404,7 @@ function runNext(){const n=RUN.step+1;if(RUN.nodes[n]==='boss'&&!RUN.gate&&RUN.s
   if(t==='battle'&&tg==='lord'&&LORD[RUN.area]){startBattle(LORD[RUN.area],'',0);if(B)B.log.push('👹 區域領主現身！')}
   else if(t==='battle'&&RUN.hunt&&tg!=='hoard'){RUN.hunt=0;startBattle(pick(a.mobs),'elite',nAdds(1));if(B){B.hoard=1;B.gmul=2;B.name='懸賞・'+B.m.n;B.log.push('📜 情報沒錯，就是牠！打倒牠必掉裝備、金幣 ×2')}}
   else if(t==='battle'){if(tg==='hoard'){startBattle(pick(rm()),'elite',nAdds(1));if(B){B.hoard=1;B.log.push('💎 牠守著一堆閃亮的東西！')}}else{startBattle(pick(rm()),'',nAdds());if(B&&!tg)rareFoe();if(B&&tg==='bounty'){B.gmul=2.5;B.log.push('💰 懸賞目標！金幣 ×2.5')}if(B&&tg==='cursed'){B.atk=Math.round(B.atk*1.25);B.mag=Math.round(B.mag*1.25);B.hp=B.max=Math.round(B.max*1.3);B.xmul=2;B.name='詛咒・'+B.name;B.log.push('☠ 詛咒讓牠更強了……經驗 ×2')}}}
-  else if(t==='elite'||t==='ambush'){const mid=DX&&t==='elite'&&n===4;startBattle(mid?DX.mid:pick(rm()),'elite',mid?0:nAdds(1));if(B&&mid){B.name='中首領・'+B.m.n;B.hp=B.max=Math.round(B.max*1.8);B.atk=Math.round(B.atk*1.15);B.mag=Math.round(B.mag*1.15);B.gmul=(B.gmul||1)*2;B.xmul=(B.xmul||1)*2;B.hoard=1;B.log.push('⚔ 中首領擋在路中央——打倒牠必掉裝備，還有機會掉流派核心傳說裝')}if(B&&t==='elite'&&n===4&&RUN.etr&&ETRAIT[RUN.etr]&&!B.trait){B.trait=RUN.etr;const T=ETRAIT[B.trait];B.name='霧紋・'+B.name;{const e0=RUN.area===0;B.hp=B.max=Math.round(B.max*(e0?1.2:1.5));if(!e0){B.atk=Math.round(B.atk*1.2);B.mag=Math.round(B.mag*1.2)}B.gmul=(B.gmul||1)*1.5}B.log.push(`⚠ 霧紋【${T.n}】${T.d}（建議：${T.tip}）`)}if(B&&tg==='bounty'){B.gmul=2.5;B.log.push('💰 懸賞目標！金幣 ×2.5')}}
+  else if(t==='elite'||t==='ambush'){const mid=DX&&t==='elite'&&n===4;startBattle(mid?DX.mid:pick(rm()),'elite',mid?0:nAdds(1));if(B&&mid){B.name='中首領・'+B.m.n;B.hp=B.max=Math.round(B.max*1.8);B.atk=Math.round(B.atk*1.15);B.mag=Math.round(B.mag*1.15);B.gmul=(B.gmul||1)*2;B.xmul=(B.xmul||1)*2;B.hoard=1;B.log.push('⚔ 中首領擋在路中央——打倒牠必掉裝備，還有機會掉流派核心傳說裝')}if(B&&t==='elite'&&n===4&&RUN.etr&&ETRAIT[RUN.etr]&&!B.trait){B.trait=RUN.etr;const T=ETRAIT[B.trait];B.name='霧紋・'+B.name;{const e0=RUN.area===0;B.hp=B.max=Math.round(B.max*(e0?1.2:1.5));if(!e0){B.atk=Math.round(B.atk*1.2);B.mag=Math.round(B.mag*1.2)}B.gmul=(B.gmul||1)*1.5}B.log.push(`⚠ 霧紋【${T.n}】${T.d}`)}if(B&&tg==='bounty'){B.gmul=2.5;B.log.push('💰 懸賞目標！金幣 ×2.5')}}
   else if(t==='boss'){const i=RUN.area;if(!RUN.nm&&S.main.acc&&S.main.ch===i&&!S.main.pre&&CH[i].pre){play(CH[i].pre,`story_ch${i+1}_pre`,a.n,()=>{S.main.pre=true;save();startBattle(a.boss,'boss');render()});return}startBattle(a.boss,'boss')}
   else if(t==='story'){const i=RUN.area;play(CH[i].mid,SKEY(i+1,'mid'),a.n,()=>{S.main.mid=true;if(RUN)RUN.view={type:'res',title:'旅途見聞',text:you('你把這件事記在心裡，繼續前進。')};save();render()});return}
   else if(t==='event'){const wid=Math.random()<.3?wanderPick():null;if(wid){RUN.wSeen=1;RUN.view={type:'event',ev:wanderEv(wid),phase:'ask',fate:false}}else{const seen=RUN.evSeen||(RUN.evSeen=[]),ar=AREAS[RUN.area].id,pool=EVENTS.filter(e=>!seen.includes(e.id)&&(!e.ar||e.ar===ar)&&!e.c),loc=pool.filter(e=>e.ar),cs=RUN.core&&!RUN.tower&&!seen.includes('coreswap')&&Math.random()<.4&&EVENTS.find(e=>e.id==='coreswap'),ev=cs||(loc.length&&Math.random()<.75?pick(loc):pick(pool.length?pool:EVENTS.filter(e=>!e.ar&&!e.c)));seen.push(ev.id);RUN.view={type:'event',ev,phase:'ask',fate:tg==='fate'}}}
@@ -2699,12 +2699,12 @@ const giftOk=()=>!!(S&&!S.g14&&S.lv>=5&&S.created&&S.created<G14T);
 const giftTier=()=>{let t=0;for(let i=0;i<TLV.length;i++)if(S.lv>=TLV[i])t=i;return Math.min(t,tierCap(),TLV.length-1)};
 function giftSets(){return SETS.map((x,i)=>[x,i]).filter(([x])=>!x.cls||x.cls===S.cls)}
 function gift14(i){if(!giftOk()||!SETS[i]||(SETS[i].cls&&SETS[i].cls!==S.cls))return;const t=giftTier(),got=[];for(const sl in SLOTS){const id=sl==='weapon'?`w_${S.cls}_${t}`:`${SLOTP[sl]}_${t}`;if(!GEAR[id])continue;const g=addGear(id,2,i);got.push(gearName(g))}S.g14=1;DROPS=[];save();render();openM('msg',{t:'重製補償',b:`<div class="panel"><h3>${SETS[i].n}套裝・六件</h3><p>已放進背包：${got.join('、')}</p><p class="sub">到「角色」頁換上。</p></div><button class="btn pri big" data-a="closeM">確定</button>`})}
-function vGift(){if(!giftOk())return '';return `<div class="panel" style="border-color:var(--exp)"><div class="row"><h3 class="grow">重製補償</h3><span class="tag red">限領一次</span></div><p class="sub">裝備與掉落重製了。感謝一路玩到現在——請自選一套同等級（第 ${giftTier()+1} 階）的新版稀有裝備，六個部位一次給齊。</p><div class="list">${giftSets().map(([x,i])=>`<div class="item"><span class="grow"><b>${x.n}套裝</b><span class="sub">2 件：${x.d2}</span><span class="sub">4 件：${x.d4}</span></span><button class="btn pri sm" data-a="gift14" data-v="${i}">選這套</button></div>`).join('')}</div></div>`}
+function vGift(){if(!giftOk())return '';return `<div class="panel" style="border-color:var(--exp)"><div class="row"><h3 class="grow">重製補償</h3><span class="tag red">限領一次</span></div><p class="sub">裝備重製了。選一套同階稀有套裝帶走。</p><div class="list">${giftSets().map(([x,i])=>`<div class="item"><span class="grow"><b>${x.n}套裝</b><span class="sub">2 件：${x.d2}</span><span class="sub">4 件：${x.d4}</span></span><button class="btn pri sm" data-a="gift14" data-v="${i}">選這套</button></div>`).join('')}</div></div>`}
 function vDg(){return DG.map((D,d)=>{
   return `<div class="panel area" style="border-color:var(--exp)">${art('area_'+AREAS[D.segs[D.segs.length-1]].id,D.n)}<div class="row"><h3 class="grow">${D.n}</h3><span class="tag red">大副本</span></div><p class="sub">${D.d}</p>
-  <div class="gsec"><b>規則</b><span class="sub">打倒一段的首領後可以直接深入下一段：不回城、不回血。每深入一段，稀有以上裝備的機率加成 +15%。副本裡有帶「機制」的新魔物與中首領，要換配裝來應付。</span></div>
-  <div class="lbl">難度</div><div class="chips">${DGDN.map((n,i)=>`<button class="chip ${Math.min(DGDIFF,dgMax(d))===i?'on':''}" data-a="dgDiff" data-v="${i}" ${i>dgMax(d)?'disabled':''}>${n}${i>dgMax(d)?'（通關'+DGDN[i-1]+'後解鎖）':i?`　怪 +${[0,2,4][i]} 級・掉寶 +${i*10}%`:''}</button>`).join('')}</div>
-  <p class="sub">流派核心傳說裝（只在這裡掉）：${DGCORE.map(k=>`<b class="c4">${GEAR[k].n}</b>`).join('、')}。中首領 3%、首領 5%，難度越高機率越高。</p>
+  <div class="gsec"><b>規則</b><span class="sub">打倒首領可直接深入：不回城、不回血。越深掉得越好。</span></div>
+  <div class="lbl">難度</div><div class="chips">${DGDN.map((n,i)=>`<button class="chip ${Math.min(DGDIFF,dgMax(d))===i?'on':''}" data-a="dgDiff" data-v="${i}" ${i>dgMax(d)?'disabled':''}>${n}${i>dgMax(d)?' 🔒':''}</button>`).join('')}</div>
+  <p class="sub">有些傳說裝只在這裡掉。</p>
   <div class="list">${D.segs.map((ar,k)=>{const a=AREAS[ar],open=S.main.ch>=ar&&(k===0||S.cleared[D.segs[k-1]]),u=BOSSU[a.boss]&&GEAR[BOSSU[a.boss]];
     return `<div class="item"><span class="grow"><b>第 ${k+1} 段　${a.n}</b>　<span class="sub">Lv ${a.lv}・首領 ${MOBS[a.boss].n}${S.cleared[ar]?'・已通關':''}</span>${u?`<span class="sub">首領專屬：<b class="c4">${u.n}</b></span>`:''}</span>${open?`<button class="btn ${k===0?'pri':''} sm" data-a="startDg" data-v="${d}:${k}">${k===0?'從頭挑戰':'從這段開始'}</button>`:`<span class="sub">打倒上一段首領後解鎖</span>`}</div>`}).join('')}</div></div>`}).join('')}
 function finish(done){const l=RUN.loot,a=AREAS[RUN.area];let extra='';if(done&&RUN.dg){const D=DG[RUN.dg.d];if(RUN.dg.k===D.segs.length-1&&RUN.nodes[RUN.nodes.length-1]==='boss'&&S.cleared[RUN.area]){S.dgc=S.dgc||{};const df=RUN.dg.diff||0;if((S.dgc[RUN.dg.d]||0)<df+1){S.dgc[RUN.dg.d]=df+1;if(df<2)extra+=`<p style="color:var(--exp)">「${D.n}」${DGDN[df]}難度通關！解鎖${DGDN[df+1]}難度。</p>`}}}if(done&&!RUN.tower)bondGain(.25,'一起完成冒險');
@@ -2739,7 +2739,7 @@ function allyAuto(){if(S.party===undefined&&ALLY.luna.open())S.party='luna'}
 function mkAlly(){if(!S.party||!ALLY[S.party]||!ALLY[S.party].open())return null;const s=stats(),pw=Math.max(s.ATK,s.MAG),bond=1+Math.min(20,S.bond||0)*.02;
   return S.party==='luna'?{id:'luna',n:'露娜',max:Math.round(s.HP*.7),pw:pw*.5*bond,def:s.DEF*.6,cd:0,heal:.2*bond}
                          :{id:'gale',n:'蓋爾',max:Math.round(s.HP*1.05),pw:pw*.62,def:s.DEF*1.1,cd:0}}
-{const _ft=foeTurn;foeTurn=function(){try{if(B&&B.fogRe&&B.turn>=B.fogRe&&B.hp>0&&!(B.fog>0)){B.fogRe=0;B.fog=3;B.log.push(`☁ 霧又纏回 ${B.name} 身上了（3 層）`)}}catch(e){}return _ft.apply(this,arguments)}}
+{const _ft=foeTurn;foeTurn=function(){try{if(B&&B.fogRe&&B.turn>=B.fogRe&&B.hp>0&&!(B.fog>0)){B.fogRe=0;B.fog=3;B.log.push('☁ 霧又纏回來了')}}catch(e){}return _ft.apply(this,arguments)}}
 function allyAct(){try{const A0=B&&B.ally;if(A0&&A0.id==='luna'&&A0.hp>0&&B.allyTurn!==B.turn&&B.hp>0&&B.fog>0)fogStrip(1,'luna')}catch(e){}const A=B.ally;if(!A||A.hp<=0||B.allyTurn===B.turn||B.hp<=0)return;const _src=B.srcNow;B.srcNow='露娜';setTimeout(()=>{if(B)B.srcNow=_src},0);B.allyTurn=B.turn;const s=stats();A.cd=Math.max(0,A.cd-1);
   const hit=(p,nm)=>{let d=A.pw*p*100/(100+B.def*(1+fbSum('def')))*(.9+Math.random()*.2);d=capB(Math.max(1,Math.round(d)));if(B.fshield>0){const ab=Math.min(B.fshield,d);B.fshield-=ab;d-=ab}B.hp=Math.max(0,B.hp-d);dsrc('露娜',d);bossPhase();B.allyD=d;blog(`${A.n}${nm}，造成 ${d} 傷害`)};
   if(A.id==='luna'){A.cd2=Math.max(0,(A.cd2||0)-1);A.cd3=Math.max(0,(A.cd3||0)-1);const has=k=>LUNASK[k].ok(),say=k=>{try{setTimeout(()=>bub('luna',`【${LUNASK[k].n}】`),200);setTimeout(()=>PFX.ally(k),250)}catch(e){}},dng=B.chg||(B.next&&isDng(SKM[B.next]));
@@ -2867,9 +2867,10 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
-  {v:'14.2',d:'2026-11-25',t:'職業重製：戰法、基礎數值與技能調整',b:'【職業戰法】每個職業新增兩種打法，在「角色」頁的職業特色裡切換（戰鬥外隨時可換，不用錢）。劍士：破陣（破綻加攻擊、清算爆發）／鐵壁（破綻改成每層減傷 9%、攻擊 +4%，招架反擊 150%→260%）。法師：引爆（照舊）／延燒（引爆不清印記，每個印記讓灼燒中毒 +45%）。遊俠：狙擊（專注加攻擊、屏息一箭打出）／連射（專注改成每層連擊率 +7%，連擊追加箭傷害提高，打出專注的招式不消耗專注）。神官：祈禱（信仰滿了回血加聖光）／審判（不回血，改成 4.5 倍聖光，信仰累積 +30%、治療 -20%）。【基礎數值】劍士的 HP 與防禦 ×1.3（原本比遊俠還薄），等級傷害成長提高；遊俠與法師的等級傷害成長提高，遊俠專注每層 +9%→+10%。【技能調整】劍士：招架反擊 MP 5→4 並 +1 破綻、鬥氣解放多給防禦 +20%、衝鋒突刺 150%→170%。法師：薄冰鏡會留下凍印記、冰霜新星 130%→150%。遊俠：伏身 +1 專注、蛇牙箭 110%→120%、穿透箭 150%→170%、屏息 160%→170% 且每層 +45%→+55%。神官：審光 150%→160%、制裁之光 160%→180%、洗禮可解除灼燒與流血。【大副本難度】依實測重新調整：首領在困難／煉獄只高 1／3 級；煉獄的攻防 ×1.27、HP ×1.55。自動戰鬥、未強化稀有裝的通關率大約是普通九成以上、困難七成、煉獄四成。'},
-  {v:'14.1',d:'2026-11-25',t:'霧蝕、共鳴改寫技能、魔物放大',b:'【霧蝕】霧終於會真的出現在魔物身上：蝕化怪與第二章起的首領身上纏著紫霧（名字下方有霧的層數）。霧散之前牠受到的傷害 -25%，技能的暈眩與虛弱無效；每次攻擊驅 1 層（每回合最多 2 層，爆擊再多 1 層），露娜的測霧燈每回合再照散 1 層。霧散的瞬間牠會變回原本的顏色、僵住 1 回合，2 回合內多受 20% 傷害；首領的霧會再纏回來一次。【露娜台詞】跟霧有關的話只會在真的有霧的魔物身上說；燈沒反應時她會說是普通魔物，霧散時會喊你追擊。【共鳴改寫技能】同一種詞綴湊到 2 件，會改寫符合條件的招式：烈焰讓傷害招附帶灼燒、連擊讓多段招多打一段、震擊讓奧義附帶暈眩、吸血讓清算／引爆招吸血、守護讓強化多 1 回合、先機讓治療強化招附帶護盾、絕境讓單發招在半血以下 +25%、荊棘讓招架同時加防、疾風讓單發招爆擊 +15%、收割讓異常多 1 回合。到「角色」頁的技能清單可以看到哪些招被改寫。【核心傳說裝】大副本再加 5 件：震雷護符、磐石指環、背水墜飾、迅風指環、收穫之月，十種共鳴都有核心裝了。【畫面】戰鬥中的魔物放大約兩成。'},
-  {v:'14.0',d:'2026-11-25',t:'大副本內容包與裝備重製（第一階段）',b:'【新魔物與機制】大副本「翠原迷森」加入 8 隻新魔物，各帶一種機制：荊棘野豬（尖刺：反彈傷害，剋多段攻擊）、苔殼蟹（反震：單發太重會震回來，剋爆發）、淨風妖精（淨化：清掉灼燒中毒，剋持續傷害）、孢子母菇（召喚幫手）、鏡翅蛾（魔障：魔法減傷，爆擊可破）、盤根守衛（不死：要靠灼燒或中毒壓制再生），以及兩隻中首領：哥布林狼騎兵（第 8 回合狂怒）與古樹祭司（淨化＋召喚）。【難度】大副本分普通、困難、煉獄，通關後解鎖下一級：怪更高等、機制怪更多、掉寶略好。【流派核心傳說裝】五件只在大副本掉的傳說裝：餘燼之心、雙生獠牙、荊棘王冠、晨霧斗篷、渴血指環。各帶一個詞綴，而且算作 2 件共鳴——三件裝備就能同時湊出兩種共鳴。中首領 3%、首領 5%。【裝備平衡】特殊玩法只出現在稀有以上的裝備；各階武器的基礎數值拉平（低階提高）；強化每級加成由 8% 改為 6%，讓刷到新裝比死命強化舊裝更有感。【補償】在這之前建立、Lv.5 以上的角色，可到冒險頁自選一套同等級的新版稀有套裝（六件）。【屬性專精】五種屬性各有兩段專精（30／60 點，含裝備加成）：力量給爆傷與暈眩、敏捷給連擊與反擊、智力給回魔與魔攻、體質給反彈與血量、幸運給爆擊與擊倒回復——配點也能決定玩法，到「角色」頁查看。職業與技能本身的重製會在下一階段進行。'},
+  {v:'14.3',d:'2026-11-25',t:'進階職重製、文字精簡',b:'八個進階職的被動會隨戰法改變，部分招式加強。戰鬥訊息與說明改短，不再附攻略建議——自己試出來吧。'},
+  {v:'14.2',d:'2026-11-25',t:'職業重製',b:'每個職業多了第二種戰法，到角色頁切換。劍士變硬了；遊俠、法師、神官的部分招式加強。大副本難度重新調整。'},
+  {v:'14.1',d:'2026-11-25',t:'霧蝕',b:'被霧纏住的魔物變得更難打——把霧打散看看。露娜的燈也幫得上忙。同種詞綴湊 2 件會改寫部分招式。戰鬥中的魔物放大了。'},
+  {v:'14.0',d:'2026-11-25',t:'大副本內容包',b:'大副本「翠原迷森」加入新魔物、中首領與三種難度。有些傳說裝只在這裡掉。強化每級 8%→6%，各階武器基礎值拉平。老玩家可到冒險頁領一套新版套裝。角色頁新增屬性專精。'},
   {v:'13.7',d:'2026-11-25',t:'魔物與掉落等級自適應',b:'魔物等級會跟著你的等級走：在牠原本的等級往上一段區間內調整（一般魔物最多 +8 級、首領最多 +6 級），不會比原本低，並且永遠比你低至少 1 級，所以回到前面的地區不再是一刀一隻。掉落的裝備階級也跟著你的等級：最多比該地區高一階，且不超過目前章節解封的階級。高塔與試煉不變。'},
   {v:'13.6',d:'2026-11-25',t:'掉落率調整',b:'整體掉落率減半，讓好裝備更有份量：一般怪掉裝備 12%→6%、精英 50%→25%、蝕化怪 100%→50%、首領額外一件 40%→20%；稀有以上的比例減半（史詩 2.6%→1.3%、傳說 0.4%→0.2%）；魔物專屬裝備 4%→2%、首領專屬裝備 8%→4%；寶箱升史詩的機率、素材、藥水、強化石、精英寶石也減半。「寶物守衛必掉裝備」、首領必掉的強化石與寶石不變。首領專屬裝備的保底取消。大副本深入加成改為每段 +15%。'},
   {v:'13.5',d:'2026-11-25',t:'大副本「翠原迷森」（試玩）',b:'冒險頁新增第一個大副本：把微風草原和迷霧森林串成一趟。打倒一段的首領後可以直接深入下一段——不回城、不回血，劇情會在途中接著演。每連續深入一段，稀有以上裝備的機率加成 +15%、首領專屬裝備機率 ×1.2。已通關的玩家可以從任一已解鎖的段落開始。原本的單區冒險仍然保留。'},
@@ -3041,7 +3042,7 @@ function scaleFoe(){if(!B||B.id==='shadow')return;{const ar=RUN?RUN.area:0,bs=B.
 const BTRAIT={iron:{n:'鋼皮',d:'沒有暈眩時受到的傷害 -35%',tip:'震擊流、控場'},undying:{n:'不死',d:'每回合回復 5% HP；灼燒或中毒時無法再生',tip:'烈焰流、毒'},ward:{n:'魔障',d:'魔法傷害 -40%；被爆擊後魔障破除 2 回合',tip:'物理、疾風流、高爆擊'},enrage:{n:'狂怒',d:'第 8 回合起攻擊 +80%',tip:'速攻、連擊流'},spike:{n:'尖刺',d:'每次受到攻擊反彈 20% 傷害',tip:'吸血流、先機護盾、守護'}};
 const weekNo=()=>Math.floor((Date.now()/864e5+3)/7);
 /* 霧紋：冒險中段強敵的特性，出發時就公布，考驗不同打法 */
-const ETRAIT={cleanse:{n:'淨化',d:'每回合清除自己身上的灼燒、中毒、流血，並回復 4% HP',tip:'直接傷害、爆發'},summon:{n:'召喚',d:'每 3 回合叫來一隻幫手（最多 2 隻）',tip:'範圍技能、速戰速決'},grove:{n:'古林',d:'每回合淨化持續傷害並回復 4% HP；每 3 回合召喚幫手',tip:'爆發、範圍、先清小怪'},plate:{n:'疊甲',d:'同一回合內每被打中一次，之後受到的傷害 -15%（最多 -60%），下回合重置',tip:'單發重擊、灼燒與中毒'},veil:{n:'霧隱',d:'每回合第一次受到的攻擊傷害減半；身上有灼燒、中毒或流血時霧隱失效',tip:'多段攻擊、持續傷害'},grudge:{n:'記仇',d:'HP 每少 25%，攻擊 +12%（最多 +36%）',tip:'爆發收尾、虛弱、留防禦到最後'},swell:{n:'漲潮',d:'每過一回合，攻擊 +12%（最多 +72%）',tip:'速戰速決、開場爆發、奇襲'},rebound:{n:'反震',d:'單次受到超過牠最大 HP 12% 的傷害時，超出部分的 40% 會震回你身上（不致命）',tip:'多段攻擊、連擊、持續傷害'}};
+const ETRAIT={cleanse:{n:'淨化',d:'每回合清掉異常並回血',tip:'直接傷害、爆發'},summon:{n:'召喚',d:'會叫幫手',tip:'範圍技能、速戰速決'},grove:{n:'古林',d:'淨化、回血，還會叫幫手',tip:'爆發、範圍、先清小怪'},plate:{n:'疊甲',d:'同一回合內每被打中一次，之後受到的傷害 -15%（最多 -60%），下回合重置',tip:'單發重擊、灼燒與中毒'},veil:{n:'霧隱',d:'每回合第一次受到的攻擊傷害減半；身上有灼燒、中毒或流血時霧隱失效',tip:'多段攻擊、持續傷害'},grudge:{n:'記仇',d:'HP 每少 25%，攻擊 +12%（最多 +36%）',tip:'爆發收尾、虛弱、留防禦到最後'},swell:{n:'漲潮',d:'每過一回合，攻擊 +12%（最多 +72%）',tip:'速戰速決、開場爆發、奇襲'},rebound:{n:'反震',d:'一擊打太重會震回你身上',tip:'多段攻擊、連擊、持續傷害'}};
 const TRT=k=>BTRAIT[k]||ETRAIT[k];
 const trIc=(k,z)=>('icon_trait_'+k) in ATL?`<i class="bi at" style="width:${z||18}px;height:${z||18}px;margin-right:3px;vertical-align:middle;background-position:${(ATL['icon_trait_'+k]%ATC)/(ATC-1)*100}% ${Math.floor(ATL['icon_trait_'+k]/ATC)/(ATR-1)*100}%"></i>`:'⚠ ';
 const grudgeM=()=>B&&B.trait==='grudge'?1+.12*Math.min(3,Math.floor((1-B.hp/B.max)/.25+1e-9)):B&&B.trait==='swell'?1+.12*Math.min(6,Math.max(0,B.turn-1)):1;
@@ -3054,9 +3055,9 @@ function startBattle(id,kind,nAdds){const F=mkFoe(id,kind),m=F.m,bs=F.kind==='bo
      buffs:[],shield:0,pst:{poison:0,regen:0,burn:0,bleed:0,weak:0,stun:0},guard:false,
      log:[bs?`首領 ${m.n} 擋住了去路！`:F.mut?`被蝕霧侵蝕的 ${m.n} 出現了！氣息完全不同……`:adds.length?`${F.name} 帶著 ${adds.map(f=>f.name).join('、')} 出現了！`:`${F.name} 出現了！`,...(F.aff.length?[`詞綴：${F.aff.map(x=>AFF[x].n).join('、')}`]:[]),...(F.bm?[id==='zenos'?'蓋爾從側面牽制住了澤諾斯！':'你事先摸清了牠的弱點！']:[]),...(ally?[`${ally.n}與你並肩作戰`]:[])],busy:false,auto:AUTO,menu:'main',turn:1,fx:null,intro:true,shown:0,last:0},F);SFX.enc();
   scaleFoe();
-  if(bs&&RUN&&(RUN.nm||RUN.tower)){B.trait=weekTrait(id);const T=BTRAIT[B.trait];B.log.push(`⚠ 本週首領特性【${T.n}】${T.d}（建議：${T.tip}）`)}
-  if(B.fog>0)B.log.push(`☁ 霧蝕：牠被霧侵蝕了（${B.fog} 層）。霧散之前傷害 -25%、暈眩與虛弱無效；攻擊、爆擊${withLuna()?'和露娜的測霧燈':''}都能驅霧，霧散時牠會僵住`);
-  if(B.trait&&m.mech===B.trait){const T=TRX(B.trait);if(T)B.log.push(`⚠ 機制【${T.n}】${T.d}（建議：${T.tip}）`)}
+  if(bs&&RUN&&(RUN.nm||RUN.tower)){B.trait=weekTrait(id);const T=BTRAIT[B.trait];B.log.push(`⚠ 本週特性【${T.n}】${T.d}`)}
+  if(B.fog>0)B.log.push(`☁ 牠身上纏著霧（${B.fog} 層）`);
+  if(B.trait&&m.mech===B.trait){const T=TRX(B.trait);if(T)B.log.push(`⚠【${T.n}】${T.d}`)}
   B.next=foePick();setTimeout(()=>{try{talk(B&&B.kind==='boss'?'boss':'start')}catch(e){}},1100);
   if(RUN&&RUN.bless){const BL={atk:{n:'戰意祝福',atk:.15},def:{n:'守護祝福',def:.35},luck:{n:'幸運祝福'}}[RUN.bless];B.buffs.push(Object.assign({id:'bless',t:999},BL))}
   if(bs&&RUN&&RUN.prep&&!RUN.prepUsed){RUN.prepUsed=1;const p=RUN.prep;
@@ -3105,9 +3106,9 @@ function bossPhase(){if(B&&B.kind==='boss'&&!B.ph2&&B.hp>0&&B.hp<=B.max*.5){B.ph
 /* 霧蝕：被霧侵蝕的魔物（蝕化怪、第二章起的首領）身上纏著霧。霧散之前傷害 -25%、技能的暈眩與虛弱無效；
    攻擊、爆擊與露娜的測霧燈都能驅霧，霧散時牠會僵住 1 回合、2 回合內多受 20% 傷害。首領的霧會再纏上來一次。 */
 const FOGN=(mut,bs)=>mut?3:(bs&&RUN&&!RUN.tower&&!RUN.trial&&RUN.area>=1)?5:0;
-function fogStrip(n,who){if(!B||!(B.fog>0)||B.hp<=0)return;B.fog=Math.max(0,B.fog-n);if(who==='luna')B.log.push(`露娜的測霧燈照散了霧（剩 ${B.fog} 層）`);
-  if(B.fog===0){B.fogBrkT=B.turn;B.fogV=B.turn+2;B.st.stun=Math.max(B.st.stun||0,1);B.frozen=0;B.log.push(`【霧散】纏著 ${B.name} 的霧散開了！牠僵住 1 回合，2 回合內多受 20% 傷害`);if(B.kind==='boss'&&!B.fogRd){B.fogRd=1;B.fogRe=B.turn+5}try{talk('fogbrk',true)}catch(e){}}}
-function hitFoe(stat,pow,o){o=o||{};const s=stats();if(s.GALE){const gt=(s.KW.gale||0);const tr=!B.gale||(gt>=2&&(B.gale||0)<2)||(gt>=3&&B.turn>0&&B.turn%4===0&&B.galeT!==B.turn);if(tr){B.gale=(B.gale||0)+1;if(B.gale>2)B.galeT=B.turn;o=Object.assign({},o,{sure:1});B.log.push('【疾風】先發制人！')}}if(!o.sure&&Math.random()*100<(B.eva+fbSum('eva'))*.6)return{d:0,cr:false,miss:true};let base=clsDm()*coreM()*(B.opening?1.5:1)*(S.cls==='swordsman'&&B.cls&&B.cls.brk?1+(stn()?.04:.06)*B.cls.brk:1)*(S.cls==='ranger'&&B.cls&&B.cls.focus&&!stn()?1+.1*B.cls.focus:1)*(stat==='BOTH'?s.ATK+s.MAG:s[stat])*(1+buffSum('atk')+(s.FOCUSATK&&B.cls.focus>=rmax(5)?s.FOCUSATK/100:0))*(B.pst.weak>0?.75:1)*(s.BACK&&S.hp<s.HP*((s.KW.back||0)>=2?.5:.35)?1+s.BACK/100:1)*((s.KW.burn||0)>=3&&B.st.burn>0?1.25:1)*((s.KW.stun||0)>=2&&B.st.stun>0?1.3:1)*((s.KW.shield||0)>=2&&B.shield>0?1.15:1)*(B.gdUp?(B.gdUp=0,1.3):1);
+function fogStrip(n,who){if(!B||!(B.fog>0)||B.hp<=0)return;B.fog=Math.max(0,B.fog-n);if(who==='luna')B.log.push('露娜的燈照散了一層霧');
+  if(B.fog===0){B.fogBrkT=B.turn;B.fogV=B.turn+2;B.st.stun=Math.max(B.st.stun||0,1);B.frozen=0;B.log.push('【霧散】牠僵住了！');if(B.kind==='boss'&&!B.fogRd){B.fogRd=1;B.fogRe=B.turn+5}try{talk('fogbrk',true)}catch(e){}}}
+function hitFoe(stat,pow,o){o=o||{};const s=stats();if(s.GALE){const gt=(s.KW.gale||0);const tr=!B.gale||(gt>=2&&(B.gale||0)<2)||(gt>=3&&B.turn>0&&B.turn%4===0&&B.galeT!==B.turn);if(tr){B.gale=(B.gale||0)+1;if(B.gale>2)B.galeT=B.turn;o=Object.assign({},o,{sure:1});B.log.push('【疾風】先發制人！')}}if(!o.sure&&Math.random()*100<(B.eva+fbSum('eva'))*.6)return{d:0,cr:false,miss:true};let base=clsDm()*coreM()*(B.opening?1.5:1)*(S.cls==='swordsman'&&B.cls&&B.cls.brk?1+(stn()?.05:.06)*B.cls.brk:1)*(S.cls==='ranger'&&B.cls&&B.cls.focus&&!stn()?1+.12*B.cls.focus:1)*(stat==='BOTH'?s.ATK+s.MAG:s[stat])*(1+buffSum('atk')+(s.FOCUSATK&&B.cls.focus>=rmax(5)?s.FOCUSATK/100:0))*(B.pst.weak>0?.75:1)*(s.BACK&&S.hp<s.HP*((s.KW.back||0)>=2?.5:.35)?1+s.BACK/100:1)*((s.KW.burn||0)>=3&&B.st.burn>0?1.25:1)*((s.KW.stun||0)>=2&&B.st.stun>0?1.3:1)*((s.KW.shield||0)>=2&&B.shield>0?1.15:1)*(B.gdUp?(B.gdUp=0,1.3):1);
   const fdef=stat==='MAG'?(B.mres??B.def):stat==='BOTH'?((B.mres??B.def)+B.def)/2:B.def;let em=elMul(B.id,B.curEl);{const ce=B.curEl,st=B.st||{};let cm=0,cn='';if(ce==='fire'&&B.frozen&&st.stun>0){cm=.5;cn='碎冰';st.stun=0;B.frozen=0}else if(ce==='ice'&&st.burn>0){cm=.3;cn='蒸發';st.burn=0}else if(ce==='thunder'&&B.frozen&&st.stun>0){cm=.3;cn='導電'}else if(ce==='thunder'&&st.poison>0){cm=.25;cn='毒爆';st.poison=Math.max(0,st.poison-1)}else if(ce==='holy'&&st.weak>0){cm=.2;cn='淨化'}else if(ce==='dark'&&st.bleed>0){cm=.25;cn='血蝕'}if(cm){if(fortK('chain'))cm+=.2;em*=1+cm;B.chain=cn;B.log.push(`【${cn}】屬性連鎖！傷害 +${Math.round(cm*100)}%`)}}if(o.rend&&em<1){em=1;B.elHit='rend'}else if(em!==1)B.elHit=em>1?'w':'r';let d=em*base*pow*100/(100+fdef*(1+fbSum('def'))*(1-(o.pierce||0)))*(.9+Math.random()*.2);const cr=!!o.sure||Math.random()*100<-(B.tough||0)+s.CRIT+(o.cr||0)+(hasP('sw1')&&B.cls.brk>=3?15:0);if(cr){const cdm=(s.CD+(hasP('rg3')&&B.cls.focus>=5?30:0)+s.BRKCD*B.cls.brk)/100;d*=1+(cdm-1)*(1-(B.cdr||0))}
   if(B.trait==='iron'&&!(B.st.stun>0))d*=.65;if(B.trait==='plate'){if(B.plT!==B.turn){B.plT=B.turn;B.plN=0}d*=Math.max(.4,1-.15*B.plN);B.plN++;if(B.plN===2)B.log.push('【疊甲】甲殼越打越硬，這回合後續傷害遞減')}if(B.trait==='veil'&&B.vlT!==B.turn){B.vlT=B.turn;if(B.st.burn>0||B.st.poison>0||B.st.bleed>0){if(!B.vlX){B.vlX=1;B.log.push('【霧隱】被持續傷害逼出原形，失效了')}}else{d*=.5;B.elHit=B.elHit||'r';B.log.push('【霧隱】第一擊打進霧裡，傷害減半')}}if(B.trait==='ward'&&stat==='MAG'&&!((B.wardBrk||0)>B.turn))d*=.6;if(B.trait==='ward'&&cr&&!((B.wardBrk||0)>B.turn)){B.wardBrk=B.turn+2;B.log.push('【魔障】被爆擊打碎了！2 回合內失效')}
   if(B.fog>0)d*=.75;else if(B.fogMax&&(B.fogV||0)>=B.turn)d*=1.2;
@@ -3134,7 +3135,7 @@ function pAct(type,arg){if(!B||B.busy)return;const s=stats();
     const sn=stn(),cl0=S.cls;let pw=0;if(k.fin)pw+=k.fin*C.brk*(sn&&cl0==='swordsman'?.5:1);if(k.det)pw+=k.det*C.marks.length*(1+s.DETAMP/100)*(sn&&cl0==='mage'?.35:1);if(k.aim)pw+=k.aim*C.focus*(sn&&cl0==='ranger'?.4:1);if(k.faithAmp)pw+=Math.min(1,C.faith/100);if(k.faithSpend)pw+=C.faith/100*1.2;if(hasP('mg2')&&(k.c==='mage'||k.c==='archmage'||k.c==='warlock'))pw+=.08*C.marks.length;if(k.ult)B.ultUsed=1;mul*=1+pw;const fx=B.fx={by:'me',cut:B.chain?`${k.n}・${B.chain}！`:k.n,chain:B.chain||null,el:SKEL[arg]||'phys',skill:arg,hits:k.dmg&&k.dmg.h||1};B.chain=null;if(S.reapFree){S.reapFree=0;ps.push('【收割共鳴】這招不消耗 MP')}else S.mp-=mpCost(arg);playSkillSfx(arg,k);
     if(k.cost)S.hp=Math.max(1,S.hp-Math.round(s.HP*k.cost));
     const consume=()=>{if(k.fin&&C.brk){ps.push(`清算 ${C.brk} 層破綻`);C.brk=0}if(k.det&&C.marks.length){if(sn&&cl0==='mage')ps.push(`【延燒】${C.marks.length} 個印記繼續燒`);else{ps.push(`引爆 ${C.marks.length} 個印記`);C.marks=[]}}
-      if(k.aim&&!k.keep&&C.focus&&!(sn&&cl0==='ranger')){ps.push(`打出 ${C.focus} 層專注`);C.focus=0}if(k.faithSpend&&C.faith){ps.push(`燃燒 ${C.faith} 點信仰`);C.faith=0}};
+      if(k.aim&&!k.keep&&C.focus&&!(sn&&cl0==='ranger')){ps.push(`打出 ${C.focus} 層專注`);C.focus=cl0==='ranger'?1:0}if(k.faithSpend&&C.faith){ps.push(`燃燒 ${C.faith} 點信仰`);C.faith=0}};
     if(k.dmg){let tot=0,cr=false;B.srcNow=k.n;const hl=[];for(let i=0;i<(k.dmg.h||1);i++){const r=hitFoe(k.dmg.s,k.dmg.p*mul,k.dmg);tot+=r.d;cr=cr||r.cr;hl.push(r.d)}if(hl.length>1)fx.hl=hl;
        {const dk=s.KW.double||0,rs=cl0==='ranger'&&sn,dbl=s.DOUBLE+(rs?7*C.focus:0);if((dk>=2||rs)&&B.hp>0&&dbl&&Math.random()*100<dbl*.5){B.srcNow='連擊';const r2=hitFoe(k.dmg.s,k.dmg.p*mul*(dk>=3?1:rs?.6:.4),k.dmg);tot+=r2.d;cr=cr||r2.cr;ps.push(`觸發連擊 +${r2.d}`)}}fx.d=tot;fx.cr=cr;ps.push(`造成 ${tot} 傷害${cr?'（爆擊！）':''}`);ps.push(...procs(s,tot));
       if(k.drain){const h=Math.round(tot*k.drain);S.hp=Math.min(s.HP,S.hp+h);fx.heal=h;ps.push(`吸取 ${h} HP`)}}
