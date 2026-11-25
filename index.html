@@ -2009,7 +2009,7 @@ function coreHtml(v){if(RUN.core)return `<p class="sub" style="color:var(--exp)"
   return `<div class="lbl">強敵倒下後留下三顆霧核（只能帶走一顆，本趟冒險生效）</div><div class="list">${v.core.filter(k=>MCORE[k]).map(k=>`<button class="btn" style="text-align:left;white-space:normal;line-height:1.5" data-a="core" data-v="${k}"${coreFit(k)?' data-fit="1"':''}><b>${coreIc(k,34)}${MCORE[k].n}</b>${coreFit(k)?' <span class="tag" style="background:#1f6b5a;color:#fff">✦ 與你的流派契合</span>':''}<br><span class="sub">${MCORE[k].d}</span><br><span class="sub" style="opacity:.7">適合：${MCORE[k].tip}</span></button>`).join('')}</div>`}
 function corePick(k){const v=RUN&&RUN.view;if(!v||!v.core||RUN.core||!MCORE[k]||!v.core.includes(k))return;RUN.core=k;try{SFX.holy(0)}catch(e){}toast(`${MCORE[k].i} 取得【${MCORE[k].n}】`);save();render()}
 function bossBoxHtml(v){if(v.box===2)return v.boxR||'';return `<div class="lbl">首領的寶物堆（只能帶走一箱）</div><div class="list">${Object.keys(BBOX).map(k=>`<button class="btn" style="text-align:left" data-a="bossBox" data-v="${k}"><b>${BBOX[k].n}</b><br><span class="sub">${BBOX[k].d}</span></button>`).join('')}</div>`}
-function bossBox(k){const v=RUN&&RUN.view;if(!v||v.box!==1||!BBOX[k])return;const L=v.boxL||S.lv,t=RUN.area;let x='';DROPS=[];
+function bossBox(k){const v=RUN&&RUN.view;if(!v||v.box!==1||!BBOX[k])return;const L=v.boxL||S.lv,t=dropTier(RUN.area);let x='';DROPS=[];
   if(k==='gold'){const g=Math.round((40+L*25)*(.9+Math.random()*.2));S.gold+=g;RUN.loot.gold+=g;addItem('stone',1);x=`箱裡塞滿了金幣：獲得 ${g} G、強化石×1。`}
   else if(k==='blue'){const g=minG(rollGear(t,Math.random()<.125?3:2,2));RUN.loot.items.push(gearName(g));x=`蒼紋在掌心亮起：獲得【${gearName(g)}】。`}
   else{if(Math.random()<.175){const g=rollGear(t,3,2,true);RUN.loot.items.push(gearName(g));x=`封印應聲碎裂——獲得【${gearName(g)}】！`}else{const g=10+L*5;S.gold+=g;RUN.loot.gold+=g;x=`鎖鏈落下，裡面只有灰塵和幾枚銅幣（${g} G）。下次運氣會更好。`}}
@@ -2350,7 +2350,7 @@ function runNext(){const n=RUN.step+1;if(RUN.nodes[n]==='boss'&&!RUN.gate&&RUN.s
   else if(t==='merchant'){const u=12+a.base*6;RUN.view={type:'shop',items:[['pot',Math.round(ITEMS.pot.price*.7)],['pot2',Math.round(ITEMS.pot2.price*.7)],['eth',Math.round(ITEMS.eth.price*.7)],['box',u*12],['hunt',u*5]],bought:{}}}
   else if(t==='chest'&&tg==='rich'&&Math.random()<.3){toast('寶箱張開了大嘴——是寶箱怪！');startBattle(pick(a.mobs),'elite',0);if(B){B.hoard=1;B.gmul=2;B.name='寶箱怪・'+B.m.n;B.log.push('👑 寶箱怪！打倒牠，寶物就是你的')}}
   else if(t==='chest'){const g=Math.round((12+a.base*6)*(1.5+Math.random())*(tg==='rich'?2:1));S.gold+=g;RUN.loot.gold+=g;let x=`你在岩縫中發現一只小寶箱，獲得 ${g} G`;
-    if(Math.random()<.5){addItem('pot',1);x+='、治療藥水'}if(Math.random()<.15){addItem('stone',1);x+='、強化石'}if(tg==='rich'||Math.random()<.15){const gg=rollGear(RUN.area,tg==='rich'?2:1);if(tg==='rich')minG(gg);x+='、'+gearName(gg);RUN.loot.items.push(gearName(gg))}RUN.view={type:'res',title:'發現寶箱',drop:dropFx(),text:x+'。'}}
+    if(Math.random()<.5){addItem('pot',1);x+='、治療藥水'}if(Math.random()<.15){addItem('stone',1);x+='、強化石'}if(tg==='rich'||Math.random()<.15){const gg=rollGear(dropTier(RUN.area),tg==='rich'?2:1);if(tg==='rich')minG(gg);x+='、'+gearName(gg);RUN.loot.items.push(gearName(gg))}RUN.view={type:'res',title:'發現寶箱',drop:dropFx(),text:x+'。'}}
   else{const sp=tg==='spring';if(!sp&&RUN.core&&MCORE[RUN.core]&&!RUN.coreUp&&!RUN.tower&&!RUN.trial)RUN.view={type:'kiln'};else if(!sp&&!RUN.tower&&!RUN.trial)RUN.view={type:'camp'};else restHere(sp)}
   save();render();$('#main').scrollTop=0}
 
@@ -2598,7 +2598,7 @@ function evPick(i){const v=RUN.view,o=v.ev.o[i];if(!o||v.phase!=='ask'||evLack(o
   const tm=setInterval(()=>{const el=$('#die');if(el)el.textContent=R(1,20);
     if(++n>=10){clearInterval(tm);if(!RUN||RUN.view!==v)return;const out=ok?o.ok:o.ng;v.phase='done';v.r={d,mod,dc,ok,a:o.a};v.text=you(out.t);v.gain=applyOut(out,ok&&d===20,v.fate);evTwist(v,ok,d);if(ok)track('check');save();render()}},70)}
 function evTwist(v,ok,d){const T=['atk','def','luck'],N={atk:'劍之紋',def:'盾之紋',luck:'星之紋'};
-  if(d===20){const x=minG(rollGear(RUN.area,2));v.gain.push('大成功獎勵：'+gearName(x));RUN.loot.items.push(gearName(x))}
+  if(d===20){const x=minG(rollGear(dropTier(RUN.area),2));v.gain.push('大成功獎勵：'+gearName(x));RUN.loot.items.push(gearName(x))}
   if(ok&&!RUN.bless&&Math.random()<(v.fate?.5:.25)){RUN.bless=pick(T);v.gain.push(`✨ 旅途祝福：${N[RUN.bless]}（本趟生效）`);v.text+='<br><span class="sub">離開時，你感覺有股溫暖的力量跟著你。</span>'}
   if(!ok&&Math.random()<(v.fate?.55:.3)){v.amb=1;v.text+='<br><b style="color:var(--hp)">動靜驚動了附近的魔物，牠們朝你衝過來了！</b>'}}
 function applyOut(o,crit,fate){const unit=12+AREAS[RUN.area].base*6,s=stats(),g=[],m=(crit?2:1)*(fate?2:1);
@@ -2609,7 +2609,7 @@ function applyOut(o,crit,fate){const unit=12+AREAS[RUN.area].base*6,s=stats(),g=
   if(o.stone){addItem('stone',o.stone);g.push(`強化石×${o.stone}`)}
   if(o.hone&&RUN&&!RUN.tower){if(!honeMax()){RUN.hone=(RUN.hone||0)+1;g.push(`⚔ 磨刃：本趟傷害 +${RUN.hone*12}%`)}else g.push('武器已經磨到極限')}
   if(o.item){addItem(o.item[0],o.item[1]);g.push(`${ITEMS[o.item[0]].n}×${o.item[1]}`)}
-  if(o.loot){const x=rollGear(RUN.area,crit?2:1);g.push(gearName(x));RUN.loot.items.push(gearName(x))}
+  if(o.loot){const x=rollGear(dropTier(RUN.area),crit?2:1);g.push(gearName(x));RUN.loot.items.push(gearName(x))}
   if(o.exp){const v=Math.round(unit*o.exp*m);RUN.loot.exp+=v;g.push(`+${v} EXP`);gainExp(v)}
   return g}
 /* 露娜羈絆：一起冒險、打倒首領、每日聊天都能慢慢累積（每天上限 1.5） */
@@ -2792,6 +2792,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'13.7',d:'2026-11-25',t:'魔物與掉落等級自適應',b:'魔物等級會跟著你的等級走：在牠原本的等級往上一段區間內調整（一般魔物最多 +8 級、首領最多 +6 級），不會比原本低，並且永遠比你低至少 1 級，所以回到前面的地區不再是一刀一隻。掉落的裝備階級也跟著你的等級：最多比該地區高一階，且不超過目前章節解封的階級。高塔與試煉不變。'},
   {v:'13.6',d:'2026-11-25',t:'掉落率調整',b:'整體掉落率減半，讓好裝備更有份量：一般怪掉裝備 12%→6%、精英 50%→25%、蝕化怪 100%→50%、首領額外一件 40%→20%；稀有以上的比例減半（史詩 2.6%→1.3%、傳說 0.4%→0.2%）；魔物專屬裝備 4%→2%、首領專屬裝備 8%→4%；寶箱升史詩的機率、素材、藥水、強化石、精英寶石也減半。「寶物守衛必掉裝備」、首領必掉的強化石與寶石不變。首領專屬裝備的保底取消。大副本深入加成改為每段 +15%。'},
   {v:'13.5',d:'2026-11-25',t:'大副本「翠原迷森」（試玩）',b:'冒險頁新增第一個大副本：把微風草原和迷霧森林串成一趟。打倒一段的首領後可以直接深入下一段——不回城、不回血，劇情會在途中接著演。每連續深入一段，稀有以上裝備的機率加成 +15%、首領專屬裝備機率 ×1.2。已通關的玩家可以從任一已解鎖的段落開始。原本的單區冒險仍然保留。'},
   {v:'13.4',d:'2026-11-25',t:'戰鬥卡住保險、露娜招式改名',b:'修正「沉沒書庫」打倒魔物後卡住不動：該區掉落裝備時會出錯，導致戰鬥無法結算（感謝回報）。另外新增保險機制，戰鬥指令鎖住超過 10 秒會自動解開，敵人已倒下則直接結算，不會再停在原地。露娜的招式改成一般魔法師的名稱：魔法彈、火球術、治癒術、魔法護盾、驅散術、奧義星光爆裂（效果不變）。'},
@@ -2932,9 +2933,13 @@ function vLShop(){const e=liveNow().find(x=>x.shop);if(!e)return{t:'活動商店
 
 /* ============ 戰鬥 ============ */
 var BHP=2.3,BATK=1.85;
+/* 自適應等級：魔物等級跟著玩家走，但只在該魔物原始等級往上的一段區間內（一般 +8、首領 +6），不會低於原始等級。
+   掉落裝備階級也跟著玩家等級，限制在「該地區階級 ～ 高一階」之間，且不超過目前章節解封的階級。 */
+const adLv=(m,bs)=>Math.max(m.lv,Math.min(S.lv-1,m.lv+(bs?6:8)));
+const dropTier=ar=>{const base=Math.min(ar,TLV.length-1);let t=0;for(let i=0;i<TLV.length;i++)if(S.lv>=TLV[i])t=i;return Math.max(base,Math.min(base+1,t,tierCap(),TLV.length-1))};
 function mkFoe(id,kind){const m=MOBS[id],bs=!!m.boss,el=kind==='elite',nm=!!(RUN&&RUN.nm);
   const mut=!bs&&!nm&&S.main.ch>=1&&Math.random()<.1;
-  const L=(RUN&&RUN.tower?RUN.tlv:m.lv)+(nm?10:0)+(mut?3:0);
+  const L=(RUN&&RUN.tower?RUN.tlv:RUN&&RUN.trial?m.lv:adLv(m,bs))+(nm?10:0)+(mut?3:0);
   const mult=(bs?(RUN&&!RUN.tower?1.05+RUN.area*.05:1.25):el?1.12:1)*(nm?1.35:1)*(mut?1.45:1),kh=(bs?(RUN&&!RUN.tower?(RUN.area===0&&!nm?2.8:3.3+RUN.area*.6)*(RUN.area===3?1.4:RUN.area>=4?1.25:RUN.area>=1?1.1:1):4.5):el?1.8:1)*(nm?1.6:1)*(mut?2.2:1);
   const st=mobBuild(m,L,mult,kh);
   const BMOD={goblinboss:'scout',zenos:'galeAlly'},bm=bs&&!nm&&S.flags[BMOD[id]]&&S.main.ch===RUN.area;if(bm)st.HP=Math.round(st.HP*.8);
@@ -3180,7 +3185,7 @@ function spoil(){const m=B.m,L=B.L,bs=B.kind==='boss',el=B.kind==='elite',T=B.to
   if(Math.random()<.06){addItem('pot',1);got.push('治療藥水')}
   if(bs||Math.random()<.03){addItem('stone',bs?2:1);got.push(bs?'強化石×2':'強化石')}
   const fld=!!m.field;const first=bs&&!fld&&!S.cleared[RUN.area];
-  {const tw=RUN.tower,gt=tw?Math.min(RUN.area,S.main.ch):RUN.area,hard=B.mut||B.nm,hd=B.hoard?1:0,n=(FA&&!bs&&!B.hoard&&Math.random()<.5)?0:hd+(bs?(Math.random()<(tw?.15:B.nm?.3:.2)?1:0)+(!tw&&B.nm&&Math.random()<.15?1:0):(Math.random()<(B.mut?.5:el?.25:B.nm?.15:lk||(RUN&&RUN.core==='greed')?.1:.06)*(tw?.6:1)?1:0));for(let i=0;i<n;i++){const g=rollGear(gt,bs?(tw?1:B.nm?3:2):hard?2:el?1:0,(bs||hard?(tw?1.3:2):1)*dgB(),hard);if(i<hd||(B.mut&&!bs))minG(g);got.push(gearName(g))}if(tw&&RUN.area>S.main.ch&&Math.random()<.5){addItem('stone',1);got.push('強化石')}
+  {const tw=RUN.tower,gt=tw?Math.min(RUN.area,S.main.ch):dropTier(RUN.area),hard=B.mut||B.nm,hd=B.hoard?1:0,n=(FA&&!bs&&!B.hoard&&Math.random()<.5)?0:hd+(bs?(Math.random()<(tw?.15:B.nm?.3:.2)?1:0)+(!tw&&B.nm&&Math.random()<.15?1:0):(Math.random()<(B.mut?.5:el?.25:B.nm?.15:lk||(RUN&&RUN.core==='greed')?.1:.06)*(tw?.6:1)?1:0));for(let i=0;i<n;i++){const g=rollGear(gt,bs?(tw?1:B.nm?3:2):hard?2:el?1:0,(bs||hard?(tw?1.3:2):1)*dgB(),hard);if(i<hd||(B.mut&&!bs))minG(g);got.push(gearName(g))}if(tw&&RUN.area>S.main.ch&&Math.random()<.5){addItem('stone',1);got.push('強化石')}
     if(MDROP[B.id]&&Math.random()<(B.wander?.25:B.treasure?.15:B.kind==='elite'?.06:B.nm?.05:.02)*(FA?.5:1)){const u=addGear(MDROP[B.id],3);DROPS.push(u);got.push(gearName(u));sys(`${S.name} 取得魔物專屬裝備【${GEAR[u.id].n}】！`)}
     if(bs&&BOSSU[B.id]&&(!RUN.tower||S.cleared[AREAS.findIndex(a=>a.boss===B.id)])&&Math.random()<(RUN.tower?.015:B.nm?.1:.04)*(RUN.dg&&RUN.dg.depth?1.2:1)){const u=addGear(BOSSU[B.id],4);DROPS.push(u);got.push(gearName(u));sys(`${S.name} 取得首領專屬裝備【${GEAR[u.id].n}】！`)}
     if(!bs&&B.kind==='elite'&&Math.random()<.03){const gm=pick(GEMS);addItem(gm,1);got.push(ITEMS[gm].n)}
@@ -3902,7 +3907,7 @@ const ACT={
   pickFork(v){if(!RUN||RUN.view.type!=='fork')return;const n=RUN.step+1;RUN.nodes[n]=RUN.view.opts[+v];RUN.tagAt=RUN.tagAt||{};RUN.tagAt[n]=((RUN.ftags||[])[n]||[])[+v]||null;runNext()},
   bless(v){if(!RUN||RUN.view.type!=='shrine'||RUN.view.done)return;RUN.bless=v;const s=stats();S.hp=Math.min(s.HP,S.hp+Math.round(s.HP*.15));RUN.view.done={atk:'劍之紋發出光芒。你感到力量湧了上來。',def:'盾之紋包覆全身，像是有人站在你身前。',luck:'星之紋閃爍了一下。今天好像會有好事。'}[v]+'（並回復少許 HP）';SFX.buff();save();render()},
   buyRun(v){const V=RUN&&RUN.view;if(!V||V.type!=='shop')return;const [k,pr]=V.items[+v];if(S.gold<pr||((k==='box'||k==='hunt')&&V.bought[k])||(k==='hunt'&&RUN.hunt))return;S.gold-=pr;
-    if(k==='hunt'){V.bought.hunt=1;RUN.hunt=1;toast('記下了懸賞目標的位置——下一場戰鬥會遇上牠')}else if(k==='box'){V.bought.box=1;const g=rollGear(RUN.area,1,1.5);RUN.loot.items.push(gearName(g));toast('開出了 '+gearName(g))}else{addItem(k,1);toast(`買了 ${ITEMS[k].n}`)}SFX.ui();save();render()},
+    if(k==='hunt'){V.bought.hunt=1;RUN.hunt=1;toast('記下了懸賞目標的位置——下一場戰鬥會遇上牠')}else if(k==='box'){V.bought.box=1;const g=rollGear(dropTier(RUN.area),1,1.5);RUN.loot.items.push(gearName(g));toast('開出了 '+gearName(g))}else{addItem(k,1);toast(`買了 ${ITEMS[k].n}`)}SFX.ui();save();render()},
   bTarget(v){if(!B||B.busy||!B.adds||!B.adds[+v])return;swapFoe(+v);B.fx=null;render()},
   sqAccept(id){S.side[id]={prog:0,done:false};toast('已接受委託');save();render()},
   sqDone(id){const q=SQ.find(x=>x.id===id);if(sqProg(q)<q.c)return;if(q.type==='item')addItem(q.item,-q.c);S.side[id].done=true;const t=give(q.rw);toast(`委託完成：${t}`);save();render()},
