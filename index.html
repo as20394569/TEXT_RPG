@@ -1451,15 +1451,15 @@ const NST=[
 ];
 /* 露娜的職業：燈術士 */
 const LUNASK={
-  bolt:{n:'燈火彈',d:'普通攻擊，射出一顆小小的燈火。',ok:()=>true,say:''},
-  flame:{n:'蒼焰',d:'每 3 回合一次，強力火焰攻擊，40% 灼燒。',ok:()=>true,say:'燒起來吧！'},
-  heal:{n:'照路之光',d:'你的 HP 低於 45% 時治療你（冷卻 3 回合）。',ok:()=>true,say:'撐住！'},
-  ward:{n:'守燈結界',d:'看到敵人準備大招時，替你展開結界，下一次傷害 -40%（冷卻 4 回合）。',ok:()=>S.main.ch>=2||(S.bond||0)>=3,say:'躲到燈後面！',need:'第 3 章或羈絆 3'},
-  clear:{n:'霧散之光',d:'敵人身上有增益或你中毒、灼燒時，削弱敵人 2 回合（冷卻 4 回合）。',ok:()=>S.main.ch>=3,say:'霧，散開！',need:'第 4 章'},
-  oath:{n:'誓約之燈',d:'奧義・每場一次。首領戰或敵人半血後發動，巨大傷害並治療你 15%。',ok:()=>(S.bond||0)>=6,say:'這盞燈，絕不熄滅！',need:'羈絆 6'}};
+  bolt:{n:'魔法彈',d:'普通攻擊，射出一發魔法彈。',ok:()=>true,say:''},
+  flame:{n:'火球術',d:'每 3 回合一次，強力火焰攻擊，40% 灼燒。',ok:()=>true,say:'燒起來吧！'},
+  heal:{n:'治癒術',d:'你的 HP 低於 45% 時治療你（冷卻 3 回合）。',ok:()=>true,say:'撐住！'},
+  ward:{n:'魔法護盾',d:'看到敵人準備大招時，替你展開結界，下一次傷害 -40%（冷卻 4 回合）。',ok:()=>S.main.ch>=2||(S.bond||0)>=3,say:'躲到燈後面！',need:'第 3 章或羈絆 3'},
+  clear:{n:'驅散術',d:'敵人身上有增益或你中毒、灼燒時，削弱敵人 2 回合（冷卻 4 回合）。',ok:()=>S.main.ch>=3,say:'霧，散開！',need:'第 4 章'},
+  oath:{n:'星光爆裂',d:'奧義・每場一次。首領戰或敵人半血後發動，巨大傷害並治療你 15%。',ok:()=>(S.bond||0)>=6,say:'這盞燈，絕不熄滅！',need:'羈絆 6'}};
 /* 同行夥伴 */
 const ALLY={
-  luna:{n:'露娜',img:'npc_luna',d:'研究黑霧的少女。職業【燈術士】：用測霧燈的蒼焰攻擊，替你治療、展開結界、驅散霧氣。',role:'燈術士',open:()=>S.main.ch>=1},
+  luna:{n:'露娜',img:'npc_luna',d:'研究黑霧的少女。職業【燈術士】：用火球術攻擊，替你治療、展開結界、驅散霧氣。',role:'燈術士',open:()=>S.main.ch>=1},
   gale:{n:'蓋爾',img:'npc_gale',d:'前王國騎士團的王牌。重擊敵人，並時常替你擋下攻擊。',role:'坦克・物理',open:()=>!!S.flags.galeBack}};
 
 /* 占星師：每日星象，整天有效的小祝福 */
@@ -2647,12 +2647,12 @@ function mkAlly(){if(!S.party||!ALLY[S.party]||!ALLY[S.party].open())return null
 function allyAct(){const A=B.ally;if(!A||A.hp<=0||B.allyTurn===B.turn||B.hp<=0)return;const _src=B.srcNow;B.srcNow='露娜';setTimeout(()=>{if(B)B.srcNow=_src},0);B.allyTurn=B.turn;const s=stats();A.cd=Math.max(0,A.cd-1);
   const hit=(p,nm)=>{let d=A.pw*p*100/(100+B.def*(1+fbSum('def')))*(.9+Math.random()*.2);d=capB(Math.max(1,Math.round(d)));if(B.fshield>0){const ab=Math.min(B.fshield,d);B.fshield-=ab;d-=ab}B.hp=Math.max(0,B.hp-d);dsrc('露娜',d);bossPhase();B.allyD=d;blog(`${A.n}${nm}，造成 ${d} 傷害`)};
   if(A.id==='luna'){A.cd2=Math.max(0,(A.cd2||0)-1);A.cd3=Math.max(0,(A.cd3||0)-1);const has=k=>LUNASK[k].ok(),say=k=>{try{setTimeout(()=>bub('luna',`【${LUNASK[k].n}】`),200);setTimeout(()=>PFX.ally(k),250)}catch(e){}},dng=B.chg||(B.next&&isDng(SKM[B.next]));
-    if(has('oath')&&!A.ult&&(B.kind==='boss'||B.hp<B.max*.5)&&B.turn>=3){A.ult=1;say('oath');hit(3,'高舉提燈，奧義【誓約之燈】');const h=Math.round(s.HP*.15);S.hp=Math.min(s.HP,S.hp+h);B.allyH=h;blog(`蒼藍的光包住了你，回復 ${h} HP`)}
-    else if(S.hp<s.HP*.45&&!A.cd){const h=Math.round(s.HP*A.heal);S.hp=Math.min(s.HP,S.hp+h);A.cd=3;B.allyH=h;say('heal');blog(`露娜舉起提燈【照路之光】，為你回復 ${h} HP`)}
-    else if(dng&&has('ward')&&!A.cd2){A.cd2=4;B.lunaWard=1;say('ward');blog('露娜展開【守燈結界】，下一次受到的傷害降低 40%')}
-    else if(has('clear')&&!A.cd3&&(B.st.poison>0||B.st.burn>0||(B.fb&&B.fb.length))&&Math.random()<.6){A.cd3=4;say('clear');B.st.weak=Math.max(B.st.weak||0,2);hit(.8,'放出【霧散之光】');blog(`${B.name} 的力量被削弱了`)}
-    else if(B.turn%3===0){say('flame');hit(1.6,'點燃燈火，【蒼焰】直擊');if(B.hp>0&&Math.random()<.4){B.st.burn=2;blog(`${B.name} 被蒼焰灼燒`)}}
-    else{try{PFX.ally('bolt')}catch(e){}hit(1,'的燈火彈')}}
+    if(has('oath')&&!A.ult&&(B.kind==='boss'||B.hp<B.max*.5)&&B.turn>=3){A.ult=1;say('oath');hit(3,'高舉雙手，奧義【星光爆裂】');const h=Math.round(s.HP*.15);S.hp=Math.min(s.HP,S.hp+h);B.allyH=h;blog(`蒼藍的光包住了你，回復 ${h} HP`)}
+    else if(S.hp<s.HP*.45&&!A.cd){const h=Math.round(s.HP*A.heal);S.hp=Math.min(s.HP,S.hp+h);A.cd=3;B.allyH=h;say('heal');blog(`露娜施展【治癒術】，為你回復 ${h} HP`)}
+    else if(dng&&has('ward')&&!A.cd2){A.cd2=4;B.lunaWard=1;say('ward');blog('露娜展開【魔法護盾】，下一次受到的傷害降低 40%')}
+    else if(has('clear')&&!A.cd3&&(B.st.poison>0||B.st.burn>0||(B.fb&&B.fb.length))&&Math.random()<.6){A.cd3=4;say('clear');B.st.weak=Math.max(B.st.weak||0,2);hit(.8,'放出【驅散術】');blog(`${B.name} 的力量被削弱了`)}
+    else if(B.turn%3===0){say('flame');hit(1.6,'詠唱咒文，【火球術】直擊');if(B.hp>0&&Math.random()<.4){B.st.burn=2;blog(`${B.name} 被火球灼燒`)}}
+    else{try{PFX.ally('bolt')}catch(e){}hit(1,'的魔法彈')}}
   else{if(!A.cd&&Math.random()<.35){A.cd=3;B.taunt=2;blog('蓋爾舉劍擋在你身前：「衝著我來。」')}
     else if(B.turn%3===0)hit(1.9,'揮出【雪葬】');else hit(1.1,'揮劍斬擊');}}
 function allyTgt(){const A=B.ally;if(!A||A.hp<=0)return false;if(B.taunt>0){B.taunt--;return true}return Math.random()<.28}
@@ -2771,6 +2771,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'13.4',d:'2026-11-25',t:'戰鬥卡住保險、露娜招式改名',b:'有玩家回報打完會卡住：新增保險機制，戰鬥指令鎖住超過 10 秒會自動解開，敵人已倒下則直接結算，不會再停在原地。露娜的招式改成一般魔法師的名稱：魔法彈、火球術、治癒術、魔法護盾、驅散術、奧義星光爆裂（效果不變）。'},
   {v:'13.3',d:'2026-11-25',t:'露娜台詞調整、切回分頁不再卡頓',b:'露娜新增一批依戰況說的話：首領蓄力、暴走、成功打斷、你閃開攻擊、敵人快倒下、戰鬥拖太久，以及遇到成群、精英、飛行魔物或你血量偏低時的開場提醒。切到別的 App 或分頁再回來時，不會再把積欠的音樂音符與戰鬥特效一口氣播出來而卡住。露娜放招時不再喊口號（像「照路之光・撐住！」這類），只顯示招式名。另外拿掉、改寫了一批比較尷尬的台詞（戰鬥喊話、出發前的話、營火閒聊與戰敗後的安慰），讓她說話更自然。'},
   {v:'13.2',d:'2026-11-25',t:'旅途插圖換新畫風',b:'旅途中遇到的五位人物（阿蕾、葛蕾塔、米洛、賽門、托比）的插圖換成新畫風，共 25 張。第三章首領預告圖重畫完成。露娜的「燈光術」演出換成新姿勢。'},
   {v:'13.1',d:'2026-11-25',t:'露娜立繪重畫、NPC 與蓋爾換新畫風',b:'露娜的全身立繪與招式圖重畫：提燈掛在腰間，招式改為放出燈光與祈禱治癒（不再揮拳）；治癒時出現祈禱演出，攻擊時偶爾出現燈光術演出。晨星鎮 9 位 NPC（含三種表情）、5 位旅途中遇到的人物、夥伴蓋爾都換成新畫風；蓋爾在戰鬥中改用頭像表情並有出招演出。章節首領預告圖 6 張與牧羊女阿蕾的旅途插圖也換新。其餘旅途插圖繪製中。'},
@@ -3084,7 +3085,7 @@ function foeTurn(){if(!B)return;if(B.treasure&&B.turn>=3&&B.hp>0){B=null;RUN.vie
         const res=mb?100/(100+s.MRES+s.DEF*.2):k&&k.mag?100/(100+s.MRES+s.DEF*.2)*(1-mobRes(k,s)/100):100/(100+s.DEF*(1+buffSum('def'))*(1-(k&&k.pierce||0)));
         let d=base*res*(.9+Math.random()*.2);if(Math.random()*100<B.crit+fbSum('crit')+(k&&k.cr||0)){d*=1.5;cr=true}tot+=d}
       if(!hit){fx.miss=1;SFX.miss();blog(`你閃開了 ${B.name} 的${nm}！`);setTimeout(()=>{try{talk('dodge')}catch(e){}},500);if(S.cls==='ranger'){B.cls.focus=Math.min(rmax(5),B.cls.focus+2);blog(`專注 ${B.cls.focus}`)}}
-      else{let d=tot;if(B.lunaWard){d*=.6;B.lunaWard=0;blog('守燈結界擋下了部分衝擊')}if(B.guard)d*=(big||dng)?.25:.5;if(B.guard&&(big||dng)){B.opening=1;blog('✦ 完美防禦！看穿破綻，下次攻擊傷害 +50%');setTimeout(()=>talk('guard'),600)}let gd=false;if(s.GUARD&&Math.random()*100<s.GUARD){d*=.5;gd=true;if((s.KW.guard||0)>=2&&B.hp>0){B.srcNow='守護反擊';const r=hitFoe(CLS[S.cls].basic==='MAG'?'MAG':'ATK',.5,{sure:1});blog(`【守護共鳴】順勢反擊 ${r.d}`)}}d=Math.max(1,Math.round(d));let ctr=false;if(B.counter){d=Math.max(1,Math.round(d*.3));B.counter=0;ctr=true}
+      else{let d=tot;if(B.lunaWard){d*=.6;B.lunaWard=0;blog('魔法護盾擋下了部分衝擊')}if(B.guard)d*=(big||dng)?.25:.5;if(B.guard&&(big||dng)){B.opening=1;blog('✦ 完美防禦！看穿破綻，下次攻擊傷害 +50%');setTimeout(()=>talk('guard'),600)}let gd=false;if(s.GUARD&&Math.random()*100<s.GUARD){d*=.5;gd=true;if((s.KW.guard||0)>=2&&B.hp>0){B.srcNow='守護反擊';const r=hitFoe(CLS[S.cls].basic==='MAG'?'MAG':'ATK',.5,{sure:1});blog(`【守護共鳴】順勢反擊 ${r.d}`)}}d=Math.max(1,Math.round(d));let ctr=false;if(B.counter){d=Math.max(1,Math.round(d*.3));B.counter=0;ctr=true}
         let ab=0;if(B.shield>0){ab=Math.min(B.shield,d);B.shield-=ab;d-=ab}
         fx.d=d;fx.cr=cr;fx.quake=!!k||d>s.HP*.15;SFX.hurt(k?.85:0);buzz(k?120:50);S.hp=Math.max(0,S.hp-d);
         blog(`${B.name} 的${nm}造成 ${d} 傷害${cr?'（爆擊）':''}${ab?`（護盾吸收 ${ab}）`:''}${gd?'（格擋）':''}${ctr?'（招架成功）':''}`);
@@ -3972,6 +3973,12 @@ document.body.classList.toggle('noshake',SHAKEOFF);
 
 /* ============ 啟動 ============ */
 load();if(S){migrate();checkDaily();learn(true);runLoad()}
+/* 戰鬥卡住保險：指令鎖住超過 10 秒就自動解開（敵人已倒下則直接結算） */
+addEventListener('error',e=>{try{localStorage.setItem('ao_err',new Date().toISOString()+' '+(e.message||'')+' @'+(e.lineno||0)+':'+(e.colno||0))}catch(_){}});
+setInterval(()=>{try{if(!B||!B.busy||MODAL||STORY||document.hidden){if(B)B.wd=0;return}const k=B.turn+'|'+B.hp+'|'+B.id+'|'+S.hp;if(B.wdK!==k){B.wdK=k;B.wd=Date.now();return}if(!B.wd)B.wd=Date.now();if(Date.now()-B.wd<10000)return;B.wd=0;
+  if(B.hp<=0){try{win()}catch(e){try{localStorage.setItem('ao_err','win '+e)}catch(_){}}if(B&&B.hp<=0){B=null;if(RUN)RUN.view={type:'res',title:'戰鬥勝利',text:'魔物倒下了。你整理好裝備，繼續前進。'};save();render()}}
+  else if(S.hp<=0){try{lose()}catch(e){B=null;RUN=null;TAB='town';save();render()}}
+  else{B.busy=false;render()}}catch(e){}},2000);
 render();chatTick();setInterval(chatTick,4000);setTimeout(bcastCheckSeen,1200);
 </script>
 <script>if('serviceWorker' in navigator&&/github\.io$/.test(location.hostname))navigator.serviceWorker.register('sw.js').catch(()=>{})</script>
