@@ -699,7 +699,7 @@ const fmt=(k,v)=>`${STATN[k]} +${v}${PCT.has(k)?'%':''}`;
 const GEAR={};
 const TLV=[1,5,10,15,20,26],TPRICE=[60,300,900,2200,5000,9000];
 const WN={swordsman:['鐵劍','鋼長劍','秘銀劍','寒鐵劍','聖騎士劍','王都名劍'],mage:['橡木杖','水晶杖','刻紋法杖','寒冰杖','星飾法杖','雷擊法杖'],ranger:['獵弓','長弓','樺木長弓','雪原長弓','牛角長弓','雷鷹長弓'],cleric:['木槌','祭司戰錘','銀戰錘','寒鐵戰錘','大教堂戰錘','白塔戰錘']};
-for(const c in WN)WN[c].forEach((n,i)=>{const v=5+i*9;GEAR[`w_${c}_${i}`]=Object.assign({n,slot:'weapon',cls:c,t:i,lv:TLV[i],price:TPRICE[i]},c==='mage'?{mag:Math.round(v*1.15)}:c==='cleric'?{atk:Math.round(v*.6),mag:Math.round(v*.85)}:{atk:v})});
+for(const c in WN)WN[c].forEach((n,i)=>{const v=Math.round(9+i*8.6);GEAR[`w_${c}_${i}`]=Object.assign({n,slot:'weapon',cls:c,t:i,lv:TLV[i],price:TPRICE[i]},c==='mage'?{mag:Math.round(v*1.15)}:c==='cleric'?{atk:Math.round(v*.6),mag:Math.round(v*.85)}:{atk:v})});
 const ARMOR={head:[['皮帽','鐵盔','秘銀頭盔','寒鐵頭盔','龍角頭盔','白塔頭盔'],i=>({def:2+i*4,hp:8+i*20}),.6],
   body:[['旅人布衣','硬皮甲','鎖子甲','寒鐵鎧甲','龍鱗鎧甲','近衛鎧甲'],i=>({def:3+i*7,hp:10+i*30}),.8],
   feet:[['草鞋','皮靴','獵人短靴','雪地長靴','騎兵長靴','鋼鐵戰靴'],i=>({def:1+i*3,eva:1+i}),.5],
@@ -730,6 +730,14 @@ Object.assign(GEAR,{
   u_worm:{n:'巨蟲的牙',slot:'neck',t:2,lv:15,price:4000,hp:150,cd:20,uq:{ls:8,burn:15},ud:'吸血 +8%，攻擊時 15% 機率灼燒',uniq:1},
   u_dragon:{n:'冰龍鱗甲',slot:'body',t:3,lv:20,price:7000,def:45,hp:260,uq:{guard:20,shield:10},ud:'受擊 20% 機率傷害減半，開場護盾 10%',uniq:1},
   u_zenos:{n:'澤諾斯的頭冠',slot:'head',t:4,lv:25,price:12000,def:30,hp:220,uq:{cd:40,resmax:1,atkp:8,magp:8},ud:'爆擊傷害 +40%、資源上限 +1、物攻與魔攻 +8%',uniq:1}});
+/* 大副本限定：流派核心傳說裝。本身帶一個詞綴，並算作 2 件該詞綴的共鳴（3 件裝就能湊出兩種共鳴 II） */
+Object.assign(GEAR,{
+  c_burn:{n:'餘燼之心',slot:'ring',t:1,lv:5,price:3000,atk:8,mag:10,mp:20,uq:{burn:20},ud:'攻擊時 20% 機率灼燒。算作 2 件「烈焰」共鳴',uniq:1,core:1},
+  c_double:{n:'雙生獠牙',slot:'neck',t:1,lv:5,price:3000,atk:10,crit:4,hp:40,uq:{double:25},ud:'普通攻擊 25% 機率追加一擊。算作 2 件「連擊」共鳴',uniq:1,core:1},
+  c_thorn:{n:'荊棘王冠',slot:'head',t:1,lv:5,price:3000,def:14,hp:90,uq:{thorn:25},ud:'被擊中時反彈 25% 傷害。算作 2 件「荊棘」共鳴',uniq:1,core:1},
+  c_shield:{n:'晨霧斗篷',slot:'body',t:1,lv:5,price:3000,def:18,hp:120,uq:{shield:15},ud:'戰鬥開始獲得 15% HP 的護盾。算作 2 件「先機」共鳴',uniq:1,core:1},
+  c_ls:{n:'渴血指環',slot:'ring',t:1,lv:5,price:3000,atk:9,hp:60,uq:{ls:8},ud:'吸血 +8%。算作 2 件「吸血」共鳴',uniq:1,core:1}});
+const DGCORE=['c_burn','c_double','c_thorn','c_shield','c_ls'];
 const BOSSU={goblinboss:'u_gob',treeking:'u_tree',worm:'u_worm',icedragon:'u_dragon',zenos:'u_zenos'};
 const GEMS=['gem_r','gem_b','gem_g','gem_y','gem_w'];
 const BGEM={goblinboss:'gem_r',treeking:'gem_g',worm:'gem_y',icedragon:'gem_w',zenos:'gem_b',rabbitking:'gem_y',moonwolf:'gem_w',foreman:'gem_r',giantking:'gem_g',mistgeneral:'gem_b'};
@@ -759,6 +767,14 @@ const ITEMS={
 const MTY={brute:{n:'力量型',w:{STR:.32,DEX:.12,INT:.06,VIT:.34,LUK:.16}},swift:{n:'敏捷型',w:{STR:.14,DEX:.36,INT:.06,VIT:.2,LUK:.24}},
   caster:{n:'魔法型',w:{STR:.06,DEX:.16,INT:.4,VIT:.22,LUK:.16}},tank:{n:'防禦型',w:{STR:.24,DEX:.08,INT:.08,VIT:.48,LUK:.12}}};
 const MOBS={
+  thornboar:{n:'荊棘野豬',lv:3,ty:'brute',dg:1,mech:'spike',sk:['m_horn','m_rock']},
+  mosscrab:{n:'苔殼蟹',lv:4,ty:'tank',hpM:1.2,dg:1,mech:'rebound',sk:['m_goo','m_rock']},
+  windfairy:{n:'淨風妖精',lv:4,ty:'caster',dg:1,mech:'cleanse',fly:1,sk:['m_spore','m_hop']},
+  wolfrider:{n:'哥布林狼騎兵',lv:6,ty:'swift',hpM:1.3,dg:1,mech:'enrage',sk:['m_bite','m_howl','m_sneak']},
+  sporemother:{n:'孢子母菇',lv:8,ty:'caster',hpM:1.2,dg:1,mech:'summon',sk:['m_spore','m_sleep']},
+  mirrormoth:{n:'鏡翅蛾',lv:8,ty:'swift',dg:1,mech:'ward',fly:1,sk:['m_sleep','m_hop']},
+  rootguard:{n:'盤根守衛',lv:9,ty:'tank',hpM:1.2,dg:1,mech:'undying',sk:['m_root','m_photo']},
+  elderdruid:{n:'古樹祭司',lv:11,ty:'caster',hpM:1.3,dg:1,mech:'grove',sk:['m_rotmist','m_rootcage','m_sap']},
   slime:{n:'史萊姆',lv:1,ty:'tank',mat:'m_gel',sk:['m_goo','m_split']},
   hornrabbit:{n:'尖角野兔',lv:2,ty:'swift',sk:['m_horn','m_hop']},
   goblin:{n:'哥布林掠奪者',lv:3,ty:'swift',sk:['m_sneak','m_rock']},
@@ -1608,7 +1624,7 @@ const xpPen=L=>{const d=S.lv-L-5;return d>0?Math.max(.2,1-d*.15):1};
 const clsName=()=>S.adv?ADV[S.adv].n:CLS[S.cls].n;
 const gearBy=u=>S.gear.find(g=>g.u===u);
 const tierCap=()=>S&&S.main&&!S.main.done?Math.max(0,S.main.ch):99,sealed=g=>GEAR[g.id].t>tierCap();
-function gearStat(g){const b=GEAR[g.id],m=(b.mx?.6:1)*(1+.2*g.r)*(1+.08*g.p)*(g.q||1)*([1.4,1.2][b.uniq?9:b.t]||1)*(sealed(g)?Math.pow(.65,b.t-tierCap()):1),o={};for(const k in STATN)if(b[k])o[k]=Math.round(b[k]*m);return o}
+function gearStat(g){const b=GEAR[g.id],m=(b.mx?.6:1)*(1+.2*g.r)*(1+.06*g.p)*(g.q||1)*([1.4,1.2][b.uniq?9:b.t]||1)*(sealed(g)?Math.pow(.65,b.t-tierCap()):1),o={};for(const k in STATN)if(b[k])o[k]=Math.round(b[k]*m);return o}
 const specV=g=>{const v=SPEC[g.sp].v;return v<=1?v:Math.max(1,Math.round(v*Math.min(1,.5+.1*(GEAR[g.id].t||0))))},specD=g=>{const x=SPEC[g.sp];return x.v<=1?x.d:x.d.replace(String(x.v),String(specV(g)))};
 function gearAll(g){const o=gearStat(g),sl=sealed(g),sm=sl?Math.pow(.65,GEAR[g.id].t-tierCap()):1,ad=(k,v)=>o[k]=(o[k]||0)+v;for(const x of g.sub||[])ad(x.k,Math.max(1,Math.round(x.v*sm)));if(g.sp&&!sl)ad(g.sp,specV(g));const u=GEAR[g.id].uq;if(u&&!sl)for(const k in u)ad(k,u[k]);
   for(const gm of g.sock||[])if(gm)for(const k in ITEMS[gm].gem)ad(k,ITEMS[gm].gem[k]);return o}
@@ -1639,7 +1655,7 @@ const RZ={
   gale:{n:'疾風',ic:'🌪',i:'前兩次攻擊必定命中且爆擊',ii:'之後每 4 回合再觸發一次'},
   reap:{n:'收割',ic:'🌾',i:'收割回復量 ×2',ii:'擊倒敵人後，下一招技能不消耗 MP'}};
 const SETKW={火山:'burn',遠征隊:'shield',輕裝:'gale',森林:'ls'};
-function kwCount(){const c={};if(!S||!S.eq)return c;const sets={};for(const sl in SLOTS){const g=gearBy(S.eq[sl]);if(!g)continue;if(g.sp&&RZ[g.sp])c[g.sp]=(c[g.sp]||0)+1;const u=GEAR[g.id]&&GEAR[g.id].uq;if(u)for(const k in u)if(RZ[k])c[k]=(c[k]||0)+1;if(g.set!=null)sets[g.set]=(sets[g.set]||0)+1}
+function kwCount(){const c={};if(!S||!S.eq)return c;const sets={};for(const sl in SLOTS){const g=gearBy(S.eq[sl]);if(!g)continue;if(g.sp&&RZ[g.sp])c[g.sp]=(c[g.sp]||0)+1;const u=GEAR[g.id]&&GEAR[g.id].uq;if(u)for(const k in u)if(RZ[k])c[k]=(c[k]||0)+(GEAR[g.id].core?2:1);if(g.set!=null)sets[g.set]=(sets[g.set]||0)+1}
   for(const i in sets)if(sets[i]>=4&&SETS[i]){const k=SETKW[SETS[i].n];if(k)c[k]=(c[k]||0)+1}return c}
 function buildName(c){c=c||kwCount();const top=Object.entries(c).filter(([k,n])=>n>=2).sort((a,b)=>b[1]-a[1]).slice(0,2);return top.length?top.map(([k])=>RZ[k].n).join('・')+'流':''}
 function power(){const s=stats();return Math.round(s.HP/4+s.MP/4+s.ATK*3+s.MAG*3+s.DEF*2.5+s.CRIT*4+(s.CD-150)*1.5+s.EVA*3+s.LS*5+(s.BURN+s.DOUBLE+s.STUN+s.GUARD+s.SHIELD+s.BACK+s.THORN+s.REAP)*3+s.GALE*40)}
@@ -1953,7 +1969,7 @@ let IDLESEL=0,IDLERES=null;
 setInterval(()=>{if(!S||!S.idle)return;const t=$('#idleT'),g=$('#idleG');if(!t)return;const c=idleCalc();t.textContent=hms(c.ms);g.innerHTML=idleLine(c)},1000);
 function idleSettle(){const c=idleCalc();if(!c)return;const lv0=S.lv,gs=[];S.idle=null;gainExp(c.exp);S.gold+=c.gold;if(c.stone)addItem('stone',c.stone);if(c.pot)addItem('pot',c.pot);
   for(let i=0;i<c.gear;i++){const g=rollGear(AREAS.indexOf(c.a),0);gs.push(g)}DROPS=[];IDLERES={c,lv0,lv1:S.lv,gs};save();openM('idleRes')}
-function vAreas(){return `<h2>選擇冒險地點</h2>`+vIdle()+vDg()+AREAS.map((a,i)=>{const open=S.main.ch>=i,bossOn=bossReady(i);
+function vAreas(){return `<h2>選擇冒險地點</h2>`+vGift()+vIdle()+vDg()+AREAS.map((a,i)=>{const open=S.main.ch>=i,bossOn=bossReady(i);
   return `<div class="panel area ${open?'':'lock'}">${art('area_'+a.id,a.n)}
   <div class="row"><h3 class="grow">${a.n}</h3><span class="tag">Lv ${a.lv}</span>${S.cleared[i]?'<span class="tag ok">已通關</span>':''}</div>
   <p class="sub">${a.d}</p><div class="chips">${a.mobs.map(m=>`<span class="chip">${MOBS[m].n}</span>`).join('')}<span class="chip" style="color:var(--hp)">首領 ${MOBS[a.boss].n}${bossOn?'':'（未現身）'}</span></div>${open&&bossOn&&!S.cleared[i]&&S.lv<MOBS[a.boss].lv?`<p class="sub" style="color:var(--hp)">⚠ ${MOBS[a.boss].n} 已在深處等著（Lv ${MOBS[a.boss].lv}）。現在 Lv ${S.lv}，這趟終點會直接碰上它——不夠強就先在岔路多打幾場、換好裝備。</p>`:''}
@@ -2029,7 +2045,7 @@ function bossReady(i){return !!S.cleared[i]||(S.main.ch===i&&S.main.acc&&(CH[i].
 function vRun(){if(RUN.tower)return vTower();const a=AREAS[RUN.area],v=RUN.view,last=RUN.step>=RUN.nodes.length-1;
   const pips=`<div class="pips">${RUN.nodes.map((t,i)=>`<span class="pip ${i<RUN.step||(i===RUN.step&&v.type==='res')?'done':i===RUN.step?'now':''} ${t==='boss'?'boss':''}">${t==='boss'||t==='elite'||t==='story'?'★':t?(i<=RUN.step?NODE[t]?NODE[t][0]:i+1:i+1):'⋔'}</span>`).join('')}</div>`;
   let body='';
-  if(v.type==='start')body=`<div class="panel">${art('area_'+a.id,a.n)}<p>${a.d}</p>${AFX[a.id]?`<div class="gsec"><b>地區特性：${AFX[a.id].n}</b><span class="sub">${AFX[a.id].d}</span></div>`:''}${RUN.dg?`<div class="gsec"><b>大副本「${dgOf().n}」第 ${RUN.dg.k+1}／${dgOf().segs.length} 段</b><span class="sub">${RUN.dg.depth?`已連續深入 ${RUN.dg.depth} 段：掉寶加成 +${Math.round((dgB()-1)*100)}%`:'打倒這段的首領後可以直接深入下一段'}</span></div>`:''}<p class="sub">本次路線共 ${RUN.nodes.length} 段，終點是${RUN.nodes[RUN.nodes.length-1]==='boss'?'首領 '+MOBS[a.boss].n:'精英魔物'}。</p><button class="btn pri big" data-a="runNext">踏入${a.n}</button><button class="btn" data-a="retreat">返回</button></div>`;
+  if(v.type==='start')body=`<div class="panel">${art('area_'+a.id,a.n)}<p>${a.d}</p>${AFX[a.id]?`<div class="gsec"><b>地區特性：${AFX[a.id].n}</b><span class="sub">${AFX[a.id].d}</span></div>`:''}${RUN.dg?`<div class="gsec"><b>大副本「${dgOf().n}」第 ${RUN.dg.k+1}／${dgOf().segs.length} 段・${DGDN[RUN.dg.diff||0]}</b><span class="sub">${RUN.dg.depth?`已連續深入 ${RUN.dg.depth} 段：掉寶加成 +${Math.round((dgB()-1)*100)}%`:'打倒這段的首領後可以直接深入下一段'}</span></div>`:''}<p class="sub">本次路線共 ${RUN.nodes.length} 段，終點是${RUN.nodes[RUN.nodes.length-1]==='boss'?'首領 '+MOBS[a.boss].n:'精英魔物'}。</p><button class="btn pri big" data-a="runNext">踏入${a.n}</button><button class="btn" data-a="retreat">返回</button></div>`;
   else if(v.type==='gate')body=bossGate(a);
   else if(v.type==='res')body=`<div class="panel">${v.img?`<div class="duo">${art(v.img,'勝利','r34')}${v.mimg?art(v.mimg,'','r11'):''}</div>`:''}<h3>${v.title}</h3>${v.drop||''}<p>${v.text}</p>${v.box?bossBoxHtml(v):''}${v.core?coreHtml(v):''}${v.box===1||(v.core&&!RUN.core)?'':last?(RUN.dg&&dgCanGo()?`<button class="btn pri big" data-a="dgNext">深入下一段：${AREAS[dgNextArea()].n}</button><p class="sub" style="text-align:center">不回城、不回血；下一段掉寶加成 +${Math.round(((RUN.dg.depth||0)+1)*15)}%</p><button class="btn" data-a="finish">帶著戰利品回城</button>`:`<button class="btn pri big" data-a="finish">完成冒險</button>${RUN.dg&&dgNextArea()>=0?'<p class="sub" style="text-align:center">這趟沒有打倒首領，無法繼續深入。</p>':''}`):`<button class="btn pri big" data-a="runNext">繼續前進</button><button class="btn" data-a="retreat">撤退回城（保留戰利品）</button>`}</div>`;
   else if(v.type==='fork')body=`<div class="panel"><h3>岔路</h3><p class="sub">前方的路分成兩條。要往哪邊走？</p>${forkTalk()}<div class="fork">${v.opts.map((o,i)=>(()=>{const tg=((RUN.ftags||[])[RUN.step+1]||[])[i],T=tg&&TAGS[tg];const bl=(RUN.blind||[])[RUN.step+1]===i;if(bl)return `<button class="btn" data-a="pickFork" data-v="${i}"><i>🌫</i><b>濃霧中的路</b><span>霧太濃了，看不清前面有什麼</span><span class="risk">完全未知</span></button>`;return `<button class="btn ${T?'tagged':''}" data-a="pickFork" data-v="${i}"><i>${NODE[o][0]}</i><b>${NODE[o][1]}</b><span>${NODE[o][2]}</span><span class="risk">${NRISK[o]||''}</span>${T?`<span class="ftag">${T[0]} ${T[1]}<small>${T[2]}</small></span>`:''}</button>`})()).join('')}</div><button class="btn" data-a="retreat">撤退回城（保留戰利品）</button></div>`;
@@ -2077,7 +2093,7 @@ function vBattle(){const s=stats(),fx=B.fx||{},intro=B.intro,a=AREAS[RUN.area];B
   else if(B.menu==='item'){const us=Object.keys(S.items).filter(k=>ITEMS[k].use);cmd=`<div class="cmd col">${us.map(k=>`<button class="btn" data-a="bItem" data-v="${k}">${ITEMS[k].n} ×${S.items[k]}<small>${ITEMS[k].d}</small></button>`).join('')||'<p class="empty">沒有可用的道具</p>'}<button class="btn" data-a="bMenu" data-v="main">返回</button></div>`}
   else cmd=`<div class="cmd"><button class="btn pri" data-a="bAtk">攻擊</button><button class="btn" data-a="bMenu" data-v="skill">技能</button><button class="btn" data-a="bMenu" data-v="item">道具</button><button class="btn" data-a="bGuard">防禦</button><button class="btn" data-a="bFlee">逃跑</button><button class="btn ${B.auto?'pri':''}" data-a="bAuto">自動 ${B.auto?'開':'關'}</button></div>`;
   return `<div class="battle"><div class="stage v2 ${AL?'hasal':''} bg-${a.id} ${S.hp>0&&S.hp<stats().HP*.3?'danger':''} ${atk&&fx.d>0&&(fx.cr||B.hp<=0)?(sk?'punchl':'punch'):''} ${fx.quake&&!fk?'quake':''} ${(sk&&sk[0]==='meteor')||(fk&&fk.fx==='slam')?'quakel':''}" ${sk?`style="--c:${sk[1]}"`:fk?`style="--c:${fk.c}"`:''}><img class="bg" src="art/battle_${a.id}.webp" alt="" ${MISS.has('battle_'+a.id)?'hidden':''} onerror="reTry(this,'battle_${a.id}')||(MISS.add('battle_${a.id}'),this.remove())">
-   <div class="ibox foe-i" data-a="openM" data-v="foe" role="button" aria-label="查看怪物情報"><div class="nm"><span>${B.name}${B.kind==='boss'?' <span class="tag red">首領</span>':''}</span><span>${(B.adds||[]).length?'<span class="tag">目標</span> ':''}Lv${B.L} ⓘ</span></div>${bbar(B.hp,B.max,fp)}${(()=>{const e=MEL[B.id];if(!e||!(S.dex&&S.dex.m&&S.dex.m[B.id]||B.kind==='boss'))return '';return `<div class="elw">${e[0]?`<span class="elt el-${e[0]}">弱 ${ELI[e[0]]||e[0]}</span>`:''}${e[1]?`<span class="elt" style="color:#777">抗 ${ELI[e[1]]||e[1]}</span>`:''}</div>`})()}${B.trait?`<div class="elw"><span class="elt" style="color:#c2410c">${trIc(B.trait,16)}${TRT(B.trait).n}${(B.trait==='grudge'||B.trait==='swell')&&grudgeM()>1?' +'+Math.round((grudgeM()-1)*100)+'%':''}</span></div>`:''}${intentHtml()}${(B.adds||[]).length?`<div class="addrow">${B.adds.map((f,i)=>`<button class="addf" data-a="bTarget" data-v="${i}" aria-label="切換目標：${f.name}">${art('mob_'+f.id,f.m.n,'r11')}<span>${f.m.n}${bbar(f.hp,f.max)}</span></button>`).join('')}</div><div class="sub" style="font-size:10px">點小頭像切換目標</div>`:''}</div>
+   <div class="ibox foe-i" data-a="openM" data-v="foe" role="button" aria-label="查看怪物情報"><div class="nm"><span>${B.name}${B.kind==='boss'?' <span class="tag red">首領</span>':''}${B.trait&&TRX(B.trait)?` <span class="tag">${TRX(B.trait).n}</span>`:''}</span><span>${(B.adds||[]).length?'<span class="tag">目標</span> ':''}Lv${B.L} ⓘ</span></div>${bbar(B.hp,B.max,fp)}${(()=>{const e=MEL[B.id];if(!e||!(S.dex&&S.dex.m&&S.dex.m[B.id]||B.kind==='boss'))return '';return `<div class="elw">${e[0]?`<span class="elt el-${e[0]}">弱 ${ELI[e[0]]||e[0]}</span>`:''}${e[1]?`<span class="elt" style="color:#777">抗 ${ELI[e[1]]||e[1]}</span>`:''}</div>`})()}${B.trait?`<div class="elw"><span class="elt" style="color:#c2410c">${trIc(B.trait,16)}${TRX(B.trait).n}${(B.trait==='grudge'||B.trait==='swell')&&grudgeM()>1?' +'+Math.round((grudgeM()-1)*100)+'%':''}</span></div>`:''}${intentHtml()}${(B.adds||[]).length?`<div class="addrow">${B.adds.map((f,i)=>`<button class="addf" data-a="bTarget" data-v="${i}" aria-label="切換目標：${f.name}">${art('mob_'+f.id,f.m.n,'r11')}<span>${f.m.n}${bbar(f.hp,f.max)}</span></button>`).join('')}</div><div class="sub" style="font-size:10px">點小頭像切換目標</div>`:''}</div>
    <div class="spr foe ${B.m.fly?'fly':''} ${B.kind==='boss'?'boss':''} ${MSMALL.has(mobBase(B.id))?'szs':MMID.has(mobBase(B.id))?'szm':''} ${foeC}" data-a="openM" data-v="foe" role="button" aria-label="查看怪物情報" style="cursor:pointer"><div class="plat"></div>${B.id==='shadow'?art(HK(),'試煉之影','r34','shadowimg'):art(fKey0,B.m.n,'r11','','mob_'+B.id)}${foeFx}</div>
    <div class="spr me ${meC}"><div class="plat"></div>${art(mKey0,clsName(),'r11','',mB+'_fn')}${meFx}</div>
    <div class="ibox me-i"><div class="nm"><span>${esc(S.name)}</span><span>Lv${S.lv}</span></div>${bbar(S.hp,s.HP,pp)}<div class="num">HP ${S.hp}/${s.HP}</div>${bbar(S.mp,s.MP,null,'m')}<div class="num">MP ${S.mp}/${s.MP}</div>${me?`<div class="chips">${me}</div>`:''}</div>
@@ -2336,13 +2352,13 @@ function restHere(sp){const s=stats();S.hp=Math.min(s.HP,S.hp+Math.round(s.HP*(s
     RUN.view={type:'res',title:sp?'靈泉':'營火休息',text:sp?'清澈的泉水泛著微光。喝下一口，全身的疲憊一掃而空——HP 與 MP 全部回復！':'你找到一處安全的營地稍作休息，回復了 35% 的 HP 與 MP。'+campTalk()+(talk?`<br><span class="sub">${talk}</span>`:'')}}
 function kilnPick(k){const v=RUN&&RUN.view;if(!v||v.type!=='kiln'||v.done)return;if(k==='hone'){if(honeMax())return;v.done=honeDo();save();render();return}if(k==='raid'){if(RUN.raid)return;v.done=raidDo();save();render();return}if(k==='forge'&&RUN.core&&!RUN.coreUp){RUN.coreUp=1;try{SFX.holy(0)}catch(e){}v.done=`你把霧核放進窯口。紫色的火舔過它，槌子落下三次——霧核縮了一圈，光卻更亮了。<br><b style="color:var(--exp)">【${coreNm(RUN.core)}】</b>：${coreDs(RUN.core)}<br><span class="sub">忙了一整晚，沒能闔眼。</span>`;toast(`⚒ 霧核重鍛完成`)}else{restHere(false);return save(),render()}save();render()}
 function runNext(){const n=RUN.step+1;if(RUN.nodes[n]==='boss'&&!RUN.gate&&RUN.step>=0){RUN.view={type:'gate'};save();render();$('#main').scrollTop=0;return}if(RUN.forks&&RUN.forks[n]&&!RUN.nodes[n]){RUN.view={type:'fork',opts:RUN.forks[n]};save();render();$('#main').scrollTop=0;return}
-  RUN.step++;const a=AREAS[RUN.area],s=stats();let t=RUN.nodes[RUN.step];const tg=(RUN.tagAt||{})[RUN.step]||null;
+  RUN.step++;const a=AREAS[RUN.area],s=stats();let t=RUN.nodes[RUN.step];const DX=RUN.dg&&DGX[a.id],rm=()=>DX&&Math.random()<[.35,.6,.85][RUN.dg.diff||0]?DX.mobs:a.mobs;const tg=(RUN.tagAt||{})[RUN.step]||null;
   if(RUN.step>0){const F=afx();if(F.rock&&Math.random()<F.rock){const v=Math.round(s.HP*.06);S.hp=Math.max(1,S.hp-v);toast(`🪨 落石！HP -${v}`)}if(F.cold&&t!=='rest'){const v=Math.round(s.HP*F.cold);S.hp=Math.max(1,S.hp-v);toast(`❄ 寒氣刺骨 HP -${v}`)}if(F.wet){const v=Math.round(s.MP*F.wet);S.mp=Math.max(0,S.mp-v);toast(`💧 積水浸濕了裝備 MP -${v}`)}}
   if(t==='mystery'){t=RUN.nodes[RUN.step]=pick(['battle','event','chest','ambush','merchant','shrine']);toast(`濃霧散去……是「${NODE[t][1]}」`)}
   if(t==='battle'&&tg==='lord'&&LORD[RUN.area]){startBattle(LORD[RUN.area],'',0);if(B)B.log.push('👹 區域領主現身！')}
   else if(t==='battle'&&RUN.hunt&&tg!=='hoard'){RUN.hunt=0;startBattle(pick(a.mobs),'elite',nAdds(1));if(B){B.hoard=1;B.gmul=2;B.name='懸賞・'+B.m.n;B.log.push('📜 情報沒錯，就是牠！打倒牠必掉裝備、金幣 ×2')}}
-  else if(t==='battle'){if(tg==='hoard'){startBattle(pick(a.mobs),'elite',nAdds(1));if(B){B.hoard=1;B.log.push('💎 牠守著一堆閃亮的東西！')}}else{startBattle(pick(a.mobs),'',nAdds());if(B&&!tg)rareFoe();if(B&&tg==='bounty'){B.gmul=2.5;B.log.push('💰 懸賞目標！金幣 ×2.5')}if(B&&tg==='cursed'){B.atk=Math.round(B.atk*1.25);B.mag=Math.round(B.mag*1.25);B.hp=B.max=Math.round(B.max*1.3);B.xmul=2;B.name='詛咒・'+B.name;B.log.push('☠ 詛咒讓牠更強了……經驗 ×2')}}}
-  else if(t==='elite'||t==='ambush'){startBattle(pick(a.mobs),'elite',nAdds(1));if(B&&t==='elite'&&n===4&&RUN.etr&&ETRAIT[RUN.etr]&&!B.trait){B.trait=RUN.etr;const T=ETRAIT[B.trait];B.name='霧紋・'+B.name;{const e0=RUN.area===0;B.hp=B.max=Math.round(B.max*(e0?1.2:1.5));if(!e0){B.atk=Math.round(B.atk*1.2);B.mag=Math.round(B.mag*1.2)}B.gmul=(B.gmul||1)*1.5}B.log.push(`⚠ 霧紋【${T.n}】${T.d}（建議：${T.tip}）`)}if(B&&tg==='bounty'){B.gmul=2.5;B.log.push('💰 懸賞目標！金幣 ×2.5')}}
+  else if(t==='battle'){if(tg==='hoard'){startBattle(pick(rm()),'elite',nAdds(1));if(B){B.hoard=1;B.log.push('💎 牠守著一堆閃亮的東西！')}}else{startBattle(pick(rm()),'',nAdds());if(B&&!tg)rareFoe();if(B&&tg==='bounty'){B.gmul=2.5;B.log.push('💰 懸賞目標！金幣 ×2.5')}if(B&&tg==='cursed'){B.atk=Math.round(B.atk*1.25);B.mag=Math.round(B.mag*1.25);B.hp=B.max=Math.round(B.max*1.3);B.xmul=2;B.name='詛咒・'+B.name;B.log.push('☠ 詛咒讓牠更強了……經驗 ×2')}}}
+  else if(t==='elite'||t==='ambush'){const mid=DX&&t==='elite'&&n===4;startBattle(mid?DX.mid:pick(rm()),'elite',mid?0:nAdds(1));if(B&&mid){B.name='中首領・'+B.m.n;B.hp=B.max=Math.round(B.max*1.8);B.atk=Math.round(B.atk*1.15);B.mag=Math.round(B.mag*1.15);B.gmul=(B.gmul||1)*2;B.xmul=(B.xmul||1)*2;B.hoard=1;B.log.push('⚔ 中首領擋在路中央——打倒牠必掉裝備，還有機會掉流派核心傳說裝')}if(B&&t==='elite'&&n===4&&RUN.etr&&ETRAIT[RUN.etr]&&!B.trait){B.trait=RUN.etr;const T=ETRAIT[B.trait];B.name='霧紋・'+B.name;{const e0=RUN.area===0;B.hp=B.max=Math.round(B.max*(e0?1.2:1.5));if(!e0){B.atk=Math.round(B.atk*1.2);B.mag=Math.round(B.mag*1.2)}B.gmul=(B.gmul||1)*1.5}B.log.push(`⚠ 霧紋【${T.n}】${T.d}（建議：${T.tip}）`)}if(B&&tg==='bounty'){B.gmul=2.5;B.log.push('💰 懸賞目標！金幣 ×2.5')}}
   else if(t==='boss'){const i=RUN.area;if(!RUN.nm&&S.main.acc&&S.main.ch===i&&!S.main.pre&&CH[i].pre){play(CH[i].pre,`story_ch${i+1}_pre`,a.n,()=>{S.main.pre=true;save();startBattle(a.boss,'boss');render()});return}startBattle(a.boss,'boss')}
   else if(t==='story'){const i=RUN.area;play(CH[i].mid,SKEY(i+1,'mid'),a.n,()=>{S.main.mid=true;if(RUN)RUN.view={type:'res',title:'旅途見聞',text:you('你把這件事記在心裡，繼續前進。')};save();render()});return}
   else if(t==='event'){const wid=Math.random()<.3?wanderPick():null;if(wid){RUN.wSeen=1;RUN.view={type:'event',ev:wanderEv(wid),phase:'ask',fate:false}}else{const seen=RUN.evSeen||(RUN.evSeen=[]),ar=AREAS[RUN.area].id,pool=EVENTS.filter(e=>!seen.includes(e.id)&&(!e.ar||e.ar===ar)&&!e.c),loc=pool.filter(e=>e.ar),cs=RUN.core&&!RUN.tower&&!seen.includes('coreswap')&&Math.random()<.4&&EVENTS.find(e=>e.id==='coreswap'),ev=cs||(loc.length&&Math.random()<.75?pick(loc):pick(pool.length?pool:EVENTS.filter(e=>!e.ar&&!e.c)));seen.push(ev.id);RUN.view={type:'event',ev,phase:'ask',fate:tg==='fate'}}}
@@ -2618,23 +2634,35 @@ function bondGain(v,why){if(!S||!withLuna())return;checkDaily();const used=S.dai
    每一段內部仍是原本的區域（地區特性、首領、劇情照舊）；打倒該段首領後可直接深入下一段，不回城、不回血。
    連續深入每段：稀有以上機率加成 +15%、首領專屬裝備機率 ×1.2。 */
 const DG=[{id:'dg1',n:'翠原迷森',d:'從微風草原一路打進迷霧森林深處。中途不回城，越深入掉的東西越好。',segs:[0,1]}];
-const dgB=()=>RUN&&RUN.dg?1+.15*(RUN.dg.depth||0):1;
+const DGX={plain:{mobs:['thornboar','mosscrab','windfairy'],mid:'wolfrider'},forest:{mobs:['sporemother','mirrormoth','rootguard'],mid:'elderdruid'}};
+const DGDN=['普通','困難','煉獄'];let DGDIFF=0;
+const dgMax=d=>Math.min(2,(S.dgc&&S.dgc[d])||0);
+const dgB=()=>RUN&&RUN.dg?1+.15*(RUN.dg.depth||0)+.1*(RUN.dg.diff||0):1;
 const dgOf=()=>RUN&&RUN.dg?DG[RUN.dg.d]:null;
 const dgNextArea=()=>{const D=dgOf();if(!D)return -1;const na=D.segs[RUN.dg.k+1];return na==null?-1:na};
 const dgCanGo=()=>dgNextArea()>=0&&RUN.nodes[RUN.nodes.length-1]==='boss'&&!!S.cleared[RUN.area];
-function startDg(d,k){const D=DG[d];if(!D||D.segs[k]==null)return;const ar=D.segs[k];if(S.main.ch<ar||(k>0&&!S.cleared[D.segs[k-1]])){toast('這一段還沒解鎖');return}startRun(ar);if(RUN){RUN.dg={d,k,depth:0};save();render()}}
+function startDg(d,k){const D=DG[d];if(!D||D.segs[k]==null)return;const ar=D.segs[k];if(S.main.ch<ar||(k>0&&!S.cleared[D.segs[k-1]])){toast('這一段還沒解鎖');return}const df=Math.min(DGDIFF,dgMax(d));RUN={dg:{diff:df}};startRun(ar);if(RUN){RUN.dg={d,k,depth:0,diff:df};save();render()}}
 function dgEnter(){const o=RUN,D=dgOf(),nk=o.dg.k+1,na=D.segs[nk],a=AREAS[o.area];const bonus=Math.round((12+a.base*6)*2);S.gold+=bonus;o.loot.gold+=bonus;track('run');bondGain(.25,'一起完成冒險');
-  startRun(na,o.nm);if(!RUN)return;RUN.loot=o.loot;RUN.bless=o.bless;RUN.core=o.core;RUN.coreUp=o.coreUp;RUN.coreN=o.coreN;RUN.dg={d:o.dg.d,k:nk,depth:(o.dg.depth||0)+1};save();render();toast(`深入第 ${nk+1} 段：${AREAS[na].n}（掉寶加成 +${Math.round((dgB()-1)*100)}%）`)}
+  RUN={dg:{diff:o.dg.diff||0}};startRun(na,o.nm);if(!RUN)return;RUN.loot=o.loot;RUN.bless=o.bless;RUN.core=o.core;RUN.coreUp=o.coreUp;RUN.coreN=o.coreN;RUN.dg={d:o.dg.d,k:nk,depth:(o.dg.depth||0)+1,diff:o.dg.diff||0};save();render();toast(`深入第 ${nk+1} 段：${AREAS[na].n}（掉寶加成 +${Math.round((dgB()-1)*100)}%）`)}
 function dgNext(){if(!RUN||!RUN.dg||B||!dgCanGo())return;const na=dgNextArea(),m=S.main;
   const s2=()=>{if(S.main.ch<na){toast('下一段還沒開放');render();return}if(m.ch===na&&!m.acc&&CH[na]&&chLvOk()){const c=CH[na];play(c.intro,SKEY(na+1,'intro'),c.t+' 開場',()=>{m.acc=true;m.step=0;m.prog=0;save();toast('已接受主線任務');dgEnter()})}else dgEnter()};
   if(m.ch===RUN.area&&mainReady()){const c=CH[m.ch];play(c.outro,SKEY(m.ch+1,'outro'),c.t+' 結尾',()=>{const t=give(c.rw);m.ch++;m.acc=false;m.step=0;m.prog=0;m.mid=false;m.pre=false;sys(`${S.name} 完成了「${c.t}」！`);toast(`章節完成，獲得：${t}`);save();s2()})}else s2()}
+/* 重製補償：v14.0 之前建立、Lv.5 以上的角色，可自選一套同等級的新版稀有裝備（六個部位） */
+const G14T=1795606200000;
+const giftOk=()=>!!(S&&!S.g14&&S.lv>=5&&S.created&&S.created<G14T);
+const giftTier=()=>{let t=0;for(let i=0;i<TLV.length;i++)if(S.lv>=TLV[i])t=i;return Math.min(t,tierCap(),TLV.length-1)};
+function giftSets(){return SETS.map((x,i)=>[x,i]).filter(([x])=>!x.cls||x.cls===S.cls)}
+function gift14(i){if(!giftOk()||!SETS[i]||(SETS[i].cls&&SETS[i].cls!==S.cls))return;const t=giftTier(),got=[];for(const sl in SLOTS){const id=sl==='weapon'?`w_${S.cls}_${t}`:`${SLOTP[sl]}_${t}`;if(!GEAR[id])continue;const g=addGear(id,2,i);got.push(gearName(g))}S.g14=1;DROPS=[];save();render();openM('msg',{t:'重製補償',b:`<div class="panel"><h3>${SETS[i].n}套裝・六件</h3><p>已放進背包：${got.join('、')}</p><p class="sub">到「角色」頁換上。</p></div><button class="btn pri big" data-a="closeM">確定</button>`})}
+function vGift(){if(!giftOk())return '';return `<div class="panel" style="border-color:var(--exp)"><div class="row"><h3 class="grow">重製補償</h3><span class="tag red">限領一次</span></div><p class="sub">裝備與掉落重製了。感謝一路玩到現在——請自選一套同等級（第 ${giftTier()+1} 階）的新版稀有裝備，六個部位一次給齊。</p><div class="list">${giftSets().map(([x,i])=>`<div class="item"><span class="grow"><b>${x.n}套裝</b><span class="sub">2 件：${x.d2}</span><span class="sub">4 件：${x.d4}</span></span><button class="btn pri sm" data-a="gift14" data-v="${i}">選這套</button></div>`).join('')}</div></div>`}
 function vDg(){return DG.map((D,d)=>{
   return `<div class="panel area" style="border-color:var(--exp)">${art('area_'+AREAS[D.segs[D.segs.length-1]].id,D.n)}<div class="row"><h3 class="grow">${D.n}</h3><span class="tag red">大副本</span></div><p class="sub">${D.d}</p>
-  <div class="gsec"><b>規則</b><span class="sub">打倒一段的首領後可以直接深入下一段：不回城、不回血。每深入一段，稀有以上裝備的機率加成 +15%、首領專屬裝備機率 ×1.2。</span></div>
+  <div class="gsec"><b>規則</b><span class="sub">打倒一段的首領後可以直接深入下一段：不回城、不回血。每深入一段，稀有以上裝備的機率加成 +15%。副本裡有帶「機制」的新魔物與中首領，要換配裝來應付。</span></div>
+  <div class="lbl">難度</div><div class="chips">${DGDN.map((n,i)=>`<button class="chip ${Math.min(DGDIFF,dgMax(d))===i?'on':''}" data-a="dgDiff" data-v="${i}" ${i>dgMax(d)?'disabled':''}>${n}${i>dgMax(d)?'（通關'+DGDN[i-1]+'後解鎖）':i?`　怪 +${[0,2,5][i]} 級・掉寶 +${i*10}%`:''}</button>`).join('')}</div>
+  <p class="sub">流派核心傳說裝（只在這裡掉）：${DGCORE.map(k=>`<b class="c4">${GEAR[k].n}</b>`).join('、')}。中首領 3%、首領 5%，難度越高機率越高。</p>
   <div class="list">${D.segs.map((ar,k)=>{const a=AREAS[ar],open=S.main.ch>=ar&&(k===0||S.cleared[D.segs[k-1]]),u=BOSSU[a.boss]&&GEAR[BOSSU[a.boss]];
     return `<div class="item"><span class="grow"><b>第 ${k+1} 段　${a.n}</b>　<span class="sub">Lv ${a.lv}・首領 ${MOBS[a.boss].n}${S.cleared[ar]?'・已通關':''}</span>${u?`<span class="sub">首領專屬：<b class="c4">${u.n}</b></span>`:''}</span>${open?`<button class="btn ${k===0?'pri':''} sm" data-a="startDg" data-v="${d}:${k}">${k===0?'從頭挑戰':'從這段開始'}</button>`:`<span class="sub">打倒上一段首領後解鎖</span>`}</div>`}).join('')}</div></div>`}).join('')}
-function finish(done){const l=RUN.loot,a=AREAS[RUN.area];let extra='';if(done&&!RUN.tower)bondGain(.25,'一起完成冒險');
-  if(done){const bonus=Math.round((12+a.base*6)*2);S.gold+=bonus;track('run');extra=`<p>完成獎勵：${bonus} G</p>`}
+function finish(done){const l=RUN.loot,a=AREAS[RUN.area];let extra='';if(done&&RUN.dg){const D=DG[RUN.dg.d];if(RUN.dg.k===D.segs.length-1&&RUN.nodes[RUN.nodes.length-1]==='boss'&&S.cleared[RUN.area]){S.dgc=S.dgc||{};const df=RUN.dg.diff||0;if((S.dgc[RUN.dg.d]||0)<df+1){S.dgc[RUN.dg.d]=df+1;if(df<2)extra+=`<p style="color:var(--exp)">「${D.n}」${DGDN[df]}難度通關！解鎖${DGDN[df+1]}難度。</p>`}}}if(done&&!RUN.tower)bondGain(.25,'一起完成冒險');
+  if(done){const bonus=Math.round((12+a.base*6)*2);S.gold+=bonus;track('run');extra+=`<p>完成獎勵：${bonus} G</p>`}
   RUN=null;B=null;save();TAB='adv';render();
   openM('msg',{t:done?'冒險完成':'撤退回城',b:`<div class="panel"><h3>${a.n}　結算</h3><p>金幣 ${l.gold} G　／　經驗 ${l.exp} EXP</p>${l.items.length?`<p>戰利品：${l.items.join('、')}</p>`:''}${extra}</div><button class="btn pri big" data-a="closeM">確定</button>`})}
 
@@ -2792,6 +2820,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'14.0',d:'2026-11-25',t:'大副本內容包與裝備重製（第一階段）',b:'【新魔物與機制】大副本「翠原迷森」加入 8 隻新魔物，各帶一種機制：荊棘野豬（尖刺：反彈傷害，剋多段攻擊）、苔殼蟹（反震：單發太重會震回來，剋爆發）、淨風妖精（淨化：清掉灼燒中毒，剋持續傷害）、孢子母菇（召喚幫手）、鏡翅蛾（魔障：魔法減傷，爆擊可破）、盤根守衛（不死：要靠灼燒或中毒壓制再生），以及兩隻中首領：哥布林狼騎兵（第 8 回合狂怒）與古樹祭司（淨化＋召喚）。【難度】大副本分普通、困難、煉獄，通關後解鎖下一級：怪更高等、機制怪更多、掉寶略好。【流派核心傳說裝】五件只在大副本掉的傳說裝：餘燼之心、雙生獠牙、荊棘王冠、晨霧斗篷、渴血指環。各帶一個詞綴，而且算作 2 件共鳴——三件裝備就能同時湊出兩種共鳴。中首領 3%、首領 5%。【裝備平衡】特殊玩法只出現在稀有以上的裝備；各階武器的基礎數值拉平（低階提高）；強化每級加成由 8% 改為 6%，讓刷到新裝比死命強化舊裝更有感。【補償】在這之前建立、Lv.5 以上的角色，可到冒險頁自選一套同等級的新版稀有套裝（六件）。職業與技能的重製會在下一階段進行。'},
   {v:'13.7',d:'2026-11-25',t:'魔物與掉落等級自適應',b:'魔物等級會跟著你的等級走：在牠原本的等級往上一段區間內調整（一般魔物最多 +8 級、首領最多 +6 級），不會比原本低，並且永遠比你低至少 1 級，所以回到前面的地區不再是一刀一隻。掉落的裝備階級也跟著你的等級：最多比該地區高一階，且不超過目前章節解封的階級。高塔與試煉不變。'},
   {v:'13.6',d:'2026-11-25',t:'掉落率調整',b:'整體掉落率減半，讓好裝備更有份量：一般怪掉裝備 12%→6%、精英 50%→25%、蝕化怪 100%→50%、首領額外一件 40%→20%；稀有以上的比例減半（史詩 2.6%→1.3%、傳說 0.4%→0.2%）；魔物專屬裝備 4%→2%、首領專屬裝備 8%→4%；寶箱升史詩的機率、素材、藥水、強化石、精英寶石也減半。「寶物守衛必掉裝備」、首領必掉的強化石與寶石不變。首領專屬裝備的保底取消。大副本深入加成改為每段 +15%。'},
   {v:'13.5',d:'2026-11-25',t:'大副本「翠原迷森」（試玩）',b:'冒險頁新增第一個大副本：把微風草原和迷霧森林串成一趟。打倒一段的首領後可以直接深入下一段——不回城、不回血，劇情會在途中接著演。每連續深入一段，稀有以上裝備的機率加成 +15%、首領專屬裝備機率 ×1.2。已通關的玩家可以從任一已解鎖的段落開始。原本的單區冒險仍然保留。'},
@@ -2937,18 +2966,19 @@ var BHP=2.3,BATK=1.85;
    掉落裝備階級也跟著玩家等級，限制在「該地區階級 ～ 高一階」之間，且不超過目前章節解封的階級。 */
 const adLv=(m,bs)=>Math.max(m.lv,Math.min(S.lv-1,m.lv+(bs?6:8)));
 const dropTier=ar=>{const base=Math.min(ar,TLV.length-1);let t=0;for(let i=0;i<TLV.length;i++)if(S.lv>=TLV[i])t=i;return Math.max(base,Math.min(base+1,t,tierCap(),TLV.length-1))};
+const TRX=t=>ETRAIT[t]||BTRAIT[t]||null;
 function mkFoe(id,kind){const m=MOBS[id],bs=!!m.boss,el=kind==='elite',nm=!!(RUN&&RUN.nm);
   const mut=!bs&&!nm&&S.main.ch>=1&&Math.random()<.1;
-  const L=(RUN&&RUN.tower?RUN.tlv:RUN&&RUN.trial?m.lv:adLv(m,bs))+(nm?10:0)+(mut?3:0);
+  const dgd=RUN&&RUN.dg?(RUN.dg.diff||0):0;const L=(RUN&&RUN.tower?RUN.tlv:RUN&&RUN.trial?m.lv:adLv(m,bs))+(nm?10:0)+(mut?3:0)+[0,2,5][dgd];
   const mult=(bs?(RUN&&!RUN.tower?1.05+RUN.area*.05:1.25):el?1.12:1)*(nm?1.35:1)*(mut?1.45:1),kh=(bs?(RUN&&!RUN.tower?(RUN.area===0&&!nm?2.8:3.3+RUN.area*.6)*(RUN.area===3?1.4:RUN.area>=4?1.25:RUN.area>=1?1.1:1):4.5):el?1.8:1)*(nm?1.6:1)*(mut?2.2:1);
-  const st=mobBuild(m,L,mult,kh);
+  const st=mobBuild(m,L,mult*[1,1.2,1.45][dgd],kh*[1,1.3,1.7][dgd]);
   const BMOD={goblinboss:'scout',zenos:'galeAlly'},bm=bs&&!nm&&S.flags[BMOD[id]]&&S.main.ch===RUN.area;if(bm)st.HP=Math.round(st.HP*.8);
   const aff=[];if(mut||nm){const ks=Object.keys(AFF).sort(()=>Math.random()-.5);aff.push(...ks.slice(0,bs&&nm?2:1))}
   if(aff.includes('rage'))st.ATK=Math.round(st.ATK*1.4),st.MAG=Math.round(st.MAG*1.4);if(aff.includes('shell'))st.DEF=Math.round(st.DEF*1.8),st.MRES=Math.round(st.MRES*1.8);if(aff.includes('swift'))st.EVA+=15,st.CRIT+=15;
   const pre=(nm?'惡夢・':'')+(mut?'蝕化・':'')+(el?'精英':'');
   /* v12.2 平衡：草原首領打的時候還沒有露娜幫忙，攻擊 1.7→1.38、HP 係數 3.3→2.8（惡夢不變） */
   const bdm=bs?(RUN&&!RUN.tower?(RUN.area===0&&!nm?1.38:1.7+RUN.area*.15)*(RUN.area===3?1.55:RUN.area>=4?1.33:RUN.area>=1?1.15:1):1.4)*BATK:1;
-  return{id,m,L,a:st.a,kind:bs?'boss':kind,mut,nm,aff,name:pre+m.n,hp:Math.round(st.HP*(bs?BHP:1)),max:Math.round(st.HP*(bs?BHP:1)),atk:Math.round(st.ATK*bdm),mag:Math.round(st.MAG*bdm),def:st.DEF,mres:st.MRES,crit:st.CRIT,eva:st.EVA,fb:[],fshield:0,st:{},rage:0,bm}}
+  return{id,m,L,a:st.a,kind:bs?'boss':kind,mut,nm,aff,name:pre+m.n,hp:Math.round(st.HP*(bs?BHP:1)),max:Math.round(st.HP*(bs?BHP:1)),atk:Math.round(st.ATK*bdm),mag:Math.round(st.MAG*bdm),def:st.DEF,mres:st.MRES,crit:st.CRIT,eva:st.EVA,fb:[],fshield:0,st:{},rage:0,bm,trait:m.mech||undefined}}
 /* 依玩家實力調整魔物：只在玩家太強、會一擊秒殺時才加強，前期不受影響 */
 function hitEst(def){const s=stats(),P=Math.max(s.ATK,s.MAG),best=Math.max(1,...battleSkills().map(k=>{const d=SK[k].dmg;return d?d.p*(d.h||1):0})),cr=1+Math.min(1,s.CRIT/100)*Math.max(0,s.CD/100-1);return clsDm()*P*best*100/(100+def)*cr}
 function rareFoe(){const r=Math.random();
@@ -2962,7 +2992,7 @@ function scaleFoe(){if(!B||B.id==='shadow')return;{const ar=RUN?RUN.area:0,bs=B.
 const BTRAIT={iron:{n:'鋼皮',d:'沒有暈眩時受到的傷害 -35%',tip:'震擊流、控場'},undying:{n:'不死',d:'每回合回復 5% HP；灼燒或中毒時無法再生',tip:'烈焰流、毒'},ward:{n:'魔障',d:'魔法傷害 -40%；被爆擊後魔障破除 2 回合',tip:'物理、疾風流、高爆擊'},enrage:{n:'狂怒',d:'第 8 回合起攻擊 +80%',tip:'速攻、連擊流'},spike:{n:'尖刺',d:'每次受到攻擊反彈 20% 傷害',tip:'吸血流、先機護盾、守護'}};
 const weekNo=()=>Math.floor((Date.now()/864e5+3)/7);
 /* 霧紋：冒險中段強敵的特性，出發時就公布，考驗不同打法 */
-const ETRAIT={plate:{n:'疊甲',d:'同一回合內每被打中一次，之後受到的傷害 -15%（最多 -60%），下回合重置',tip:'單發重擊、灼燒與中毒'},veil:{n:'霧隱',d:'每回合第一次受到的攻擊傷害減半；身上有灼燒、中毒或流血時霧隱失效',tip:'多段攻擊、持續傷害'},grudge:{n:'記仇',d:'HP 每少 25%，攻擊 +12%（最多 +36%）',tip:'爆發收尾、虛弱、留防禦到最後'},swell:{n:'漲潮',d:'每過一回合，攻擊 +12%（最多 +72%）',tip:'速戰速決、開場爆發、奇襲'},rebound:{n:'反震',d:'單次受到超過牠最大 HP 12% 的傷害時，超出部分的 40% 會震回你身上（不致命）',tip:'多段攻擊、連擊、持續傷害'}};
+const ETRAIT={cleanse:{n:'淨化',d:'每回合清除自己身上的灼燒、中毒、流血，並回復 4% HP',tip:'直接傷害、爆發'},summon:{n:'召喚',d:'每 3 回合叫來一隻幫手（最多 2 隻）',tip:'範圍技能、速戰速決'},grove:{n:'古林',d:'每回合淨化持續傷害並回復 4% HP；每 3 回合召喚幫手',tip:'爆發、範圍、先清小怪'},plate:{n:'疊甲',d:'同一回合內每被打中一次，之後受到的傷害 -15%（最多 -60%），下回合重置',tip:'單發重擊、灼燒與中毒'},veil:{n:'霧隱',d:'每回合第一次受到的攻擊傷害減半；身上有灼燒、中毒或流血時霧隱失效',tip:'多段攻擊、持續傷害'},grudge:{n:'記仇',d:'HP 每少 25%，攻擊 +12%（最多 +36%）',tip:'爆發收尾、虛弱、留防禦到最後'},swell:{n:'漲潮',d:'每過一回合，攻擊 +12%（最多 +72%）',tip:'速戰速決、開場爆發、奇襲'},rebound:{n:'反震',d:'單次受到超過牠最大 HP 12% 的傷害時，超出部分的 40% 會震回你身上（不致命）',tip:'多段攻擊、連擊、持續傷害'}};
 const TRT=k=>BTRAIT[k]||ETRAIT[k];
 const trIc=(k,z)=>('icon_trait_'+k) in ATL?`<i class="bi at" style="width:${z||18}px;height:${z||18}px;margin-right:3px;vertical-align:middle;background-position:${(ATL['icon_trait_'+k]%ATC)/(ATC-1)*100}% ${Math.floor(ATL['icon_trait_'+k]/ATC)/(ATR-1)*100}%"></i>`:'⚠ ';
 const grudgeM=()=>B&&B.trait==='grudge'?1+.12*Math.min(3,Math.floor((1-B.hp/B.max)/.25+1e-9)):B&&B.trait==='swell'?1+.12*Math.min(6,Math.max(0,B.turn-1)):1;
@@ -2976,6 +3006,7 @@ function startBattle(id,kind,nAdds){const F=mkFoe(id,kind),m=F.m,bs=F.kind==='bo
      log:[bs?`首領 ${m.n} 擋住了去路！`:F.mut?`被蝕霧侵蝕的 ${m.n} 出現了！氣息完全不同……`:adds.length?`${F.name} 帶著 ${adds.map(f=>f.name).join('、')} 出現了！`:`${F.name} 出現了！`,...(F.aff.length?[`詞綴：${F.aff.map(x=>AFF[x].n).join('、')}`]:[]),...(F.bm?[id==='zenos'?'蓋爾從側面牽制住了澤諾斯！':'你事先摸清了牠的弱點！']:[]),...(ally?[`${ally.n}與你並肩作戰`]:[])],busy:false,auto:AUTO,menu:'main',turn:1,fx:null,intro:true,shown:0,last:0},F);SFX.enc();
   scaleFoe();
   if(bs&&RUN&&(RUN.nm||RUN.tower)){B.trait=weekTrait(id);const T=BTRAIT[B.trait];B.log.push(`⚠ 本週首領特性【${T.n}】${T.d}（建議：${T.tip}）`)}
+  if(B.trait&&m.mech===B.trait){const T=TRX(B.trait);if(T)B.log.push(`⚠ 機制【${T.n}】${T.d}（建議：${T.tip}）`)}
   B.next=foePick();setTimeout(()=>{try{talk(B&&B.kind==='boss'?'boss':'start')}catch(e){}},1100);
   if(RUN&&RUN.bless){const BL={atk:{n:'戰意祝福',atk:.15},def:{n:'守護祝福',def:.35},luck:{n:'幸運祝福'}}[RUN.bless];B.buffs.push(Object.assign({id:'bless',t:999},BL))}
   if(bs&&RUN&&RUN.prep&&!RUN.prepUsed){RUN.prepUsed=1;const p=RUN.prep;
@@ -3088,6 +3119,8 @@ function foeTurn(){if(!B)return;if(B.treasure&&B.turn>=3&&B.hp>0){B=null;RUN.vie
   addsDot();
   if(B.hp<=0){render();setTimeout(win,1200);return}
   allyAct();if(B.hp<=0){render();setTimeout(win,1200);return}
+  if((B.trait==='cleanse'||B.trait==='grove')&&B.hp>0&&(B.st.burn>0||B.st.poison>0||B.st.bleed>0)){B.st.burn=0;B.st.poison=0;B.st.bleed=0;const h=Math.round(B.max*.04);B.hp=Math.min(B.max,B.hp+h);blog(`${B.name} 的【${TRX(B.trait).n}】清除了持續傷害，並回復 ${h} HP`)}
+  if((B.trait==='summon'||B.trait==='grove')&&B.hp>0&&B.turn%3===0&&(B.adds||[]).filter(f=>f.hp>0).length<2&&RUN){try{const f=mkFoe(pick(AREAS[RUN.area].mobs.slice(0,2)),'');f.hp=f.max=Math.round(f.max*.6);B.adds=(B.adds||[]).filter(x=>x.hp>0);B.adds.push(f);blog(`${B.name} 叫來了 ${f.name}！`)}catch(e){}}
   if(B.trait==='undying'&&B.hp>0){if(B.st.burn>0||B.st.poison>0)blog(`${B.name} 的【不死】被灼燒／中毒壓制，無法再生`);else{const h=Math.round(B.max*.05);B.hp=Math.min(B.max,B.hp+h);blog(`${B.name} 的【不死】再生 ${h} HP`)}}
   if(B.spk){blog(`【尖刺】這回合你被反彈了 ${B.spk} 傷害`);B.spk=0}
   if(B.aff.includes('regen')&&B.turn<20){const h=Math.round(B.max*.06);B.hp=Math.min(B.max,B.hp+h);blog(`${B.name} 再生了 ${h} HP`)}
@@ -3188,6 +3221,7 @@ function spoil(){const m=B.m,L=B.L,bs=B.kind==='boss',el=B.kind==='elite',T=B.to
   {const tw=RUN.tower,gt=tw?Math.min(RUN.area,S.main.ch):dropTier(RUN.area),hard=B.mut||B.nm,hd=B.hoard?1:0,n=(FA&&!bs&&!B.hoard&&Math.random()<.5)?0:hd+(bs?(Math.random()<(tw?.15:B.nm?.3:.2)?1:0)+(!tw&&B.nm&&Math.random()<.15?1:0):(Math.random()<(B.mut?.5:el?.25:B.nm?.15:lk||(RUN&&RUN.core==='greed')?.1:.06)*(tw?.6:1)?1:0));for(let i=0;i<n;i++){const g=rollGear(gt,bs?(tw?1:B.nm?3:2):hard?2:el?1:0,(bs||hard?(tw?1.3:2):1)*dgB(),hard);if(i<hd||(B.mut&&!bs))minG(g);got.push(gearName(g))}if(tw&&RUN.area>S.main.ch&&Math.random()<.5){addItem('stone',1);got.push('強化石')}
     if(MDROP[B.id]&&Math.random()<(B.wander?.25:B.treasure?.15:B.kind==='elite'?.06:B.nm?.05:.02)*(FA?.5:1)){const u=addGear(MDROP[B.id],3);DROPS.push(u);got.push(gearName(u));sys(`${S.name} 取得魔物專屬裝備【${GEAR[u.id].n}】！`)}
     if(bs&&BOSSU[B.id]&&(!RUN.tower||S.cleared[AREAS.findIndex(a=>a.boss===B.id)])&&Math.random()<(RUN.tower?.015:B.nm?.1:.04)*(RUN.dg&&RUN.dg.depth?1.2:1)){const u=addGear(BOSSU[B.id],4);DROPS.push(u);got.push(gearName(u));sys(`${S.name} 取得首領專屬裝備【${GEAR[u.id].n}】！`)}
+    if(RUN.dg&&(bs||String(B.name).startsWith('中首領'))&&Math.random()<(bs?.05:.03)*(1+.5*(RUN.dg.diff||0))*(RUN.dg.depth?1.2:1)){const u=addGear(pick(DGCORE),4);DROPS.push(u);got.push(gearName(u));sys(`${S.name} 取得流派核心裝備【${GEAR[u.id].n}】！`)}
     if(!bs&&B.kind==='elite'&&Math.random()<.03){const gm=pick(GEMS);addItem(gm,1);got.push(ITEMS[gm].n)}
     if(bs&&Math.random()<(RUN.tower?.3:1)){const n=1+(B.nm&&Math.random()<.5?1:0);for(let i=0;i<n;i++){const gm=BGEM[B.id]||pick(GEMS);addItem(gm,1);got.push(ITEMS[gm].n)}}}
   got.push(...liveDrop(bs));
@@ -3853,7 +3887,7 @@ const ACT={
   startRun(v){if(S.hp<=1){toast('HP 太低，先到旅店休息');return}startRun(+v)},
   trial(){if(S.adv||S.trial||S.lv<TRIAL.lv)return;if(S.hp<=1){toast('HP 太低，先到旅店休息');return}const sh=SHADOW[S.cls];MOBS.shadow.ty=sh[0];MOBS.shadow.sk=sh[1];
     closeM();TAB='adv';RUN={area:Math.min(4,Math.max(0,S.main.ch)),trial:true,nm:false,step:0,nodes:['boss'],loot:{gold:0,exp:0,items:[]},view:{type:'start'}};startBattle('shadow','boss');render()},
-  startDg(v){if(S.hp<=1){toast('HP 太低，先到旅店休息');return}const [d,k]=String(v).split(':').map(Number);startDg(d,k)},dgNext(){dgNext()},
+  startDg(v){if(S.hp<=1){toast('HP 太低，先到旅店休息');return}const [d,k]=String(v).split(':').map(Number);startDg(d,k)},dgNext(){dgNext()},gift14(v){gift14(+v)},dgDiff(v){DGDIFF=+v;render()},
   startNm(v){if(S.hp<=1){toast('HP 太低，先到旅店休息');return}startRun(+v,true)},
   runNext(){runNext()},bossGo(){if(!RUN)return;RUN.gate=1;runNext()},gatePrep(v){doPrep(v)},bossBox(v){bossBox(v)},core(v){corePick(v)},kiln(v){kilnPick(v)},camp(v){campPick(v)},retreat(){if(!RUN)return;if(RUN.step<0){RUN=null;render()}else finish(false)},retreatAsk(){if(!RUN||B)return;if(confirm('要撤退回城嗎？\n已獲得的金幣、經驗與戰利品都會保留。'))ACT.retreat()},finish(){finish(true)},
   evPick(v){evPick(+v)},
