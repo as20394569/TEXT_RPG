@@ -2657,7 +2657,7 @@ function dgNext(){if(!RUN||!RUN.dg||B||!dgCanGo())return;const na=dgNextArea(),m
   const s2=()=>{if(S.main.ch<na){toast('下一段還沒開放');render();return}if(m.ch===na&&!m.acc&&CH[na]&&chLvOk()){const c=CH[na];play(c.intro,SKEY(na+1,'intro'),c.t+' 開場',()=>{m.acc=true;m.step=0;m.prog=0;save();toast('已接受主線任務');dgEnter()})}else dgEnter()};
   if(m.ch===RUN.area&&mainReady()){const c=CH[m.ch];play(c.outro,SKEY(m.ch+1,'outro'),c.t+' 結尾',()=>{const t=give(c.rw);m.ch++;m.acc=false;m.step=0;m.prog=0;m.mid=false;m.pre=false;sys(`${S.name} 完成了「${c.t}」！`);toast(`章節完成，獲得：${t}`);save();s2()})}else s2()}
 /* 重製補償：v14.0 之前建立、Lv.5 以上的角色，可自選一套同等級的新版稀有裝備（六個部位） */
-const G14T=1795606200000;
+const G14T=1795611600000;
 const giftOk=()=>!!(S&&!S.g14&&S.lv>=5&&S.created&&S.created<G14T);
 const giftTier=()=>{let t=0;for(let i=0;i<TLV.length;i++)if(S.lv>=TLV[i])t=i;return Math.min(t,tierCap(),TLV.length-1)};
 function giftSets(){return SETS.map((x,i)=>[x,i]).filter(([x])=>!x.cls||x.cls===S.cls)}
