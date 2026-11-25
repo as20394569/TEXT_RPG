@@ -1748,16 +1748,16 @@ const BT={
   luna:{start:[['測霧燈有反應……小心，牠身上沾了霧。',null],['我在後面，{你|妳}專心打就好。',null],['又是牠們？今天第三群了吧。',null],['別逞強，痛了就說喔。',null],['跟礦坑那些比，這隻還算客氣。',()=>chA(3)],['冷死了……打完這場就去烤火！',()=>chA(3)&&!chA(4)]],
     boss:[['就是牠……{name}，這次換我們先出手。',null],['手在抖？……我也是。一起上吧。',null],['這股霧的濃度……不能讓牠逃掉！',()=>chA(2)]],
     crit:[['好漂亮的一擊！',null],['……剛剛那下，我都替牠覺得痛。',null],['再來一次！就是那樣！',null]],
-    low:[['{name}！退後一點，我來擋！',null],['別倒下……我不想再一個人走夜路了。',()=>bondA(2)],['撐住！燈還亮著，我們就還沒輸！',null]],
+    low:[['{name}！退後一點，我來擋！',null],['撐住！燈還亮著，我們就還沒輸！',null]],
     guard:[['看穿了！就是現在！',null],['好險……{你|妳}的反應好快。',null]],
-    win:[['呼……結束了。{你|妳}有沒有受傷？',null],['牠身上的霧晶我收走囉，研究用的。',null],['下次換我打前鋒——開玩笑的，我會乖乖待在後面。',null],['跟{你|妳}搭檔，好像什麼都不怕了。',()=>bondA(3)]]},
+    win:[['呼……結束了。{你|妳}有沒有受傷？',null],['牠身上的霧晶我收走囉，研究用的。',null],['下次換我打前鋒——開玩笑的，我會乖乖待在後面。',null]]},
   me:{start:[['（來吧。）',null],['又擋路，真受不了。',null],['（先看清楚牠的動作……）',null]],
     boss:[['（心跳好快……冷靜。）',null],['終於找到你了。',null]],
     crit:[['就是這裡！',null],['抓到了！',null]],
     low:[['（還……撐得住。）',null],['可惡，大意了……',null]],
     guard:[['被我看穿了。',null]],
     win:[['好，下一個。',null],['呼，手都麻了。',null],['（今天的晚餐有著落了。）',null]],
-    reply:[['知道啦，別一直盯著我。',null],['{你|妳}也是，別跑太前面。',null],['嗯，交給我。',null],['……謝了。',null]]}};
+    reply:[['知道啦。',null],['{你|妳}也是，別跑太前面。',null],['嗯，交給我。',null],['……謝了。',null]]}};
 
 /* 露娜台詞依主角職業、進階職、技能、性別變化 */
 const cI=k=>()=>S.cls===k,aI=k=>()=>S.adv===k,sF=()=>S.sex==='f',sM=()=>S.sex==='m';
@@ -1769,19 +1769,19 @@ const cI=k=>()=>S.cls===k,aI=k=>()=>S.adv===k,sF=()=>S.sex==='f',sM=()=>S.sex===
   ['大魔導士的魔力，連測霧燈都會發抖。',aI('archmage')],['{你|妳}的咒術……跟霧有點像。別靠太近喔。',aI('warlock')],
   ['神射手的話，牠還沒看到{你|妳}就倒了吧。',aI('sniper')],['刺客大人，記得留一隻給我研究。',aI('assassin')],
   ['主教大人，祈禱完再上也不遲。',aI('bishop')],['聖殿騎士……一手錘一手禱詞，好忙。',aI('templar')],
-  ['女孩子一起出門，被魔物纏上也太掃興了。',sF],['{name}，等一下別又一個人衝出去。',sM]]],
+  ['{name}，等一下別又一個人衝出去。',sM]]],
  ['boss',[['{name}，破綻交給{你|妳}堆，我負責看牠什麼時候倒。',cI('swordsman')],['印記多留幾個，我幫{你|妳}拖時間！',cI('mage')],['專注到最高再放，別急。',cI('ranger')],['神會回應{你|妳}的，我信。',cI('cleric')]]],
- ['crit',[['那一劍連霧都劈開了！',cI('swordsman')],['好燙！……我是說，好厲害！',cI('mage')],['正中要害，{你|妳}眼睛到底多好？',cI('ranger')],['神官打人也這麼痛的嗎……',cI('cleric')]]],
- ['low',[['法師不能被貼身！我把牠引開！',cI('mage')],['劍士倒下，我們就沒有前排了！撐住！',cI('swordsman')],['先別管專注了，拉開距離！',cI('ranger')],['先治療自己！不要只顧著我！',cI('cleric')],['{name}！……我才剛有一個可以說話的朋友。',sF]]],
+ ['crit',[['那一劍連霧都劈開了！',cI('swordsman')],['好燙！站在後面都感覺得到。',cI('mage')],['正中要害，{你|妳}眼睛到底多好？',cI('ranger')],['神官打人也這麼痛的嗎……',cI('cleric')]]],
+ ['low',[['法師不能被貼身！我把牠引開！',cI('mage')],['劍士倒下，我們就沒有前排了！撐住！',cI('swordsman')],['先別管專注了，拉開距離！',cI('ranger')],['先治療自己！不要只顧著我！',cI('cleric')]]],
  ['win',[['劍上的霧擦乾淨再收，不然會生鏽。',cI('swordsman')],['魔力還夠嗎？我包包裡有魔力藥水。',cI('mage')],['箭我幫{你|妳}撿回來了，少了兩支。',cI('ranger')],['謝謝{你|妳}的祝福，手不痛了。',cI('cleric')]]]
 ].forEach(([ev,ls])=>BT.luna[ev].push(...ls));
 /* 主角放技能時露娜的反應：先看技能，再看進階職、職業 */
 const LSK={whirl:['十字裂斬！破綻全清掉了！','漂亮的收尾！'],skyslash:['那一刀……空氣都裂開了。'],warcry:['{你|妳}的鬥氣，我在後面都感覺得到。'],
   fire:['點火了，記得接著引雷！','火光一亮，測霧燈都變暗了。'],ice:['霜針插上去了，再一個印記！'],thunder:['引爆了——全部炸開！','印記一起爆，好壯觀！'],barrier:['冰鏡好漂亮，借我照一下。'],collapse:['元素崩解……{你|妳}到底藏了多少魔力？'],meteor:['星星掉下來了！？'],drain:['{你|妳}吸走的那個……真的只是魔力嗎？'],
   snipe:['屏息——中了！','我連呼吸都不敢出聲。'],arrowstorm:['下箭雨了，大家趴下！'],trap:['陷阱什麼時候放的？我完全沒看到。'],dodge:['伏得好低，像隻貓。'],
-  heal:['謝謝，燈也跟著亮了一點。','溫暖的光……跟媽媽的燈很像。'],holy:['審光！牠的霧被燒掉了！'],miracle:['神蹟……原來真的存在。'],bless:['晨禱的時候，{你|妳}的側臉很安靜。'],purify:['霧氣散了，呼吸輕鬆多了。'],
+  heal:['謝謝，燈也跟著亮了一點。','溫暖的光……跟媽媽的燈很像。'],holy:['審光！牠的霧被燒掉了！'],miracle:['神蹟……原來真的存在。'],bless:['晨禱的光落下來，身體變輕了。'],purify:['霧氣散了，呼吸輕鬆多了。'],
   bash:['盾牌撞上去的聲音好響！'],rage:['又拿血換傷害！等下我要罵{你|妳}。'],stab:['影子一閃就結束了……'],sanct:['庇護所裡，霧進不來。'],judge:['天秤傾斜了——牠完了。']};
-const LCL={swordsman:['好重的一擊！','前排就交給{你|妳}了！'],mage:['魔法的光，比我的燈還亮。','好強的魔力波動！'],ranger:['好準！','風剛好停了，時機完美。'],cleric:['神聖的光……牠在發抖。','{你|妳}祈禱的聲音好好聽。'],
+const LCL={swordsman:['好重的一擊！','前排就交給{你|妳}了！'],mage:['魔法的光，比我的燈還亮。','好強的魔力波動！'],ranger:['好準！','風剛好停了，時機完美。'],cleric:['神聖的光……牠在發抖。','祈禱起作用了，牠的霧變淡了。'],
   knight:['{你|妳}站在那裡，就像一面牆。'],berserker:['別打到忘記自己還在流血！'],archmage:['這才是大魔導士。'],warlock:['黑色的魔力……還好是站在我們這邊。'],sniper:['一箭一隻，乾淨俐落。'],assassin:['我根本看不到{你|妳}的刀。'],bishop:['主教的光，連霧都會讓路。'],templar:['錘子加禱詞，好吵但好可靠。']};
 function lunaSkill(id){if(!B||!withLuna()||B.ally&&B.ally.hp<=0||(B.talkN||0)>=3||Math.random()>.3)return;const L=LSK[id]||LCL[S.adv]||LCL[S.cls];if(!L)return;B.talkN=(B.talkN||0)+1;setTimeout(()=>{if(B)bub('luna',pick(L))},1100)}
 /* 非戰鬥：出發、營火時依職業與性別說話 */
@@ -1791,7 +1791,7 @@ const LOUT=[['出發前檢查一下：藥水、繩子、{你|妳}的劍。',cI('
   ['出發前，可以幫我也祈禱一下嗎？',cI('cleric')],['神官大人，今天也請多關照。',cI('cleric')],
   ['騎士的盔甲好重，背包我幫{你|妳}揹吧。',aI('knight')],['今天不准再拿血換傷害喔。',aI('berserker')],['大魔導士也會迷路嗎？……地圖給我。',aI('archmage')],['{你|妳}的咒術書，可以借我看一頁就好嗎？',aI('warlock')],
   ['神射手，今天的目標是什麼？',aI('sniper')],['刺客出門都不打招呼的嗎？嚇我一跳。',aI('assassin')],['主教的袍子拖地了，小心踩到。',aI('bishop')],['聖殿騎士今天也要邊打邊唸經？',aI('templar')],
-  ['等這件事結束，我們去晨星鎮那間甜點店吧，就我們兩個女生。',sF],['{name}，你的披風破了，回來我幫你補。',sM]];
+  ['藥水帶夠了嗎？不夠我這裡還有。',null],['路上小心，霧濃的地方跟緊我的燈。',null]];
 {const _sr=startRun;startRun=function(){const r=_sr.apply(this,arguments);try{if(withLuna()&&Math.random()<.4){const l=lunaOut();if(l)setTimeout(()=>toast('露娜：「'+l+'」'),600)}}catch(e){}return r}}
 function lunaOut(){if(!withLuna())return '';const l=pickC(LOUT);return l?you(tx(l)):''}
 function bub(who,text){try{const el=document.querySelector(who==='luna'?'.stage .ally':'.stage .spr.me'),app=$('#app');if(!el||!app||!text)return;const r=el.getBoundingClientRect(),a=app.getBoundingClientRect();
@@ -1808,10 +1808,10 @@ const CAMP=[
   {ch:1,l:[['露娜','小時候哥哥常背我回家。我腳很慢，他一次也沒抱怨過。'],['{name}','所以這次，換{你|妳}去找他。'],['露娜','……嗯。'],['旁白','她把膝蓋抱得更緊了一點。']]},
   {ch:2,l:[['露娜','礦坑裡的壁畫，我一直在想。'],['露娜','如果霧以前來過，那上一次……是誰把它擋下來的？'],['{name}','說不定，就跟我們一樣，是一群剛好路過的人。'],['露娜','剛好路過嗎……那也不錯。']]},
   {ch:2,l:[['露娜','{你|妳}的武器常保養嗎？'],['{name}','巴爾德說不保養就不幫我修。'],['露娜','那個大叔嘴巴很壞，其實比誰都在意客人。'],['露娜','上次我燈罩裂了，他半夜偷偷幫我補好，還說是「順手」。']]},
-  {ch:3,l:[['露娜','好冷……{name}，借我靠一下。只有一下。'],['{name}','（……她的手好冰。）'],['露娜','……謝謝。']]},
+  {ch:3,l:[['露娜','好冷……山上的風跟村子完全不一樣。'],['{name}','火再添一點柴吧。'],['露娜','嗯。謝謝。']]},
   {ch:3,l:[['露娜','如果有一天，霧散了，村子回來了……{你|妳}會來看看嗎？'],['{name}','當然。{你|妳}要請我吃村子裡最好吃的東西。'],['露娜','那是我媽媽的燉菜。'],['露娜','……我會把它學起來的。']]},
   {ch:4,l:[['露娜','明天就要進城了。'],['{name}','怕嗎？'],['露娜','怕。但比起一個人的時候，好多了。']]},
-  {ch:4,l:[['露娜','{name}。不管明天怎樣——'],['露娜','謝謝{你|妳}，那天在草原答應跟我搭檔。'],['{name}','說得好像要告別一樣。'],['露娜','才、才不是！……只是想說而已。']]}];
+  {ch:4,l:[['露娜','{name}。不管明天怎樣——'],['露娜','謝謝{你|妳}，那天在草原答應跟我搭檔。'],['{name}','說得好像要告別一樣。'],['露娜','不是告別。只是覺得該說一聲。']]}];
 const SOLO=['（篝火劈啪作響。四周好安靜。）','（明天，要往哪邊走呢。）','（把靴子脫下來晾一下……好臭。）','（星星好多。小時候，好像也這樣看過。）','（今天的戰鬥……下次可以打得更好。）'];
 function campTalk(){if(!S)return '';if(withLuna()){S.camp=S.camp||[];const pool=CAMP.map((c,i)=>[c,i]).filter(([c,i])=>S.main.ch>=c.ch&&!S.camp.includes(i));const it=pool.length?pool[0]:null;
     if(!it){checkDaily();if(!S.daily.lchat){S.daily.lchat=1;bondGain(.3,'營火閒聊');const l=lunaOut();if(l)return `<div class="camp"><p><b>露娜</b>「${esc(l)}」</p><p class="sub">你們聊了一會兒，火光很暖。</p></div>`}return `<div class="camp"><p><b>露娜</b>「……」</p><p class="sub">她靠著樹幹睡著了，手裡還握著提燈。</p></div>`}
@@ -2322,7 +2322,7 @@ const NRISK={battle:'危險 ★　金幣・經驗',ambush:'危險 ★★　裝�
 const nAdds=el=>{const a=RUN.area,r=Math.random();if(el)return a>=3&&r<.5?1:0;return a>=3&&r<.2?2:a>=2&&r<.5?1:0};
 /* 營地：休息回復。帶著還沒重鍛的霧核時，改成霧窯二選一（RUN.view.type==='kiln'） */
 function restHere(sp){const s=stats();S.hp=Math.min(s.HP,S.hp+Math.round(s.HP*(sp?1:.35)));S.mp=Math.min(s.MP,S.mp+Math.round(s.MP*(sp?1:.35)));
-    const al=S.party&&S.party!=='none'&&ALLY[S.party]&&ALLY[S.party].open()?S.party:null,lo=al==='luna'&&Math.random()<.5?lunaOut():'',talk=al==='luna'?(lo?'露娜：「'+lo+'」':pick(['露娜望著營火：「媽媽做這盞燈的時候，說是為了讓人在霧裡找得到路。」','露娜把烤好的麵包分你一半：「別逞強。累了要說。」','露娜看著北方：「等霧散了，我想帶{你|妳}去看我們村子的麥田。」'])):al==='gale'?pick(['蓋爾默默擦著那把短劍，劍柄上的名字被摸得發亮。','蓋爾：「騎士團守夜，第一個睡著的人要請全隊喝酒。……你別睡。」','蓋爾把披風丟給你：「山上的夜很冷。」']):'';
+    const al=S.party&&S.party!=='none'&&ALLY[S.party]&&ALLY[S.party].open()?S.party:null,lo=al==='luna'&&Math.random()<.5?lunaOut():'',talk=al==='luna'?(lo?'露娜：「'+lo+'」':pick(['露娜望著營火：「媽媽做這盞燈的時候，說是為了讓人在霧裡找得到路。」','露娜把烤好的麵包分你一半：「別逞強。累了要說。」','露娜看著北方：「等霧散了，村子的麥田也差不多該收成了。」'])):al==='gale'?pick(['蓋爾默默擦著那把短劍，劍柄上的名字被摸得發亮。','蓋爾：「騎士團守夜，第一個睡著的人要請全隊喝酒。……你別睡。」','蓋爾把披風丟給你：「山上的夜很冷。」']):'';
     RUN.view={type:'res',title:sp?'靈泉':'營火休息',text:sp?'清澈的泉水泛著微光。喝下一口，全身的疲憊一掃而空——HP 與 MP 全部回復！':'你找到一處安全的營地稍作休息，回復了 35% 的 HP 與 MP。'+campTalk()+(talk?`<br><span class="sub">${talk}</span>`:'')}}
 function kilnPick(k){const v=RUN&&RUN.view;if(!v||v.type!=='kiln'||v.done)return;if(k==='hone'){if(honeMax())return;v.done=honeDo();save();render();return}if(k==='raid'){if(RUN.raid)return;v.done=raidDo();save();render();return}if(k==='forge'&&RUN.core&&!RUN.coreUp){RUN.coreUp=1;try{SFX.holy(0)}catch(e){}v.done=`你把霧核放進窯口。紫色的火舔過它，槌子落下三次——霧核縮了一圈，光卻更亮了。<br><b style="color:var(--exp)">【${coreNm(RUN.core)}】</b>：${coreDs(RUN.core)}<br><span class="sub">忙了一整晚，沒能闔眼。</span>`;toast(`⚒ 霧核重鍛完成`)}else{restHere(false);return save(),render()}save();render()}
 function runNext(){const n=RUN.step+1;if(RUN.nodes[n]==='boss'&&!RUN.gate&&RUN.step>=0){RUN.view={type:'gate'};save();render();$('#main').scrollTop=0;return}if(RUN.forks&&RUN.forks[n]&&!RUN.nodes[n]){RUN.view={type:'fork',opts:RUN.forks[n]};save();render();$('#main').scrollTop=0;return}
@@ -2638,9 +2638,9 @@ function mkAlly(){if(!S.party||!ALLY[S.party]||!ALLY[S.party].open())return null
                          :{id:'gale',n:'蓋爾',max:Math.round(s.HP*1.05),pw:pw*.62,def:s.DEF*1.1,cd:0}}
 function allyAct(){const A=B.ally;if(!A||A.hp<=0||B.allyTurn===B.turn||B.hp<=0)return;const _src=B.srcNow;B.srcNow='露娜';setTimeout(()=>{if(B)B.srcNow=_src},0);B.allyTurn=B.turn;const s=stats();A.cd=Math.max(0,A.cd-1);
   const hit=(p,nm)=>{let d=A.pw*p*100/(100+B.def*(1+fbSum('def')))*(.9+Math.random()*.2);d=capB(Math.max(1,Math.round(d)));if(B.fshield>0){const ab=Math.min(B.fshield,d);B.fshield-=ab;d-=ab}B.hp=Math.max(0,B.hp-d);dsrc('露娜',d);bossPhase();B.allyD=d;blog(`${A.n}${nm}，造成 ${d} 傷害`)};
-  if(A.id==='luna'){A.cd2=Math.max(0,(A.cd2||0)-1);A.cd3=Math.max(0,(A.cd3||0)-1);const has=k=>LUNASK[k].ok(),say=k=>{try{setTimeout(()=>bub('luna',`【${LUNASK[k].n}】${LUNASK[k].say}`),200);setTimeout(()=>PFX.ally(k),250)}catch(e){}},dng=B.chg||(B.next&&isDng(SKM[B.next]));
+  if(A.id==='luna'){A.cd2=Math.max(0,(A.cd2||0)-1);A.cd3=Math.max(0,(A.cd3||0)-1);const has=k=>LUNASK[k].ok(),say=k=>{try{setTimeout(()=>bub('luna',`【${LUNASK[k].n}】`),200);setTimeout(()=>PFX.ally(k),250)}catch(e){}},dng=B.chg||(B.next&&isDng(SKM[B.next]));
     if(has('oath')&&!A.ult&&(B.kind==='boss'||B.hp<B.max*.5)&&B.turn>=3){A.ult=1;say('oath');hit(3,'高舉提燈，奧義【誓約之燈】');const h=Math.round(s.HP*.15);S.hp=Math.min(s.HP,S.hp+h);B.allyH=h;blog(`蒼藍的光包住了你，回復 ${h} HP`)}
-    else if(S.hp<s.HP*.45&&!A.cd){const h=Math.round(s.HP*A.heal);S.hp=Math.min(s.HP,S.hp+h);A.cd=3;B.allyH=h;say('heal');blog(`露娜舉起提燈【照路之光】：「撐住！」為你回復 ${h} HP`)}
+    else if(S.hp<s.HP*.45&&!A.cd){const h=Math.round(s.HP*A.heal);S.hp=Math.min(s.HP,S.hp+h);A.cd=3;B.allyH=h;say('heal');blog(`露娜舉起提燈【照路之光】，為你回復 ${h} HP`)}
     else if(dng&&has('ward')&&!A.cd2){A.cd2=4;B.lunaWard=1;say('ward');blog('露娜展開【守燈結界】，下一次受到的傷害降低 40%')}
     else if(has('clear')&&!A.cd3&&(B.st.poison>0||B.st.burn>0||(B.fb&&B.fb.length))&&Math.random()<.6){A.cd3=4;say('clear');B.st.weak=Math.max(B.st.weak||0,2);hit(.8,'放出【霧散之光】');blog(`${B.name} 的力量被削弱了`)}
     else if(B.turn%3===0){say('flame');hit(1.6,'點燃燈火，【蒼焰】直擊');if(B.hp>0&&Math.random()<.4){B.st.burn=2;blog(`${B.name} 被蒼焰灼燒`)}}
@@ -2763,6 +2763,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'13.3',d:'2026-11-25',t:'露娜台詞調整',b:'露娜放招時不再喊口號（像「照路之光・撐住！」這類），只顯示招式名。另外拿掉、改寫了一批比較尷尬的台詞（戰鬥喊話、出發前的話、營火閒聊與戰敗後的安慰），讓她說話更自然。'},
   {v:'13.2',d:'2026-11-25',t:'旅途插圖換新畫風',b:'旅途中遇到的五位人物（阿蕾、葛蕾塔、米洛、賽門、托比）的插圖換成新畫風，共 25 張。第三章首領預告圖重畫完成。露娜的「燈光術」演出換成新姿勢。'},
   {v:'13.1',d:'2026-11-25',t:'露娜立繪重畫、NPC 與蓋爾換新畫風',b:'露娜的全身立繪與招式圖重畫：提燈掛在腰間，招式改為放出燈光與祈禱治癒（不再揮拳）；治癒時出現祈禱演出，攻擊時偶爾出現燈光術演出。晨星鎮 9 位 NPC（含三種表情）、5 位旅途中遇到的人物、夥伴蓋爾都換成新畫風；蓋爾在戰鬥中改用頭像表情並有出招演出。章節首領預告圖 6 張與牧羊女阿蕾的旅途插圖也換新。其餘旅途插圖繪製中。'},
   {v:'13.0',d:'2026-11-25',t:'冒險途中重新整理不再丟進度',b:'冒險到一半關掉或重新整理頁面，回來會自動接回同一趟路線：已拿到的金幣、經驗、戰利品、祝福與霧核都保留。如果是在戰鬥中離開，會回到那場戰鬥之前，需要重新打一次（HP、MP 維持離開時的狀態）。戰敗畫面改用新畫風的負傷插圖。'},
@@ -3162,7 +3163,7 @@ function win(){if(!B||B.hp>0)return;try{const ds=B.ds||{},tot=Object.values(ds).
   RUN.loot.gold+=T.gold;RUN.loot.exp+=T.exp;RUN.loot.items.push(...T.got);
   if(RUN.trial){S.trial=1;for(const k in TRIAL.items)addItem(k,-TRIAL.items[k]);S.gold=Math.max(0,S.gold-TRIAL.gold)}
   const ally=B.ally&&B.ally.hp>0?B.ally.n:null;
-  RUN.view={type:'res',img:HK()+'_win',mimg:bid==='shadow'?null:'mob_'+bid+'_lose',title:RUN.trial?'試煉通過':bs?'首領討伐成功':'戰鬥勝利',drop:dropFx(),text:`擊敗 ${T.names.join('、')}！獲得 ${T.exp} EXP、${T.gold} G。${T.got.length?'<br>戰利品：'+T.got.join('、'):''}${B.rp?'<br><span class="sub">'+B.rp+'</span>':''}${ally&&Math.random()<.35?`<br><span class="sub">${ally==='露娜'?'露娜：「辛苦了。……你的背影，越來越可靠了。」':'蓋爾：「還不錯。別鬆懈。」'}</span>`:''}`};
+  RUN.view={type:'res',img:HK()+'_win',mimg:bid==='shadow'?null:'mob_'+bid+'_lose',title:RUN.trial?'試煉通過':bs?'首領討伐成功':'戰鬥勝利',drop:dropFx(),text:`擊敗 ${T.names.join('、')}！獲得 ${T.exp} EXP、${T.gold} G。${T.got.length?'<br>戰利品：'+T.got.join('、'):''}${B.rp?'<br><span class="sub">'+B.rp+'</span>':''}${ally&&Math.random()<.35?`<br><span class="sub">${ally==='露娜'?'露娜：「辛苦了。回鎮上好好休息吧。」':'蓋爾：「還不錯。別鬆懈。」'}</span>`:''}`};
   if(!bs&&!RUN.trial&&!RUN.tower&&!RUN.core&&RUN.nodes[RUN.step]==='elite'&&RUN.step>=3&&RUN.step<RUN.nodes.length-1)RUN.view.core=coreRoll();
   if(bs&&!(MOBS[bid]&&MOBS[bid].field)&&!RUN.trial&&!RUN.tower){RUN.view.box=1;RUN.view.boxL=MOBS[bid]?MOBS[bid].lv+(RUN.nm?10:0):S.lv}
   B=null;gainExp(T.exp);save();render();$('#main').scrollTop=0}
