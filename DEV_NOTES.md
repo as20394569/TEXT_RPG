@@ -271,3 +271,8 @@
 
 ## 冒險續行（v13.0）
 - `runSnap()`（由 `save()` 呼叫）把 RUN 存到 `KEY+'_run'`；`runLoad()` 開機時還原。戰鬥中存檔會 step-1，重整後重打該節點。高塔／試煉不存。改 RUN 結構時要保持可 JSON 化。
+
+
+## 夥伴與 NPC 新畫風（v13.1）
+- 夥伴頭像表情 `an_{id}_fn/fa/fh`、演出 `an_{id}_s1/s2`（luna：s1 燈光術、s2 祈禱；gale 只有 s2）。`ally_gale_*` 舊變體已刪，勿補。
+- NPC `portrait_npc_*`（含 _smile/_serious）、`npc_w_*`、`story_ch*_pre`、`story_w_*` 逐步換新畫風，勿覆蓋、勿向 Codex 下單。

@@ -1,4 +1,4 @@
-const C='ao-art-v42';
+const C='ao-art-v43';
 self.addEventListener('install',e=>self.skipWaiting());
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k.startsWith('ao-art')&&k!==C).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
 const get=(req,n)=>fetch(req).catch(err=>n>0?new Promise(r=>setTimeout(r,800)).then(()=>get(req,n-1)):Promise.reject(err));
