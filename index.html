@@ -584,20 +584,20 @@ function toast(t){const T=$('#toast');while(T.children.length>=3)T.firstChild.re
 /* ============ 資料 ============ */
 const ATTR={STR:'力量',DEX:'敏捷',INT:'智力',VIT:'體質',LUK:'幸運'};
 const CLS={
-  swordsman:{n:'劍士',d:'站在最前面的人。血與防禦是四職之首，越打越順手。',f:'破綻：普攻與「裂甲擊」會在敵人身上堆疊破綻（最多 5 層），每層讓你的攻擊 +6%；再用「十字裂斬」全部清算。普攻較重，命中時燃起鬥志回復少量 MP。',base:{STR:8,DEX:5,INT:3,VIT:8,LUK:4},grow:{STR:1,VIT:1},atk:'STR',basic:'ATK',adv:['knight','berserker']},
-  mage:{n:'法師',d:'火力最高，身體最脆。靠順序取勝的人。',f:'印記：「點火」「霜針」會在敵人身上留下印記（最多 3 個），再用「引雷」全部引爆。普攻會回流少量 MP。',base:{STR:2,DEX:4,INT:10,VIT:5,LUK:5},grow:{INT:2},atk:'STR',basic:'MAG',adv:['archmage','warlock']},
-  ranger:{n:'遊俠',d:'不硬碰硬，等對方露出空檔。',f:'專注：普攻、閃過攻擊都會累積專注（最多 5 層），每層讓你的攻擊 +12%；「屏息」一箭把專注全部打出去。',base:{STR:4,DEX:10,INT:3,VIT:9,LUK:6},grow:{DEX:1,LUK:1},atk:'DEX',basic:'ATK',adv:['sniper','assassin']},
-  cleric:{n:'神官',d:'打得慢，但很難倒下。',f:'信仰：治療、祈禱與普攻會累積信仰，滿 100 時神會「回應」——自動回復 25% HP 並降下聖光。',base:{STR:4,DEX:4,INT:8,VIT:8,LUK:4},grow:{INT:1,VIT:1},atk:'STR',basic:'MAG',adv:['bishop','templar']}
+  swordsman:{n:'劍士',d:'站在最前面的人。血與防禦是四職之首，越打越順手。',f:'破綻：攻擊在敵人身上堆破綻，再一口氣清算。',base:{STR:8,DEX:5,INT:3,VIT:8,LUK:4},grow:{STR:1,VIT:1},atk:'STR',basic:'ATK',adv:['knight','berserker']},
+  mage:{n:'法師',d:'火力最高，身體最脆。靠順序取勝的人。',f:'印記：技能留下印記，再一次引爆。',base:{STR:2,DEX:4,INT:10,VIT:5,LUK:5},grow:{INT:2},atk:'STR',basic:'MAG',adv:['archmage','warlock']},
+  ranger:{n:'遊俠',d:'不硬碰硬，等對方露出空檔。',f:'專注：攻擊與閃避累積專注，再一箭打出去。',base:{STR:4,DEX:10,INT:3,VIT:9,LUK:6},grow:{DEX:1,LUK:1},atk:'DEX',basic:'ATK',adv:['sniper','assassin']},
+  cleric:{n:'神官',d:'打得慢，但很難倒下。',f:'信仰：治療與祈禱累積信仰，滿了神會回應。',base:{STR:4,DEX:4,INT:8,VIT:8,LUK:4},grow:{INT:1,VIT:1},atk:'STR',basic:'MAG',adv:['bishop','templar']}
 };
 const ADV={
-  knight:{n:'騎士',d:'用身體擋住一切。體質 +5、力量 +3，Lv.20/23/26 習得重盾衝擊、堅守、聖騎衝鋒。被動【守護者】防禦 +20%。',bonus:{VIT:5,STR:3}},
-  berserker:{n:'狂戰士',d:'拿血換傷害。力量 +8，Lv.20/23/26 習得捨身猛擊、狂暴化、血之饗宴。被動【嗜血】吸血 +8%。',bonus:{STR:8}},
-  archmage:{n:'大魔導士',d:'把印記玩到極致。智力 +8，Lv.20/23/26 習得墜星、奧術飛彈、元素領域。被動【奧術精通】魔攻 +15%。',bonus:{INT:8}},
-  warlock:{n:'咒術師',d:'靠吸取活下去。智力 +5、體質 +3，Lv.20/23/26 習得汲魂、詛咒、靈魂收割。被動【黑暗契約】吸血與魔力提升。',bonus:{INT:5,VIT:3}},
-  sniper:{n:'神射手',d:'專注越高越可怕。敏捷 +8、體質 +4，Lv.20/23/26 習得驟雨、爆裂箭、致命狙擊。被動【穩定瞄準】爆擊傷害 +30%。',bonus:{VIT:4,DEX:8}},
-  assassin:{n:'刺客',d:'只出一刀。敏捷 +5、幸運 +5、體質 +4，Lv.20/23/26 習得影縫、煙霧彈、千刃。被動【暗殺術】爆擊率 +10%。',bonus:{VIT:4,DEX:5,LUK:5}},
-  bishop:{n:'主教',d:'讓神更快回應。智力 +6、體質 +2，Lv.20/23/26 習得庇護所、復活之光、天罰。被動【慈悲】治療與信仰提升。',bonus:{INT:6,VIT:2}},
-  templar:{n:'聖殿騎士',d:'把信仰變成鐵鎚。力量 +6、體質 +4，Lv.20/23/26 習得天秤、聖光鎚擊、審判之日。被動【信念之鎚】物攻、魔攻 +10%。',bonus:{STR:6,VIT:4}}
+  knight:{n:'騎士',d:'用身體擋住一切。體質 +5、力量 +3。',bonus:{VIT:5,STR:3}},
+  berserker:{n:'狂戰士',d:'拿血換傷害。力量 +8。',bonus:{STR:8}},
+  archmage:{n:'大魔導士',d:'把印記玩到極致。智力 +8。',bonus:{INT:8}},
+  warlock:{n:'咒術師',d:'靠吸取活下去。智力 +5、體質 +3。',bonus:{INT:5,VIT:3}},
+  sniper:{n:'神射手',d:'專注越高越可怕。敏捷 +8、體質 +4。',bonus:{VIT:4,DEX:8}},
+  assassin:{n:'刺客',d:'只出一刀。敏捷 +5、幸運 +5、體質 +4。',bonus:{VIT:4,DEX:5,LUK:5}},
+  bishop:{n:'主教',d:'讓神更快回應。智力 +6、體質 +2。',bonus:{INT:6,VIT:2}},
+  templar:{n:'聖殿騎士',d:'把信仰變成鐵鎚。力量 +6、體質 +4。',bonus:{STR:6,VIT:4}}
 };
 const SK={
   slash:{n:'裂甲擊',c:'swordsman',lv:1,mp:4,dmg:{s:'ATK',p:1.55,rend:1},brk:2,d:'踏前一步重砍，敵人破綻 +2。劈開護甲：無視物理抗性。'},
@@ -2185,8 +2185,8 @@ function buildPanel(){const c=kwCount(),ks=Object.keys(RZ).filter(k=>c[k]),nm=bu
   return `<div class="panel bld"><h3>我的流派　${nm?`<span class="tag red">${nm}</span>`:'<span class="tag off">尚未成形</span>'}</h3>
    ${ks.length?ks.sort((a,b)=>c[b]-c[a]).map(k=>{const n=c[k],x=RZ[k];return `<div class="bk"><div class="bkh"><b>${x.ic} ${x.n}</b><span class="pips">${[1,2,3].map(i=>`<i class="${i<=n?'on':''}"></i>`).join('')}</span></div>
      <span class="sub ${n>=2?'son':''}">2 件：${x.i}</span><span class="sub ${n>=3?'son':''}">3 件：${x.ii}</span></div>`}).join('')
-   :'<p class="sub">裝備上的稀有詞綴（烈焰、連擊、震擊……）湊到 2 件、3 件會產生「共鳴」，改變你的戰鬥方式。到鐵匠鋪「銘刻」可以指定詞綴。</p>'}
-   <p class="sub">詞綴來源：稀有以上裝備、首領專屬裝備、火山／遠征隊／輕裝／森林 4 件套。</p></div>`}
+   :'<p class="sub">同種稀有詞綴湊 2、3 件會產生共鳴。</p>'}
+   <p class="sub">稀有以上的裝備才有詞綴。</p></div>`}
 function vBag(){
   const tabs=`<div class="tabs">${[['gear','裝備'],['use','道具'],['mat','素材']].map(([k,n])=>`<button class="${BAGTAB===k?'on':''}" data-a="bagTab" data-v="${k}">${n}</button>`).join('')}</div>`;
   let body='';
