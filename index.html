@@ -331,6 +331,14 @@ body.pc #app{margin:0;flex:none;box-shadow:0 0 40px rgba(0,0,0,.45)}
 .spr.foe.lunge2{animation:lgF .4s .45s}
 .spr.me.hitl .art{animation:hitA .5s .9s}
 .spr.foe.mut .art img{filter:hue-rotate(250deg) saturate(1.5) drop-shadow(0 0 10px rgba(150,40,200,.7))}
+.spr.foe.fog::before,.spr.foe.fog::after{content:'';position:absolute;pointer-events:none;border-radius:50%}
+.spr.foe.fog::before{inset:8% -14% -4%;background:radial-gradient(ellipse at 50% 62%,rgba(150,70,225,.55),rgba(95,35,170,.25) 42%,transparent 68%);filter:blur(7px);animation:fogsw 3.4s ease-in-out infinite}
+.spr.foe.fog::after{inset:30% -6% 2%;z-index:3;background:radial-gradient(ellipse at 30% 60%,rgba(190,140,255,.34),transparent 55%),radial-gradient(ellipse at 72% 45%,rgba(120,60,200,.3),transparent 50%);filter:blur(9px);animation:fogsw 4.6s ease-in-out infinite reverse}
+.spr.foe.fog:not(.mut) .art img{filter:drop-shadow(0 0 9px rgba(150,60,220,.75)) saturate(.85)}
+.spr.foe.fogout .art img{animation:fogout .9s ease-out}
+@keyframes fogsw{0%,100%{transform:translateX(-4%) scale(1);opacity:.85}50%{transform:translateX(4%) scale(1.08);opacity:1}}
+@keyframes fogout{0%{filter:hue-rotate(250deg) saturate(1.5) brightness(1.6)}100%{filter:none}}
+.fogp{display:inline-flex;gap:3px;align-items:center;font-size:12px;font-weight:700;color:#7c3aed}.fogp i{width:9px;height:9px;border-radius:50%;background:#d9c8f5;display:inline-block}.fogp i.on{background:#8b3ff0;box-shadow:0 0 5px #a86bff}
 .spr.foe.nm .art img{filter:saturate(1.3) contrast(1.1) drop-shadow(0 0 10px rgba(200,30,60,.75))}
 .ibox.foe-i{cursor:pointer}
 .duo{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:end}
@@ -414,9 +422,9 @@ body.pc #app{margin:0;flex:none;box-shadow:0 0 40px rgba(0,0,0,.45)}
 /* ===== 戰鬥畫面 v2：怪物置中、隊伍頭像在下 ===== */
 .stage.v2{height:clamp(280px,52vh,440px)}
 .stage.v2 .ibox.foe-i{left:6px;right:6px;top:6px;width:auto;opacity:.96}
-.stage.v2 .spr.foe{left:27%;right:auto;top:auto;bottom:25%;width:46%}
-.stage.v2 .spr.foe.szs{left:22%;right:auto;top:auto;bottom:25%;width:56%}.stage.v2 .spr.foe.szm{left:24%;right:auto;top:auto;bottom:25%;width:52%}
-.stage.v2 .spr.foe.boss{left:19%;width:62%;bottom:24%}
+.stage.v2 .spr.foe{left:22%;right:auto;top:auto;bottom:24%;width:56%}
+.stage.v2 .spr.foe.szs{left:17%;right:auto;top:auto;bottom:24%;width:66%}.stage.v2 .spr.foe.szm{left:19%;right:auto;top:auto;bottom:24%;width:62%}
+.stage.v2 .spr.foe.boss{left:13%;width:74%;bottom:23%}
 .stage.v2 .spr.me{left:6px;bottom:6px;width:22%;z-index:5}
 .stage.v2 .spr.me .plat,.stage.v2 .ally .plat{display:none}
 .stage.v2 .spr.me .art,.stage.v2 .ally .art{aspect-ratio:1/1;border:2px solid var(--navy);border-radius:10px;background:linear-gradient(#33466e,#1b2540);box-shadow:2px 2px 0 rgba(0,0,0,.35)}
@@ -736,8 +744,13 @@ Object.assign(GEAR,{
   c_double:{n:'雙生獠牙',slot:'neck',t:1,lv:5,price:3000,atk:10,crit:4,hp:40,uq:{double:25},ud:'普通攻擊 25% 機率追加一擊。算作 2 件「連擊」共鳴',uniq:1,core:1},
   c_thorn:{n:'荊棘王冠',slot:'head',t:1,lv:5,price:3000,def:14,hp:90,uq:{thorn:25},ud:'被擊中時反彈 25% 傷害。算作 2 件「荊棘」共鳴',uniq:1,core:1},
   c_shield:{n:'晨霧斗篷',slot:'body',t:1,lv:5,price:3000,def:18,hp:120,uq:{shield:15},ud:'戰鬥開始獲得 15% HP 的護盾。算作 2 件「先機」共鳴',uniq:1,core:1},
+  c_stun:{n:'震雷護符',slot:'neck',t:1,lv:5,price:3000,atk:9,mag:9,def:6,uq:{stun:12},ud:'攻擊時 12% 機率使敵人暈眩。算作 2 件「震擊」共鳴',uniq:1,core:1},
+  c_guard:{n:'磐石指環',slot:'ring',t:1,lv:5,price:3000,def:14,hp:80,uq:{guard:15},ud:'受擊時 15% 機率傷害減半。算作 2 件「守護」共鳴',uniq:1,core:1},
+  c_back:{n:'背水墜飾',slot:'neck',t:1,lv:5,price:3000,atk:12,mag:12,uq:{back:30},ud:'HP 低於 35% 時傷害 +30%。算作 2 件「絕境」共鳴',uniq:1,core:1},
+  c_gale:{n:'迅風指環',slot:'ring',t:1,lv:5,price:3000,atk:8,mag:8,crit:5,uq:{gale:1},ud:'每場戰鬥的第一下攻擊必定命中且爆擊。算作 2 件「疾風」共鳴',uniq:1,core:1},
+  c_reap:{n:'收穫之月',slot:'neck',t:1,lv:5,price:3000,hp:60,mp:30,uq:{reap:10},ud:'每擊倒一個敵人回復 10% HP 與 MP。算作 2 件「收割」共鳴',uniq:1,core:1},
   c_ls:{n:'渴血指環',slot:'ring',t:1,lv:5,price:3000,atk:9,hp:60,uq:{ls:8},ud:'吸血 +8%。算作 2 件「吸血」共鳴',uniq:1,core:1}});
-const DGCORE=['c_burn','c_double','c_thorn','c_shield','c_ls'];
+const DGCORE=['c_burn','c_double','c_thorn','c_shield','c_ls','c_stun','c_guard','c_back','c_gale','c_reap'];
 const BOSSU={goblinboss:'u_gob',treeking:'u_tree',worm:'u_worm',icedragon:'u_dragon',zenos:'u_zenos'};
 const GEMS=['gem_r','gem_b','gem_g','gem_y','gem_w'];
 const BGEM={goblinboss:'gem_r',treeking:'gem_g',worm:'gem_y',icedragon:'gem_w',zenos:'gem_b',rabbitking:'gem_y',moonwolf:'gem_w',foreman:'gem_r',giantking:'gem_g',mistgeneral:'gem_b'};
@@ -910,7 +923,7 @@ const ARMB={head:[['學徒兜帽','法師頭巾','刻紋頭環','毛皮兜帽','
 for(const sl in ARMB){const [ns,f,pm]=ARMB[sl];ns.forEach((n,i)=>GEAR[SLOTP[sl]+'b_'+i]=Object.assign({n,slot:sl,t:i,lv:TLV[i],price:Math.round(TPRICE[i]*pm)},f(i)))}
 const MDROP={bogslime:'x_bog',sparkrabbit:'x_spark',soulshroom:'x_soul',shadewolf:'x_shade',lavabat:'x_lava',crystalgolem:'x_crystal',blizzardwolf:'x_blizzard',stormsprite:'x_storm',bloodknight:'x_blood',voidwraith:'x_void'};
 /* 原圖較小的魔物在戰鬥畫面放大 */
-const MSMALL=new Set(['bat','bogslime','bookworm','hornrabbit','icesprite','lavabat','slime','sparkrabbit']),MMID=new Set(['wolf','shadewolf','blizzardwolf','stormhawk','snowwolf']);
+const MSMALL=new Set(['bat','bogslime','bookworm','hornrabbit','icesprite','lavabat','slime','sparkrabbit']),MMID=new Set(['wolf','shadewolf','blizzardwolf','stormhawk','snowwolf','wolfrider','elderdruid','windfairy','mirrormoth']);
 const mobBase=id=>MVAR[id]?MVAR[id].base:id;
 const AREAS=[
   {id:'plain',n:'微風草原',lv:'1–5',base:1,d:'晨星鎮外的遼闊草原，新手冒險者的起點。',mobs:['slime','hornrabbit','goblin','bogslime','sparkrabbit'],boss:'goblinboss'},
@@ -1674,6 +1687,21 @@ const respecCost=()=>S.lv<10?0:S.lv*150;
 let CT={};const confirmTap=k=>{const t=Date.now();if(CT[k]&&t-CT[k]<3000){CT={};return true}CT={[k]:t};toast('再按一次確認');return false};
 const mpCost=k=>Math.max(1,Math.round(SK[k].mp*(1-stats().MPCUT/100)));
 function clamp(){const s=stats();S.hp=Math.min(S.hp,s.HP);S.mp=Math.min(S.mp,s.MP)}
+/* 共鳴改寫技能：同一種詞綴湊到 2 件，就會改寫符合條件的招式（詞綴只出現在稀有以上裝備） */
+const SKX={
+  burn:{d:'傷害招式附帶灼燒 2 回合',ok:k=>k.dmg&&!(k.foe&&k.foe.burn),f:k=>{k.foe=Object.assign({},k.foe,{burn:2})}},
+  double:{d:'多段招式多打一段',ok:k=>k.dmg&&k.dmg.h>=2,f:k=>{k.dmg=Object.assign({},k.dmg,{h:k.dmg.h+1})}},
+  stun:{d:'奧義附帶暈眩 1 回合',ok:k=>k.ult&&k.dmg,f:k=>{k.foe=Object.assign({},k.foe,{stun:1})}},
+  ls:{d:'清算／引爆類招式吸取 20% 傷害',ok:k=>k.dmg&&(k.fin||k.det||k.aim||k.faithSpend),f:k=>{k.drain=(k.drain||0)+.2}},
+  guard:{d:'強化類招式多維持 1 回合',ok:k=>k.buff,f:k=>{k.buff=Object.assign({},k.buff,{t:k.buff.t+1})}},
+  shield:{d:'治療、強化、護盾招式額外獲得 8% HP 護盾',ok:k=>k.heal||k.buff||k.shield,f:k=>{k.shp=.08}},
+  back:{d:'HP 低於一半時，單發招式威力 +25%',ok:k=>k.dmg&&!k.dmg.h,f:k=>{k.backp=.25}},
+  thorn:{d:'招架類招式同時防禦 +30%（2 回合）',ok:k=>k.counter&&!k.buff,f:k=>{k.buff={def:.3,t:2}}},
+  gale:{d:'單發招式爆擊率 +15%',ok:k=>k.dmg&&!k.dmg.h,f:k=>{k.dmg=Object.assign({},k.dmg,{cr:(k.dmg.cr||0)+15})}},
+  reap:{d:'招式造成的異常狀態多 1 回合',ok:k=>k.foe&&Object.keys(k.foe).some(f=>f!=='stun'),f:k=>{const o={};for(const f in k.foe)o[f]=k.foe[f]+(f==='stun'?0:1);k.foe=o}}
+};
+const skxOn=(id,c)=>Object.keys(SKX).filter(w=>(c[w]||0)>=2&&SKX[w].ok(SK[id]));
+function skx(id,c){c=c||kwCount();const on=skxOn(id,c);if(!on.length)return SK[id];const k=Object.assign({},SK[id]);for(const w of on)SKX[w].f(k);k.xw=on;return k}
 function mySkills(){return Object.keys(SK).filter(k=>(SK[k].c===S.cls||SK[k].c===S.adv)&&S.lv>=SK[k].lv)}
 /* 技能配置：最多帶 4 招進戰鬥（Lv.30 起 5 招），招式組合就是流派的一部分 */
 const loadMax=()=>S.lv>=30?5:4;
@@ -1773,20 +1801,22 @@ function myCode(){if(!S.pid){S.pid=Math.random().toString(36).slice(2,10);save()
 function readCode(c){try{c=(c||'').trim();if(!c.startsWith('AO1-'))return null;const o=JSON.parse(decodeURIComponent(escape(atob(c.slice(4)))));if(!o.i||!o.n||typeof o.p!=='number')return null;return o}catch(e){return null}}
 function greet(who,fallback){const g=GREET[who];return (g&&pickC(g))||fallback}
 /* 戰鬥中的即時對話泡泡 */
+const fgN=()=>!!(B&&B.fog>0),fgE=()=>!!(B&&B.fogMax>0);
 const BT={
-  luna:{start:[['測霧燈有反應……小心，牠身上沾了霧。',null],['我在後面，{你|妳}專心打就好。',null],['又是牠們？今天第三群了吧。',null],['數量不少……先解決最弱的那隻。',()=>B&&B.adds&&B.adds.length>0],['這隻比一般的大，別大意。',()=>B&&B.kind==='elite'],['牠飛得很高，等牠俯衝再出手。',()=>B&&B.m&&B.m.fly],['{你|妳}的血不多，這場我多留意治療。',()=>{try{return S.hp<stats().HP*.5}catch(e){return false}}],['別逞強，痛了就說喔。',null],['跟礦坑那些比，這隻還算客氣。',()=>chA(3)],['冷死了……打完這場就去烤火！',()=>chA(3)&&!chA(4)]],
-    boss:[['就是牠……{name}，這次換我們先出手。',null],['手在抖？……我也是。一起上吧。',null],['這股霧的濃度……不能讓牠逃掉！',()=>chA(2)]],
+  luna:{start:[['測霧燈變藍了……小心，牠被霧蝕了。先把霧打散！',fgN],['顏色不對……霧晶長進牠身體裡了。我用燈照，{你|妳}負責打。',fgN],['燈沒有反應，是普通的魔物。放心打。',()=>B&&!B.fogMax&&B.kind!=='boss'],['我在後面，{你|妳}專心打就好。',null],['又是牠們？今天第三群了吧。',null],['數量不少……先解決最弱的那隻。',()=>B&&B.adds&&B.adds.length>0],['這隻比一般的大，別大意。',()=>B&&B.kind==='elite'],['牠飛得很高，等牠俯衝再出手。',()=>B&&B.m&&B.m.fly],['{你|妳}的血不多，這場我多留意治療。',()=>{try{return S.hp<stats().HP*.5}catch(e){return false}}],['別逞強，痛了就說喔。',null],['跟礦坑那些比，這隻還算客氣。',()=>chA(3)],['冷死了……打完這場就去烤火！',()=>chA(3)&&!chA(4)]],
+    boss:[['就是牠……{name}，這次換我們先出手。',null],['手在抖？……我也是。一起上吧。',null],['這股霧的濃度……不能讓牠逃掉！',()=>chA(2)&&fgN()],['霧晶長在牠身上……先驅霧，不然打不痛！',fgN]],
     crit:[['好漂亮的一擊！',null],['打中弱點了！',null],['……剛剛那下，我都替牠覺得痛。',null],['再來一次！就是那樣！',null]],
     low:[['{name}！退後一點，我來擋！',null],['撐住！燈還亮著，我們就還沒輸！',null]],
     guard:[['看穿了！就是現在！',null],['擋得好！牠收不回來了，反擊！',null],['好險……{你|妳}的反應好快。',null]],
-    charge:[['牠在蓄力！先防禦，不然就趁現在打斷牠！',null],['那股氣息不對……這一下不能硬吃！',null],['測霧燈在抖……牠要放大招了！',null]],
+    charge:[['牠在蓄力！先防禦，不然就趁現在打斷牠！',null],['那股氣息不對……這一下不能硬吃！',null],['測霧燈在抖……牠要放大招了！',fgE]],
     rage:[['牠發狂了！接下來每一下都很痛，小心！',null],['血量過半了，牠開始拚命了。',null],['別被牠的氣勢壓住，照我們的節奏打！',null]],
     brk:[['打斷了！牠站不穩，快追擊！',null],['漂亮！牠的大招放不出來了。',null]],
     dodge:[['好險，剛剛那下擦過去了。',null],['閃得好！牠露出空檔了。',null],['牠揮空了，趁現在！',null]],
     drag:[['拖太久了……牠還有體力，我們得加快。',null],['藥水還夠嗎？這場比想像中難纏。',null],['牠的動作我大概看懂了，再撐一下。',null]],
-    near:[['牠快不行了，別給牠喘息的機會！',null],['再一下就倒了，穩穩打！',null],['牠的霧在散……只差一點！',null]],
-    win:[['呼……結束了。{你|妳}有沒有受傷？',null],['牠身上的霧晶我收走囉，研究用的。',null],['這場打得很順，照這個節奏走。',null],['先喘口氣，我看一下{你|妳}的傷。',()=>{try{return S.hp<stats().HP*.5}catch(e){return false}}],['下次換我打前鋒——開玩笑的，我會乖乖待在後面。',null]]},
-  me:{start:[['（來吧。）',null],['又擋路，真受不了。',null],['（先看清楚牠的動作……）',null]],
+    near:[['牠快不行了，別給牠喘息的機會！',null],['再一下就倒了，穩穩打！',null],['霧散之後牠變弱了……只差一點！',()=>fgE()&&!fgN()]],
+    fogbrk:[['霧散了！牠僵住了，趁現在！',null],['燈光透進去了——牠變回原本的樣子了！',null],['就是現在！霧散的這幾下最痛！',null]],
+    win:[['呼……結束了。{你|妳}有沒有受傷？',null],['牠身上的霧晶我收走囉，研究用的。',fgE],['霧散了，牠也安靜下來了。……對不起，只能這樣讓你停下。',fgE],['這場打得很順，照這個節奏走。',null],['先喘口氣，我看一下{你|妳}的傷。',()=>{try{return S.hp<stats().HP*.5}catch(e){return false}}],['下次換我打前鋒——開玩笑的，我會乖乖待在後面。',null]]},
+  me:{fogbrk:[['（顏色變回來了……就是現在！）',null],['霧散了，換我了。',null]],start:[['（那層紫色的霧……不太對勁。）',fgN],['（來吧。）',null],['又擋路，真受不了。',null],['（先看清楚牠的動作……）',null]],
     boss:[['（心跳好快……冷靜。）',null],['終於找到你了。',null]],
     crit:[['就是這裡！',null],['抓到了！',null]],
     low:[['（還……撐得住。）',null],['可惡，大意了……',null]],
@@ -1806,9 +1836,9 @@ const cI=k=>()=>S.cls===k,aI=k=>()=>S.adv===k,sF=()=>S.sex==='f',sM=()=>S.sex===
   ['主教大人，祈禱完再上也不遲。',aI('bishop')],['聖殿騎士……一手錘一手禱詞，好忙。',aI('templar')],
   ['{name}，等一下別又一個人衝出去。',sM]]],
  ['boss',[['{name}，破綻交給{你|妳}堆，我負責看牠什麼時候倒。',cI('swordsman')],['印記多留幾個，我幫{你|妳}拖時間！',cI('mage')],['專注到最高再放，別急。',cI('ranger')],['神會回應{你|妳}的，我信。',cI('cleric')]]],
- ['crit',[['那一劍連霧都劈開了！',cI('swordsman')],['好燙！站在後面都感覺得到。',cI('mage')],['正中要害，{你|妳}眼睛到底多好？',cI('ranger')],['神官打人也這麼痛的嗎……',cI('cleric')]]],
+ ['crit',[['那一劍連霧都劈開了！',()=>S.cls==='swordsman'&&fgE()],['好重的一劍！',cI('swordsman')],['好燙！站在後面都感覺得到。',cI('mage')],['正中要害，{你|妳}眼睛到底多好？',cI('ranger')],['神官打人也這麼痛的嗎……',cI('cleric')]]],
  ['low',[['法師不能被貼身！我把牠引開！',cI('mage')],['劍士倒下，我們就沒有前排了！撐住！',cI('swordsman')],['先別管專注了，拉開距離！',cI('ranger')],['先治療自己！不要只顧著我！',cI('cleric')]]],
- ['win',[['劍上的霧擦乾淨再收，不然會生鏽。',cI('swordsman')],['魔力還夠嗎？我包包裡有魔力藥水。',cI('mage')],['箭我幫{你|妳}撿回來了，少了兩支。',cI('ranger')],['謝謝{你|妳}的祝福，手不痛了。',cI('cleric')]]]
+ ['win',[['劍上的霧擦乾淨再收，不然會生鏽。',()=>S.cls==='swordsman'&&fgE()],['劍收好，手給我看看有沒有磨破。',cI('swordsman')],['魔力還夠嗎？我包包裡有魔力藥水。',cI('mage')],['箭我幫{你|妳}撿回來了，少了兩支。',cI('ranger')],['謝謝{你|妳}的祝福，手不痛了。',cI('cleric')]]]
 ].forEach(([ev,ls])=>BT.luna[ev].push(...ls));
 /* 主角放技能時露娜的反應：先看技能，再看進階職、職業 */
 const LSK={whirl:['十字裂斬！破綻全清掉了！','漂亮的收尾！'],skyslash:['那一刀……空氣都裂開了。'],warcry:['{你|妳}的鬥氣，我在後面都感覺得到。'],
@@ -1831,7 +1861,7 @@ const LOUT=[['出發前檢查一下：藥水、繩子、{你|妳}的劍。',cI('
 function lunaOut(){if(!withLuna())return '';const l=pickC(LOUT);return l?you(tx(l)):''}
 function bub(who,text){try{const el=document.querySelector(who==='luna'?'.stage .ally':'.stage .spr.me'),app=$('#app');if(!el||!app||!text)return;const r=el.getBoundingClientRect(),a=app.getBoundingClientRect();
   const d=document.createElement('div');d.className='spb '+(who==='luna'?'bubL':'bubM');d.innerHTML=`<b>${who==='luna'?'露娜':esc(S.name)}</b>${esc(you(tx(text)))}`;d.style.left=Math.max(4,Math.min(a.width-200,r.left-a.left+r.width*(who==='luna'?.1:.35)))+'px';d.style.top=Math.max(4,r.top-a.top-8)+'px';app.appendChild(d);setTimeout(()=>d.classList.add('out'),2300);setTimeout(()=>d.remove(),2700)}catch(e){}}
-function talk(ev,force){if(!B||!S)return;B.talkN=B.talkN||0;if(B.talkN>=3&&!force)return;const ch={start:.35,boss:1,crit:.3,low:1,guard:.8,win:.5,charge:1,rage:.9,brk:.9,dodge:.25,drag:.7,near:.5}[ev]||.3;if(!force&&Math.random()>ch)return;
+function talk(ev,force){if(!B||!S)return;B.talkN=B.talkN||0;if(B.talkN>=3&&!force)return;const ch={start:.35,boss:1,crit:.3,low:1,guard:.8,win:.5,charge:1,rage:.9,brk:.9,dodge:.25,drag:.7,near:.5,fogbrk:1}[ev]||.3;if(!force&&Math.random()>ch)return;
   if(ev==='low'){if(B.talkLow)return;B.talkLow=1}
   const L=withLuna()&&(!BT.me[ev]||Math.random()<.7)&&!(B.ally&&B.ally.hp<=0);const line=pickC((L?BT.luna:BT.me)[ev]||[]);if(!line)return;B.talkN++;
   if(ev==='win'){blog(`${L?'露娜':S.name}：「${you(tx(line))}」`);return}
@@ -2078,7 +2108,7 @@ function vBattle(){const s=stats(),fx=B.fx||{},intro=B.intro,a=AREAS[RUN.area];B
   const me=[RUN&&RUN.core&&MCORE[RUN.core]&&!RUN.tower?`<span class="chip" style="color:var(--exp)" title="${coreDs(RUN.core)}">${coreIc(RUN.core,16)}${coreNm(RUN.core).replace('霧核','')}${coreM0()>1?' ▲':''}${RUN.core==='shatter'&&!RUN.trial?` ${B.brkP?(RUN.coreUp?4:5):B.crk||0}/${RUN.coreUp?4:5}`:''}</span>`:'',B.opening?'<span class="chip" style="color:#1a1206;background:var(--exp);font-weight:700">✦ 下一擊 +50%</span>':'',honeM()>1?`<span class="chip" style="color:var(--exp)">⚔ 磨刃 +${RUN.hone*12}%</span>`:'',C.focus?`<span class="chip" style="color:var(--exp)">專注 ${C.focus}</span>`:'',S.cls==='cleric'?`<span class="chip" style="color:var(--r4)">信仰 ${C.faith}</span>`:'',B.counter?'<span class="chip">招架反擊</span>':'',B.endure?'<span class="chip">鬥氣解放</span>':'',...B.buffs.map(b=>`<span class="chip">${b.n} ${b.t}</span>`),B.shield>0?`<span class="chip">護盾 ${B.shield}</span>`:'',...['poison','burn','bleed','weak','stun'].filter(h=>B.pst[h]>0).map(h=>`<span class="chip" style="color:var(--hp)">${HST[h]} ${B.pst[h]}</span>`),B.pst.regen>0?`<span class="chip">再生 ${B.pst.regen}</span>`:'',B.guard?'<span class="chip">防禦中</span>':''].join('');
   
   if(fx.by)B.pfx=fx;const mine=fx.by==='me',theirs=fx.by==='foe',atk=mine&&fx.d!=null;const sk=fx.skill?SKA[fx.skill]:null,fk=theirs&&fx.fsk?(SKM[fx.fsk]||{fx:'roar',c:'#ff4a4a'}):null;B.delayBar=!!(sk||fk);
-  const foeC=[intro?'in-r':'',atk&&fx.d>0?(sk?'hitl':'hit'):fx.brk?'hit':'',theirs&&!fx.stun?(fk?(MELEE[fk.fx]?'charge lunge2':'charge'):'lunge-foe'):'',B.hp<=0?(sk?'faintl':'faint'):'',B.mut?'mut':'',B.nm?'nm':'',B.treasure?'gold':'',B.wander?'wander':'',...Object.keys(B.st||{}).filter(k=>B.st[k]>0).map(k=>'s-'+k),B.frozen&&B.st.stun>0?'s-freeze':'',B.chg?'chg':''].join(' ');
+  const foeC=[intro?'in-r':'',atk&&fx.d>0?(sk?'hitl':'hit'):fx.brk?'hit':'',theirs&&!fx.stun?(fk?(MELEE[fk.fx]?'charge lunge2':'charge'):'lunge-foe'):'',B.hp<=0?(sk?'faintl':'faint'):'',B.fog>0?'fog':'',B.mut&&(B.fog>0||!B.fogMax)?'mut':'',B.fogBrkT===B.turn&&B.fogMax?'fogout':'',B.nm?'nm':'',B.treasure?'gold':'',B.wander?'wander':'',...Object.keys(B.st||{}).filter(k=>B.st[k]>0).map(k=>'s-'+k),B.frozen&&B.st.stun>0?'s-freeze':'',B.chg?'chg':''].join(' ');
   const meC=[intro?'in-l':'',sk?(sk[0]==='slash'||sk[0]==='spin'?'cast dash':'cast'):atk?'lunge-me':'',mine&&fx.glow&&!sk?'glow':'',theirs&&fx.d>0?(fk?'hitl':'hit'):'',...Object.keys(B.pst||{}).filter(k=>B.pst[k]>0).map(k=>'s-'+k)].join(' ');
   const foeFx0=(fx.fheal?`<span class="dmg heal ${fk?'late':''}">+${fx.fheal}</span>`:'')+(atk&&fx.d===0?'<span class="dmg miss">MISS</span>':'')+(atk&&fx.d>0?(fx.hl?fx.hl.map((d,i)=>`<span class="dmg hitn" style="animation-delay:${(.95+i*.13).toFixed(2)}s;margin-left:${((i%3)-1)*26}px;margin-top:${-(i%2)*14}px">${d}</span>`).join('')+`<span class="dmg tot ${fx.cr?'cr':''}" style="animation-delay:${(1.05+fx.hl.length*.13).toFixed(2)}s">${fx.hl.length} HIT　-${fx.d}${fx.cr?'!':''}</span>`:sk?`<span class="dmg late ${fx.cr?'cr':''} ${fx.d>=B.max*.2?'big':''}">-${fx.d}${fx.cr?'!':''}</span>`:`<span class="dmg ${fx.cr?'cr':''} ${fx.d>=B.max*.2?'big':''}">-${fx.d}${fx.cr?'!':''}</span>`):'')+(mine&&fx.tags&&fx.tags.length?`<span class="ftags">${fx.tags.map((t,i)=>`<i style="animation-delay:${(1.2+i*.25).toFixed(2)}s">${esc(t)}</i>`).join('')}</span>`:'')+(atk&&fx.d>0&&B.elHit?`<span class="dmg ${sk?'late':''} eltag ${B.elHit}">${B.elHit==='w'?'弱點！':B.elHit==='rend'?'裂甲！':'抵抗'}</span>`:'');
   const foeFx=foeFx0+(()=>{const x=(B.pops||[]).slice(-4).map((p,i)=>`<span class="dmg pop p-${POPK[p.k]}" style="animation-delay:${(sk?1.1:.35)+i*.22}s;margin-left:${(i%2?1:-1)*(18+i*6)}px">-${p.d}<small>${p.k}</small></span>`).join('');B.pops=[];return x})();
@@ -2098,11 +2128,11 @@ function vBattle(){const s=stats(),fx=B.fx||{},intro=B.intro,a=AREAS[RUN.area];B
   else if(mine&&(sk||atk))swap('.spr.me',mIdle(B.php),(sk?950:250)+500);
   if(AL&&ARTSET&&ARTSET.has('an_'+AL.id+'_fn')&&(aD||aH||aHit)&&AL.hp>0)swap('.stage .ally','an_'+AL.id+'_'+(AL.hp<AL.max*.3?'fh':'fn'),1200);
   let cmd;
-  if(B.menu==='skill')cmd=`<div class="cmd col">${battleSkills().map(k=>{const lv=S.skl[k]||1;return `<button class="btn" data-a="bSkill" data-v="${k}" ${S.mp<mpCost(k)||(SK[k].ult&&B.ultUsed)?'disabled':''} ${SK[k].ult?'style="border-color:var(--r4);color:var(--r4)"':''}>${('skill_'+k) in ATL?`<i class="bi at" style="background-position:${(ATL['skill_'+k]%ATC)/(ATC-1)*100}% ${Math.floor(ATL['skill_'+k]/ATC)/(ATR-1)*100}%"></i>`:''}${SK[k].n} Lv${lv}<small>${SK[k].ult?(B.ultUsed?'已使用':'奧義'):'MP '+mpCost(k)}</small></button>`}).join('')}<button class="btn" data-a="bMenu" data-v="main">返回</button></div>`;
+  if(B.menu==='skill')cmd=`<div class="cmd col">${battleSkills().map(k=>{const lv=S.skl[k]||1;return `<button class="btn" data-a="bSkill" data-v="${k}" ${S.mp<mpCost(k)||(SK[k].ult&&B.ultUsed)?'disabled':''} ${SK[k].ult?'style="border-color:var(--r4);color:var(--r4)"':''}>${('skill_'+k) in ATL?`<i class="bi at" style="background-position:${(ATL['skill_'+k]%ATC)/(ATC-1)*100}% ${Math.floor(ATL['skill_'+k]/ATC)/(ATR-1)*100}%"></i>`:''}${SK[k].n}${skxOn(k,stats().KW).map(w=>RZ[w].ic).join('')} Lv${lv}<small>${SK[k].ult?(B.ultUsed?'已使用':'奧義'):'MP '+mpCost(k)}</small></button>`}).join('')}<button class="btn" data-a="bMenu" data-v="main">返回</button></div>`;
   else if(B.menu==='item'){const us=Object.keys(S.items).filter(k=>ITEMS[k].use);cmd=`<div class="cmd col">${us.map(k=>`<button class="btn" data-a="bItem" data-v="${k}">${ITEMS[k].n} ×${S.items[k]}<small>${ITEMS[k].d}</small></button>`).join('')||'<p class="empty">沒有可用的道具</p>'}<button class="btn" data-a="bMenu" data-v="main">返回</button></div>`}
   else cmd=`<div class="cmd"><button class="btn pri" data-a="bAtk">攻擊</button><button class="btn" data-a="bMenu" data-v="skill">技能</button><button class="btn" data-a="bMenu" data-v="item">道具</button><button class="btn" data-a="bGuard">防禦</button><button class="btn" data-a="bFlee">逃跑</button><button class="btn ${B.auto?'pri':''}" data-a="bAuto">自動 ${B.auto?'開':'關'}</button></div>`;
   return `<div class="battle"><div class="stage v2 ${AL?'hasal':''} bg-${a.id} ${S.hp>0&&S.hp<stats().HP*.3?'danger':''} ${atk&&fx.d>0&&(fx.cr||B.hp<=0)?(sk?'punchl':'punch'):''} ${fx.quake&&!fk?'quake':''} ${(sk&&sk[0]==='meteor')||(fk&&fk.fx==='slam')?'quakel':''}" ${sk?`style="--c:${sk[1]}"`:fk?`style="--c:${fk.c}"`:''}><img class="bg" src="art/battle_${a.id}.webp" alt="" ${MISS.has('battle_'+a.id)?'hidden':''} onerror="reTry(this,'battle_${a.id}')||(MISS.add('battle_${a.id}'),this.remove())">
-   <div class="ibox foe-i" data-a="openM" data-v="foe" role="button" aria-label="查看怪物情報"><div class="nm"><span>${B.name}${B.kind==='boss'?' <span class="tag red">首領</span>':''}${B.trait&&TRX(B.trait)?` <span class="tag">${TRX(B.trait).n}</span>`:''}</span><span>${(B.adds||[]).length?'<span class="tag">目標</span> ':''}Lv${B.L} ⓘ</span></div>${bbar(B.hp,B.max,fp)}${(()=>{const e=MEL[B.id];if(!e||!(S.dex&&S.dex.m&&S.dex.m[B.id]||B.kind==='boss'))return '';return `<div class="elw">${e[0]?`<span class="elt el-${e[0]}">弱 ${ELI[e[0]]||e[0]}</span>`:''}${e[1]?`<span class="elt" style="color:#777">抗 ${ELI[e[1]]||e[1]}</span>`:''}</div>`})()}${B.trait?`<div class="elw"><span class="elt" style="color:#c2410c">${trIc(B.trait,16)}${TRX(B.trait).n}${(B.trait==='grudge'||B.trait==='swell')&&grudgeM()>1?' +'+Math.round((grudgeM()-1)*100)+'%':''}</span></div>`:''}${intentHtml()}${(B.adds||[]).length?`<div class="addrow">${B.adds.map((f,i)=>`<button class="addf" data-a="bTarget" data-v="${i}" aria-label="切換目標：${f.name}">${art('mob_'+f.id,f.m.n,'r11')}<span>${f.m.n}${bbar(f.hp,f.max)}</span></button>`).join('')}</div><div class="sub" style="font-size:10px">點小頭像切換目標</div>`:''}</div>
+   <div class="ibox foe-i" data-a="openM" data-v="foe" role="button" aria-label="查看怪物情報"><div class="nm"><span>${B.name}${B.kind==='boss'?' <span class="tag red">首領</span>':''}${B.trait&&TRX(B.trait)?` <span class="tag">${TRX(B.trait).n}</span>`:''}</span><span>${(B.adds||[]).length?'<span class="tag">目標</span> ':''}Lv${B.L} ⓘ</span></div>${bbar(B.hp,B.max,fp)}${(()=>{const e=MEL[B.id];if(!e||!(S.dex&&S.dex.m&&S.dex.m[B.id]||B.kind==='boss'))return '';return `<div class="elw">${e[0]?`<span class="elt el-${e[0]}">弱 ${ELI[e[0]]||e[0]}</span>`:''}${e[1]?`<span class="elt" style="color:#777">抗 ${ELI[e[1]]||e[1]}</span>`:''}</div>`})()}${B.fogMax?`<div class="elw"><span class="fogp">${B.fog>0?'霧蝕':'霧散'} ${Array.from({length:B.fogMax},(_,i)=>`<i class="${i<B.fog?'on':''}"></i>`).join('')}</span></div>`:''}${B.trait?`<div class="elw"><span class="elt" style="color:#c2410c">${trIc(B.trait,16)}${TRX(B.trait).n}${(B.trait==='grudge'||B.trait==='swell')&&grudgeM()>1?' +'+Math.round((grudgeM()-1)*100)+'%':''}</span></div>`:''}${intentHtml()}${(B.adds||[]).length?`<div class="addrow">${B.adds.map((f,i)=>`<button class="addf" data-a="bTarget" data-v="${i}" aria-label="切換目標：${f.name}">${art('mob_'+f.id,f.m.n,'r11')}<span>${f.m.n}${bbar(f.hp,f.max)}</span></button>`).join('')}</div><div class="sub" style="font-size:10px">點小頭像切換目標</div>`:''}</div>
    <div class="spr foe ${B.m.fly?'fly':''} ${B.kind==='boss'?'boss':''} ${MSMALL.has(mobBase(B.id))?'szs':MMID.has(mobBase(B.id))?'szm':''} ${foeC}" data-a="openM" data-v="foe" role="button" aria-label="查看怪物情報" style="cursor:pointer"><div class="plat"></div>${B.id==='shadow'?art(HK(),'試煉之影','r34','shadowimg'):art(fKey0,B.m.n,'r11','','mob_'+B.id)}${foeFx}</div>
    <div class="spr me ${meC}"><div class="plat"></div>${art(mKey0,clsName(),'r11','',mB+'_fn')}${meFx}</div>
    <div class="ibox me-i"><div class="nm"><span>${esc(S.name)}</span><span>Lv${S.lv}</span></div>${bbar(S.hp,s.HP,pp)}<div class="num">HP ${S.hp}/${s.HP}</div>${bbar(S.mp,s.MP,null,'m')}<div class="num">MP ${S.mp}/${s.MP}</div>${me?`<div class="chips">${me}</div>`:''}</div>
@@ -2132,7 +2162,7 @@ function dollHtml(){const sl=k=>{const g=gearBy(S.eq[k]);return g?`<button class
 function vChar(){const s=stats(),sc=setCounts();
   const setHtml=Object.keys(sc).map(i=>{const st=SETS[i],n=sc[i];return `<div class="gsec"><b>${st.n}套裝　${n}/4</b><span class="sub ${n>=2?'son':''}">2 件：${st.d2}</span><span class="sub ${n>=4?'son':''}">4 件：${st.d4}</span></div>`}).join('');
   const eq=dollHtml();
-  const BS=battleSkills(),lim=mySkills().length>loadMax();const sk=(lim?`<p class="sub">戰鬥中最多帶 <b>${loadMax()}</b> 招（目前 ${BS.length}/${loadMax()}），點「帶入／取下」調整你的招式組合。</p>`:'')+mySkills().map(k=>{const lv=S.skl[k]||1,on=BS.includes(k);return `<div class="item ${lim&&!on?'off':''}"><span class="ico c2">${icon('skill_'+k,ic('skill'))}</span><span class="grow"><b>${SK[k].n}　Lv.${lv}/5${lim&&on?' <span class="tag red">出戰</span>':''}</b><span class="sub">MP ${mpCost(k)}・${SK[k].d}</span></span>${lim?`<button class="btn sm ${on?'':'pri'}" data-a="skLoad" data-v="${k}">${on?'取下':'帶入'}</button>`:''}<button class="btn sm" data-a="skUp" data-v="${k}" ${S.sp>0&&lv<5?'':'disabled'}>升級</button></div>`}).join('');
+  const BS=battleSkills(),lim=mySkills().length>loadMax();const sk=(lim?`<p class="sub">戰鬥中最多帶 <b>${loadMax()}</b> 招（目前 ${BS.length}/${loadMax()}），點「帶入／取下」調整你的招式組合。</p>`:'')+mySkills().map(k=>{const lv=S.skl[k]||1,on=BS.includes(k);return `<div class="item ${lim&&!on?'off':''}"><span class="ico c2">${icon('skill_'+k,ic('skill'))}</span><span class="grow"><b>${SK[k].n}　Lv.${lv}/5${lim&&on?' <span class="tag red">出戰</span>':''}</b><span class="sub">MP ${mpCost(k)}・${SK[k].d}</span>${skxOn(k,s.KW).map(w=>`<span class="sub" style="color:var(--r4)">${RZ[w].ic}【${RZ[w].n}改寫】${SKX[w].d}</span>`).join('')}</span>${lim?`<button class="btn sm ${on?'':'pri'}" data-a="skLoad" data-v="${k}">${on?'取下':'帶入'}</button>`:''}<button class="btn sm" data-a="skUp" data-v="${k}" ${S.sp>0&&lv<5?'':'disabled'}>升級</button></div>`}).join('');
   const nxt=Object.keys(SK).filter(k=>(SK[k].c===S.cls||SK[k].c===S.adv)&&S.lv<SK[k].lv).map(k=>`<span class="chip">Lv.${SK[k].lv} ${SK[k].n}</span>`).join('');
   return `<div class="panel"><div class="char-top">${art(HK(),clsName()+'立繪','r34')}
    <div class="list"><h3>${esc(S.name)}</h3><div class="row"><span class="tag">${clsName()}</span><span class="sub">Lv.${S.lv}</span></div>
@@ -2666,7 +2696,7 @@ function vGift(){if(!giftOk())return '';return `<div class="panel" style="border
 function vDg(){return DG.map((D,d)=>{
   return `<div class="panel area" style="border-color:var(--exp)">${art('area_'+AREAS[D.segs[D.segs.length-1]].id,D.n)}<div class="row"><h3 class="grow">${D.n}</h3><span class="tag red">大副本</span></div><p class="sub">${D.d}</p>
   <div class="gsec"><b>規則</b><span class="sub">打倒一段的首領後可以直接深入下一段：不回城、不回血。每深入一段，稀有以上裝備的機率加成 +15%。副本裡有帶「機制」的新魔物與中首領，要換配裝來應付。</span></div>
-  <div class="lbl">難度</div><div class="chips">${DGDN.map((n,i)=>`<button class="chip ${Math.min(DGDIFF,dgMax(d))===i?'on':''}" data-a="dgDiff" data-v="${i}" ${i>dgMax(d)?'disabled':''}>${n}${i>dgMax(d)?'（通關'+DGDN[i-1]+'後解鎖）':i?`　怪 +${[0,2,5][i]} 級・掉寶 +${i*10}%`:''}</button>`).join('')}</div>
+  <div class="lbl">難度</div><div class="chips">${DGDN.map((n,i)=>`<button class="chip ${Math.min(DGDIFF,dgMax(d))===i?'on':''}" data-a="dgDiff" data-v="${i}" ${i>dgMax(d)?'disabled':''}>${n}${i>dgMax(d)?'（通關'+DGDN[i-1]+'後解鎖）':i?`　怪 +${[0,2,4][i]} 級・掉寶 +${i*10}%`:''}</button>`).join('')}</div>
   <p class="sub">流派核心傳說裝（只在這裡掉）：${DGCORE.map(k=>`<b class="c4">${GEAR[k].n}</b>`).join('、')}。中首領 3%、首領 5%，難度越高機率越高。</p>
   <div class="list">${D.segs.map((ar,k)=>{const a=AREAS[ar],open=S.main.ch>=ar&&(k===0||S.cleared[D.segs[k-1]]),u=BOSSU[a.boss]&&GEAR[BOSSU[a.boss]];
     return `<div class="item"><span class="grow"><b>第 ${k+1} 段　${a.n}</b>　<span class="sub">Lv ${a.lv}・首領 ${MOBS[a.boss].n}${S.cleared[ar]?'・已通關':''}</span>${u?`<span class="sub">首領專屬：<b class="c4">${u.n}</b></span>`:''}</span>${open?`<button class="btn ${k===0?'pri':''} sm" data-a="startDg" data-v="${d}:${k}">${k===0?'從頭挑戰':'從這段開始'}</button>`:`<span class="sub">打倒上一段首領後解鎖</span>`}</div>`}).join('')}</div></div>`}).join('')}
@@ -2702,7 +2732,8 @@ function allyAuto(){if(S.party===undefined&&ALLY.luna.open())S.party='luna'}
 function mkAlly(){if(!S.party||!ALLY[S.party]||!ALLY[S.party].open())return null;const s=stats(),pw=Math.max(s.ATK,s.MAG),bond=1+Math.min(20,S.bond||0)*.02;
   return S.party==='luna'?{id:'luna',n:'露娜',max:Math.round(s.HP*.7),pw:pw*.5*bond,def:s.DEF*.6,cd:0,heal:.2*bond}
                          :{id:'gale',n:'蓋爾',max:Math.round(s.HP*1.05),pw:pw*.62,def:s.DEF*1.1,cd:0}}
-function allyAct(){const A=B.ally;if(!A||A.hp<=0||B.allyTurn===B.turn||B.hp<=0)return;const _src=B.srcNow;B.srcNow='露娜';setTimeout(()=>{if(B)B.srcNow=_src},0);B.allyTurn=B.turn;const s=stats();A.cd=Math.max(0,A.cd-1);
+{const _ft=foeTurn;foeTurn=function(){try{if(B&&B.fogRe&&B.turn>=B.fogRe&&B.hp>0&&!(B.fog>0)){B.fogRe=0;B.fog=3;B.log.push(`☁ 霧又纏回 ${B.name} 身上了（3 層）`)}}catch(e){}return _ft.apply(this,arguments)}}
+function allyAct(){try{const A0=B&&B.ally;if(A0&&A0.id==='luna'&&A0.hp>0&&B.allyTurn!==B.turn&&B.hp>0&&B.fog>0)fogStrip(1,'luna')}catch(e){}const A=B.ally;if(!A||A.hp<=0||B.allyTurn===B.turn||B.hp<=0)return;const _src=B.srcNow;B.srcNow='露娜';setTimeout(()=>{if(B)B.srcNow=_src},0);B.allyTurn=B.turn;const s=stats();A.cd=Math.max(0,A.cd-1);
   const hit=(p,nm)=>{let d=A.pw*p*100/(100+B.def*(1+fbSum('def')))*(.9+Math.random()*.2);d=capB(Math.max(1,Math.round(d)));if(B.fshield>0){const ab=Math.min(B.fshield,d);B.fshield-=ab;d-=ab}B.hp=Math.max(0,B.hp-d);dsrc('露娜',d);bossPhase();B.allyD=d;blog(`${A.n}${nm}，造成 ${d} 傷害`)};
   if(A.id==='luna'){A.cd2=Math.max(0,(A.cd2||0)-1);A.cd3=Math.max(0,(A.cd3||0)-1);const has=k=>LUNASK[k].ok(),say=k=>{try{setTimeout(()=>bub('luna',`【${LUNASK[k].n}】`),200);setTimeout(()=>PFX.ally(k),250)}catch(e){}},dng=B.chg||(B.next&&isDng(SKM[B.next]));
     if(has('oath')&&!A.ult&&(B.kind==='boss'||B.hp<B.max*.5)&&B.turn>=3){A.ult=1;say('oath');hit(3,'高舉雙手，奧義【星光爆裂】');const h=Math.round(s.HP*.15);S.hp=Math.min(s.HP,S.hp+h);B.allyH=h;blog(`蒼藍的光包住了你，回復 ${h} HP`)}
@@ -2718,7 +2749,7 @@ function allyHurt(base,nm,src){const A=B.ally;let d=base*100/(100+A.def)*(.9+Mat
   blog(`${src} 的${nm}擊中了${A.n}，造成 ${d} 傷害`);if(A.hp<=0)blog(`${A.n}倒下了！`)}
 
 /* ============ 多隻魔物 ============ */
-const FK=['id','m','L','a','kind','mut','nm','aff','name','hp','max','atk','mag','def','crit','eva','fb','fshield','st','rage','bm','trait','wardBrk','vlX','mres'];
+const FK=['fog','fogMax','fogV','fogRe','fogRd','id','m','L','a','kind','mut','nm','aff','name','hp','max','atk','mag','def','crit','eva','fb','fshield','st','rage','bm','trait','wardBrk','vlX','mres'];
 function swapFoe(i){const a=B.adds[i],cur={};FK.forEach(k=>{cur[k]=B[k];B[k]=a[k]});B.adds[i]=cur;B.fhp=null}
 function addsAct(fx){const s=stats();for(const f of B.adds||[]){if(f.hp<=0||S.hp<=0)continue;
     if(f.st.stun>0){f.st.stun--;blog(`${f.name} 暈眩中`);continue}
@@ -2829,6 +2860,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'14.1',d:'2026-11-25',t:'霧蝕、共鳴改寫技能、魔物放大',b:'【霧蝕】霧終於會真的出現在魔物身上：蝕化怪與第二章起的首領身上纏著紫霧（名字下方有霧的層數）。霧散之前牠受到的傷害 -25%，技能的暈眩與虛弱無效；每次攻擊驅 1 層（每回合最多 2 層，爆擊再多 1 層），露娜的測霧燈每回合再照散 1 層。霧散的瞬間牠會變回原本的顏色、僵住 1 回合，2 回合內多受 20% 傷害；首領的霧會再纏回來一次。【露娜台詞】跟霧有關的話只會在真的有霧的魔物身上說；燈沒反應時她會說是普通魔物，霧散時會喊你追擊。【共鳴改寫技能】同一種詞綴湊到 2 件，會改寫符合條件的招式：烈焰讓傷害招附帶灼燒、連擊讓多段招多打一段、震擊讓奧義附帶暈眩、吸血讓清算／引爆招吸血、守護讓強化多 1 回合、先機讓治療強化招附帶護盾、絕境讓單發招在半血以下 +25%、荊棘讓招架同時加防、疾風讓單發招爆擊 +15%、收割讓異常多 1 回合。到「角色」頁的技能清單可以看到哪些招被改寫。【核心傳說裝】大副本再加 5 件：震雷護符、磐石指環、背水墜飾、迅風指環、收穫之月，十種共鳴都有核心裝了。【畫面】戰鬥中的魔物放大約兩成。'},
   {v:'14.0',d:'2026-11-25',t:'大副本內容包與裝備重製（第一階段）',b:'【新魔物與機制】大副本「翠原迷森」加入 8 隻新魔物，各帶一種機制：荊棘野豬（尖刺：反彈傷害，剋多段攻擊）、苔殼蟹（反震：單發太重會震回來，剋爆發）、淨風妖精（淨化：清掉灼燒中毒，剋持續傷害）、孢子母菇（召喚幫手）、鏡翅蛾（魔障：魔法減傷，爆擊可破）、盤根守衛（不死：要靠灼燒或中毒壓制再生），以及兩隻中首領：哥布林狼騎兵（第 8 回合狂怒）與古樹祭司（淨化＋召喚）。【難度】大副本分普通、困難、煉獄，通關後解鎖下一級：怪更高等、機制怪更多、掉寶略好。【流派核心傳說裝】五件只在大副本掉的傳說裝：餘燼之心、雙生獠牙、荊棘王冠、晨霧斗篷、渴血指環。各帶一個詞綴，而且算作 2 件共鳴——三件裝備就能同時湊出兩種共鳴。中首領 3%、首領 5%。【裝備平衡】特殊玩法只出現在稀有以上的裝備；各階武器的基礎數值拉平（低階提高）；強化每級加成由 8% 改為 6%，讓刷到新裝比死命強化舊裝更有感。【補償】在這之前建立、Lv.5 以上的角色，可到冒險頁自選一套同等級的新版稀有套裝（六件）。【屬性專精】五種屬性各有兩段專精（30／60 點，含裝備加成）：力量給爆傷與暈眩、敏捷給連擊與反擊、智力給回魔與魔攻、體質給反彈與血量、幸運給爆擊與擊倒回復——配點也能決定玩法，到「角色」頁查看。職業與技能本身的重製會在下一階段進行。'},
   {v:'13.7',d:'2026-11-25',t:'魔物與掉落等級自適應',b:'魔物等級會跟著你的等級走：在牠原本的等級往上一段區間內調整（一般魔物最多 +8 級、首領最多 +6 級），不會比原本低，並且永遠比你低至少 1 級，所以回到前面的地區不再是一刀一隻。掉落的裝備階級也跟著你的等級：最多比該地區高一階，且不超過目前章節解封的階級。高塔與試煉不變。'},
   {v:'13.6',d:'2026-11-25',t:'掉落率調整',b:'整體掉落率減半，讓好裝備更有份量：一般怪掉裝備 12%→6%、精英 50%→25%、蝕化怪 100%→50%、首領額外一件 40%→20%；稀有以上的比例減半（史詩 2.6%→1.3%、傳說 0.4%→0.2%）；魔物專屬裝備 4%→2%、首領專屬裝備 8%→4%；寶箱升史詩的機率、素材、藥水、強化石、精英寶石也減半。「寶物守衛必掉裝備」、首領必掉的強化石與寶石不變。首領專屬裝備的保底取消。大副本深入加成改為每段 +15%。'},
@@ -2978,16 +3010,16 @@ const dropTier=ar=>{const base=Math.min(ar,TLV.length-1);let t=0;for(let i=0;i<T
 const TRX=t=>ETRAIT[t]||BTRAIT[t]||null;
 function mkFoe(id,kind){const m=MOBS[id],bs=!!m.boss,el=kind==='elite',nm=!!(RUN&&RUN.nm);
   const mut=!bs&&!nm&&S.main.ch>=1&&Math.random()<.1;
-  const dgd=RUN&&RUN.dg?(RUN.dg.diff||0):0;const L=(RUN&&RUN.tower?RUN.tlv:RUN&&RUN.trial?m.lv:adLv(m,bs))+(nm?10:0)+(mut?3:0)+[0,2,5][dgd];
+  const dgd=RUN&&RUN.dg?(RUN.dg.diff||0):0;const L=(RUN&&RUN.tower?RUN.tlv:RUN&&RUN.trial?m.lv:adLv(m,bs))+(nm?10:0)+(mut?3:0)+[0,2,4][dgd];
   const mult=(bs?(RUN&&!RUN.tower?1.05+RUN.area*.05:1.25):el?1.12:1)*(nm?1.35:1)*(mut?1.45:1),kh=(bs?(RUN&&!RUN.tower?(RUN.area===0&&!nm?2.8:3.3+RUN.area*.6)*(RUN.area===3?1.4:RUN.area>=4?1.25:RUN.area>=1?1.1:1):4.5):el?1.8:1)*(nm?1.6:1)*(mut?2.2:1);
-  const st=mobBuild(m,L,mult*[1,1.2,1.45][dgd],kh*[1,1.3,1.7][dgd]);
+  const st=mobBuild(m,L,mult*[1,1.1,1.22][dgd],kh*[1,1.2,1.45][dgd]);
   const BMOD={goblinboss:'scout',zenos:'galeAlly'},bm=bs&&!nm&&S.flags[BMOD[id]]&&S.main.ch===RUN.area;if(bm)st.HP=Math.round(st.HP*.8);
   const aff=[];if(mut||nm){const ks=Object.keys(AFF).sort(()=>Math.random()-.5);aff.push(...ks.slice(0,bs&&nm?2:1))}
   if(aff.includes('rage'))st.ATK=Math.round(st.ATK*1.4),st.MAG=Math.round(st.MAG*1.4);if(aff.includes('shell'))st.DEF=Math.round(st.DEF*1.8),st.MRES=Math.round(st.MRES*1.8);if(aff.includes('swift'))st.EVA+=15,st.CRIT+=15;
   const pre=(nm?'惡夢・':'')+(mut?'蝕化・':'')+(el?'精英':'');
   /* v12.2 平衡：草原首領打的時候還沒有露娜幫忙，攻擊 1.7→1.38、HP 係數 3.3→2.8（惡夢不變） */
   const bdm=bs?(RUN&&!RUN.tower?(RUN.area===0&&!nm?1.38:1.7+RUN.area*.15)*(RUN.area===3?1.55:RUN.area>=4?1.33:RUN.area>=1?1.15:1):1.4)*BATK:1;
-  return{id,m,L,a:st.a,kind:bs?'boss':kind,mut,nm,aff,name:pre+m.n,hp:Math.round(st.HP*(bs?BHP:1)),max:Math.round(st.HP*(bs?BHP:1)),atk:Math.round(st.ATK*bdm),mag:Math.round(st.MAG*bdm),def:st.DEF,mres:st.MRES,crit:st.CRIT,eva:st.EVA,fb:[],fshield:0,st:{},rage:0,bm,trait:m.mech||undefined}}
+  return{id,m,L,a:st.a,kind:bs?'boss':kind,mut,nm,aff,name:pre+m.n,hp:Math.round(st.HP*(bs?BHP:1)),max:Math.round(st.HP*(bs?BHP:1)),atk:Math.round(st.ATK*bdm),mag:Math.round(st.MAG*bdm),def:st.DEF,mres:st.MRES,crit:st.CRIT,eva:st.EVA,fb:[],fshield:0,st:{},rage:0,bm,trait:m.mech||undefined,fog:FOGN(mut,bs),fogMax:FOGN(mut,bs)}}
 /* 依玩家實力調整魔物：只在玩家太強、會一擊秒殺時才加強，前期不受影響 */
 function hitEst(def){const s=stats(),P=Math.max(s.ATK,s.MAG),best=Math.max(1,...battleSkills().map(k=>{const d=SK[k].dmg;return d?d.p*(d.h||1):0})),cr=1+Math.min(1,s.CRIT/100)*Math.max(0,s.CD/100-1);return clsDm()*P*best*100/(100+def)*cr}
 function rareFoe(){const r=Math.random();
@@ -3015,6 +3047,7 @@ function startBattle(id,kind,nAdds){const F=mkFoe(id,kind),m=F.m,bs=F.kind==='bo
      log:[bs?`首領 ${m.n} 擋住了去路！`:F.mut?`被蝕霧侵蝕的 ${m.n} 出現了！氣息完全不同……`:adds.length?`${F.name} 帶著 ${adds.map(f=>f.name).join('、')} 出現了！`:`${F.name} 出現了！`,...(F.aff.length?[`詞綴：${F.aff.map(x=>AFF[x].n).join('、')}`]:[]),...(F.bm?[id==='zenos'?'蓋爾從側面牽制住了澤諾斯！':'你事先摸清了牠的弱點！']:[]),...(ally?[`${ally.n}與你並肩作戰`]:[])],busy:false,auto:AUTO,menu:'main',turn:1,fx:null,intro:true,shown:0,last:0},F);SFX.enc();
   scaleFoe();
   if(bs&&RUN&&(RUN.nm||RUN.tower)){B.trait=weekTrait(id);const T=BTRAIT[B.trait];B.log.push(`⚠ 本週首領特性【${T.n}】${T.d}（建議：${T.tip}）`)}
+  if(B.fog>0)B.log.push(`☁ 霧蝕：牠被霧侵蝕了（${B.fog} 層）。霧散之前傷害 -25%、暈眩與虛弱無效；攻擊、爆擊${withLuna()?'和露娜的測霧燈':''}都能驅霧，霧散時牠會僵住`);
   if(B.trait&&m.mech===B.trait){const T=TRX(B.trait);if(T)B.log.push(`⚠ 機制【${T.n}】${T.d}（建議：${T.tip}）`)}
   B.next=foePick();setTimeout(()=>{try{talk(B&&B.kind==='boss'?'boss':'start')}catch(e){}},1100);
   if(RUN&&RUN.bless){const BL={atk:{n:'戰意祝福',atk:.15},def:{n:'守護祝福',def:.35},luck:{n:'幸運祝福'}}[RUN.bless];B.buffs.push(Object.assign({id:'bless',t:999},BL))}
@@ -3061,10 +3094,16 @@ const basicEl=()=>({swordsman:'phys',ranger:'phys',mage:'arcane',cleric:'holy'}[
 /* 首領護甲：每回合傷害上限；半血時進入狂怒（護盾＋攻擊上升） */
 const capB=d=>{if(!B||B.kind!=='boss')return d;const lim=B.max,r=Math.max(1,Math.min(d,lim-(B.tk||0)));B.tk=(B.tk||0)+r;return r};
 function bossPhase(){if(B&&B.kind==='boss'&&!B.ph2&&B.hp>0&&B.hp<=B.max*.5){B.ph2=1;{const a=Math.round(B.max*.12);B.fshield=(B.fshield||0)+a;if(B.chg)B.chgSh=(B.chgSh||0)+a}blog(`${B.name} 被逼入絕境，張開了護盾！`)}}
+/* 霧蝕：被霧侵蝕的魔物（蝕化怪、第二章起的首領）身上纏著霧。霧散之前傷害 -25%、技能的暈眩與虛弱無效；
+   攻擊、爆擊與露娜的測霧燈都能驅霧，霧散時牠會僵住 1 回合、2 回合內多受 20% 傷害。首領的霧會再纏上來一次。 */
+const FOGN=(mut,bs)=>mut?3:(bs&&RUN&&!RUN.tower&&!RUN.trial&&RUN.area>=1)?5:0;
+function fogStrip(n,who){if(!B||!(B.fog>0)||B.hp<=0)return;B.fog=Math.max(0,B.fog-n);if(who==='luna')B.log.push(`露娜的測霧燈照散了霧（剩 ${B.fog} 層）`);
+  if(B.fog===0){B.fogBrkT=B.turn;B.fogV=B.turn+2;B.st.stun=Math.max(B.st.stun||0,1);B.frozen=0;B.log.push(`【霧散】纏著 ${B.name} 的霧散開了！牠僵住 1 回合，2 回合內多受 20% 傷害`);if(B.kind==='boss'&&!B.fogRd){B.fogRd=1;B.fogRe=B.turn+5}try{talk('fogbrk',true)}catch(e){}}}
 function hitFoe(stat,pow,o){o=o||{};const s=stats();if(s.GALE){const gt=(s.KW.gale||0);const tr=!B.gale||(gt>=2&&(B.gale||0)<2)||(gt>=3&&B.turn>0&&B.turn%4===0&&B.galeT!==B.turn);if(tr){B.gale=(B.gale||0)+1;if(B.gale>2)B.galeT=B.turn;o=Object.assign({},o,{sure:1});B.log.push('【疾風】先發制人！')}}if(!o.sure&&Math.random()*100<(B.eva+fbSum('eva'))*.6)return{d:0,cr:false,miss:true};let base=clsDm()*coreM()*(B.opening?1.5:1)*(S.cls==='swordsman'&&B.cls&&B.cls.brk?1+.06*B.cls.brk:1)*(S.cls==='ranger'&&B.cls&&B.cls.focus?1+.09*B.cls.focus:1)*(stat==='BOTH'?s.ATK+s.MAG:s[stat])*(1+buffSum('atk')+(s.FOCUSATK&&B.cls.focus>=rmax(5)?s.FOCUSATK/100:0))*(B.pst.weak>0?.75:1)*(s.BACK&&S.hp<s.HP*((s.KW.back||0)>=2?.5:.35)?1+s.BACK/100:1)*((s.KW.burn||0)>=3&&B.st.burn>0?1.25:1)*((s.KW.stun||0)>=2&&B.st.stun>0?1.3:1)*((s.KW.shield||0)>=2&&B.shield>0?1.15:1)*(B.gdUp?(B.gdUp=0,1.3):1);
   const fdef=stat==='MAG'?(B.mres??B.def):stat==='BOTH'?((B.mres??B.def)+B.def)/2:B.def;let em=elMul(B.id,B.curEl);{const ce=B.curEl,st=B.st||{};let cm=0,cn='';if(ce==='fire'&&B.frozen&&st.stun>0){cm=.5;cn='碎冰';st.stun=0;B.frozen=0}else if(ce==='ice'&&st.burn>0){cm=.3;cn='蒸發';st.burn=0}else if(ce==='thunder'&&B.frozen&&st.stun>0){cm=.3;cn='導電'}else if(ce==='thunder'&&st.poison>0){cm=.25;cn='毒爆';st.poison=Math.max(0,st.poison-1)}else if(ce==='holy'&&st.weak>0){cm=.2;cn='淨化'}else if(ce==='dark'&&st.bleed>0){cm=.25;cn='血蝕'}if(cm){if(fortK('chain'))cm+=.2;em*=1+cm;B.chain=cn;B.log.push(`【${cn}】屬性連鎖！傷害 +${Math.round(cm*100)}%`)}}if(o.rend&&em<1){em=1;B.elHit='rend'}else if(em!==1)B.elHit=em>1?'w':'r';let d=em*base*pow*100/(100+fdef*(1+fbSum('def'))*(1-(o.pierce||0)))*(.9+Math.random()*.2);const cr=!!o.sure||Math.random()*100<-(B.tough||0)+s.CRIT+(o.cr||0)+(hasP('sw1')&&B.cls.brk>=3?15:0);if(cr){const cdm=(s.CD+(hasP('rg3')&&B.cls.focus>=5?30:0)+s.BRKCD*B.cls.brk)/100;d*=1+(cdm-1)*(1-(B.cdr||0))}
   if(B.trait==='iron'&&!(B.st.stun>0))d*=.65;if(B.trait==='plate'){if(B.plT!==B.turn){B.plT=B.turn;B.plN=0}d*=Math.max(.4,1-.15*B.plN);B.plN++;if(B.plN===2)B.log.push('【疊甲】甲殼越打越硬，這回合後續傷害遞減')}if(B.trait==='veil'&&B.vlT!==B.turn){B.vlT=B.turn;if(B.st.burn>0||B.st.poison>0||B.st.bleed>0){if(!B.vlX){B.vlX=1;B.log.push('【霧隱】被持續傷害逼出原形，失效了')}}else{d*=.5;B.elHit=B.elHit||'r';B.log.push('【霧隱】第一擊打進霧裡，傷害減半')}}if(B.trait==='ward'&&stat==='MAG'&&!((B.wardBrk||0)>B.turn))d*=.6;if(B.trait==='ward'&&cr&&!((B.wardBrk||0)>B.turn)){B.wardBrk=B.turn+2;B.log.push('【魔障】被爆擊打碎了！2 回合內失效')}
-  d=capB(Math.max(1,Math.round(d)));if(B.fshield>0){const ab=Math.min(B.fshield,d);B.fshield-=ab;d-=ab}B.hp=Math.max(0,B.hp-d);if(B.trait==='rebound'&&d>B.max*.12&&B.srcNow!=='荊棘'){const r=Math.min(S.hp-1,Math.round(stats().HP*.15),Math.round((d-B.max*.12)*.4));if(r>0){S.hp-=r;B.spk=(B.spk||0)+r;B.log.push(`【反震】這一擊太重，${r} 點傷害震回你身上`)}}if(B.trait==='spike'&&d>0&&B.srcNow!=='荊棘'){const r=Math.max(1,Math.round(d*.2));S.hp=Math.max(1,S.hp-r);B.spk=(B.spk||0)+r}dsrc(B.srcNow||'攻擊',d);if(d>0&&RUN&&RUN.core==='shatter'&&!RUN.tower&&!RUN.trial&&B.hp>0){const th=RUN.coreUp?4:5;B.crk=(B.crk||0)+1;if(B.crk>=th){B.crk-=th;B.brkP=1}}bossPhase();return{d,cr}}
+  if(B.fog>0)d*=.75;else if(B.fogMax&&(B.fogV||0)>=B.turn)d*=1.2;
+  d=capB(Math.max(1,Math.round(d)));if(B.fog>0&&B.srcNow!=='荊棘'){if(B.fogHT!==B.turn){B.fogHT=B.turn;B.fogHN=0}if(B.fogHN<2){B.fogHN++;fogStrip(1)}else if(cr&&B.fogHN<3){B.fogHN++;fogStrip(1)}}if(B.fshield>0){const ab=Math.min(B.fshield,d);B.fshield-=ab;d-=ab}B.hp=Math.max(0,B.hp-d);if(B.trait==='rebound'&&d>B.max*.12&&B.srcNow!=='荊棘'){const r=Math.min(S.hp-1,Math.round(stats().HP*.15),Math.round((d-B.max*.12)*.4));if(r>0){S.hp-=r;B.spk=(B.spk||0)+r;B.log.push(`【反震】這一擊太重，${r} 點傷害震回你身上`)}}if(B.trait==='spike'&&d>0&&B.srcNow!=='荊棘'){const r=Math.max(1,Math.round(d*.2));S.hp=Math.max(1,S.hp-r);B.spk=(B.spk||0)+r}dsrc(B.srcNow||'攻擊',d);if(d>0&&RUN&&RUN.core==='shatter'&&!RUN.tower&&!RUN.trial&&B.hp>0){const th=RUN.coreUp?4:5;B.crk=(B.crk||0)+1;if(B.crk>=th){B.crk-=th;B.brkP=1}}bossPhase();return{d,cr}}
 const ultPk=()=>{const c=[PKEY('serious'),PKEY(),`portrait_${S.cls}_${S.sex}_serious`,`portrait_${S.cls}_${S.sex}`];return c.find(k=>ARTSET&&ARTSET.has(k))||c[2]};
 const POPK={灼燒:'burn',中毒:'poison',荊棘:'thorn',守護反擊:'guard',震擊共鳴:'stun',露娜:'ally'};
 function dsrc(k,d){if(!B||!(d>0))return;B.ds=B.ds||{};B.ds[k]=(B.ds[k]||0)+d;if(POPK[k]){B.pops=B.pops||[];B.pops.push({k,d})}}
@@ -3082,7 +3121,7 @@ function pAct(type,arg){if(!B||B.busy)return;const s=stats();
     if(cl==='swordsman'){C.brk=Math.min(rmax(5),C.brk+(d>0&&hasP('sw3')&&Math.random()<.3?2:1));pr.push(`破綻 ${C.brk}`);if(d>0){const g=Math.max(1,Math.round(s.MP*.05));S.mp=Math.min(s.MP,S.mp+g);pr.push(`鬥志 +${g} MP`)}}else if(cl==='ranger'){C.focus=Math.min(rmax(5),C.focus+1);pr.push(`專注 ${C.focus}`)}
     else if(cl==='cleric'){C.faith=Math.min(100,C.faith+8);pr.push(`信仰 ${C.faith}`)}else if(cl==='mage'){const g=Math.max(1,Math.round(s.MP*.06));S.mp=Math.min(s.MP,S.mp+g);pr.push(`回流 ${g} MP`)}
     blog(d===0?`${B.name} 閃開了你的攻擊`:`你發動攻擊，造成 ${d} 傷害${cr?'（爆擊！）':''}${ex}${pr.length?'，'+pr.join('，'):''}`)}
-  else if(type==='skill'){try{lunaSkill(arg)}catch(e){}const k=SK[arg],C=B.cls;let mul=1+.15*((S.skl[arg]||1)-1);const ps=[];
+  else if(type==='skill'){try{lunaSkill(arg)}catch(e){}const k=skx(arg,s.KW),C=B.cls;let mul=1+.15*((S.skl[arg]||1)-1);const ps=[];if(k.backp&&S.hp<s.HP*.5){mul*=1+k.backp;ps.push('【絕境改寫】威力 +25%')}
     if(k.mark2){C.marks.push('星','星');C.marks=C.marks.slice(-5)}
     let pw=0;if(k.fin)pw+=k.fin*C.brk;if(k.det)pw+=k.det*C.marks.length*(1+s.DETAMP/100);if(k.aim)pw+=k.aim*C.focus;if(k.faithAmp)pw+=Math.min(1,C.faith/100);if(k.faithSpend)pw+=C.faith/100*1.2;if(hasP('mg2')&&(k.c==='mage'||k.c==='archmage'||k.c==='warlock'))pw+=.08*C.marks.length;if(k.ult)B.ultUsed=1;mul*=1+pw;const fx=B.fx={by:'me',cut:B.chain?`${k.n}・${B.chain}！`:k.n,chain:B.chain||null,el:SKEL[arg]||'phys',skill:arg,hits:k.dmg&&k.dmg.h||1};B.chain=null;if(S.reapFree){S.reapFree=0;ps.push('【收割共鳴】這招不消耗 MP')}else S.mp-=mpCost(arg);playSkillSfx(arg,k);
     if(k.cost)S.hp=Math.max(1,S.hp-Math.round(s.HP*k.cost));
@@ -3093,8 +3132,9 @@ function pAct(type,arg){if(!B||B.busy)return;const s=stats();
       if(k.drain){const h=Math.round(tot*k.drain);S.hp=Math.min(s.HP,S.hp+h);fx.heal=h;ps.push(`吸取 ${h} HP`)}}
     if(k.heal){const h=Math.round(s.MAG*k.heal*mul*.7*(1+s.HEALP/100));S.hp=Math.min(s.HP,S.hp+h);fx.heal=h;ps.push(`回復 ${h} HP`)}
     if(k.shield){B.shield=Math.round(s.MAG*k.shield*mul);ps.push(`獲得 ${B.shield} 點護盾`)}
+    if(k.shp){const v=Math.round(s.HP*k.shp);B.shield=(B.shield||0)+v;ps.push(`【先機改寫】護盾 +${v}`)}
     if(k.buff){B.buffs=B.buffs.filter(b=>b.id!==arg);B.buffs.push(Object.assign({id:arg,n:k.n},k.buff));ps.push('能力提升')}
-    if(k.foe&&B.hp>0)for(const f in k.foe){if(f==='stun'&&B.kind==='boss'&&Math.random()<.5){ps.push('暈眩被抵抗');continue}B.st[f]=k.foe[f];if(f==='stun')B.frozen=k.mark==='凍'?1:0;ps.push(`敵人陷入${f==='stun'&&k.mark==='凍'?'冰凍':FOE[f]}`)}
+    if(k.foe&&B.hp>0)for(const f in k.foe){if(B.fog>0&&(f==='stun'||f==='weak')){ps.push(`霧擋下了${FOE[f]}`);continue}if(f==='stun'&&B.kind==='boss'&&Math.random()<.5){ps.push('暈眩被抵抗');continue}B.st[f]=k.foe[f];if(f==='stun')B.frozen=k.mark==='凍'?1:0;ps.push(`敵人陷入${f==='stun'&&k.mark==='凍'?'冰凍':FOE[f]}`)}
     consume();
     fx.tags=ps.filter(x=>/灼燒|連擊|震暈|冰凍|暈眩|中毒|流血|虛弱|引爆|清算|專注|信仰|護盾|共鳴|吸血|吸取/.test(x)&&!/^造成/.test(x)).map(x=>x.replace(/^敵人陷入/,'').replace(/^附加/,'')).slice(0,3);
     if(k.brk){C.brk=Math.min(rmax(5),C.brk+k.brk);ps.push(`破綻 ${C.brk}`)}
