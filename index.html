@@ -1953,7 +1953,7 @@ let IDLESEL=0,IDLERES=null;
 setInterval(()=>{if(!S||!S.idle)return;const t=$('#idleT'),g=$('#idleG');if(!t)return;const c=idleCalc();t.textContent=hms(c.ms);g.innerHTML=idleLine(c)},1000);
 function idleSettle(){const c=idleCalc();if(!c)return;const lv0=S.lv,gs=[];S.idle=null;gainExp(c.exp);S.gold+=c.gold;if(c.stone)addItem('stone',c.stone);if(c.pot)addItem('pot',c.pot);
   for(let i=0;i<c.gear;i++){const g=rollGear(AREAS.indexOf(c.a),0);gs.push(g)}DROPS=[];IDLERES={c,lv0,lv1:S.lv,gs};save();openM('idleRes')}
-function vAreas(){return `<h2>選擇冒險地點</h2>`+vIdle()+AREAS.map((a,i)=>{const open=S.main.ch>=i,bossOn=bossReady(i);
+function vAreas(){return `<h2>選擇冒險地點</h2>`+vIdle()+vDg()+AREAS.map((a,i)=>{const open=S.main.ch>=i,bossOn=bossReady(i);
   return `<div class="panel area ${open?'':'lock'}">${art('area_'+a.id,a.n)}
   <div class="row"><h3 class="grow">${a.n}</h3><span class="tag">Lv ${a.lv}</span>${S.cleared[i]?'<span class="tag ok">已通關</span>':''}</div>
   <p class="sub">${a.d}</p><div class="chips">${a.mobs.map(m=>`<span class="chip">${MOBS[m].n}</span>`).join('')}<span class="chip" style="color:var(--hp)">首領 ${MOBS[a.boss].n}${bossOn?'':'（未現身）'}</span></div>${open&&bossOn&&!S.cleared[i]&&S.lv<MOBS[a.boss].lv?`<p class="sub" style="color:var(--hp)">⚠ ${MOBS[a.boss].n} 已在深處等著（Lv ${MOBS[a.boss].lv}）。現在 Lv ${S.lv}，這趟終點會直接碰上它——不夠強就先在岔路多打幾場、換好裝備。</p>`:''}
@@ -2029,9 +2029,9 @@ function bossReady(i){return !!S.cleared[i]||(S.main.ch===i&&S.main.acc&&(CH[i].
 function vRun(){if(RUN.tower)return vTower();const a=AREAS[RUN.area],v=RUN.view,last=RUN.step>=RUN.nodes.length-1;
   const pips=`<div class="pips">${RUN.nodes.map((t,i)=>`<span class="pip ${i<RUN.step||(i===RUN.step&&v.type==='res')?'done':i===RUN.step?'now':''} ${t==='boss'?'boss':''}">${t==='boss'||t==='elite'||t==='story'?'★':t?(i<=RUN.step?NODE[t]?NODE[t][0]:i+1:i+1):'⋔'}</span>`).join('')}</div>`;
   let body='';
-  if(v.type==='start')body=`<div class="panel">${art('area_'+a.id,a.n)}<p>${a.d}</p>${AFX[a.id]?`<div class="gsec"><b>地區特性：${AFX[a.id].n}</b><span class="sub">${AFX[a.id].d}</span></div>`:''}<p class="sub">本次路線共 ${RUN.nodes.length} 段，終點是${RUN.nodes[RUN.nodes.length-1]==='boss'?'首領 '+MOBS[a.boss].n:'精英魔物'}。</p><button class="btn pri big" data-a="runNext">踏入${a.n}</button><button class="btn" data-a="retreat">返回</button></div>`;
+  if(v.type==='start')body=`<div class="panel">${art('area_'+a.id,a.n)}<p>${a.d}</p>${AFX[a.id]?`<div class="gsec"><b>地區特性：${AFX[a.id].n}</b><span class="sub">${AFX[a.id].d}</span></div>`:''}${RUN.dg?`<div class="gsec"><b>大副本「${dgOf().n}」第 ${RUN.dg.k+1}／${dgOf().segs.length} 段</b><span class="sub">${RUN.dg.depth?`已連續深入 ${RUN.dg.depth} 段：掉寶加成 +${Math.round((dgB()-1)*100)}%`:'打倒這段的首領後可以直接深入下一段'}</span></div>`:''}<p class="sub">本次路線共 ${RUN.nodes.length} 段，終點是${RUN.nodes[RUN.nodes.length-1]==='boss'?'首領 '+MOBS[a.boss].n:'精英魔物'}。</p><button class="btn pri big" data-a="runNext">踏入${a.n}</button><button class="btn" data-a="retreat">返回</button></div>`;
   else if(v.type==='gate')body=bossGate(a);
-  else if(v.type==='res')body=`<div class="panel">${v.img?`<div class="duo">${art(v.img,'勝利','r34')}${v.mimg?art(v.mimg,'','r11'):''}</div>`:''}<h3>${v.title}</h3>${v.drop||''}<p>${v.text}</p>${v.box?bossBoxHtml(v):''}${v.core?coreHtml(v):''}${v.box===1||(v.core&&!RUN.core)?'':last?`<button class="btn pri big" data-a="finish">完成冒險</button>`:`<button class="btn pri big" data-a="runNext">繼續前進</button><button class="btn" data-a="retreat">撤退回城（保留戰利品）</button>`}</div>`;
+  else if(v.type==='res')body=`<div class="panel">${v.img?`<div class="duo">${art(v.img,'勝利','r34')}${v.mimg?art(v.mimg,'','r11'):''}</div>`:''}<h3>${v.title}</h3>${v.drop||''}<p>${v.text}</p>${v.box?bossBoxHtml(v):''}${v.core?coreHtml(v):''}${v.box===1||(v.core&&!RUN.core)?'':last?(RUN.dg&&dgCanGo()?`<button class="btn pri big" data-a="dgNext">深入下一段：${AREAS[dgNextArea()].n}</button><p class="sub" style="text-align:center">不回城、不回血；下一段掉寶加成 +${Math.round(((RUN.dg.depth||0)+1)*50)}%</p><button class="btn" data-a="finish">帶著戰利品回城</button>`:`<button class="btn pri big" data-a="finish">完成冒險</button>${RUN.dg&&dgNextArea()>=0?'<p class="sub" style="text-align:center">這趟沒有打倒首領，無法繼續深入。</p>':''}`):`<button class="btn pri big" data-a="runNext">繼續前進</button><button class="btn" data-a="retreat">撤退回城（保留戰利品）</button>`}</div>`;
   else if(v.type==='fork')body=`<div class="panel"><h3>岔路</h3><p class="sub">前方的路分成兩條。要往哪邊走？</p>${forkTalk()}<div class="fork">${v.opts.map((o,i)=>(()=>{const tg=((RUN.ftags||[])[RUN.step+1]||[])[i],T=tg&&TAGS[tg];const bl=(RUN.blind||[])[RUN.step+1]===i;if(bl)return `<button class="btn" data-a="pickFork" data-v="${i}"><i>🌫</i><b>濃霧中的路</b><span>霧太濃了，看不清前面有什麼</span><span class="risk">完全未知</span></button>`;return `<button class="btn ${T?'tagged':''}" data-a="pickFork" data-v="${i}"><i>${NODE[o][0]}</i><b>${NODE[o][1]}</b><span>${NODE[o][2]}</span><span class="risk">${NRISK[o]||''}</span>${T?`<span class="ftag">${T[0]} ${T[1]}<small>${T[2]}</small></span>`:''}</button>`})()).join('')}</div><button class="btn" data-a="retreat">撤退回城（保留戰利品）</button></div>`;
   else if(v.type==='kiln')body=`<div class="panel">${art('event_kiln','霧窯')}<h3>營地旁的霧窯</h3><p>營地後面有一座長滿青苔的舊窯，窯口還留著不會熄的紫火，槌子靠在一旁。你懷裡的霧核微微發燙，像是認得這裡。</p>${v.done?`<p>${v.done}</p><button class="btn pri big" data-a="${last?'finish':'runNext'}">${last?'完成冒險':'繼續前進'}</button>`:`<div class="lbl">今晚只夠做一件事</div><div class="list"><button class="btn" style="text-align:left;white-space:normal;line-height:1.5" data-a="kiln" data-v="rest"><b>${campIc('rest',26)}在營火旁休息</b><br><span class="sub">回復 35% 的 HP 與 MP</span></button><button class="btn" style="text-align:left;white-space:normal;line-height:1.5" data-a="kiln" data-v="forge"><b>${campIc('core',26)}重鍛【${MCORE[RUN.core].n}】</b><br><span class="sub">不休息。霧核升為精鍛：${MCORE[RUN.core].d2||MCORE[RUN.core].d}</span></button><button class="btn" style="text-align:left;white-space:normal;line-height:1.5" data-a="kiln" data-v="hone"${honeMax()?' disabled':''}><b>${campIc('hone',26)}磨刃</b><br><span class="sub">${honeMax()?'武器已經磨到極限了':CAMPO.hone[2]}</span></button><button class="btn" style="text-align:left;white-space:normal;line-height:1.5" data-a="kiln" data-v="raid"${RUN.raid?' disabled':''}><b>${campIc('raid',26)}夜探</b><br><span class="sub">${RUN.raid?'前面的路已經探過了':CAMPO.raid[2]}</span></button></div>`}</div>`;
   else if(v.type==='camp')body=campHtml();
@@ -2614,6 +2614,25 @@ function applyOut(o,crit,fate){const unit=12+AREAS[RUN.area].base*6,s=stats(),g=
   return g}
 /* 露娜羈絆：一起冒險、打倒首領、每日聊天都能慢慢累積（每天上限 1.5） */
 function bondGain(v,why){if(!S||!withLuna())return;checkDaily();const used=S.daily.bond||0,g=Math.min(v,1.5-used);if(g<=0)return;const b0=Math.floor(S.bond||0);S.daily.bond=used+g;S.bond=Math.round(((S.bond||0)+g)*100)/100;if(Math.floor(S.bond)>b0)setTimeout(()=>toast(`與露娜的羈絆提升到 ${Math.floor(S.bond)}！（${why}）`),1200)}
+/* ============ 大副本：把幾個區域串成一趟，只往前打 ============
+   每一段內部仍是原本的區域（地區特性、首領、劇情照舊）；打倒該段首領後可直接深入下一段，不回城、不回血。
+   連續深入每段：裝備稀有度加成 +50%、首領專屬裝備機率 ×1.5；首領專屬裝備沒掉會累積保底（S.pity）。 */
+const DG=[{id:'dg1',n:'翠原迷森',d:'從微風草原一路打進迷霧森林深處。中途不回城，越深入掉的東西越好。',segs:[0,1]}];
+const dgB=()=>RUN&&RUN.dg?1+.5*(RUN.dg.depth||0):1;
+const dgOf=()=>RUN&&RUN.dg?DG[RUN.dg.d]:null;
+const dgNextArea=()=>{const D=dgOf();if(!D)return -1;const na=D.segs[RUN.dg.k+1];return na==null?-1:na};
+const dgCanGo=()=>dgNextArea()>=0&&RUN.nodes[RUN.nodes.length-1]==='boss'&&!!S.cleared[RUN.area];
+function startDg(d,k){const D=DG[d];if(!D||D.segs[k]==null)return;const ar=D.segs[k];if(S.main.ch<ar||(k>0&&!S.cleared[D.segs[k-1]])){toast('這一段還沒解鎖');return}startRun(ar);if(RUN){RUN.dg={d,k,depth:0};save();render()}}
+function dgEnter(){const o=RUN,D=dgOf(),nk=o.dg.k+1,na=D.segs[nk],a=AREAS[o.area];const bonus=Math.round((12+a.base*6)*2);S.gold+=bonus;o.loot.gold+=bonus;track('run');bondGain(.25,'一起完成冒險');
+  startRun(na,o.nm);if(!RUN)return;RUN.loot=o.loot;RUN.bless=o.bless;RUN.core=o.core;RUN.coreUp=o.coreUp;RUN.coreN=o.coreN;RUN.dg={d:o.dg.d,k:nk,depth:(o.dg.depth||0)+1};save();render();toast(`深入第 ${nk+1} 段：${AREAS[na].n}（掉寶加成 +${Math.round((dgB()-1)*100)}%）`)}
+function dgNext(){if(!RUN||!RUN.dg||B||!dgCanGo())return;const na=dgNextArea(),m=S.main;
+  const s2=()=>{if(S.main.ch<na){toast('下一段還沒開放');render();return}if(m.ch===na&&!m.acc&&CH[na]&&chLvOk()){const c=CH[na];play(c.intro,SKEY(na+1,'intro'),c.t+' 開場',()=>{m.acc=true;m.step=0;m.prog=0;save();toast('已接受主線任務');dgEnter()})}else dgEnter()};
+  if(m.ch===RUN.area&&mainReady()){const c=CH[m.ch];play(c.outro,SKEY(m.ch+1,'outro'),c.t+' 結尾',()=>{const t=give(c.rw);m.ch++;m.acc=false;m.step=0;m.prog=0;m.mid=false;m.pre=false;sys(`${S.name} 完成了「${c.t}」！`);toast(`章節完成，獲得：${t}`);save();s2()})}else s2()}
+function vDg(){return DG.map((D,d)=>{const pit=id=>(S.pity&&S.pity[id])||0;
+  return `<div class="panel area" style="border-color:var(--exp)">${art('area_'+AREAS[D.segs[D.segs.length-1]].id,D.n)}<div class="row"><h3 class="grow">${D.n}</h3><span class="tag red">大副本</span></div><p class="sub">${D.d}</p>
+  <div class="gsec"><b>規則</b><span class="sub">打倒一段的首領後可以直接深入下一段：不回城、不回血。每深入一段，裝備稀有度加成 +50%、首領專屬裝備機率 ×1.5。</span></div>
+  <div class="list">${D.segs.map((ar,k)=>{const a=AREAS[ar],open=S.main.ch>=ar&&(k===0||S.cleared[D.segs[k-1]]),u=BOSSU[a.boss]&&GEAR[BOSSU[a.boss]];
+    return `<div class="item"><span class="grow"><b>第 ${k+1} 段　${a.n}</b>　<span class="sub">Lv ${a.lv}・首領 ${MOBS[a.boss].n}${S.cleared[ar]?'・已通關':''}</span>${u?`<span class="sub">首領專屬：<b class="c4">${u.n}</b>${pit(a.boss)?`（保底累積 ${pit(a.boss)} 次）`:''}</span>`:''}</span>${open?`<button class="btn ${k===0?'pri':''} sm" data-a="startDg" data-v="${d}:${k}">${k===0?'從頭挑戰':'從這段開始'}</button>`:`<span class="sub">打倒上一段首領後解鎖</span>`}</div>`}).join('')}</div></div>`}).join('')}
 function finish(done){const l=RUN.loot,a=AREAS[RUN.area];let extra='';if(done&&!RUN.tower)bondGain(.25,'一起完成冒險');
   if(done){const bonus=Math.round((12+a.base*6)*2);S.gold+=bonus;track('run');extra=`<p>完成獎勵：${bonus} G</p>`}
   RUN=null;B=null;save();TAB='adv';render();
@@ -2773,6 +2792,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'13.5',d:'2026-11-25',t:'大副本「翠原迷森」（試玩）',b:'冒險頁新增第一個大副本：把微風草原和迷霧森林串成一趟。打倒一段的首領後可以直接深入下一段——不回城、不回血，劇情會在途中接著演。每連續深入一段，裝備稀有度加成 +50%、首領專屬裝備機率 ×1.5。首領專屬裝備沒掉會累積保底，每次 +4%，掉了才歸零（一般冒險也算）。已通關的玩家可以從任一已解鎖的段落開始。原本的單區冒險仍然保留。'},
   {v:'13.4',d:'2026-11-25',t:'戰鬥卡住保險、露娜招式改名',b:'修正「沉沒書庫」打倒魔物後卡住不動：該區掉落裝備時會出錯，導致戰鬥無法結算（感謝回報）。另外新增保險機制，戰鬥指令鎖住超過 10 秒會自動解開，敵人已倒下則直接結算，不會再停在原地。露娜的招式改成一般魔法師的名稱：魔法彈、火球術、治癒術、魔法護盾、驅散術、奧義星光爆裂（效果不變）。'},
   {v:'13.3',d:'2026-11-25',t:'露娜台詞調整、切回分頁不再卡頓',b:'露娜新增一批依戰況說的話：首領蓄力、暴走、成功打斷、你閃開攻擊、敵人快倒下、戰鬥拖太久，以及遇到成群、精英、飛行魔物或你血量偏低時的開場提醒。切到別的 App 或分頁再回來時，不會再把積欠的音樂音符與戰鬥特效一口氣播出來而卡住。露娜放招時不再喊口號（像「照路之光・撐住！」這類），只顯示招式名。另外拿掉、改寫了一批比較尷尬的台詞（戰鬥喊話、出發前的話、營火閒聊與戰敗後的安慰），讓她說話更自然。'},
   {v:'13.2',d:'2026-11-25',t:'旅途插圖換新畫風',b:'旅途中遇到的五位人物（阿蕾、葛蕾塔、米洛、賽門、托比）的插圖換成新畫風，共 25 張。第三章首領預告圖重畫完成。露娜的「燈光術」演出換成新姿勢。'},
@@ -3159,9 +3179,9 @@ function spoil(){const m=B.m,L=B.L,bs=B.kind==='boss',el=B.kind==='elite',T=B.to
   if(Math.random()<.12){addItem('pot',1);got.push('治療藥水')}
   if(bs||Math.random()<.06){addItem('stone',bs?2:1);got.push(bs?'強化石×2':'強化石')}
   const fld=!!m.field;const first=bs&&!fld&&!S.cleared[RUN.area];
-  {const tw=RUN.tower,gt=tw?Math.min(RUN.area,S.main.ch):RUN.area,hard=B.mut||B.nm,hd=B.hoard?1:0,n=(FA&&!bs&&!B.hoard&&Math.random()<.5)?0:hd+(bs?(Math.random()<(tw?.3:B.nm?.6:.4)?1:0)+(!tw&&B.nm&&Math.random()<.3?1:0):(B.mut?1:Math.random()<(el?.5:B.nm?.3:lk||(RUN&&RUN.core==='greed')?.2:.12)*(tw?.6:1)?1:0));for(let i=0;i<n;i++){const g=rollGear(gt,bs?(tw?1:B.nm?3:2):hard?2:el?1:0,bs||hard?(tw?1.3:2):1,hard);if(i<hd||(B.mut&&!bs))minG(g);got.push(gearName(g))}if(tw&&RUN.area>S.main.ch&&Math.random()<.5){addItem('stone',1);got.push('強化石')}
+  {const tw=RUN.tower,gt=tw?Math.min(RUN.area,S.main.ch):RUN.area,hard=B.mut||B.nm,hd=B.hoard?1:0,n=(FA&&!bs&&!B.hoard&&Math.random()<.5)?0:hd+(bs?(Math.random()<(tw?.3:B.nm?.6:.4)?1:0)+(!tw&&B.nm&&Math.random()<.3?1:0):(B.mut?1:Math.random()<(el?.5:B.nm?.3:lk||(RUN&&RUN.core==='greed')?.2:.12)*(tw?.6:1)?1:0));for(let i=0;i<n;i++){const g=rollGear(gt,bs?(tw?1:B.nm?3:2):hard?2:el?1:0,(bs||hard?(tw?1.3:2):1)*dgB(),hard);if(i<hd||(B.mut&&!bs))minG(g);got.push(gearName(g))}if(tw&&RUN.area>S.main.ch&&Math.random()<.5){addItem('stone',1);got.push('強化石')}
     if(MDROP[B.id]&&Math.random()<(B.wander?.5:B.treasure?.3:B.kind==='elite'?.12:B.nm?.1:.04)*(FA?.5:1)){const u=addGear(MDROP[B.id],3);DROPS.push(u);got.push(gearName(u));sys(`${S.name} 取得魔物專屬裝備【${GEAR[u.id].n}】！`)}
-    if(bs&&BOSSU[B.id]&&(!RUN.tower||S.cleared[AREAS.findIndex(a=>a.boss===B.id)])&&Math.random()<(RUN.tower?.03:B.nm?.2:.08)){const u=addGear(BOSSU[B.id],4);DROPS.push(u);got.push(gearName(u));sys(`${S.name} 取得首領專屬裝備【${GEAR[u.id].n}】！`)}
+    if(bs&&BOSSU[B.id]&&(!RUN.tower||S.cleared[AREAS.findIndex(a=>a.boss===B.id)])&&(S.pity=S.pity||{},Math.random()<Math.min(1,((RUN.tower?.03:B.nm?.2:.08)+(RUN.tower?0:.04*(S.pity[B.id]||0)))*(RUN.dg&&RUN.dg.depth?1.5:1))?(S.pity[B.id]=0,true):(RUN.tower||(S.pity[B.id]=(S.pity[B.id]||0)+1),false))){const u=addGear(BOSSU[B.id],4);DROPS.push(u);got.push(gearName(u));sys(`${S.name} 取得首領專屬裝備【${GEAR[u.id].n}】！`)}
     if(!bs&&B.kind==='elite'&&Math.random()<.06){const gm=pick(GEMS);addItem(gm,1);got.push(ITEMS[gm].n)}
     if(bs&&Math.random()<(RUN.tower?.3:1)){const n=1+(B.nm&&Math.random()<.5?1:0);for(let i=0;i<n;i++){const gm=BGEM[B.id]||pick(GEMS);addItem(gm,1);got.push(ITEMS[gm].n)}}}
   got.push(...liveDrop(bs));
@@ -3827,6 +3847,7 @@ const ACT={
   startRun(v){if(S.hp<=1){toast('HP 太低，先到旅店休息');return}startRun(+v)},
   trial(){if(S.adv||S.trial||S.lv<TRIAL.lv)return;if(S.hp<=1){toast('HP 太低，先到旅店休息');return}const sh=SHADOW[S.cls];MOBS.shadow.ty=sh[0];MOBS.shadow.sk=sh[1];
     closeM();TAB='adv';RUN={area:Math.min(4,Math.max(0,S.main.ch)),trial:true,nm:false,step:0,nodes:['boss'],loot:{gold:0,exp:0,items:[]},view:{type:'start'}};startBattle('shadow','boss');render()},
+  startDg(v){if(S.hp<=1){toast('HP 太低，先到旅店休息');return}const [d,k]=String(v).split(':').map(Number);startDg(d,k)},dgNext(){dgNext()},
   startNm(v){if(S.hp<=1){toast('HP 太低，先到旅店休息');return}startRun(+v,true)},
   runNext(){runNext()},bossGo(){if(!RUN)return;RUN.gate=1;runNext()},gatePrep(v){doPrep(v)},bossBox(v){bossBox(v)},core(v){corePick(v)},kiln(v){kilnPick(v)},camp(v){campPick(v)},retreat(){if(!RUN)return;if(RUN.step<0){RUN=null;render()}else finish(false)},retreatAsk(){if(!RUN||B)return;if(confirm('要撤退回城嗎？\n已獲得的金幣、經驗與戰利品都會保留。'))ACT.retreat()},finish(){finish(true)},
   evPick(v){evPick(+v)},
