@@ -1470,7 +1470,10 @@ const DAILY=[{k:'kill',c:10,n:'擊敗 10 隻魔物',rw:{gold:800,items:{stone:2}
 const KEY='azure_oath_save_v1';
 let S=null,TAB='town',RUN=null,B=null,MODAL=null,STORY=null;
 let NEWCLS='swordsman',NEWSEX='m',BAGF='all',NEWNAME='',BAGTAB='gear',QTAB='main',AUTO=false,CHATQ=[];
-let BAKT=0;function save(){try{if(S&&S.ach)checkAch()}catch(e){}try{const j=JSON.stringify(S);localStorage.setItem(KEY,j);try{accDirty()}catch(e){}if(Date.now()-BAKT>300000){BAKT=Date.now();localStorage.setItem(KEY+'_bak',j)}}catch(e){}}
+/* 冒險途中重新整理不丟進度：把本趟路線存起來；戰鬥中斷則回到該節點重打 */
+function runSnap(){try{if(!S||!RUN||RUN.step<0||RUN.tower||RUN.trial){localStorage.removeItem(KEY+'_run');return}const o=JSON.parse(JSON.stringify(RUN,(k,v)=>typeof v==='function'?undefined:v));if(B){if(o.nodes[o.step]==='chest')o.nodes[o.step]='ambush';o.step--;o.view={type:'res',title:'戰鬥中斷',text:'你回過神來——魔物還擋在前面。'}}else if(!o.view||o.view.type!=='fork'&&o.view.type!=='gate'&&o.view.type!=='res'&&o.view.type!=='camp'&&o.view.type!=='kiln'&&o.view.type!=='shrine')o.view={type:'res',title:'繼續冒險',text:'你整理好行囊，繼續沿著路走。'};else if(o.view.type==='res')delete o.view.drop;localStorage.setItem(KEY+'_run',JSON.stringify({n:S.name,r:o}))}catch(e){}}
+function runLoad(){try{const j=localStorage.getItem(KEY+'_run');if(!j||!S)return;const o=JSON.parse(j);if(!o||o.n!==S.name||!o.r||!AREAS[o.r.area]||!Array.isArray(o.r.nodes)){localStorage.removeItem(KEY+'_run');return}RUN=o.r;B=null;TAB='adv';setTimeout(()=>toast('已回到冒險途中'),600)}catch(e){try{localStorage.removeItem(KEY+'_run')}catch(_){}}}
+let BAKT=0;function save(){runSnap();try{if(S&&S.ach)checkAch()}catch(e){}try{const j=JSON.stringify(S);localStorage.setItem(KEY,j);try{accDirty()}catch(e){}if(Date.now()-BAKT>300000){BAKT=Date.now();localStorage.setItem(KEY+'_bak',j)}}catch(e){}}
 function load(){try{const s=localStorage.getItem(KEY);if(s)S=JSON.parse(s)}catch(e){S=null}if(!S||!S.cls){try{const b=localStorage.getItem(KEY+'_bak');if(b){S=JSON.parse(b);setTimeout(()=>toast('主存檔損壞，已從備份還原'),800)}}catch(e){}}}
 function newGame(name,cls,sex){
   S={created:Date.now(),v:2,name,cls,sex,adv:null,lv:1,exp:0,gold:100,attr:Object.assign({},CLS[cls].base),pts:0,sp:0,skl:{},hp:1,mp:1,
@@ -2760,6 +2763,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'13.0',d:'2026-11-25',t:'冒險途中重新整理不再丟進度',b:'冒險到一半關掉或重新整理頁面，回來會自動接回同一趟路線：已拿到的金幣、經驗、戰利品、祝福與霧核都保留。如果是在戰鬥中離開，會回到那場戰鬥之前，需要重新打一次（HP、MP 維持離開時的狀態）。戰敗畫面改用新畫風的負傷插圖。'},
   {v:'12.9',d:'2026-11-25',t:'劇情插圖全數換新',b:'退回重畫的 7 張劇情插圖審查通過並上線：礦坑兩張（女主角手部修正）、迷霧森林腳印（主角改為彎身查看）、沉沒書庫（提燈數量修正）、公會大廳（接待員恢復原本造型）。主線七章 42 張劇情插圖至此全部是新畫風。'},
   {v:'12.8',d:'2026-11-25',t:'劇情插圖換新畫風、街道盜賊重畫',b:'主線七章的劇情插圖換成新的動畫畫風，主角與露娜都是定稿造型（先上線 35 張，逐張檢查過手部、臉部與動作；其餘 7 張有瑕疵退回重畫中，暫時維持舊圖）。街道盜賊重畫完成，換上新的動作圖：雙手握匕首的姿勢已修正。'},
   {v:'12.7',d:'2026-11-25',t:'魔物動作圖',b:'42 種魔物換上新畫風的動作圖，全部正面朝向你：待機、兩種攻擊動作與倒地；首領與特殊魔物多一個大招動作。普通攻擊會輪流使出兩種動作，首領施放技能時改用大招姿勢，被擊倒會換成倒地圖。原本靠調色區分的亞種（毒沼史萊姆、熔岩蝙蝠、水晶魔像等）現在都有自己的造型。'},
@@ -3161,7 +3165,7 @@ function win(){if(!B||B.hp>0)return;try{const ds=B.ds||{},tot=Object.values(ds).
   if(bs&&!(MOBS[bid]&&MOBS[bid].field)&&!RUN.trial&&!RUN.tower){RUN.view.box=1;RUN.view.boxL=MOBS[bid]?MOBS[bid].lv+(RUN.nm?10:0):S.lv}
   B=null;gainExp(T.exp);save();render();$('#main').scrollTop=0}
 function lose(){SFX.lose();const lid=B?B.id:null;const lost=Math.round(S.gold*.1),s=stats();S.gold-=lost;S.hp=Math.round(s.HP*.3);B=null;RUN=null;TAB='town';save();render();
-  openM('msg',{t:'戰敗',b:`<div class="panel"><div class="duo">${art(HK()+'_lose','戰敗','r34')}${lid&&lid!=='shadow'?art('mob_'+lid+'_win','','r11'):''}</div><p>${you('你')}倒下了。巡邏隊把你送回晨星鎮，途中遺失了 ${lost} G。</p><p class="sub">強化裝備、分配屬性點，或先到旅店休息再出發吧。</p></div><button class="btn pri big" data-a="closeM">確定</button>`})}
+  openM('msg',{t:'戰敗',b:`<div class="panel"><div class="duo">${art(ARTSET&&ARTSET.has(AK()+'_dm')?AK()+'_dm':HK()+'_lose','戰敗','r34')}${lid&&lid!=='shadow'?art('mob_'+lid+'_win','','r11'):''}</div><p>${you('你')}倒下了。巡邏隊把你送回晨星鎮，途中遺失了 ${lost} G。</p><p class="sub">強化裝備、分配屬性點，或先到旅店休息再出發吧。</p></div><button class="btn pri big" data-a="closeM">確定</button>`})}
 
 /* ============ 粒子特效（Canvas） ============ */
 const PFX=(()=>{let HS=0,cv,cx,P=[],Q=[],raf=0,W=0,Hh=0,t0=0,SR={x:0,y:0,w:360,h:260};
@@ -3955,7 +3959,7 @@ faLoop();
 document.body.classList.toggle('noshake',SHAKEOFF);
 
 /* ============ 啟動 ============ */
-load();if(S){migrate();checkDaily();learn(true)}
+load();if(S){migrate();checkDaily();learn(true);runLoad()}
 render();chatTick();setInterval(chatTick,4000);setTimeout(bcastCheckSeen,1200);
 </script>
 <script>if('serviceWorker' in navigator&&/github\.io$/.test(location.hostname))navigator.serviceWorker.register('sw.js').catch(()=>{})</script>
