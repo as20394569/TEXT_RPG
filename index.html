@@ -439,13 +439,14 @@ body.pc #app{margin:0;flex:none;box-shadow:0 0 40px rgba(0,0,0,.45)}
 .stage.v2 .spr.foe.lunge-foe{animation:v2lg .42s}.stage.v2 .spr.foe.lunge2{animation:v2lg .42s .5s}
 @keyframes v2lg{45%{transform:translateY(16%) scale(1.22)}}
 @keyframes v2pop{30%{transform:scale(1.12) translateY(-6%)}}
-.posein{position:absolute;inset:0;z-index:30;pointer-events:none;overflow:hidden;opacity:0;animation:v2pin 1.05s ease-out forwards}
+.posein{position:absolute;inset:0;z-index:30;pointer-events:none;overflow:hidden;opacity:0;animation:v2pin .62s ease-out forwards}
+.stage.pd .spr.foe.hitl .art{animation-delay:1.38s}.stage.pd .spr.foe.faintl{animation-delay:1.88s}.stage.pd.quakel,.stage.pd.punchl{animation-delay:1.38s}.stage.pd .dmg.late{animation-delay:1.43s}.stage.pd .spr.me.dash{animation-delay:.93s}
 .posein>i{position:absolute;left:-10%;right:-10%;top:14%;bottom:14%;background:linear-gradient(100deg,transparent 0,rgba(10,16,40,.86) 14% 86%,transparent);transform:skewY(-7deg);box-shadow:0 0 0 3px var(--c,#ffd86b) inset}
-.posein>img{position:absolute;left:6%;bottom:4%;height:92%;max-width:88%;object-fit:contain;filter:drop-shadow(0 6px 10px rgba(0,0,0,.6));animation:v2pim 1.05s cubic-bezier(.15,.8,.25,1) forwards}
+.posein>img{position:absolute;left:6%;bottom:4%;height:92%;max-width:88%;object-fit:contain;filter:drop-shadow(0 6px 10px rgba(0,0,0,.6));animation:v2pim .62s cubic-bezier(.15,.8,.25,1) forwards}
 .posein.p2>img,.posein.lu>img{left:auto;right:6%;animation-name:v2pim2}
 .posein>b{position:absolute;right:6%;bottom:17%;color:#fff;font-family:var(--display);font-weight:900;font-size:24px;letter-spacing:.12em;text-shadow:0 2px 0 #000,0 0 12px var(--c,#ffd86b)}
 .posein.p2>b,.posein.lu>b{right:auto;left:6%}
-@keyframes v2pin{0%{opacity:0}10%,82%{opacity:1}100%{opacity:0}}
+@keyframes v2pin{0%{opacity:0}12%,74%{opacity:1}100%{opacity:0}}
 @keyframes v2pim{0%{transform:translateX(-55%) scale(1.08)}22%{transform:translateX(0) scale(1)}85%{transform:translateX(5%) scale(1.02)}100%{transform:translateX(30%) scale(1.02)}}
 @keyframes v2pim2{0%{transform:translateX(55%) scale(1.08)}22%{transform:translateX(0) scale(1)}85%{transform:translateX(-5%) scale(1.02)}100%{transform:translateX(-30%) scale(1.02)}}
 .dmgin{position:absolute;inset:0;z-index:32;pointer-events:none;overflow:hidden;opacity:0;animation:v2din 1.5s .3s ease-out forwards}
@@ -519,6 +520,17 @@ body.pc #app{margin:0;flex:none;box-shadow:0 0 40px rgba(0,0,0,.45)}
 @keyframes v2kb{0%,100%{transform:none}25%{transform:translate(-7%,5%) rotate(-6deg);filter:brightness(2.2)}55%{transform:translate(4%,-2%) rotate(3deg)}}
 .stage.v2 .spr.foe.lunge-foe{animation:v2lg2 .44s}
 @keyframes v2lg2{0%{transform:none}22%{transform:translateY(-7%) scale(1.06)}58%{transform:translateY(24%) scale(1.3)}100%{transform:none}}
+.stage.v2 .spr.foe.lunge-foe.mv-beast{animation:mvbeast .5s}.stage.v2 .spr.foe.lunge2.mv-beast{animation:mvbeast .5s .5s}@keyframes mvbeast{0%{transform:none}22%{transform:translateY(5%) scale(.95,.88)}55%{transform:translateY(23%) scale(1.3) rotate(-5deg)}72%{transform:translateY(21%) scale(1.28) rotate(4deg)}100%{transform:none}}
+.stage.v2 .spr.foe.lunge-foe.mv-flyer{animation:mvflyer .52s}.stage.v2 .spr.foe.lunge2.mv-flyer{animation:mvflyer .52s .5s}@keyframes mvflyer{0%{transform:none}28%{transform:translate(-20%,-16%) scale(.88) rotate(-12deg)}62%{transform:translate(7%,24%) scale(1.3) rotate(9deg)}100%{transform:none}}
+.stage.v2 .spr.foe.lunge-foe.mv-slime{animation:mvslime .56s}.stage.v2 .spr.foe.lunge2.mv-slime{animation:mvslime .56s .5s}@keyframes mvslime{0%{transform:none}20%{transform:translateY(8%) scale(1.22,.7)}45%{transform:translateY(-14%) scale(.82,1.26)}72%{transform:translateY(24%) scale(1.38,.9)}100%{transform:none}}
+.stage.v2 .spr.foe.lunge-foe.mv-plant{animation:mvplant .58s}.stage.v2 .spr.foe.lunge2.mv-plant{animation:mvplant .58s .5s}@keyframes mvplant{0%{transform:none}25%{transform:rotate(-10deg)}52%{transform:translateY(12%) rotate(9deg) scale(1.14,1.24)}76%{transform:rotate(-4deg)}100%{transform:none}}
+.stage.v2 .spr.foe.lunge-foe.mv-undead{animation:mvundead .6s}.stage.v2 .spr.foe.lunge2.mv-undead{animation:mvundead .6s .5s}@keyframes mvundead{0%{transform:none;opacity:1}22%{transform:none;opacity:0}40%{transform:translateY(22%) scale(1.3);opacity:0}55%,82%{transform:translateY(22%) scale(1.3);opacity:1}100%{transform:none;opacity:1}}
+.stage.v2 .spr.foe.lunge-foe.mv-construct{animation:mvconstruct .7s}.stage.v2 .spr.foe.lunge2.mv-construct{animation:mvconstruct .7s .5s}@keyframes mvconstruct{0%{transform:none}32%{transform:translateY(-10%)}56%{transform:translateY(21%) scale(1.26)}62%{transform:translateY(17%) scale(1.26)}70%{transform:translateY(21%) scale(1.26)}100%{transform:none}}
+.stage.v2 .spr.foe.lunge-foe.mv-humanoid{animation:mvhumanoid .5s}.stage.v2 .spr.foe.lunge2.mv-humanoid{animation:mvhumanoid .5s .5s}@keyframes mvhumanoid{0%{transform:none}26%{transform:translate(-9%,2%) rotate(-9deg)}56%{transform:translate(7%,21%) scale(1.26) rotate(11deg)}100%{transform:none}}
+.stage.v2 .spr.foe.lunge-foe.mv-dragon{animation:mvdragon .66s}.stage.v2 .spr.foe.lunge2.mv-dragon{animation:mvdragon .66s .5s}@keyframes mvdragon{0%{transform:none}32%{transform:translateY(-13%) scale(1.14)}62%{transform:translateY(18%) scale(1.42)}100%{transform:none}}
+.stage.v2 .spr.foe.lunge-foe.mv-elemental{animation:mvelemental .6s}.stage.v2 .spr.foe.lunge2.mv-elemental{animation:mvelemental .6s .5s}@keyframes mvelemental{0%{transform:none}55%{transform:translateY(16%) rotate(360deg) scale(1.26)}100%{transform:rotate(360deg)}}
+.stage.v2 .spr.foe.lunge-foe.mv-insect{animation:mvinsect .56s}.stage.v2 .spr.foe.lunge2.mv-insect{animation:mvinsect .56s .5s}@keyframes mvinsect{0%{transform:none}18%{transform:translateX(-13%)}38%{transform:translateX(13%)}66%{transform:translateY(22%) scale(1.26)}100%{transform:none}}
+.stage.v2 .spr.foe.lunge-foe.mv-demon{animation:mvdemon .6s}.stage.v2 .spr.foe.lunge2.mv-demon{animation:mvdemon .6s .5s}@keyframes mvdemon{0%{transform:none}30%{transform:translateY(-5%) scale(1.16)}58%{transform:translateY(23%) scale(1.36) rotate(-6deg)}100%{transform:none}}
 body.noanim *{transition:none!important}
 </style>
 </head>
@@ -1542,7 +1554,7 @@ function newGame(name,cls,sex){
   learn(true);const s=stats();S.hp=s.HP;S.mp=s.MP;checkDaily();save();
 }
 /* 舊存檔升級：三格裝備 → 六格、四階稀有度 → 五階 */
-function migrate(){if(!S)return;try{if(!S.gemFix){let n=0;for(const k of GEMS){n+=S.items[k]||0;delete S.items[k]}for(const g of S.gear||[])if(g.sock)g.sock=g.sock.map(x=>{if(x)n++;return null});if(n){S.gold+=n*120;setTimeout(()=>toast(`寶石改為只有首領掉落：回收 ${n} 顆寶石，補償 ${n*120} G`),2500)}S.gemFix=1}}catch(e){}try{if(!S.gearQfix){for(const g of S.gear||[]){const b=GEAR[g.id];if(!b||g.q!=null)continue;g.q=b.uniq?1:.85;for(const x of g.sub||[])if(SUBS[x.k])x.v=Math.max(1,Math.round(SUBS[x.k](b.t||0)*.7))}S.gearQfix=1}}catch(e){}try{if(S.cleared&&S.main&&!S.main.done&&!S.fixTowerClr){for(const k in S.cleared){const i=+k,bi=(CH[i]&&CH[i].steps||[]).findIndex(x=>x.type==='boss'),ok=S.main.ch>i||(S.main.ch===i&&bi>=0&&S.main.step>bi);if(!ok)delete S.cleared[k]}S.fixTowerClr=1}}catch(e){}if(!S.pid)S.pid=Math.random().toString(36).slice(2,10);dexInit();if(!S.tut){S.tut={};if(S.lv>=5)for(const k in TIPS)if(k!=='tower'&&k!=='ally'&&k!=='adv20')S.tut[k]=1}if(!S.nst)S.nst={};if(S.gem){S.gold+=S.gem*5;S.gem=0}for(const g of S.gear||[])if(!g.sock)g.sock=g.r>=4?[null,null]:g.r>=3?[null]:[];if(!S.sex)S.sex='m';if(!S.flags)S.flags={};if(S.bond==null)S.bond=0;if((S.v||1)>=2)return;
+function migrate(){if(!S)return;setFoldAll();try{if(!S.gemFix){let n=0;for(const k of GEMS){n+=S.items[k]||0;delete S.items[k]}for(const g of S.gear||[])if(g.sock)g.sock=g.sock.map(x=>{if(x)n++;return null});if(n){S.gold+=n*120;setTimeout(()=>toast(`寶石改為只有首領掉落：回收 ${n} 顆寶石，補償 ${n*120} G`),2500)}S.gemFix=1}}catch(e){}try{if(!S.gearQfix){for(const g of S.gear||[]){const b=GEAR[g.id];if(!b||g.q!=null)continue;g.q=b.uniq?1:.85;for(const x of g.sub||[])if(SUBS[x.k])x.v=Math.max(1,Math.round(SUBS[x.k](b.t||0)*.7))}S.gearQfix=1}}catch(e){}try{if(S.cleared&&S.main&&!S.main.done&&!S.fixTowerClr){for(const k in S.cleared){const i=+k,bi=(CH[i]&&CH[i].steps||[]).findIndex(x=>x.type==='boss'),ok=S.main.ch>i||(S.main.ch===i&&bi>=0&&S.main.step>bi);if(!ok)delete S.cleared[k]}S.fixTowerClr=1}}catch(e){}if(!S.pid)S.pid=Math.random().toString(36).slice(2,10);dexInit();if(!S.tut){S.tut={};if(S.lv>=5)for(const k in TIPS)if(k!=='tower'&&k!=='ally'&&k!=='adv20')S.tut[k]=1}if(!S.nst)S.nst={};if(S.gem){S.gold+=S.gem*5;S.gem=0}for(const g of S.gear||[])if(!g.sock)g.sock=g.r>=4?[null,null]:g.r>=3?[null]:[];if(!S.sex)S.sex='m';if(!S.flags)S.flags={};if(S.bond==null)S.bond=0;if((S.v||1)>=2)return;
   const om=[0,1,3,4];
   for(const g of S.gear){if(g.id.startsWith('c_'))g.id='r_'+g.id.slice(2);g.r=om[g.r]??g.r;
     if(GEAR[g.id]){if(!g.sub)g.sub=rollSubs(GEAR[g.id].t,g.r);if(g.r>=4&&!g.sp)g.sp=pick(Object.keys(SPEC))}g.lock=!!g.lock}
@@ -1635,6 +1647,45 @@ const BGM={
     {w:.125,v:.022,n:rep('A4 C5 E5 A5',4)+' '+rep('F4 A4 C5 F5',2)+' '+rep('E4 G#4 B4 E5',2)+' '+rep('A4 C5 E5 A5',2)+' '+rep('D4 F4 A4 D5',2)+' '+rep('E4 G#4 B4 E5',4)},
     {w:'tri',v:.15,n:'A1 - - - - - - - - - - - - - - - F1 - - - - - - - E1 - - - - - - - A1 - - - - - - - D2 - - - - - - - E1 - - - - - - - - - - - - - - -'},
     {w:'nz',v:.04,n:rep('k . . h . . h .',8)}]},
+  f_archive:{bpm:80,ch:[
+    {w:.5,v:.05,n:'A4 - - C5 - - E5 - D5 - - - B4 - - - C5 - - E5 - - A5 - G#5 - - - - - . . F5 - - E5 - - D5 - C5 - - - A4 - - - B4 - - D5 - - C5 - B4 - - - - - . .'},
+    {w:.125,v:.02,n:rep('A3 E4 A4 C5 A4 E4 A3 E4',2)+' '+rep('E3 B3 E4 G#4 E4 B3 E3 B3',2)+' '+rep('F3 C4 F4 A4 F4 C4 F3 C4',2)+' '+rep('E3 B3 E4 G#4 E4 B3 E3 B3',2)},
+    {w:'tri',v:.13,n:'A1 - - - - - - - - - - - - - - - E1 - - - - - - - - - - - - - - - F1 - - - - - - - - - - - - - - - E1 - - - - - - - - - - - - - - -'}]},
+  b_plain:{bpm:164,ch:[
+    {w:.25,v:.08,n:'G5 - B5 D6 - B5 G5 - A5 - C6 E6 - C6 A5 - B5 - D6 G6 - F#6 E6 D6 C6 - B5 - A5 - D5 - G5 - B5 D6 - B5 G5 - E5 - G5 C6 - B5 A5 G5 F#5 - A5 D6 - C6 B5 A5 G5 - - - B5 - D6 -'},
+    {w:.5,v:.032,n:rep('G4 . B4 . D5 . B4 .',1)+' '+rep('A4 . C5 . E5 . C5 .',1)+' '+rep('B4 . D5 . G5 . D5 .',1)+' '+rep('D4 . F#4 . A4 . F#4 .',1)+' '+rep('G4 . B4 . D5 . B4 .',1)+' '+rep('C4 . E4 . G4 . E4 .',1)+' '+rep('D4 . F#4 . A4 . F#4 .',1)+' '+rep('G4 . B4 . D5 . B4 .',1)},
+    {w:'tri',v:.18,n:rep('G2 G3',4)+' '+rep('A2 A3',4)+' '+rep('B2 B3',4)+' '+rep('D2 D3',4)+' '+rep('G2 G3',4)+' '+rep('C3 C4',4)+' '+rep('D2 D3',4)+' '+rep('G2 G3',4)},
+    {w:'nz',v:.07,n:rep('k h s h k h s s',8)}]},
+  b_forest:{bpm:150,ch:[
+    {w:.125,v:.075,n:'E5 . G5 . B5 - A5 G5 F#5 . A5 . G5 - E5 - D5 . F#5 . A5 - G5 F#5 E5 - - - B4 - . . E5 . G5 . B5 - D6 C6 B5 . G5 . A5 - B5 - C6 - B5 A5 G5 - F#5 E5 D#5 - F#5 - B5 - . .'},
+    {w:.5,v:.03,n:rep('E4 B4 E5 B4',4)+' '+rep('D4 A4 D5 A4',4)+' '+rep('C4 G4 C5 G4',4)+' '+rep('B3 F#4 B4 F#4',4)},
+    {w:'tri',v:.18,n:rep('E2 . E2 E3 . E2 . E3',2)+' '+rep('D2 . D2 D3 . D2 . D3',2)+' '+rep('C2 . C2 C3 . C2 . C3',2)+' '+rep('B1 . B1 B2 . B1 . B2',2)},
+    {w:'nz',v:.065,n:rep('k . h k s . h h k h . k s . s h',4)}]},
+  b_mine:{bpm:144,ch:[
+    {w:.25,v:.08,n:'C5 C5 . Eb5 . G5 - - F5 F5 . Eb5 . D5 - - Eb5 Eb5 . G5 . Bb5 - Ab5 G5 - F5 - Eb5 - D5 - C5 C5 . Eb5 . G5 - - Ab5 Ab5 . G5 . F5 - - G5 - Bb5 - C6 - Bb5 Ab5 G5 - - - B4 - D5 -'},
+    {w:.5,v:.03,n:rep('C4 G4 C4 G4',4)+' '+rep('Ab3 Eb4 Ab3 Eb4',2)+' '+rep('Bb3 F4 Bb3 F4',2)+' '+rep('C4 G4 C4 G4',2)+' '+rep('F3 C4 F3 C4',2)+' '+rep('G3 D4 G3 D4',4)},
+    {w:'tri',v:.2,n:rep('C2 . C2 C2 . C2 C3 .',2)+' '+rep('Ab1 . Ab1 Ab1 . Bb1 Bb2 .',2)+' '+rep('C2 . C2 C2 . C2 C3 .',1)+' '+rep('F1 . F1 F1 . F1 F2 .',1)+' '+rep('G1 . G1 G1 . G1 G2 .',2)},
+    {w:'nz',v:.08,n:rep('k . . k s . k . k k . k s . s s',4)}]},
+  b_snow:{bpm:152,ch:[
+    {w:.125,v:.07,n:'B5 - F#5 B5 D6 - C#6 B5 A5 - E5 A5 C#6 - B5 A5 G5 - D5 G5 B5 - A5 G5 F#5 - - - A#5 - C#6 - B5 - F#5 B5 D6 - F#6 E6 D6 - A5 D6 E6 - D6 C#6 B5 - G5 B5 E6 - D6 B5 C#6 - - - F#5 - A#5 -'},
+    {w:.5,v:.03,n:rep('B3 F#4 B4 D5 B4 F#4 B3 F#4',1)+' '+rep('A3 E4 A4 C#5 A4 E4 A3 E4',1)+' '+rep('G3 D4 G4 B4 G4 D4 G3 D4',1)+' '+rep('F#3 C#4 F#4 A#4 F#4 C#4 F#3 C#4',1)+' '+rep('B3 F#4 B4 D5 B4 F#4 B3 F#4',1)+' '+rep('D4 A4 D5 F#5 D5 A4 D4 A4',1)+' '+rep('E4 B4 E5 G5 E5 B4 E4 B4',1)+' '+rep('F#3 C#4 F#4 A#4 F#4 C#4 F#3 C#4',1)},
+    {w:'tri',v:.17,n:rep('B1 B2',4)+' '+rep('A1 A2',4)+' '+rep('G1 G2',4)+' '+rep('F#1 F#2',4)+' '+rep('B1 B2',4)+' '+rep('D2 D3',4)+' '+rep('E2 E3',4)+' '+rep('F#1 F#2',4)},
+    {w:'nz',v:.06,n:rep('k h h s h h k h s h h h k h s h',4)}]},
+  b_castle:{bpm:170,ch:[
+    {w:.125,v:.08,n:'D5 D5 Eb5 D5 . A5 . G5 F5 F5 G5 F5 . Eb5 . D5 C5 C5 D5 Eb5 . G5 . F5 Eb5 - D5 - C#5 - A4 - D5 D5 Eb5 D5 . A5 . Bb5 C6 C6 Bb5 A5 . G5 . F5 G5 - A5 - Bb5 - A5 G5 F5 - E5 - C#5 - A5 -'},
+    {w:.25,v:.035,n:rep('D4 A4 D5 A4',4)+' '+rep('Bb3 F4 Bb4 F4',2)+' '+rep('C4 G4 C5 G4',2)+' '+rep('D4 A4 D5 A4',2)+' '+rep('G3 D4 G4 D4',2)+' '+rep('A3 E4 A4 E4',4)},
+    {w:'tri',v:.2,n:rep('D2 D2 D3 D2 Eb2 D2 D3 D2',2)+' '+rep('Bb1 Bb1 Bb2 Bb1',2)+' '+rep('C2 C2 C3 C2',2)+' '+rep('D2 D2 D3 D2 Eb2 D2 D3 D2',1)+' '+rep('G1 G1 G2 G1',2)+' '+rep('A1 A1 A2 A1',4)},
+    {w:'nz',v:.08,n:rep('k k s k k k s s',8)}]},
+  b_road:{bpm:156,ch:[
+    {w:.25,v:.08,n:'F5 - A5 C6 - A5 F5 - G5 - Bb5 D6 - Bb5 G5 - A5 - C6 F6 - E6 D6 C6 Bb5 - A5 - G5 - C5 - D5 - F5 A5 - F5 D5 - Bb4 - D5 G5 - F5 E5 D5 C5 - E5 G5 - Bb5 A5 G5 F5 - - - C6 - A5 -'},
+    {w:.5,v:.03,n:rep('F4 . A4 C5 . A4 F4 .',1)+' '+rep('G4 . Bb4 D5 . Bb4 G4 .',1)+' '+rep('A4 . C5 F5 . C5 A4 .',1)+' '+rep('C4 . E4 G4 . E4 C4 .',1)+' '+rep('D4 . F4 A4 . F4 D4 .',1)+' '+rep('Bb3 . D4 G4 . D4 Bb3 .',1)+' '+rep('C4 . E4 G4 . E4 C4 .',1)+' '+rep('F4 . A4 C5 . A4 F4 .',1)},
+    {w:'tri',v:.18,n:rep('F2 . F2 C3 F2 . C3 .',1)+' '+rep('G2 . G2 D3 G2 . D3 .',1)+' '+rep('A2 . A2 E3 A2 . E3 .',1)+' '+rep('C2 . C2 G2 C2 . G2 .',1)+' '+rep('D2 . D2 A2 D2 . A2 .',1)+' '+rep('Bb1 . Bb1 F2 Bb1 . F2 .',1)+' '+rep('C2 . C2 G2 C2 . G2 .',1)+' '+rep('F2 . F2 C3 F2 . C3 .',1)},
+    {w:'nz',v:.075,n:rep('k . s . k k s . k . s s k k s .',4)}]},
+  b_archive:{bpm:146,ch:[
+    {w:.125,v:.07,n:'A5 E5 C6 E5 B5 E5 A5 E5 G#5 E5 B5 E5 A5 E5 G#5 E5 F5 C5 A5 C5 G5 C5 F5 C5 E5 B4 G#5 B4 E5 - . . A5 E5 C6 E5 D6 F5 C6 F5 B5 D5 G#5 D5 A5 C5 E5 C5 D5 F5 A5 D6 C6 A5 E5 C5 B4 E5 G#5 B5 A5 - . .'},
+    {w:.5,v:.03,n:'A4 - - - C5 - - - B4 - - - E5 - - - F4 - - - A4 - - - E4 - - - G#4 - - - A4 - - - D5 - - - B4 - - - C5 - - - D4 - - - E4 - - - E4 - G#4 - A4 - - -'},
+    {w:'tri',v:.18,n:rep('A2 . A2 . E2 . A2 .',2)+' '+rep('E2 . E2 . B1 . E2 .',2)+' '+rep('F2 . F2 . C2 . F2 .',2)+' '+rep('E2 . E2 . B1 . E2 .',2)},
+    {w:'nz',v:.06,n:rep('k . h . s . h k . k h . s . h h',4)}]},
   battle:{bpm:160,ch:[
     {w:.25,v:.08,n:'A5 A5 . A5 C6 - B5 A5 G5 - E5 - G5 A5 - - F5 F5 . F5 A5 - G5 F5 E5 - D5 - E5 G5 - - A5 - C6 - E6 - D6 C6 B5 - G5 - D6 - B5 - C6 - A5 - F5 - A5 C6 B5 - G#5 - E5 - E6 -'},
     {w:.5,v:.035,n:'A4 . A4 . E5 . A4 . G4 . G4 . D5 . G4 . F4 . F4 . C5 . F4 . E4 . E4 . B4 . E4 . A4 . A4 . E5 . A4 . G4 . G4 . D5 . G4 . F4 . F4 . C5 . F4 . E4 . E4 . G#4 . B4 .'},
@@ -1654,7 +1705,7 @@ function bgmTick(){const a=ctx();if(!a||!BGMCUR||document.hidden)return;const tr
     BGMT+=st;BGMI++}}
 function bgm(name){if(BGMOFF)name=null;if(name===BGMCUR)return;BGMCUR=name;clearInterval(BGMTIMER);BGMTIMER=null;
   if(!name)return;const a=ctx();if(!a)return;BGMT=a.currentTime+.08;BGMI=0;BGMTIMER=setInterval(bgmTick,30);bgmTick()}
-function bgmAuto(){let n='title';if(S)n=B?(B.kind==='boss'||B.id==='shadow'?'boss':'battle'):RUN?(RUN.tower?'f_tower':BGM['f_'+(AREAS[RUN.area]||{}).id]?'f_'+AREAS[RUN.area].id:'field'):'town';bgm(n)}
+function bgmAuto(){let n='title';if(S)n=B?(B.kind==='boss'||B.id==='shadow'?'boss':(RUN&&!RUN.tower&&BGM['b_'+(AREAS[RUN.area]||{}).id]?'b_'+AREAS[RUN.area].id:'battle')):RUN?(RUN.tower?'f_tower':BGM['f_'+(AREAS[RUN.area]||{}).id]?'f_'+AREAS[RUN.area].id:'field'):'town';bgm(n)}
 document.addEventListener('visibilitychange',()=>{try{if(!document.hidden){window.__back=performance.now();document.body.classList.add('noanim');setTimeout(()=>document.body.classList.remove('noanim'),120)}}catch(e){}if(!AC)return;if(document.hidden)AC.suspend();else{try{AC.resume().then(()=>{BGMT=AC.currentTime+.08})}catch(e){}}});
 ['pointerdown','keydown'].forEach(e=>document.addEventListener(e,()=>{if(!BGMOFF&&!BGMCUR&&typeof S!=='undefined')bgmAuto();else if(AC&&AC.state==='suspended')AC.resume()},{passive:true}));
 
@@ -1669,15 +1720,14 @@ function gearStat(g){const b=GEAR[g.id],m=(b.mx?.6:1)*(1+.2*g.r)*(1+.06*g.p)*(g.
 const specV=g=>{const v=SPEC[g.sp].v;return v<=1?v:Math.max(1,Math.round(v*Math.min(1,.5+.1*(GEAR[g.id].t||0))))},specD=g=>{const x=SPEC[g.sp];return x.v<=1?x.d:x.d.replace(String(x.v),String(specV(g)))};
 function gearAll(g){const o=gearStat(g),sl=sealed(g),sm=sl?Math.pow(.65,GEAR[g.id].t-tierCap()):1,ad=(k,v)=>o[k]=(o[k]||0)+v;for(const x of g.sub||[])ad(x.k,Math.max(1,Math.round(x.v*sm)));if(g.sp&&!sl)ad(g.sp,specV(g));const u=GEAR[g.id].uq;if(u&&!sl)for(const k in u)ad(k,u[k]);
   for(const gm of g.sock||[])if(gm)for(const k in ITEMS[gm].gem)ad(k,ITEMS[gm].gem[k]);return o}
-const gearName=g=>`${g.sh?'✧':''}${g.set!=null?SETS[g.set].n+'・':''}${GEAR[g.id].uniq?'「'+GEAR[g.id].n+'」':GEAR[g.id].n}${g.p?` +${g.p}`:''}`;
+const gearName=g=>`${g.sh?'✧':''}${GEAR[g.id].uniq?'「'+GEAR[g.id].n+'」':GEAR[g.id].n}${g.p?` +${g.p}`:''}`;
 const gearDesc=g=>(g.q>=1.3?'【完美】':'')+Object.entries(gearStat(g)).map(([k,v])=>fmt(k,v)).join('　')+((g.sub||[]).length?`　詞條×${g.sub.length}`:'')+(g.sp?`　【${SPEC[g.sp].n}】`:'')+(GEAR[g.id].uniq?'　專屬':'')+((g.sock||[]).length?`　孔 ${(g.sock||[]).filter(Boolean).length}/${g.sock.length}`:'');
 function gearPower(g){const o=gearAll(g),mg=CLS[S.cls].basic==='MAG',W={atk:mg?1:3,mag:mg?3:.8,def:2.5,mres:1.5,rfire:1,rice:1,rthunder:1,rdark:1,hp:.25,mp:.25,crit:4,cd:1.5,eva:3,ls:5,atkp:mg?2:6,magp:mg?6:2,STR:mg?1.5:4,DEX:3,INT:mg?4:1.5,VIT:3,LUK:3};
   let v=0;for(const k in o)v+=o[k]*(W[k]||3);return Math.round(v)}
-function setCounts(){const c={};for(const sl in SLOTS){const g=gearBy(S.eq[sl]);if(g&&g.set!=null)c[g.set]=(c[g.set]||0)+1}return c}
+function setCounts(){return {}}
 function gearTotals(){const e={},add=o=>{for(const k in o)e[k]=(e[k]||0)+o[k]};
   for(const sl in SLOTS){const g=gearBy(S.eq[sl]);if(g)add(gearAll(g))}
-  const c=setCounts();for(const i in c){if(c[i]>=2)add(SETS[i].b2);if(c[i]>=4)add(SETS[i].b4)}
-  for(const id in PASS)if(hasP(id)){if(PASS[id].st)add(PASS[id].st);if(PASS[id].sx)add(PASS[id].sx[stn()].st)}return e}
+    for(const id in PASS)if(hasP(id)){if(PASS[id].st)add(PASS[id].st);if(PASS[id].sx)add(PASS[id].sx[stn()].st)}return e}
 /* 屬性專精：單一屬性（含裝備加成）達 30／60 時解鎖特殊效果，讓配點也能決定玩法 */
 const MSAT=[30,60];
 const MS={
@@ -1704,9 +1754,11 @@ const RZ={
   thorn:{n:'荊棘',ic:'🌵',i:'反彈傷害可以擊倒敵人',ii:'反彈比例 ×1.5，防禦時再 ×2'},
   gale:{n:'疾風',ic:'🌪',i:'前兩次攻擊必定命中且爆擊',ii:'之後每 4 回合再觸發一次'},
   reap:{n:'收割',ic:'🌾',i:'收割回復量 ×2',ii:'擊倒敵人後，下一招技能不消耗 MP'}};
-const SETKW={火山:'burn',遠征隊:'shield',輕裝:'gale',森林:'ls'};
-function kwCount(){const c={};if(!S||!S.eq)return c;const sets={};for(const sl in SLOTS){const g=gearBy(S.eq[sl]);if(!g)continue;if(g.sp&&RZ[g.sp])c[g.sp]=(c[g.sp]||0)+1;const u=GEAR[g.id]&&GEAR[g.id].uq;if(u)for(const k in u)if(RZ[k])c[k]=(c[k]||0)+(GEAR[g.id].core?2:1);if(g.set!=null)sets[g.set]=(sets[g.set]||0)+1}
-  for(const i in sets)if(sets[i]>=4&&SETS[i]){const k=SETKW[SETS[i].n];if(k)c[k]=(c[k]||0)+1}return c}
+/* 套裝已併入流派：原本的套裝標記換成對應的詞綴（一件一個詞綴，湊 2、3 件觸發共鳴） */
+const SETKW={輕裝:'gale',森林:'ls',火山:'burn',雪地:'thorn',遠征隊:'shield',劍士:'guard',法師:'burn',弓手:'double',祭司:'reap',雷擊:'stun',書庫:'back'};
+function setFold(g){if(g&&g.set!=null){const st=SETS[g.set];if(st&&!g.sp&&!(GEAR[g.id]&&GEAR[g.id].uniq))g.sp=SETKW[st.n];delete g.set}return g}
+function setFoldAll(){try{if(S&&S.gear)S.gear.forEach(setFold)}catch(e){}}
+function kwCount(){const c={};if(!S||!S.eq)return c;const sets={};for(const sl in SLOTS){const g=gearBy(S.eq[sl]);if(!g)continue;if(g.sp&&RZ[g.sp])c[g.sp]=(c[g.sp]||0)+1;const u=GEAR[g.id]&&GEAR[g.id].uq;if(u)for(const k in u)if(RZ[k])c[k]=(c[k]||0)+(GEAR[g.id].core?2:1);}return c}
 function buildName(c){c=c||kwCount();const top=Object.entries(c).filter(([k,n])=>n>=2).sort((a,b)=>b[1]-a[1]).slice(0,2);return top.length?top.map(([k])=>RZ[k].n).join('・')+'流':''}
 function power(){const s=stats();return Math.round(s.HP/4+s.MP/4+s.ATK*3+s.MAG*3+s.DEF*2.5+s.CRIT*4+(s.CD-150)*1.5+s.EVA*3+s.LS*5+(s.BURN+s.DOUBLE+s.STUN+s.GUARD+s.SHIELD+s.BACK+s.THORN+s.REAP)*3+s.GALE*40)}
 const baseAttr=()=>{const a=Object.assign({},CLS[S.cls].base),g=CLS[S.cls].grow;for(const k in g)a[k]+=g[k]*(S.lv-1);if(S.adv){const b=ADV[S.adv].bonus;for(const k in b)a[k]+=b[k]}return a};
@@ -1740,7 +1792,7 @@ const OFFK=()=>{const c=S&&S.cls;return c==='mage'?['atk','atkp','STR']:c==='swo
 function rollSubs(t,r){const off=OFFK();return Object.keys(SUBS).filter(k=>!off.includes(k)).sort(()=>Math.random()-.5).slice(0,Math.min(5,r)).map(k=>({k,v:Math.max(1,Math.round(SUBS[k](t)*(.7+Math.random()*.6)))}))}
 function minG(g){if(!g||GEAR[g.id].uniq)return g;g.q=.85;const t=GEAR[g.id].t||0;for(const x of g.sub||[])if(SUBS[x.k])x.v=Math.max(1,Math.round(SUBS[x.k](t)*.7));if(g.sh){g.sh=0}return g}
 function rollQ(){const x=Math.random();return x<.03?+(1.3+Math.random()*.1).toFixed(2):+(0.85+Math.random()*.4).toFixed(2)}
-function addGear(id,r,set){const g={u:S.uid++,id,r,p:0,q:GEAR[id].uniq?1:rollQ(),sub:rollSubs(GEAR[id].t,r+(r>=2&&Math.random()<.2?1:0)),lock:false,sock:r>=4?[null,null]:r>=3?[null]:[]};if(r>=4&&!GEAR[id].uniq)g.sp=pick(Object.keys(SPEC));if(set!=null)g.set=set;S.gear.push(g);if(S.dex)S.dex.g[id]=1;return g}
+function addGear(id,r,set){const g={u:S.uid++,id,r,p:0,q:GEAR[id].uniq?1:rollQ(),sub:rollSubs(GEAR[id].t,r+(r>=2&&Math.random()<.2?1:0)),lock:false,sock:r>=4?[null,null]:r>=3?[null]:[]};if(r>=4&&!GEAR[id].uniq)g.sp=pick(Object.keys(SPEC));if(set!=null){g.set=set;setFold(g)}S.gear.push(g);if(S.dex)S.dex.g[id]=1;return g}
 function rollRar(minR,bonus){if(S&&fortK('drop'))bonus=(bonus||1)*1.3;const lu=1+Math.min(.5,(S?stats().A.LUK:0)*.004);const w=RW.map((x,i)=>i<minR?0:x*(i>=2?(bonus||1)*lu:1)),t=w.reduce((a,b)=>a+b);let r=Math.random()*t;for(let i=0;i<5;i++){if((r-=w[i])<0)return i}return 4}
 function makeGear(tier,r,hard){const sl=pick(Object.keys(SLOTS)),alt=Math.random()<.5;let id=sl==='weapon'?(alt&&S.adv&&GEAR[`w_${S.adv}_${tier}`]?`w_${S.adv}_${tier}`:`w_${S.cls}_${tier}`):(alt&&GEAR[`${SLOTP[sl]}b_${tier}`]?`${SLOTP[sl]}b_${tier}`:`${SLOTP[sl]}_${tier}`);
   /* 該階級沒有這個部位的裝備時，往下找最近一階（否則掉寶會讓戰鬥結算卡住） */
@@ -2045,7 +2097,7 @@ function vTowerCard(){return towerOpen()?`<div class="panel area">${art('area_to
 /* 首領前哨的戰前準備：三選一，各有代價 */
 const PREP={scout:{n:'🔭 偵察動向',d:'摸清首領的習慣，開戰時首領 HP -12%'},trap:{n:'🪤 布置陷阱',d:'用一瓶治療藥水當誘餌，首領開場中毒 4 回合、攻擊下降 2 回合'},camp:{n:'🔥 營火調息',d:'免費回復 30% HP／MP，但火光驚動首領：攻擊 +12%'}};
 const prepCost=L=>20+L*8;
-const BBOX={gold:{n:'👑 金冠寶箱',d:'穩穩到手：大把金幣＋強化石×1'},blue:{n:'💠 蒼紋寶箱',d:'一件稀有以上裝備，12% 升為史詩'},seal:{n:'⛓️ 封印寶箱',d:'賭一把：17% 史詩裝備（可帶套裝），否則落空'}};
+const BBOX={gold:{n:'👑 金冠寶箱',d:'穩穩到手：大把金幣＋強化石×1'},blue:{n:'💠 蒼紋寶箱',d:'一件稀有以上裝備，12% 升為史詩'},seal:{n:'⛓️ 封印寶箱',d:'賭一把：17% 史詩裝備，否則落空'}};
 /* 霧核：中段強敵掉落，三選一，本趟冒險生效（RUN.core）。改變打法而不是單純加數值 */
 const MCORE={fang:{i:'⚡',n:'獵牙霧核',d:'敵人 HP 高於 70% 時，你的傷害 +30%',tip:'開場爆發、疾風流',d2:'敵人 HP 高於 70% 時，你的傷害 +45%'},
   exec:{i:'🗡',n:'斷罪霧核',d:'敵人 HP 低於 35% 時，你的傷害 +40%',tip:'收尾、連擊流',d2:'敵人 HP 低於 35% 時，你的傷害 +60%'},
@@ -2130,20 +2182,34 @@ function vRun(){if(RUN.tower)return vTower();const a=AREAS[RUN.area],v=RUN.view,
   return `<div class="row"><h2 class="grow">${a.n}</h2><span class="sub">已獲得 ${RUN.loot.gold} G・${RUN.loot.exp} EXP</span>${RUN.step>=0&&!RUN.tower&&!RUN.trial?'<button class="btn sm" data-a="retreatAsk" style="margin-left:6px">撤退</button>':''}</div>${pips}${RUN.etr&&ETRAIT[RUN.etr]&&RUN.step<4&&RUN.nodes[4]==='elite'&&!RUN.tower&&!RUN.trial?`<p class="sub" style="margin:2px 0 6px;color:#c2410c">${trIc(RUN.etr,22)}中段強敵帶著霧紋【${ETRAIT[RUN.etr].n}】：${ETRAIT[RUN.etr].d}</p>`:''}${RUN.hone&&!RUN.tower?`<p class="sub" style="margin:2px 0 6px;color:var(--exp)">⚔ 磨刃：本趟冒險傷害 +${RUN.hone*12}%</p>`:''}${RUN.raid&&!RUN.tower?`<p class="sub" style="margin:2px 0 6px;color:var(--exp)">🌙 夜探：下一場強敵或首領戰由你奇襲</p>`:''}${RUN.core&&MCORE[RUN.core]?`<p class="sub" style="margin:2px 0 6px;color:var(--exp)">${coreIc(RUN.core)}${coreNm(RUN.core)}：${coreDs(RUN.core)}${RUN.core==='temper'?(RUN.coreN>=1?'（已淬鍊完成）':'（淬鍊中）'):''}</p>`:''}${body}`}
 const hpCls=(v,m)=>v/m>.5?'g':v/m>.2?'y':'r';
 function bbar(v,m,prev,c){const p=Math.max(0,Math.min(100,v/m*100));return `<div class="bbar ${c?'s':''}"><i class="${c||hpCls(v,m)}" style="width:${prev==null?p:prev}%" data-w="${p}"></i></div>`}
+/* 種族：決定魔物的攻擊動作與圖鑑分類 */
+const RACE={beast:'野獸',flyer:'飛禽',slime:'軟泥',plant:'植物',undead:'亡靈',construct:'構造體',humanoid:'人形',dragon:'龍',elemental:'元素',insect:'蟲',demon:'惡魔'};
+const RACEOF=(()=>{const m={};const put=(r,l)=>l.split(' ').forEach(k=>m[k]=r);
+  put('beast','hornrabbit sparkrabbit rabbitking wolf shadewolf snowwolf blizzardwolf moonwolf thornboar icebear icethorn drillmole yetichief');
+  put('flyer','bat gasbat lavabat stormhawk mistcrow mirrormoth');
+  put('slime','slime bogslime inkslime');
+  put('plant','shroom soulshroom treant treeking sporemother rootguard elderdruid');
+  put('undead','skeleton foreman phantom voidwraith lampghost pagewraith waterwraith darkknight bloodknight cursearmor');
+  put('construct','golem crystalgolem sealguard rustguard weathergolem');
+  put('humanoid','goblin goblinboss wolfrider bandit deserter shieldbandit tollcaptain shadowpriest snowshaman zenos mistgeneral archivist frostgiant giantking');
+  put('dragon','icedragon');put('elemental','icesprite stormsprite windfairy');put('insect','orebeetle mosscrab worm bookworm');put('demon','demon gatewarden');return m})();
+const raceOf=id=>{if(RACEOF[id])return RACEOF[id];const v=typeof MVAR!=='undefined'&&MVAR[id];if(v&&RACEOF[v.base])return RACEOF[v.base];const m=MOBS[id];return m&&m.fly?'flyer':'beast'};
+/* 招式圖卡先亮相，退場後特效才開始、最後才命中：圖卡時間 PD 毫秒 */
+const PD=480;
 function vBattle(){const s=stats(),fx=B.fx||{},intro=B.intro,a=AREAS[RUN.area];B.fx=null;B.intro=false;const AL=B.ally,aD=B.allyD,aH=B.allyH,aHit=B.allyHit;B.allyD=B.allyH=B.allyHit=0;
   const fp=B.fhp,pp=B.php;B.fhp=B.hp/B.max*100;B.php=S.hp/s.HP*100;
   const C=B.cls,kl=B.hp>0&&!(B.adds||[]).some(f=>f.hp>0)&&(()=>{try{return myPd(null,s)>=B.hp?'普攻':battleSkills().some(k=>SK[k].dmg&&S.mp>=mpCost(k)&&myPd(k,s)>=B.hp)?'技能':''}catch(e){return ''}})(),st=[kl?`<span class="chip" style="color:#fff;background:#b8452a" title="這一擊大概就能收掉，不必再防守">🗡 ${kl}可斬殺</span>`:'',...B.aff.map(x=>`<span class="chip" style="color:#fff;background:#7a2a4a">${AFF[x].n}</span>`),...B.fb.map(b=>`<span class="chip">${b.n} ${b.t}</span>`),B.fshield>0?`<span class="chip">盾 ${B.fshield}</span>`:'',C.brk?`<span class="chip" style="color:var(--hp)">破綻 ${C.brk}</span>`:'',B.tough||B.cdr>.06?`<span class="chip" title="降低你的爆擊率與爆擊傷害">韌性 ${B.tough||0}・爆抗 ${Math.round((B.cdr||0)*100)}%</span>`:'',C.marks.length?`<span class="chip" style="color:var(--r3)">印記 ${C.marks.join('')}</span>`:'',...Object.keys(B.st).filter(k=>B.st[k]>0).map(k=>`<span class="chip">${FOE[k]} ${B.st[k]}</span>`)].join('');
   const me=[RUN&&RUN.core&&MCORE[RUN.core]&&!RUN.tower?`<span class="chip" style="color:var(--exp)" title="${coreDs(RUN.core)}">${coreIc(RUN.core,16)}${coreNm(RUN.core).replace('霧核','')}${coreM0()>1?' ▲':''}${RUN.core==='shatter'&&!RUN.trial?` ${B.brkP?(RUN.coreUp?4:5):B.crk||0}/${RUN.coreUp?4:5}`:''}</span>`:'',B.opening?'<span class="chip" style="color:#1a1206;background:var(--exp);font-weight:700">✦ 下一擊 +50%</span>':'',honeM()>1?`<span class="chip" style="color:var(--exp)">⚔ 磨刃 +${RUN.hone*12}%</span>`:'',C.focus?`<span class="chip" style="color:var(--exp)">專注 ${C.focus}</span>`:'',S.cls==='cleric'?`<span class="chip" style="color:var(--r4)">信仰 ${C.faith}</span>`:'',B.counter?'<span class="chip">招架反擊</span>':'',B.endure?'<span class="chip">鬥氣解放</span>':'',...B.buffs.map(b=>`<span class="chip">${b.n} ${b.t}</span>`),B.shield>0?`<span class="chip">護盾 ${B.shield}</span>`:'',...['poison','burn','bleed','weak','stun'].filter(h=>B.pst[h]>0).map(h=>`<span class="chip" style="color:var(--hp)">${HST[h]} ${B.pst[h]}</span>`),B.pst.regen>0?`<span class="chip">再生 ${B.pst.regen}</span>`:'',B.guard?'<span class="chip">防禦中</span>':''].join('');
   
-  if(fx.by)B.pfx=fx;const mine=fx.by==='me',theirs=fx.by==='foe',atk=mine&&fx.d!=null;const sk=fx.skill?SKA[fx.skill]:null,fk=theirs&&fx.fsk?(SKM[fx.fsk]||{fx:'roar',c:'#ff4a4a'}):null;B.delayBar=!!(sk||fk);
-  const foeC=[intro?'in-r':'',atk&&fx.d>0?(sk?'hitl':'hit'):fx.brk?'hit':'',theirs&&!fx.stun?(fk?(MELEE[fk.fx]?'charge lunge2':'charge'):'lunge-foe'):'',B.hp<=0?(sk?'faintl':'faint'):'',B.fog>0?'fog':'',B.mut&&(B.fog>0||!B.fogMax)?'mut':'',B.fogBrkT===B.turn&&B.fogMax?'fogout':'',B.nm?'nm':'',B.treasure?'gold':'',B.wander?'wander':'',...Object.keys(B.st||{}).filter(k=>B.st[k]>0).map(k=>'s-'+k),B.frozen&&B.st.stun>0?'s-freeze':'',B.chg?'chg':''].join(' ');
+  if(fx.by)B.pfx=fx;const mine=fx.by==='me',theirs=fx.by==='foe',atk=mine&&fx.d!=null;const sk=fx.skill?SKA[fx.skill]:null,pd=B.pd=(sk&&mine&&ARTSET&&(ARTSET.has(AK()+'_s1')||ARTSET.has(AK()+'_s2')))?PD:0,fk=theirs&&fx.fsk?(SKM[fx.fsk]||{fx:'roar',c:'#ff4a4a'}):null;B.delayBar=!!(sk||fk);
+  const foeC=['mv-'+raceOf(B.id),intro?'in-r':'',atk&&fx.d>0?(sk?'hitl':'hit'):fx.brk?'hit':'',theirs&&!fx.stun?(fk?(MELEE[fk.fx]?'charge lunge2':'charge'):'lunge-foe'):'',B.hp<=0?(sk?'faintl':'faint'):'',B.fog>0?'fog':'',B.mut&&(B.fog>0||!B.fogMax)?'mut':'',B.fogBrkT===B.turn&&B.fogMax?'fogout':'',B.nm?'nm':'',B.treasure?'gold':'',B.wander?'wander':'',...Object.keys(B.st||{}).filter(k=>B.st[k]>0).map(k=>'s-'+k),B.frozen&&B.st.stun>0?'s-freeze':'',B.chg?'chg':''].join(' ');
   const meC=[intro?'in-l':'',sk?(sk[0]==='slash'||sk[0]==='spin'?'cast dash':'cast'):atk?'lunge-me':'',mine&&fx.glow&&!sk?'glow':'',theirs&&fx.d>0?(fk?'hitl':'hit'):'',...Object.keys(B.pst||{}).filter(k=>B.pst[k]>0).map(k=>'s-'+k)].join(' ');
   const foeFx0=(fx.fheal?`<span class="dmg heal ${fk?'late':''}">+${fx.fheal}</span>`:'')+(atk&&fx.d===0?'<span class="dmg miss">MISS</span>':'')+(atk&&fx.d>0?(fx.hl?fx.hl.map((d,i)=>`<span class="dmg hitn" style="animation-delay:${(.95+i*.13).toFixed(2)}s;margin-left:${((i%3)-1)*26}px;margin-top:${-(i%2)*14}px">${d}</span>`).join('')+`<span class="dmg tot ${fx.cr?'cr':''}" style="animation-delay:${(1.05+fx.hl.length*.13).toFixed(2)}s">${fx.hl.length} HIT　-${fx.d}${fx.cr?'!':''}</span>`:sk?`<span class="dmg late ${fx.cr?'cr':''} ${fx.d>=B.max*.2?'big':''}">-${fx.d}${fx.cr?'!':''}</span>`:`<span class="dmg ${fx.cr?'cr':''} ${fx.d>=B.max*.2?'big':''}">-${fx.d}${fx.cr?'!':''}</span>`):'')+(mine&&fx.tags&&fx.tags.length?`<span class="ftags">${fx.tags.map((t,i)=>`<i style="animation-delay:${(1.2+i*.25).toFixed(2)}s">${esc(t)}</i>`).join('')}</span>`:'')+(atk&&fx.d>0&&B.elHit?`<span class="dmg ${sk?'late':''} eltag ${B.elHit}">${B.elHit==='w'?'弱點！':B.elHit==='rend'?'裂甲！':'抵抗'}</span>`:'');
-  const foeFx=foeFx0+(()=>{const x=(B.pops||[]).slice(-4).map((p,i)=>`<span class="dmg pop p-${POPK[p.k]}" style="animation-delay:${(sk?1.1:.35)+i*.22}s;margin-left:${(i%2?1:-1)*(18+i*6)}px">-${p.d}<small>${p.k}</small></span>`).join('');B.pops=[];return x})();
+  const foeFx=foeFx0+(()=>{const x=(B.pops||[]).slice(-4).map((p,i)=>`<span class="dmg pop p-${POPK[p.k]}" style="animation-delay:${(sk?1.1+pd/1000:.35)+i*.22}s;margin-left:${(i%2?1:-1)*(18+i*6)}px">-${p.d}<small>${p.k}</small></span>`).join('');B.pops=[];return x})();
   const meFx=(theirs?(fx.miss?'<span class="dmg miss">MISS</span>':fx.d>0?(fk?`<span class="dmg late ${fx.cr?'cr':''}">-${fx.d}</span>`:`<span class="dmg">-${fx.d}</span>`):fx.d===0?'<span class="dmg miss">擋下</span>':''):'')+(fx.heal?`<span class="dmg heal ${sk?'late':''}">+${fx.heal}</span>`:'');
   /* 動作依時間發生：先出手，命中瞬間才受傷／倒地，之後回到待機 */
   const fB='mob_'+B.id,fIdle=h=>fB+(h<=0?'_lose':(B.chg||(B.next&&SKM[B.next]&&isDng(SKM[B.next])))&&ARTSET&&(ARTSET.has(fB+'_charge')||ARTSET.has(fB+'_a3'))?'_charge':h<30?'_low':''),mB=AK(),mIdle=h=>mB+(h<30?'_fh':'_fn');
-  const fHit=atk&&fx.d>0,mHit=theirs&&fx.d>0,tF=sk?950:250,tM=fk?950:250;
+  const fHit=atk&&fx.d>0,mHit=theirs&&fx.d>0,tF=sk?950+pd:250,tM=fk?950:250;
   const fNew=ARTSET&&ARTSET.has(fB+'_a1'),fAtk=!fNew?fB+'_atk':fB+(fk&&ARTSET.has(fB+'_a3')?'_a3':theirs&&((fx.an??=(B.fan=(B.fan||0)+1))%2===0)?'_a2':'_a1');
   const fKey0=theirs&&!fx.stun?fAtk:fHit?fIdle(fp??100):B.hp<=0?fB+'_lose':fIdle(B.fhp);
   const mKey0=(sk||atk)?mB+'_fa':mHit?mIdle(pp??100):mIdle(B.php);
@@ -2159,8 +2225,8 @@ function vBattle(){const s=stats(),fx=B.fx||{},intro=B.intro,a=AREAS[RUN.area];B
   if(B.menu==='skill')cmd=`<div class="cmd col">${battleSkills().map(k=>{const lv=S.skl[k]||1;return `<button class="btn" data-a="bSkill" data-v="${k}" ${S.mp<mpCost(k)||(SK[k].ult&&B.ultUsed)?'disabled':''} ${SK[k].ult?'style="border-color:var(--r4);color:var(--r4)"':''}>${('skill_'+k) in ATL?`<i class="bi at" style="background-position:${(ATL['skill_'+k]%ATC)/(ATC-1)*100}% ${Math.floor(ATL['skill_'+k]/ATC)/(ATR-1)*100}%"></i>`:''}${SK[k].n}${skxOn(k,stats().KW).map(w=>RZ[w].ic).join('')} Lv${lv}<small>${SK[k].ult?(B.ultUsed?'已使用':'奧義'):'MP '+mpCost(k)}</small></button>`}).join('')}<button class="btn" data-a="bMenu" data-v="main">返回</button></div>`;
   else if(B.menu==='item'){const us=Object.keys(S.items).filter(k=>ITEMS[k].use);cmd=`<div class="cmd col">${us.map(k=>`<button class="btn" data-a="bItem" data-v="${k}">${ITEMS[k].n} ×${S.items[k]}<small>${ITEMS[k].d}</small></button>`).join('')||'<p class="empty">沒有可用的道具</p>'}<button class="btn" data-a="bMenu" data-v="main">返回</button></div>`}
   else cmd=`<div class="cmd"><button class="btn pri" data-a="bAtk">攻擊</button><button class="btn" data-a="bMenu" data-v="skill">技能</button><button class="btn" data-a="bMenu" data-v="item">道具</button><button class="btn" data-a="bGuard">防禦</button><button class="btn" data-a="bFlee">逃跑</button><button class="btn ${B.auto?'pri':''}" data-a="bAuto">自動 ${B.auto?'開':'關'}</button></div>`;
-  return `<div class="battle"><div class="stage v2 ${AL?'hasal':''} bg-${a.id} ${S.hp>0&&S.hp<stats().HP*.3?'danger':''} ${atk&&fx.d>0&&(fx.cr||B.hp<=0)?(sk?'punchl':'punch'):''} ${fx.quake&&!fk?'quake':''} ${(sk&&sk[0]==='meteor')||(fk&&fk.fx==='slam')?'quakel':''}" ${sk?`style="--c:${sk[1]}"`:fk?`style="--c:${fk.c}"`:''}><img class="bg" src="art/${bgKey(a)}.webp" alt="" ${MISS.has(bgKey(a))?'hidden':''} onerror="reTry(this,'${bgKey(a)}')||(MISS.add('${bgKey(a)}'),this.remove())">
-   <div class="ibox foe-i" data-a="openM" data-v="foe" role="button" aria-label="查看怪物情報"><div class="nm"><span>${B.name}${B.kind==='boss'?' <span class="tag red">首領</span>':''}${B.trait&&TRX(B.trait)?` <span class="tag">${TRX(B.trait).n}</span>`:''}</span><span>${(B.adds||[]).length?'<span class="tag">目標</span> ':''}Lv${B.L} ⓘ</span></div>${bbar(B.hp,B.max,fp)}${(()=>{const e=MEL[B.id];if(!e||!(S.dex&&S.dex.m&&S.dex.m[B.id]||B.kind==='boss'))return '';return `<div class="elw">${e[0]?`<span class="elt el-${e[0]}">弱 ${ELI[e[0]]||e[0]}</span>`:''}${e[1]?`<span class="elt" style="color:#777">抗 ${ELI[e[1]]||e[1]}</span>`:''}</div>`})()}${B.fogMax?`<div class="elw"><span class="fogp">${B.fog>0?'霧蝕':'霧散'} ${Array.from({length:B.fogMax},(_,i)=>`<i class="${i<B.fog?'on':''}"></i>`).join('')}</span></div>`:''}${B.trait?`<div class="elw"><span class="elt" style="color:#c2410c">${trIc(B.trait,16)}${TRX(B.trait).n}${(B.trait==='grudge'||B.trait==='swell')&&grudgeM()>1?' +'+Math.round((grudgeM()-1)*100)+'%':''}</span></div>`:''}${intentHtml()}${(B.adds||[]).length?`<div class="addrow">${B.adds.map((f,i)=>`<button class="addf" data-a="bTarget" data-v="${i}" aria-label="切換目標：${f.name}">${art('mob_'+f.id,f.m.n,'r11')}<span>${f.m.n}${bbar(f.hp,f.max)}</span></button>`).join('')}</div><div class="sub" style="font-size:10px">點小頭像切換目標</div>`:''}</div>
+  return `<div class="battle"><div class="stage v2 ${pd?'pd':''} ${AL?'hasal':''} bg-${a.id} ${S.hp>0&&S.hp<stats().HP*.3?'danger':''} ${atk&&fx.d>0&&(fx.cr||B.hp<=0)?(sk?'punchl':'punch'):''} ${fx.quake&&!fk?'quake':''} ${(sk&&sk[0]==='meteor')||(fk&&fk.fx==='slam')?'quakel':''}" ${sk?`style="--c:${sk[1]}"`:fk?`style="--c:${fk.c}"`:''}><img class="bg" src="art/${bgKey(a)}.webp" alt="" ${MISS.has(bgKey(a))?'hidden':''} onerror="reTry(this,'${bgKey(a)}')||(MISS.add('${bgKey(a)}'),this.remove())">
+   <div class="ibox foe-i" data-a="openM" data-v="foe" role="button" aria-label="查看怪物情報"><div class="nm"><span>${B.name} <small style="opacity:.6;font-weight:400">${RACE[raceOf(B.id)]}</small>${B.kind==='boss'?' <span class="tag red">首領</span>':''}${B.trait&&TRX(B.trait)?` <span class="tag">${TRX(B.trait).n}</span>`:''}</span><span>${(B.adds||[]).length?'<span class="tag">目標</span> ':''}Lv${B.L} ⓘ</span></div>${bbar(B.hp,B.max,fp)}${(()=>{const e=MEL[B.id];if(!e||!(S.dex&&S.dex.m&&S.dex.m[B.id]||B.kind==='boss'))return '';return `<div class="elw">${e[0]?`<span class="elt el-${e[0]}">弱 ${ELI[e[0]]||e[0]}</span>`:''}${e[1]?`<span class="elt" style="color:#777">抗 ${ELI[e[1]]||e[1]}</span>`:''}</div>`})()}${B.fogMax?`<div class="elw"><span class="fogp">${B.fog>0?'霧蝕':'霧散'} ${Array.from({length:B.fogMax},(_,i)=>`<i class="${i<B.fog?'on':''}"></i>`).join('')}</span></div>`:''}${B.trait?`<div class="elw"><span class="elt" style="color:#c2410c">${trIc(B.trait,16)}${TRX(B.trait).n}${(B.trait==='grudge'||B.trait==='swell')&&grudgeM()>1?' +'+Math.round((grudgeM()-1)*100)+'%':''}</span></div>`:''}${intentHtml()}${(B.adds||[]).length?`<div class="addrow">${B.adds.map((f,i)=>`<button class="addf" data-a="bTarget" data-v="${i}" aria-label="切換目標：${f.name}">${art('mob_'+f.id,f.m.n,'r11')}<span>${f.m.n}${bbar(f.hp,f.max)}</span></button>`).join('')}</div><div class="sub" style="font-size:10px">點小頭像切換目標</div>`:''}</div>
    <div class="spr foe ${B.m.fly?'fly':''} ${B.kind==='boss'?'boss':''} ${MSMALL.has(mobBase(B.id))?'szs':MMID.has(mobBase(B.id))?'szm':''} ${foeC}" data-a="openM" data-v="foe" role="button" aria-label="查看怪物情報" style="cursor:pointer"><div class="plat"></div>${B.id==='shadow'?art(HK(),'試煉之影','r34','shadowimg'):art(fKey0,B.m.n,'r11','','mob_'+B.id)}${foeFx}</div>
    <div class="spr me ${meC}"><div class="plat"></div>${art(mKey0,clsName(),'r11','',mB+'_fn')}${meFx}</div>
    <div class="ibox me-i"><div class="nm"><span>${esc(S.name)}</span><span>Lv${S.lv}</span></div>${bbar(S.hp,s.HP,pp)}<div class="num">HP ${S.hp}/${s.HP}</div>${bbar(S.mp,s.MP,null,'m')}<div class="num">MP ${S.mp}/${s.MP}</div>${me?`<div class="chips">${me}</div>`:''}</div>
@@ -2179,8 +2245,8 @@ function skillFx(t,n){return '<div class="fxl"><div class="dim"></div><div class
 function foeSkillFx(id){return '<div class="fxl"><div class="dim"></div></div>'}
 const MELEE={claw:1,slam:1};
 function v2Fit(){try{const st=document.querySelector('.stage.v2');if(!st)return;const fo=st.querySelector('.spr.foe'),ib=st.querySelector('.foe-i'),me=st.querySelector('.me-i');if(!fo||!ib||!me)return;fo.style.width='';fo.style.left='';fo.style.top='';fo.style.bottom='';const W=st.clientWidth,top=ib.offsetTop+ib.offsetHeight+6,bot=me.offsetTop-10,av=bot-top;if(av<40)return;const sz=Math.max(90,Math.min(fo.offsetWidth,av,W*.74));fo.style.width=sz+'px';fo.style.left=(W-sz)/2+'px';fo.style.top=Math.max(top-sz*.06,bot-sz)+'px';fo.style.bottom='auto'}catch(e){}}
-function afterBattle(){v2Fit();const el=$('#msg');if(!el||!B)return;if(B.pfx){const f=B.pfx;B.pfx=null;requestAnimationFrame(()=>f.by==='me'?PFX.me(f):PFX.foe(f))}
-  const upd=()=>document.querySelectorAll('.bbar i').forEach(i=>i.style.width=i.dataset.w+'%');if(B.delayBar)setTimeout(upd,950);else requestAnimationFrame(()=>requestAnimationFrame(upd));
+function afterBattle(){v2Fit();const el=$('#msg');if(!el||!B)return;if(B.pfx){const f=B.pfx;B.pfx=null;const go=()=>{if(B)f.by==='me'?PFX.me(f):PFX.foe(f)};if(f.by==='me'&&B.pd)setTimeout(go,B.pd);else requestAnimationFrame(go)}
+  const upd=()=>document.querySelectorAll('.bbar i').forEach(i=>i.style.width=i.dataset.w+'%');if(B.delayBar)setTimeout(upd,950+(B.pd||0));else requestAnimationFrame(()=>requestAnimationFrame(upd));
   clearInterval(window.TYPER);if(B.shown===B.log.length){el.textContent=B.msg||'';return}
   const txt=B.msg=B.log.slice(Math.max(B.shown,B.log.length-3)).join('\n');B.shown=B.log.length;let n=0;
   window.TYPER=setInterval(()=>{n+=2;el.textContent=txt.slice(0,n);if(n>=txt.length)clearInterval(window.TYPER)},16)}
@@ -2220,7 +2286,7 @@ function vBag(){
     const ch=(act,v,on,n)=>`<button class="${on?'on':''}" data-a="${act}" data-v="${v}">${n}</button>`;
     body=`<div class="fchips">${[['all','全部'],['weapon','武器'],['head','頭盔'],['body','鎧甲'],['feet','鞋子'],['ring','戒指'],['neck','項鍊']].map(([k,n])=>ch('gearF',k,BAGF===k,n)).join('')}</div>
       <div class="fchips">${[[0,'全稀有度'],[1,'精良+'],[2,'稀有+'],[3,'史詩+'],[4,'傳說']].map(([k,n])=>ch('gearR',k,BF.r===k,n)).join('')}</div>
-      <div class="fchips">${ch('gearT','up',BF.up,'▲只看更強')}${ch('gearT','set',BF.set,'套裝')}${ch('gearT','sp',BF.sp,'詞綴・閃耀・專屬')}<span class="sub" style="margin-left:auto">${gs.length}/${S.gear.length} 件</span></div>
+      <div class="fchips">${ch('gearT','up',BF.up,'▲只看更強')}${ch('gearT','sp',BF.sp,'詞綴・閃耀・專屬')}<span class="sub" style="margin-left:auto">${gs.length}/${S.gear.length} 件</span></div>
       <div class="fchips">排序：${[['pow','戰力'],['rar','稀有度'],['lv','等級'],['new','最新']].map(([k,n])=>ch('gearS',k,BF.sort===k,n)).join('')}</div>
       <div class="row" style="gap:6px;flex-wrap:wrap"><button class="btn sm" data-a="disAll">一鍵分解普通、精良</button><button class="btn sm" data-a="sellAll" data-v="1">一鍵販售普通、精良</button><button class="btn sm" data-a="sellAll" data-v="2">一鍵販售稀有以下</button></div><p class="sub" style="margin:2px 0">鎖定與裝備中的不會被處理。</p>`+
       (gs.map(g=>`<button class="item" data-a="openGear" data-v="${g.u}"><span class="ico c${g.r}">${gIco(g.id)}</span><span class="grow"><b class="c${g.r}">${gearName(g)}</b><span class="sub">${gearDesc(g)}</span></span>${sealed(g)?'<span class="tag off">封印</span>':''}${eqd.includes(g.u)?'<span class="tag ok">裝備中</span>':up(g)?'<span class="tag upt">▲ 更強</span>':''}${g.lock?'<span class="tag off">鎖</span>':''}</button>`).join('')||'<p class="empty">沒有裝備</p>')}
@@ -2294,17 +2360,17 @@ const MV={
     const its=['pot','pot2','pot3','eth','eth2','stone'].filter(k=>(tier>=2||!k.endsWith('2'))&&(tier>=4||k!=='pot3')).map(k=>`<div class="item"><span class="ico c0">${icon('item_'+k,ic(ITEMS[k].use?'potion':'mat'))}</span><span class="grow"><b>${ITEMS[k].n}</b><span class="sub">${ITEMS[k].d}・持有 ${S.items[k]||0}</span></span><button class="btn sm" data-a="buyItem" data-v="${k}" ${S.gold>=ITEMS[k].price?'':'disabled'}>${ITEMS[k].price} G</button></div>`).join('');
     const gs=[];for(let t=Math.max(0,tier-1);t<=tier;t++)for(const sl in SLOTS)gs.push(sl==='weapon'?`w_${S.cls}_${t}`:`${SLOTP[sl]}_${t}`);
     const gl=gs.reverse().map(id=>{const g=GEAR[id],f={u:0,id,r:0,p:0};return `<div class="item"><span class="ico c0">${gIco(id)}</span><span class="grow"><b>${g.n}</b><span class="sub">Lv.${g.lv}・${gearDesc(f)}</span></span><button class="btn sm" data-a="buyGear" data-v="${id}" ${S.gold>=g.price?'':'disabled'}>${g.price} G</button></div>`}).join('');
-    return{t:'道具商店',b:npcSay('npc_miko','蜜可','歡迎光臨！主線每推進一章，我就會進新貨喔。')+`<h3>消耗品</h3><div class="list">${its}</div><h3>裝備</h3><p class="sub">商店只賣普通裝備。附加詞條、套裝與傳說詞綴要靠冒險掉落或召喚。</p><div class="list">${gl}</div>`}},
+    return{t:'道具商店',b:npcSay('npc_miko','蜜可','歡迎光臨！主線每推進一章，我就會進新貨喔。')+`<h3>消耗品</h3><div class="list">${its}</div><h3>裝備</h3><p class="sub">商店只賣普通裝備。詞條與詞綴要靠冒險掉落。</p><div class="list">${gl}</div>`}},
   smith(){const eqd=Object.values(S.eq);const gs=[...S.gear].sort((a,b)=>eqd.includes(b.u)-eqd.includes(a.u)||b.p-a.p||b.r-a.r);
     return{t:'鐵匠鋪',b:npcSay('npc_bald','巴爾德','要強化哪一件？+7 以後失敗會掉一級，想清楚再敲。')+`<div class="chips"><span class="chip">強化石 ${S.items.stone||0}</span><span class="chip">星塵 ${S.items.dust||0}</span><span class="chip">G ${S.gold}</span></div>
       <div class="row"><button class="btn grow" data-a="disAll">一鍵分解普通、精良</button><button class="btn grow" data-a="openM" data-v="craft">合成工坊</button></div>
       <div class="list">${gs.map(g=>`<div class="item"><span class="ico c${g.r}">${gIco(g.id)}</span><span class="grow" data-a="openGear" data-v="${g.u}"><b class="c${g.r}">${gearName(g)}</b><span class="sub">${g.p>=15?'已達強化上限':`${enhCost(g)} G・強化石×${enhStone(g)}・成功率 ${enhRate(g)}%`}${eqd.includes(g.u)?'・裝備中':''}</span></span><button class="btn sm pri" data-a="enh" data-v="${g.u}" ${canEnh(g)?'':'disabled'}>強化</button></div>`).join('')}</div>
       <p class="sub">每 +1 提升 8% 主屬性，上限 +15。點裝備名稱可以洗練詞條、鎖定或分解。</p>`}},
   inn(){const c=S.lv*4;return{t:'旅店',b:npcSay('npc_martha','瑪莎','累了吧？睡一覺就能恢復精神。')+`<button class="btn pri big" data-a="rest" ${S.gold>=c?'':'disabled'}>休息一晚（${c} G）</button>`}},
-  altar(){const rows=AREAS.map((A,i)=>{const lock=i>=S.main.ch+1&&!S.main.done;return `<div class="gsec"><b>${A.n}　<small class="sub">Lv.${A.lv}</small></b>${lock?'<span class="sub">星象尚未顯現……推進主線後再來。</span>':`<span class="subl" style="color:#c2410c">⚠ 本週惡夢首領特性【${BTRAIT[weekTrait(A.boss)].n}】${BTRAIT[weekTrait(A.boss)].d}</span><span class="subl">◆ 地區套裝【${SETS[ASET(i)].n}】：此地魔物掉落（稀有以上）</span><span class="subl">◆ 首領專屬【${GEAR[BOSSU[A.boss]].n}】：${MOBS[A.boss].n}，掉落率 8%（惡夢 20%）</span>`}</div>`}).join('');
+  altar(){const rows=AREAS.map((A,i)=>{const lock=i>=S.main.ch+1&&!S.main.done;return `<div class="gsec"><b>${A.n}　<small class="sub">Lv.${A.lv}</small></b>${lock?'<span class="sub">星象尚未顯現……推進主線後再來。</span>':`<span class="subl" style="color:#c2410c">⚠ 本週惡夢首領特性【${BTRAIT[weekTrait(A.boss)].n}】${BTRAIT[weekTrait(A.boss)].d}</span><span class="subl">◆ 此地常見詞綴【${RZ[SETKW[SETS[ASET(i)].n]].n}】</span><span class="subl">◆ 首領專屬【${GEAR[BOSSU[A.boss]].n}】：${MOBS[A.boss].n}，掉落率 8%（惡夢 20%）</span>`}</div>`}).join('');
     const cs=SETS[CSET[S.cls]];
     const ft=fortune(),FI=FORT[ft&&ft.k];
-    return{t:'星象台',b:npcSay('npc_oracle','占星師',FI?`今天的星象是【${FI.n}】。${FI.say}`:'星辰不賣裝備，只告訴你去哪裡找。……要看看今天的星象嗎？')+`<div class="gsec"><b>今日星象</b>${FI?`<span class="subl">✦ ${FI.n}：${FI.d}（今天有效）</span>`:`<span class="sub">每天免費占卜一次，抽一個整天有效的祝福。</span><button class="btn pri" data-a="fortune">占卜今天的星象</button>`}</div>`+rows+`<div class="gsec"><b>職業套裝【${cs.n}】</b><span class="subl">◆ 只從<b class="c3">異變種</b>與<b class="c4">惡夢模式</b>的魔物身上掉落</span><span class="sub">2 件：${cs.d2}　4 件：${cs.d4}</span></div>`}},
+    return{t:'星象台',b:npcSay('npc_oracle','占星師',FI?`今天的星象是【${FI.n}】。${FI.say}`:'星辰不賣裝備，只告訴你去哪裡找。……要看看今天的星象嗎？')+`<div class="gsec"><b>今日星象</b>${FI?`<span class="subl">✦ ${FI.n}：${FI.d}（今天有效）</span>`:`<span class="sub">每天免費占卜一次，抽一個整天有效的祝福。</span><button class="btn pri" data-a="fortune">占卜今天的星象</button>`}</div>`+rows}},
   temple(){let b=npcSay('npc_edwin','艾德溫','轉職是冒險者的第二次誕生。先證明你能贏過自己的影子。');
     if(S.adv)b+=`<p>${you('你')}已轉職為 <b>${ADV[S.adv].n}</b>。</p>`;
     else if(S.lv<TRIAL.lv)b+=`<div class="gsec"><b>轉職試煉</b><span class="sub">Lv.${TRIAL.lv} 才能接受試煉（目前 Lv.${S.lv}）。在那之前，先把現在職業的技能練熟吧。</span></div>`;
@@ -2718,9 +2784,9 @@ function dgNext(){if(!RUN||!RUN.dg||B||!dgCanGo())return;const na=dgNextArea(),m
 const G14T=1795611600000;
 const giftOk=()=>!!(S&&!S.g14&&S.lv>=5&&S.created&&S.created<G14T);
 const giftTier=()=>{let t=0;for(let i=0;i<TLV.length;i++)if(S.lv>=TLV[i])t=i;return Math.min(t,tierCap(),TLV.length-1)};
-function giftSets(){return SETS.map((x,i)=>[x,i]).filter(([x])=>!x.cls||x.cls===S.cls)}
-function gift14(i){if(!giftOk()||!SETS[i]||(SETS[i].cls&&SETS[i].cls!==S.cls))return;const t=giftTier(),got=[];for(const sl in SLOTS){const id=sl==='weapon'?`w_${S.cls}_${t}`:`${SLOTP[sl]}_${t}`;if(!GEAR[id])continue;const g=addGear(id,2,i);got.push(gearName(g))}S.g14=1;DROPS=[];save();render();openM('msg',{t:'重製補償',b:`<div class="panel"><h3>${SETS[i].n}套裝・六件</h3><p>已放進背包：${got.join('、')}</p><p class="sub">到「角色」頁換上。</p></div><button class="btn pri big" data-a="closeM">確定</button>`})}
-function vGift(){if(!giftOk())return '';return `<div class="panel" style="border-color:var(--exp)"><div class="row"><h3 class="grow">重製補償</h3><span class="tag red">限領一次</span></div><p class="sub">裝備重製了。選一套同階稀有套裝帶走。</p><div class="list">${giftSets().map(([x,i])=>`<div class="item"><span class="grow"><b>${x.n}套裝</b><span class="sub">2 件：${x.d2}</span><span class="sub">4 件：${x.d4}</span></span><button class="btn pri sm" data-a="gift14" data-v="${i}">選這套</button></div>`).join('')}</div></div>`}
+function giftSets(){return Object.keys(RZ)}
+function gift14(k){if(!giftOk()||!RZ[k])return;const t=giftTier(),got=[];for(const sl in SLOTS){const id=sl==='weapon'?`w_${S.cls}_${t}`:`${SLOTP[sl]}_${t}`;if(!GEAR[id])continue;const g=addGear(id,2);g.sp=k;got.push(gearName(g))}S.g14=1;DROPS=[];save();render();openM('msg',{t:'重製補償',b:`<div class="panel"><h3>${RZ[k].ic} ${RZ[k].n}流・六件</h3><p>已放進背包：${got.join('、')}</p></div><button class="btn pri big" data-a="closeM">確定</button>`})}
+function vGift(){if(!giftOk())return '';return `<div class="panel" style="border-color:var(--exp)"><div class="row"><h3 class="grow">重製補償</h3><span class="tag red">限領一次</span></div><p class="sub">裝備重製了。選一種流派，帶走一整套同階稀有裝。</p><div class="list">${giftSets().map(k=>`<div class="item"><span class="grow"><b>${RZ[k].ic} ${RZ[k].n}流</b><span class="sub">${SPEC[k].d}</span></span><button class="btn pri sm" data-a="gift14" data-v="${k}">選這個</button></div>`).join('')}</div></div>`}
 function vDg(){return DG.map((D,d)=>{
   return `<div class="panel area" style="border-color:var(--exp)">${art('area_'+AREAS[D.segs[D.segs.length-1]].id,D.n)}<div class="row"><h3 class="grow">${D.n}</h3><span class="tag red">大副本</span></div><p class="sub">${D.d}</p>
   <div class="gsec"><b>規則</b><span class="sub">打倒首領可直接深入：不回城、不回血。越深掉得越好。${D.segs.length>=3?'路太長，每段之間能喘口氣。':''}</span></div>
@@ -2818,7 +2884,7 @@ const ACH=[
   {id:'enh15',n:'傳說工匠',d:'擁有 +15 的裝備',c:()=>S.gear.some(g=>g.p>=15),rw:{gold:20000}},
   {id:'leg',n:'傳說的重量',d:'取得一件傳說裝備',c:()=>S.gear.some(g=>g.r>=4),rw:{items:{dust:30}}},
   {id:'uniq',n:'首領的遺物',d:'取得一件首領專屬裝備',c:()=>S.gear.some(g=>GEAR[g.id].uniq),rw:{items:{gem_b:1}}},
-  {id:'set4',n:'整套行頭',d:'同時穿上 4 件同套裝備',c:()=>Object.values(setCounts()).some(n=>n>=4),rw:{gold:3000}},
+  {id:'set4',n:'整套行頭',d:'同一種詞綴湊到 3 件',c:()=>Object.values(kwCount()).some(n=>n>=3),rw:{gold:3000}},
   {id:'dexm',n:'魔物博士',d:'魔物圖鑑全部登錄',c:()=>dexMobs().every(k=>S.dex.m[k]),rw:{gold:10000,items:{gem_g:1}}},
   {id:'dexg',n:'收藏家',d:'裝備圖鑑登錄一半以上',c:()=>{const g=dexGear();return g.filter(k=>S.dex.g[k]).length>=g.length/2},rw:{items:{stone:5}}},
   {id:'story',n:'晨星鎮的朋友',d:'完成所有人物故事',c:()=>NST.every(q=>(S.nst[q.id]||{}).done),rw:{gold:8000,items:{gem_w:1}}},
@@ -2888,6 +2954,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'15.0',d:'2026-11-26',t:'流派與套裝合併、戰鬥演出',b:'套裝併入流派：原本的套裝裝備改成帶一個詞綴，同種詞綴湊 2、3 件就有共鳴。招式圖卡先亮相，特效與命中跟在後面。每個地區有自己的戰鬥音樂。魔物依種族有不同的攻擊動作。'},
   {v:'14.6',d:'2026-11-26',t:'後期職業平衡',b:'高等級時劍士不再一枝獨秀，法師與遊俠更耐打。'},
   {v:'14.5',d:'2026-11-26',t:'大副本「霧都長征」',b:'第三個大副本開放：要塞、石板路、地下書庫連成一趟，共三段。這三個地區的戰鬥背景也各多了三張。法師與遊俠後期變耐打了；後期首領下手輕了一點。'},
   {v:'14.4',d:'2026-11-25',t:'大副本「凍脈深坑」、戰鬥背景',b:'第二個大副本開放：穿過礦坑、爬上雪山，有新魔物與中首領。草原、森林、礦坑、雪山的戰鬥背景各多了三張，一趟冒險裡每場都不一樣。'},
@@ -3045,7 +3112,7 @@ function mkFoe(id,kind){const m=MOBS[id],bs=!!m.boss,el=kind==='elite',nm=!!(RUN
   const mut=!bs&&!nm&&S.main.ch>=1&&Math.random()<.1;
   const dgd=RUN&&RUN.dg?(RUN.dg.diff||0):0;const L=(RUN&&RUN.tower?RUN.tlv:RUN&&RUN.trial?m.lv:adLv(m,bs))+(nm?10:0)+(mut?3:0)+(bs?[0,1,3]:[0,2,4])[dgd];
   const mult=(bs?(RUN&&!RUN.tower?1.05+RUN.area*.05:1.25):el?1.12:1)*(nm?1.35:1)*(mut?1.45:1),kh=(bs?(RUN&&!RUN.tower?(RUN.area===0&&!nm?2.8:3.3+RUN.area*.6)*(RUN.area===3?1.4:RUN.area>=4?1.25:RUN.area>=1?1.1:1):4.5):el?1.8:1)*(nm?1.6:1)*(mut?2.2:1);
-  const st=mobBuild(m,L,mult*[1,1.1,1.27][dgd],kh*[1,1.2,1.55][dgd]);
+  const st=mobBuild(m,L,mult*[1,1.14,1.33][dgd],kh*[1,1.28,1.7][dgd]);
   const BMOD={goblinboss:'scout',zenos:'galeAlly'},bm=bs&&!nm&&S.flags[BMOD[id]]&&S.main.ch===RUN.area;if(bm)st.HP=Math.round(st.HP*.8);
   const aff=[];if(mut||nm){const ks=Object.keys(AFF).sort(()=>Math.random()-.5);aff.push(...ks.slice(0,bs&&nm?2:1))}
   if(aff.includes('rage'))st.ATK=Math.round(st.ATK*1.4),st.MAG=Math.round(st.MAG*1.4);if(aff.includes('shell'))st.DEF=Math.round(st.DEF*1.8),st.MRES=Math.round(st.MRES*1.8);if(aff.includes('swift'))st.EVA+=15,st.CRIT+=15;
@@ -3188,7 +3255,7 @@ function pAct(type,arg){if(!B||B.busy)return;const s=stats();
   else if(type==='flee'){if(Math.random()<.6+S.attr.DEX*.005){B=null;RUN.view={type:'res',title:'成功逃離',text:'你甩開了魔物，繼續趕路。'};render();return}blog('逃跑失敗！')}
   B.menu='main';B.busy=true;render();
   if(B.hp<=0){setTimeout(win,type==='skill'?1900:1200);return}
-  setTimeout(foeTurn,AS(type==='skill'?1750:850))}
+  setTimeout(foeTurn,AS(type==='skill'?1750+(B&&B.pd||PD):850))}
 /* 魔法型首領（MAG 遠高於 ATK）的普通攻擊改成魔力彈：吃 MAG×0.6、看魔抗 */
 const mgB=()=>!!(B&&B.kind==='boss'&&B.id!=='shadow'&&B.mag>B.atk*1.5);
 const isDng=k=>!!k&&!!k.pow&&((k.pow||0)>=1.6||(k.h||1)>=3);
@@ -3972,7 +4039,7 @@ const ACT={
   startRun(v){if(S.hp<=1){toast('HP 太低，先到旅店休息');return}startRun(+v)},
   trial(){if(S.adv||S.trial||S.lv<TRIAL.lv)return;if(S.hp<=1){toast('HP 太低，先到旅店休息');return}const sh=SHADOW[S.cls];MOBS.shadow.ty=sh[0];MOBS.shadow.sk=sh[1];
     closeM();TAB='adv';RUN={area:Math.min(4,Math.max(0,S.main.ch)),trial:true,nm:false,step:0,nodes:['boss'],loot:{gold:0,exp:0,items:[]},view:{type:'start'}};startBattle('shadow','boss');render()},
-  startDg(v){if(S.hp<=1){toast('HP 太低，先到旅店休息');return}const [d,k]=String(v).split(':').map(Number);startDg(d,k)},dgNext(){dgNext()},gift14(v){gift14(+v)},setStn(v){if(B){toast('戰鬥中不能切換戰法');return}S.stn=+v?1:0;save();render();toast(`切換為【${STN[S.cls][stn()].n}】`)},dgDiff(v){DGDIFF=+v;render()},
+  startDg(v){if(S.hp<=1){toast('HP 太低，先到旅店休息');return}const [d,k]=String(v).split(':').map(Number);startDg(d,k)},dgNext(){dgNext()},gift14(v){gift14(v)},setStn(v){if(B){toast('戰鬥中不能切換戰法');return}S.stn=+v?1:0;save();render();toast(`切換為【${STN[S.cls][stn()].n}】`)},dgDiff(v){DGDIFF=+v;render()},
   startNm(v){if(S.hp<=1){toast('HP 太低，先到旅店休息');return}startRun(+v,true)},
   runNext(){runNext()},bossGo(){if(!RUN)return;RUN.gate=1;runNext()},gatePrep(v){doPrep(v)},bossBox(v){bossBox(v)},core(v){corePick(v)},kiln(v){kilnPick(v)},camp(v){campPick(v)},retreat(){if(!RUN)return;if(RUN.step<0){RUN=null;render()}else finish(false)},retreatAsk(){if(!RUN||B)return;if(confirm('要撤退回城嗎？\n已獲得的金幣、經驗與戰利品都會保留。'))ACT.retreat()},finish(){finish(true)},
   evPick(v){evPick(+v)},
