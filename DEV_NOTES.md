@@ -266,4 +266,4 @@
 - 有 `_a1` 的魔物，舊鍵 `_atk/_hurt/_low/_charge/_win` 由 `mobN()` 自動對應，不要再補這些舊變體圖，也不要向 Codex 下單魔物圖。
 - 亞種（MVAR）已有專屬圖，不再套濾鏡。43 隻全部換新。
 
-- 劇情圖 `story_ch{1-7}_{intro,mid,outro}_{m,f}_usual` 已換新畫風（1280×720）。重畫中仍為舊圖：ch1_intro_m、ch2_mid_m/f、ch3_mid_f、ch3_outro_f、ch7_mid_m/f。不要覆蓋或向 Codex 下單。
+- 劇情圖 `story_ch{1-7}_{intro,mid,outro}_{m,f}_usual` 已換新畫風（1280×720）。42 張全部換新。不要覆蓋或向 Codex 下單。
