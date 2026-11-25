@@ -471,6 +471,46 @@ body.pc #app{margin:0;flex:none;box-shadow:0 0 40px rgba(0,0,0,.45)}
 @keyframes v2rg{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(22)}}
 @keyframes v2ob{0%{opacity:1;transform:translate(0,0) scale(.5)}100%{opacity:0;transform:translate(var(--dx,0),38vh) scale(1.6)}}
 @keyframes v2fl{0%{opacity:.7}100%{opacity:0}}
+
+/* 魔物普攻：衝擊演出 */
+.fhit{position:absolute;inset:0;z-index:27;pointer-events:none;overflow:hidden;--tx:14%;--ty:86%}
+.fhit.lu{--tx:88%}
+.fhit>u{position:absolute;inset:0;background:#fff;opacity:0}
+.fhit.hit>u{animation:v2wf .28s .27s ease-out}
+.fhit.hit.hv>u{background:#ff3b3b;animation:v2wf .42s .27s ease-out}
+.fhit>em{position:absolute;left:var(--tx);top:var(--ty);width:10px;height:10px;margin:-5px;border-radius:50%;opacity:0}
+.fhit.hit>em{background:radial-gradient(circle,#fff 0 30%,#ffd86b 45%,rgba(255,90,60,.9) 62%,transparent 72%);animation:v2bst .42s .26s ease-out;box-shadow:0 0 0 2px rgba(255,255,255,.6)}
+.fhit.hit.hv>em{animation:v2bst2 .55s .26s ease-out}
+.fhit>i{position:absolute;opacity:0}
+.fhit.t-claw>i{left:calc(var(--tx) - 34%);top:calc(var(--ty) - 9%);width:68%;height:9px;border-radius:50%;background:linear-gradient(90deg,transparent,#fff 35%,#ffb37a 65%,transparent);transform:rotate(-38deg) scaleX(0);box-shadow:0 0 10px #ff7a4a}
+.fhit.t-claw>i:nth-of-type(2){top:calc(var(--ty) - 3%)}.fhit.t-claw>i:nth-of-type(3){top:calc(var(--ty) + 3%)}
+.fhit.t-claw.hit>i,.fhit.t-claw.miss>i{animation:v2sl .24s .2s ease-out}
+.fhit.t-claw>i:nth-of-type(2){animation-delay:.25s!important}.fhit.t-claw>i:nth-of-type(3){animation-delay:.3s!important}
+.fhit.t-claw.miss>i{opacity:0;filter:grayscale(1) brightness(1.4)}
+.fhit.t-slam>i{left:var(--tx);top:var(--ty);width:16px;height:16px;margin:-8px;border:5px solid #fff;border-radius:50%}
+.fhit.t-slam.hit>i{animation:v2rg2 .5s .27s ease-out}.fhit.t-slam.hit>i:nth-of-type(2){animation-delay:.36s;border-color:#ffd86b}.fhit.t-slam.hit>i:nth-of-type(3){animation-delay:.45s;border-width:2px}
+.fhit.t-slam.miss>i:first-of-type{animation:v2rg2 .4s .27s ease-out;border-color:#ccc;border-width:2px}
+.fhit.t-orb>i{left:50%;top:40%;width:30px;height:30px;margin:-15px;border-radius:50%;background:radial-gradient(circle,#fff,#b48bff 55%,transparent 72%);box-shadow:0 0 16px #b48bff;--ex:calc(var(--tx) - 50%)}
+.fhit.t-orb>i:first-of-type{animation:v2orb .26s .02s cubic-bezier(.5,0,.9,.5)}
+.fhit.t-orb.lu>i:first-of-type{animation-name:v2orbR}
+.stage.v2:has(.fhit.hit){animation:v2qk .3s .27s}
+.stage.v2:has(.fhit.hit.hv){animation:v2qk2 .45s .27s}
+.stage.v2:has(.fskin.dg){animation:v2qk2 .5s .92s}
+.stage.v2:has(.fhit.hit:not(.lu)) .spr.me .art,.stage.v2:has(.fskin) .spr.me.hitl .art{animation:v2kb .4s .27s}
+.stage.v2:has(.fskin) .spr.me.hitl .art{animation-delay:.92s}
+.stage.v2:has(.fhit.lu) .ally .art{animation:v2kb .4s .27s}
+@keyframes v2wf{0%{opacity:.55}100%{opacity:0}}
+@keyframes v2bst{0%{opacity:1;transform:scale(1)}60%{opacity:1;transform:scale(15)}100%{opacity:0;transform:scale(19)}}
+@keyframes v2bst2{0%{opacity:1;transform:scale(1)}55%{opacity:1;transform:scale(24)}100%{opacity:0;transform:scale(30)}}
+@keyframes v2sl{0%{opacity:1;transform:rotate(-38deg) scaleX(0)}55%{opacity:1;transform:rotate(-38deg) scaleX(1)}100%{opacity:0;transform:rotate(-38deg) scaleX(1.08)}}
+@keyframes v2rg2{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(15)}}
+@keyframes v2orb{0%{opacity:1;transform:translate(0,0) scale(.6)}100%{opacity:1;transform:translate(-36vw,40vh) scale(1.3)}}
+@keyframes v2orbR{0%{opacity:1;transform:translate(0,0) scale(.6)}100%{opacity:1;transform:translate(36vw,40vh) scale(1.3)}}
+@keyframes v2qk{0%,100%{transform:none}20%{transform:translate(-5px,3px)}45%{transform:translate(5px,-3px)}70%{transform:translate(-3px,2px)}}
+@keyframes v2qk2{0%,100%{transform:none}12%{transform:translate(-9px,5px) rotate(-.6deg)}30%{transform:translate(9px,-5px) rotate(.6deg)}50%{transform:translate(-7px,4px)}70%{transform:translate(6px,-3px)}85%{transform:translate(-3px,2px)}}
+@keyframes v2kb{0%,100%{transform:none}25%{transform:translate(-7%,5%) rotate(-6deg);filter:brightness(2.2)}55%{transform:translate(4%,-2%) rotate(3deg)}}
+.stage.v2 .spr.foe.lunge-foe{animation:v2lg2 .44s}
+@keyframes v2lg2{0%{transform:none}22%{transform:translateY(-7%) scale(1.06)}58%{transform:translateY(24%) scale(1.3)}100%{transform:none}}
 </style>
 </head>
 <body>
@@ -1989,7 +2029,7 @@ function vRun(){if(RUN.tower)return vTower();const a=AREAS[RUN.area],v=RUN.view,
     else body+=(v.r?`<div class="die ${v.r.ok?'ok':'ng'}">${v.r.d}</div><p class="calc">d20 <b>${v.r.d}</b> + ${ATTR[v.r.a]}修正 <b>${v.r.mod}</b> = <b>${v.r.d+v.r.mod}</b>　／　DC ${v.r.dc}<br><b style="color:var(--${v.r.ok?'exp':'hp'})">${v.r.d===20?'大成功！':v.r.d===1?'大失敗…':v.r.ok?'檢定成功':'檢定失敗'}</b></p>`:'')+
       `<p>${v.text}</p>${v.gain.length?`<div class="chips">${v.gain.map(g=>`<span class="chip">${g}</span>`).join('')}</div>`:''}${v.amb?'<button class="btn pri big" data-a="evFight">迎戰！</button>':`<button class="btn pri big" data-a="${last?'finish':'runNext'}">${last?'完成冒險':'繼續前進'}</button>`}`;
     body+='</div>'}
-  return `<div class="row"><h2 class="grow">${a.n}</h2><span class="sub">已獲得 ${RUN.loot.gold} G・${RUN.loot.exp} EXP</span></div>${pips}${RUN.etr&&ETRAIT[RUN.etr]&&RUN.step<4&&RUN.nodes[4]==='elite'&&!RUN.tower&&!RUN.trial?`<p class="sub" style="margin:2px 0 6px;color:#c2410c">${trIc(RUN.etr,22)}中段強敵帶著霧紋【${ETRAIT[RUN.etr].n}】：${ETRAIT[RUN.etr].d}　<span style="opacity:.75">建議：${ETRAIT[RUN.etr].tip}</span></p>`:''}${RUN.hone&&!RUN.tower?`<p class="sub" style="margin:2px 0 6px;color:var(--exp)">⚔ 磨刃：本趟冒險傷害 +${RUN.hone*12}%</p>`:''}${RUN.raid&&!RUN.tower?`<p class="sub" style="margin:2px 0 6px;color:var(--exp)">🌙 夜探：下一場強敵或首領戰由你奇襲</p>`:''}${RUN.core&&MCORE[RUN.core]?`<p class="sub" style="margin:2px 0 6px;color:var(--exp)">${coreIc(RUN.core)}${coreNm(RUN.core)}：${coreDs(RUN.core)}${RUN.core==='temper'?(RUN.coreN>=1?'（已淬鍊完成）':'（淬鍊中）'):''}</p>`:''}${body}`}
+  return `<div class="row"><h2 class="grow">${a.n}</h2><span class="sub">已獲得 ${RUN.loot.gold} G・${RUN.loot.exp} EXP</span>${RUN.step>=0&&!RUN.tower&&!RUN.trial?'<button class="btn sm" data-a="retreatAsk" style="margin-left:6px">撤退</button>':''}</div>${pips}${RUN.etr&&ETRAIT[RUN.etr]&&RUN.step<4&&RUN.nodes[4]==='elite'&&!RUN.tower&&!RUN.trial?`<p class="sub" style="margin:2px 0 6px;color:#c2410c">${trIc(RUN.etr,22)}中段強敵帶著霧紋【${ETRAIT[RUN.etr].n}】：${ETRAIT[RUN.etr].d}　<span style="opacity:.75">建議：${ETRAIT[RUN.etr].tip}</span></p>`:''}${RUN.hone&&!RUN.tower?`<p class="sub" style="margin:2px 0 6px;color:var(--exp)">⚔ 磨刃：本趟冒險傷害 +${RUN.hone*12}%</p>`:''}${RUN.raid&&!RUN.tower?`<p class="sub" style="margin:2px 0 6px;color:var(--exp)">🌙 夜探：下一場強敵或首領戰由你奇襲</p>`:''}${RUN.core&&MCORE[RUN.core]?`<p class="sub" style="margin:2px 0 6px;color:var(--exp)">${coreIc(RUN.core)}${coreNm(RUN.core)}：${coreDs(RUN.core)}${RUN.core==='temper'?(RUN.coreN>=1?'（已淬鍊完成）':'（淬鍊中）'):''}</p>`:''}${body}`}
 const hpCls=(v,m)=>v/m>.5?'g':v/m>.2?'y':'r';
 function bbar(v,m,prev,c){const p=Math.max(0,Math.min(100,v/m*100));return `<div class="bbar ${c?'s':''}"><i class="${c||hpCls(v,m)}" style="width:${prev==null?p:prev}%" data-w="${p}"></i></div>`}
 function vBattle(){const s=stats(),fx=B.fx||{},intro=B.intro,a=AREAS[RUN.area];B.fx=null;B.intro=false;const AL=B.ally,aD=B.allyD,aH=B.allyH,aHit=B.allyHit;B.allyD=B.allyH=B.allyHit=0;
@@ -2031,6 +2071,7 @@ function vBattle(){const s=stats(),fx=B.fx||{},intro=B.intro,a=AREAS[RUN.area];B
 function v2Over(fx,sk,fk,theirs,s,pp,AL,aHit,aH){let h='';try{const mB=AK(),im=k=>ARTSET&&ARTSET.has(k)?`<img src="art/${k}.webp" alt="">`:'';
   if(sk&&fx.by==='me'&&fx.skill){const ks=battleSkills(),i=ks.indexOf(fx.skill),n=(SK[fx.skill]&&SK[fx.skill].ult)||i%2?2:1,g=im(mB+'_s'+n);if(g)h+=`<div class="posein p${n}"><i></i>${g}<b>${esc(SK[fx.skill]?SK[fx.skill].n:'')}</b></div>`}
   if(AL&&AL.id==='luna'&&aH&&!sk&&!fk){const g=im('an_luna_s'+((B.turn||0)%2?2:1));if(g)h+=`<div class="posein lu"><i></i>${g}<b>${esc(AL.n)}</b></div>`}
+  if(theirs&&!fk&&!fx.stun&&B&&B.m){const ty={brute:'slam',tank:'slam',swift:'claw',caster:'orb'}[B.m.ty]||'claw',hit=fx.d>0,lu=!hit&&aHit;h+=`<div class="fhit t-${ty} ${hit||lu?'hit':'miss'} ${lu?'lu':''} ${hit&&fx.d>=s.HP*.2?'hv':''}"><u></u><i></i><i></i><i></i><em></em></div>`}
   if(fk){const k=SKM[fx.fsk]||{},t={claw:'claw',slam:'slam',roar:'roar',orb:'orb',spore:'orb',drain:'orb'}[k.fx]||'flash',dg=fx.d>0&&fx.d>=s.HP*.22;h+=`<div class="fskin t-${t} ${dg?'dg':''}"><u></u><i></i><i></i><i></i><b>${esc(k.n||'')}</b></div>`}
   if(theirs&&fx.d>0&&S.hp>0&&(fx.d>=s.HP*.3||((pp??100)>30&&B.php<=30))&&(B.dmc||0)<2){const g=im(mB+'_dm');if(g){B.dmc=(B.dmc||0)+1;h+=`<div class="dmgin ${fk?'late':''}"><i></i>${g}<b>重創</b></div>`}}
   else if(AL&&AL.id==='luna'&&aHit&&AL.hp>0&&aHit>=AL.max*.35&&!B.ldmc){const g=im('an_luna_dm');if(g){B.ldmc=1;h+=`<div class="dmgin lu"><i></i>${g}<b>重創</b></div>`}}
@@ -2038,7 +2079,8 @@ function v2Over(fx,sk,fk,theirs,s,pp,AL,aHit,aH){let h='';try{const mB=AK(),im=k
 function skillFx(t,n){return '<div class="fxl"><div class="dim"></div><div class="mc"><i></i><i></i></div></div>'}
 function foeSkillFx(id){return '<div class="fxl"><div class="dim"></div></div>'}
 const MELEE={claw:1,slam:1};
-function afterBattle(){const el=$('#msg');if(!el||!B)return;if(B.pfx){const f=B.pfx;B.pfx=null;requestAnimationFrame(()=>f.by==='me'?PFX.me(f):PFX.foe(f))}
+function v2Fit(){try{const st=document.querySelector('.stage.v2');if(!st)return;const fo=st.querySelector('.spr.foe'),ib=st.querySelector('.foe-i'),me=st.querySelector('.me-i');if(!fo||!ib||!me)return;fo.style.width='';fo.style.left='';fo.style.top='';fo.style.bottom='';const W=st.clientWidth,top=ib.offsetTop+ib.offsetHeight+6,bot=me.offsetTop-10,av=bot-top;if(av<40)return;const sz=Math.max(90,Math.min(fo.offsetWidth,av,W*.74));fo.style.width=sz+'px';fo.style.left=(W-sz)/2+'px';fo.style.top=Math.max(top-sz*.06,bot-sz)+'px';fo.style.bottom='auto'}catch(e){}}
+function afterBattle(){v2Fit();const el=$('#msg');if(!el||!B)return;if(B.pfx){const f=B.pfx;B.pfx=null;requestAnimationFrame(()=>f.by==='me'?PFX.me(f):PFX.foe(f))}
   const upd=()=>document.querySelectorAll('.bbar i').forEach(i=>i.style.width=i.dataset.w+'%');if(B.delayBar)setTimeout(upd,950);else requestAnimationFrame(()=>requestAnimationFrame(upd));
   clearInterval(window.TYPER);if(B.shown===B.log.length){el.textContent=B.msg||'';return}
   const txt=B.msg=B.log.slice(Math.max(B.shown,B.log.length-3)).join('\n');B.shown=B.log.length;let n=0;
@@ -2715,6 +2757,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'12.6',d:'2026-11-25',t:'魔物攻擊衝擊感、隨時撤退',b:'魔物的普通攻擊現在會撲向畫面，並依類型打出不同的衝擊演出（爪擊、重砸、魔彈），命中時頭像被擊退、畫面震動，重擊會更強烈。魔物圖不再被上方資訊欄或下方隊伍欄蓋住，會自動縮放到中間的空位。冒險途中任何時候（戰鬥以外）都能從右上角「撤退」回城，戰利品照樣保留。'},
   {v:'12.5',d:'2026-11-25',t:'畫風重製與全新戰鬥畫面',b:'主角與露娜全面換上新的動畫畫風：12 個職業男女各一套全新立繪。戰鬥畫面重新設計——魔物站在畫面中央，我方改在下方以頭像顯示；普通攻擊與受傷時頭像會換表情，施放技能會切入職業專屬的招式姿勢圖，受到重創時會跳出戰損插圖；魔物放技能時改用全螢幕動畫演出（爪擊、震地、咆哮、魔彈），並打出招式名稱。'},
   {v:'12.4',d:'2026-11-23',t:'夜探奇襲、兩種新霧紋、魔力彈',b:'營地與霧窯多了第四個選擇「夜探」：不休息，摸黑去探前面的路，下一場強敵或首領戰由你奇襲——牠第一回合來不及行動，你的第一擊傷害 +50%。中段強敵新增兩種霧紋：「漲潮」（每回合攻擊 +12%，拖越久越痛，要速戰速決）與「反震」（單次打太重會震回自己身上，多段攻擊和持續傷害比較吃香）。魔法型首領（樹王、霜龍等）的普通攻擊改成「魔力彈」，看的是魔抗而不是防禦，法系職業比較扛得住、只堆防禦的角色要留意。九顆精鍛霧核換上帶金色箍環的正式圖示。修正：敵人暈眩時預告仍顯示牠下回合會出招，現在會標示「暈眩中」。'},
   {v:'12.3',d:'2026-11-23',t:'營地抉擇：休整、磨刃、搜刮',b:'營地不再只是回血，天亮前只夠做一件事：休整（回復 35% HP／MP）、磨刃（不休息，本趟冒險傷害 +12%，最多兩次）、搜刮（不休息，拿金幣與治療藥水）。帶著霧核時的霧窯也多了「磨刃」可以選。五張地圖各多一個新事件，路邊的磨刀匠、岩縫裡的溫泉、封死的軍械庫也有機會磨刃。營地選項、裂紋霧核與三種霧紋換上正式圖示。修正手機戰鬥中「全自動」按鈕蓋住指令按鈕的問題。'},
@@ -3760,7 +3803,7 @@ const ACT={
   trial(){if(S.adv||S.trial||S.lv<TRIAL.lv)return;if(S.hp<=1){toast('HP 太低，先到旅店休息');return}const sh=SHADOW[S.cls];MOBS.shadow.ty=sh[0];MOBS.shadow.sk=sh[1];
     closeM();TAB='adv';RUN={area:Math.min(4,Math.max(0,S.main.ch)),trial:true,nm:false,step:0,nodes:['boss'],loot:{gold:0,exp:0,items:[]},view:{type:'start'}};startBattle('shadow','boss');render()},
   startNm(v){if(S.hp<=1){toast('HP 太低，先到旅店休息');return}startRun(+v,true)},
-  runNext(){runNext()},bossGo(){if(!RUN)return;RUN.gate=1;runNext()},gatePrep(v){doPrep(v)},bossBox(v){bossBox(v)},core(v){corePick(v)},kiln(v){kilnPick(v)},camp(v){campPick(v)},retreat(){if(RUN.step<0){RUN=null;render()}else finish(false)},finish(){finish(true)},
+  runNext(){runNext()},bossGo(){if(!RUN)return;RUN.gate=1;runNext()},gatePrep(v){doPrep(v)},bossBox(v){bossBox(v)},core(v){corePick(v)},kiln(v){kilnPick(v)},camp(v){campPick(v)},retreat(){if(!RUN)return;if(RUN.step<0){RUN=null;render()}else finish(false)},retreatAsk(){if(!RUN||B)return;if(confirm('要撤退回城嗎？\n已獲得的金幣、經驗與戰利品都會保留。'))ACT.retreat()},finish(){finish(true)},
   evPick(v){evPick(+v)},
   bAtk(){pAct('atk')},bGuard(){pAct('guard')},bFlee(){pAct('flee')},bSkill(v){pAct('skill',v)},bItem(v){pAct('item',v)},
   bMenu(v){if(B.busy)return;B.menu=v;render()},
