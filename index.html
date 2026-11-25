@@ -1747,12 +1747,18 @@ function readCode(c){try{c=(c||'').trim();if(!c.startsWith('AO1-'))return null;c
 function greet(who,fallback){const g=GREET[who];return (g&&pickC(g))||fallback}
 /* 戰鬥中的即時對話泡泡 */
 const BT={
-  luna:{start:[['測霧燈有反應……小心，牠身上沾了霧。',null],['我在後面，{你|妳}專心打就好。',null],['又是牠們？今天第三群了吧。',null],['別逞強，痛了就說喔。',null],['跟礦坑那些比，這隻還算客氣。',()=>chA(3)],['冷死了……打完這場就去烤火！',()=>chA(3)&&!chA(4)]],
+  luna:{start:[['測霧燈有反應……小心，牠身上沾了霧。',null],['我在後面，{你|妳}專心打就好。',null],['又是牠們？今天第三群了吧。',null],['數量不少……先解決最弱的那隻。',()=>B&&B.adds&&B.adds.length>0],['這隻比一般的大，別大意。',()=>B&&B.kind==='elite'],['牠飛得很高，等牠俯衝再出手。',()=>B&&B.m&&B.m.fly],['{你|妳}的血不多，這場我多留意治療。',()=>{try{return S.hp<stats().HP*.5}catch(e){return false}}],['別逞強，痛了就說喔。',null],['跟礦坑那些比，這隻還算客氣。',()=>chA(3)],['冷死了……打完這場就去烤火！',()=>chA(3)&&!chA(4)]],
     boss:[['就是牠……{name}，這次換我們先出手。',null],['手在抖？……我也是。一起上吧。',null],['這股霧的濃度……不能讓牠逃掉！',()=>chA(2)]],
-    crit:[['好漂亮的一擊！',null],['……剛剛那下，我都替牠覺得痛。',null],['再來一次！就是那樣！',null]],
+    crit:[['好漂亮的一擊！',null],['打中弱點了！',null],['……剛剛那下，我都替牠覺得痛。',null],['再來一次！就是那樣！',null]],
     low:[['{name}！退後一點，我來擋！',null],['撐住！燈還亮著，我們就還沒輸！',null]],
-    guard:[['看穿了！就是現在！',null],['好險……{你|妳}的反應好快。',null]],
-    win:[['呼……結束了。{你|妳}有沒有受傷？',null],['牠身上的霧晶我收走囉，研究用的。',null],['下次換我打前鋒——開玩笑的，我會乖乖待在後面。',null]]},
+    guard:[['看穿了！就是現在！',null],['擋得好！牠收不回來了，反擊！',null],['好險……{你|妳}的反應好快。',null]],
+    charge:[['牠在蓄力！先防禦，不然就趁現在打斷牠！',null],['那股氣息不對……這一下不能硬吃！',null],['測霧燈在抖……牠要放大招了！',null]],
+    rage:[['牠發狂了！接下來每一下都很痛，小心！',null],['血量過半了，牠開始拚命了。',null],['別被牠的氣勢壓住，照我們的節奏打！',null]],
+    brk:[['打斷了！牠站不穩，快追擊！',null],['漂亮！牠的大招放不出來了。',null]],
+    dodge:[['好險，剛剛那下擦過去了。',null],['閃得好！牠露出空檔了。',null],['牠揮空了，趁現在！',null]],
+    drag:[['拖太久了……牠還有體力，我們得加快。',null],['藥水還夠嗎？這場比想像中難纏。',null],['牠的動作我大概看懂了，再撐一下。',null]],
+    near:[['牠快不行了，別給牠喘息的機會！',null],['再一下就倒了，穩穩打！',null],['牠的霧在散……只差一點！',null]],
+    win:[['呼……結束了。{你|妳}有沒有受傷？',null],['牠身上的霧晶我收走囉，研究用的。',null],['這場打得很順，照這個節奏走。',null],['先喘口氣，我看一下{你|妳}的傷。',()=>{try{return S.hp<stats().HP*.5}catch(e){return false}}],['下次換我打前鋒——開玩笑的，我會乖乖待在後面。',null]]},
   me:{start:[['（來吧。）',null],['又擋路，真受不了。',null],['（先看清楚牠的動作……）',null]],
     boss:[['（心跳好快……冷靜。）',null],['終於找到你了。',null]],
     crit:[['就是這裡！',null],['抓到了！',null]],
@@ -1798,9 +1804,9 @@ const LOUT=[['出發前檢查一下：藥水、繩子、{你|妳}的劍。',cI('
 function lunaOut(){if(!withLuna())return '';const l=pickC(LOUT);return l?you(tx(l)):''}
 function bub(who,text){try{const el=document.querySelector(who==='luna'?'.stage .ally':'.stage .spr.me'),app=$('#app');if(!el||!app||!text)return;const r=el.getBoundingClientRect(),a=app.getBoundingClientRect();
   const d=document.createElement('div');d.className='spb '+(who==='luna'?'bubL':'bubM');d.innerHTML=`<b>${who==='luna'?'露娜':esc(S.name)}</b>${esc(you(tx(text)))}`;d.style.left=Math.max(4,Math.min(a.width-200,r.left-a.left+r.width*(who==='luna'?.1:.35)))+'px';d.style.top=Math.max(4,r.top-a.top-8)+'px';app.appendChild(d);setTimeout(()=>d.classList.add('out'),2300);setTimeout(()=>d.remove(),2700)}catch(e){}}
-function talk(ev,force){if(!B||!S)return;B.talkN=B.talkN||0;if(B.talkN>=3&&!force)return;const ch={start:.35,boss:1,crit:.3,low:1,guard:.8,win:.5}[ev]||.3;if(!force&&Math.random()>ch)return;
+function talk(ev,force){if(!B||!S)return;B.talkN=B.talkN||0;if(B.talkN>=3&&!force)return;const ch={start:.35,boss:1,crit:.3,low:1,guard:.8,win:.5,charge:1,rage:.9,brk:.9,dodge:.25,drag:.7,near:.5}[ev]||.3;if(!force&&Math.random()>ch)return;
   if(ev==='low'){if(B.talkLow)return;B.talkLow=1}
-  const L=withLuna()&&Math.random()<.7;const line=pickC((L?BT.luna:BT.me)[ev]||[]);if(!line)return;B.talkN++;
+  const L=withLuna()&&(!BT.me[ev]||Math.random()<.7)&&!(B.ally&&B.ally.hp<=0);const line=pickC((L?BT.luna:BT.me)[ev]||[]);if(!line)return;B.talkN++;
   if(ev==='win'){blog(`${L?'露娜':S.name}：「${you(tx(line))}」`);return}
   bub(L?'luna':'me',line);if(L&&Math.random()<.35)setTimeout(()=>{if(B)bub('me',pickC(BT.me.reply))},1500)}
 /* 營火閒聊：和露娜依章節慢慢聊開；沒帶夥伴時是主角的心聲 */
@@ -2765,7 +2771,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
-  {v:'13.3',d:'2026-11-25',t:'露娜台詞調整、切回分頁不再卡頓',b:'切到別的 App 或分頁再回來時，不會再把積欠的音樂音符與戰鬥特效一口氣播出來而卡住。露娜放招時不再喊口號（像「照路之光・撐住！」這類），只顯示招式名。另外拿掉、改寫了一批比較尷尬的台詞（戰鬥喊話、出發前的話、營火閒聊與戰敗後的安慰），讓她說話更自然。'},
+  {v:'13.3',d:'2026-11-25',t:'露娜台詞調整、切回分頁不再卡頓',b:'露娜新增一批依戰況說的話：首領蓄力、暴走、成功打斷、你閃開攻擊、敵人快倒下、戰鬥拖太久，以及遇到成群、精英、飛行魔物或你血量偏低時的開場提醒。切到別的 App 或分頁再回來時，不會再把積欠的音樂音符與戰鬥特效一口氣播出來而卡住。露娜放招時不再喊口號（像「照路之光・撐住！」這類），只顯示招式名。另外拿掉、改寫了一批比較尷尬的台詞（戰鬥喊話、出發前的話、營火閒聊與戰敗後的安慰），讓她說話更自然。'},
   {v:'13.2',d:'2026-11-25',t:'旅途插圖換新畫風',b:'旅途中遇到的五位人物（阿蕾、葛蕾塔、米洛、賽門、托比）的插圖換成新畫風，共 25 張。第三章首領預告圖重畫完成。露娜的「燈光術」演出換成新姿勢。'},
   {v:'13.1',d:'2026-11-25',t:'露娜立繪重畫、NPC 與蓋爾換新畫風',b:'露娜的全身立繪與招式圖重畫：提燈掛在腰間，招式改為放出燈光與祈禱治癒（不再揮拳）；治癒時出現祈禱演出，攻擊時偶爾出現燈光術演出。晨星鎮 9 位 NPC（含三種表情）、5 位旅途中遇到的人物、夥伴蓋爾都換成新畫風；蓋爾在戰鬥中改用頭像表情並有出招演出。章節首領預告圖 6 張與牧羊女阿蕾的旅途插圖也換新。其餘旅途插圖繪製中。'},
   {v:'13.0',d:'2026-11-25',t:'冒險途中重新整理不再丟進度',b:'冒險到一半關掉或重新整理頁面，回來會自動接回同一趟路線：已拿到的金幣、經驗、戰利品、祝福與霧核都保留。如果是在戰鬥中離開，會回到那場戰鬥之前，需要重新打一次（HP、MP 維持離開時的狀態）。戰敗畫面改用新畫風的負傷插圖。'},
@@ -3057,11 +3063,11 @@ function foeTurn(){if(!B)return;if(B.treasure&&B.turn>=3&&B.hp>0){B=null;RUN.vie
   if(B.spk){blog(`【尖刺】這回合你被反彈了 ${B.spk} 傷害`);B.spk=0}
   if(B.aff.includes('regen')&&B.turn<20){const h=Math.round(B.max*.06);B.hp=Math.min(B.max,B.hp+h);blog(`${B.name} 再生了 ${h} HP`)}
   if(B.turn>=20){const d=Math.round(B.max*Math.min(.15,.02*(B.turn-19)));B.hp=Math.max(0,B.hp-d);blog(`久戰之下，${B.name} 開始力竭，流失 ${d} HP`);if(B.hp<=0){render();setTimeout(win,1200);return}}
-  const fx=B.fx={by:'foe'};
-  if(B.kind==='boss'&&!B.rage&&B.hp<B.max*.5){B.rage=1;B.atk=Math.round(B.atk*1.3);B.mag=Math.round(B.mag*1.3);fx.cut=`${B.m.n} 暴走`;fx.fsk='m_rage';blog(`${B.name} 進入暴走狀態！攻擊大幅提升`)}
+  const fx=B.fx={by:'foe'};if(B.turn===8&&!B.talkDrag){B.talkDrag=1;setTimeout(()=>{try{talk('drag')}catch(e){}},900)}
+  if(B.kind==='boss'&&!B.rage&&B.hp<B.max*.5){B.rage=1;B.atk=Math.round(B.atk*1.3);B.mag=Math.round(B.mag*1.3);fx.cut=`${B.m.n} 暴走`;fx.fsk='m_rage';blog(`${B.name} 進入暴走狀態！攻擊大幅提升`);setTimeout(()=>{try{talk('rage',1)}catch(e){}},900)}
   else if(B.st.stun>0){B.st.stun--;fx.stun=1;blog(`${B.name} 暈眩中，無法行動`)}
-  else if(B.kind==='boss'&&!B.chg&&!B.big&&B.turn>=3&&B.turn%4===3){B.chg=1;B.chgHp=B.hp;B.chgSh=B.fshield||0;B.chgNeed=brkNeed();fx.cut='蓄力';fx.fsk='m_rage';blog(`⚠ ${B.name} 開始蓄力……下回合將發動【毀滅一擊】！先防禦，或這回合打出 ${B.chgNeed} 傷害打斷牠！`);toast(`${B.m.n} 正在蓄力：防禦，或打出 ${B.chgNeed} 傷害打斷！`)}
-  else if(B.chg&&B.chgNeed&&brkDone()>=B.chgNeed){B.chg=0;B.brkN=(B.brkN||0)+1;fx.stun=1;fx.brk=1;fx.cut='打斷！';B.st.weak=Math.max(B.st.weak||0,2);const bc=brkCore();if(bc)B.st.stun=Math.max(B.st.stun||0,1);B.opening=1;try{SFX.thunder();buzz([40,30,90])}catch(e){}blog(`✦ 打斷成功！${B.name} 的【毀滅一擊】被打散，陷入虛弱${bc?'並暈眩 1 回合（破勢霧核）':''}，還露出破綻（下次攻擊傷害 +50%）。牠學乖了，下次會更難打斷`);setTimeout(()=>{try{talk('guard')}catch(e){}},600)}
+  else if(B.kind==='boss'&&!B.chg&&!B.big&&B.turn>=3&&B.turn%4===3){B.chg=1;B.chgHp=B.hp;B.chgSh=B.fshield||0;B.chgNeed=brkNeed();fx.cut='蓄力';fx.fsk='m_rage';blog(`⚠ ${B.name} 開始蓄力……下回合將發動【毀滅一擊】！先防禦，或這回合打出 ${B.chgNeed} 傷害打斷牠！`);toast(`${B.m.n} 正在蓄力：防禦，或打出 ${B.chgNeed} 傷害打斷！`);setTimeout(()=>{try{talk('charge',1)}catch(e){}},900)}
+  else if(B.chg&&B.chgNeed&&brkDone()>=B.chgNeed){B.chg=0;B.brkN=(B.brkN||0)+1;fx.stun=1;fx.brk=1;fx.cut='打斷！';setTimeout(()=>{try{talk('brk',1)}catch(e){}},700);B.st.weak=Math.max(B.st.weak||0,2);const bc=brkCore();if(bc)B.st.stun=Math.max(B.st.stun||0,1);B.opening=1;try{SFX.thunder();buzz([40,30,90])}catch(e){}blog(`✦ 打斷成功！${B.name} 的【毀滅一擊】被打散，陷入虛弱${bc?'並暈眩 1 回合（破勢霧核）':''}，還露出破綻（下次攻擊傷害 +50%）。牠學乖了，下次會更難打斷`);setTimeout(()=>{try{talk('guard')}catch(e){}},600)}
   else{const big=B.chg?(B.chg=0,1):0,id=big?null:('next' in B?B.next:foePick());delete B.next;const dng=!big&&!!id&&isDng(SKM[id]),k=big?{n:'毀滅一擊',pow:2.6,mag:B.mag>B.atk?1:0}:id?SKM[id]:null,mb=!k&&mgB(),nm=k?`【${k.n}】`:mb?'魔力彈':'攻擊';
     if(k){fx.cut=k.n;fx.fsk=id}
     if(k&&k.cost)B.hp=Math.max(1,B.hp-Math.round(B.max*k.cost));
@@ -3077,7 +3083,7 @@ function foeTurn(){if(!B)return;if(B.treasure&&B.turn>=3&&B.hp>0){B=null;RUN.vie
         const base=(k&&k.mag?B.mag:mb?B.mag*.6:B.atk)*(k?k.pow:1)*(1+fbSum('atk'))*(B.st.weak>0?.75:1)*(B.trait==='enrage'&&B.turn>=8?1.8:1)*grudgeM();
         const res=mb?100/(100+s.MRES+s.DEF*.2):k&&k.mag?100/(100+s.MRES+s.DEF*.2)*(1-mobRes(k,s)/100):100/(100+s.DEF*(1+buffSum('def'))*(1-(k&&k.pierce||0)));
         let d=base*res*(.9+Math.random()*.2);if(Math.random()*100<B.crit+fbSum('crit')+(k&&k.cr||0)){d*=1.5;cr=true}tot+=d}
-      if(!hit){fx.miss=1;SFX.miss();blog(`你閃開了 ${B.name} 的${nm}！`);if(S.cls==='ranger'){B.cls.focus=Math.min(rmax(5),B.cls.focus+2);blog(`專注 ${B.cls.focus}`)}}
+      if(!hit){fx.miss=1;SFX.miss();blog(`你閃開了 ${B.name} 的${nm}！`);setTimeout(()=>{try{talk('dodge')}catch(e){}},500);if(S.cls==='ranger'){B.cls.focus=Math.min(rmax(5),B.cls.focus+2);blog(`專注 ${B.cls.focus}`)}}
       else{let d=tot;if(B.lunaWard){d*=.6;B.lunaWard=0;blog('守燈結界擋下了部分衝擊')}if(B.guard)d*=(big||dng)?.25:.5;if(B.guard&&(big||dng)){B.opening=1;blog('✦ 完美防禦！看穿破綻，下次攻擊傷害 +50%');setTimeout(()=>talk('guard'),600)}let gd=false;if(s.GUARD&&Math.random()*100<s.GUARD){d*=.5;gd=true;if((s.KW.guard||0)>=2&&B.hp>0){B.srcNow='守護反擊';const r=hitFoe(CLS[S.cls].basic==='MAG'?'MAG':'ATK',.5,{sure:1});blog(`【守護共鳴】順勢反擊 ${r.d}`)}}d=Math.max(1,Math.round(d));let ctr=false;if(B.counter){d=Math.max(1,Math.round(d*.3));B.counter=0;ctr=true}
         let ab=0;if(B.shield>0){ab=Math.min(B.shield,d);B.shield-=ab;d-=ab}
         fx.d=d;fx.cr=cr;fx.quake=!!k||d>s.HP*.15;SFX.hurt(k?.85:0);buzz(k?120:50);S.hp=Math.max(0,S.hp-d);
@@ -3788,7 +3794,7 @@ const PFX=(()=>{let HS=0,cv,cx,P=[],Q=[],raf=0,W=0,Hh=0,t0=0,SR={x:0,y:0,w:360,h
       if(fx.miss)return wind([H[0]+.05,H[1]],'#ffffff',{dir:-1,n:3,life:.35});
       if(fx.d>0){claw(H,'#ff6a6a',{n:3,ang:-.9});later(90,()=>hitFx(H,'#ff9a8a',.7))}}};
 })();
-{const _imp=PFX.impact;PFX.impact=function(side,str,cr,dead){_imp.apply(this,arguments);try{if(side==='foe'&&cr&&!dead)setTimeout(()=>talk('crit'),350);if(side==='me'&&!dead&&lowHP())setTimeout(()=>talk('low'),450)}catch(e){}}}
+{const _imp=PFX.impact;PFX.impact=function(side,str,cr,dead){_imp.apply(this,arguments);try{if(side==='foe'&&cr&&!dead)setTimeout(()=>talk('crit'),350);else if(side==='foe'&&!dead&&B&&B.kind!==''&&B.kind&&B.hp<B.max*.25&&!B.talkNear){B.talkNear=1;setTimeout(()=>talk('near'),350)}if(side==='me'&&!dead&&lowHP())setTimeout(()=>talk('low'),450)}catch(e){}}}
 const S_CLS=()=>S.cls;
 
 /* ============ 操作 ============ */
