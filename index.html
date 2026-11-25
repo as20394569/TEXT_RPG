@@ -543,7 +543,9 @@ const ATL={"icon_a_0":0,"icon_a_1":1,"icon_a_2":2,"icon_a_3":3,"icon_a_4":4,"ico
 const SHO=['','mage','ranger','cleric','knight','berserker','archmage','warlock','sniper','assassin','bishop','templar'];
 const shKey=k=>{const m=k&&k.match(/^story_ch(\d)_(intro|mid|outro)_([mf])(?:_(\w+))?$/);if(!m)return null;const i=SHO.indexOf(m[4]||'');return i<0?null:{f:`sheet_ch${m[1]}_${m[2]}_${m[3]}`,i}};
 const shPos=i=>`background-position:${(i%4)/3*100}% ${Math.floor(i/4)/2*100}%`;
-function art(key,label,r='r169',extra='',under){let vf='';{const m=key&&key.match(/^mob_([a-z]+)(_\w+)?$/);if(m&&typeof MVAR!=='undefined'&&MVAR[m[1]]&&!(ARTSET&&ARTSET.has(key))){vf=MVAR[m[1]].f;key='mob_'+MVAR[m[1]].base+(m[2]||'')}if(under){const u2=under.match(/^mob_([a-z]+)(_\w+)?$/);if(u2&&typeof MVAR!=='undefined'&&MVAR[u2[1]])under='mob_'+MVAR[u2[1]].base+(u2[2]||'')}}if(key&&/^npc_\w+$/.test(key))key='portrait_'+key;if(under&&/^npc_\w+$/.test(under))under='portrait_'+under;
+/* 新版魔物動作圖：待機／_a1 普攻／_a2 技能／_a3 首領大招／_lose 倒地；舊鍵自動對應 */
+function mobN(k){const m=k&&k.match(/^mob_([a-z]+)_(atk|hurt|low|charge|win)$/);if(!m||!ARTSET||!ARTSET.has('mob_'+m[1]+'_a1'))return k;const b='mob_'+m[1];return m[2]==='atk'||m[2]==='win'?b+'_a1':m[2]==='charge'&&ARTSET.has(b+'_a3')?b+'_a3':b}
+function art(key,label,r='r169',extra='',under){let vf='';key=mobN(key);under=mobN(under);{const m=key&&key.match(/^mob_([a-z]+)(_\w+)?$/);if(m&&typeof MVAR!=='undefined'&&MVAR[m[1]]&&!(ARTSET&&ARTSET.has(key))){vf=MVAR[m[1]].f;key='mob_'+MVAR[m[1]].base+(m[2]||'')}if(under){const u2=under.match(/^mob_([a-z]+)(_\w+)?$/);if(u2&&typeof MVAR!=='undefined'&&MVAR[u2[1]]&&!(ARTSET&&ARTSET.has(under)))under='mob_'+MVAR[u2[1]].base+(u2[2]||'')}}if(key&&/^npc_\w+$/.test(key))key='portrait_'+key;if(under&&/^npc_\w+$/.test(under))under='portrait_'+under;
   {const sc=key&&key.match(/^(story_ch\d+_(?:intro|mid|outro)_[mf])(_\w+)?$/);if(sc&&ARTSET&&ARTSET.has(sc[1]+'_usual'))key=sc[1]+'_usual'}
   const sk=shKey(key);if(sk)return `<div class="art ${r} ${extra} has" data-art="${key}"${vf?` style="filter:${vf}"`:''}><i class="sht" style="background-image:url(art/${sk.f}.webp);${shPos(sk.i)}"></i></div>`;
   const src=artSrc(key);
@@ -558,7 +560,7 @@ const icon=(key,fb)=>(key&&/^npc_\w+$/.test(key)&&(key='portrait_'+key),key in A
 const gIco=id=>icon('icon_'+id,SLOTCH[GEAR[id].slot]);
 let ARTSET=null;try{fetch('art/list.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(a=>{if(a){ARTSET=new Set(a);try{render()}catch(e){}}}).catch(()=>{})}catch(e){}
 const hasArt=k=>!ARTSET||ARTSET.has(k);
-function artSrc(k){{const m=k&&k.match(/^mob_([a-z]+)(_\w+)?$/);if(m&&typeof MVAR!=='undefined'&&MVAR[m[1]]&&!(ARTSET&&ARTSET.has(k)))k='mob_'+MVAR[m[1]].base+(m[2]||'')}while(k&&(MISS.has(k)||!hasArt(k)))k=ALT(k);return k}
+function artSrc(k){k=mobN(k);{const m=k&&k.match(/^mob_([a-z]+)(_\w+)?$/);if(m&&typeof MVAR!=='undefined'&&MVAR[m[1]]&&!(ARTSET&&ARTSET.has(k)))k='mob_'+MVAR[m[1]].base+(m[2]||'')}while(k&&(MISS.has(k)||!hasArt(k)))k=ALT(k);return k}
 function artErr(img,src){MISS.add(src);const a=artSrc(ALT(src));if(a){delete img.dataset.r;img.onerror=()=>reTry(img,a)||artErr(img,a);img.src='art/'+a+'.webp'}else img.remove()}
 function tx(t){if(!S)return t;const f=S.sex==='f';t=t.replace(/\{wfix\}/g,{swordsman:'劍磨好了',mage:'法杖的杖頭我重新嵌緊了',ranger:'弓弦換了新的',cleric:'戰錘的握柄重新纏好了'}[S.cls]||'武器整理好了');return t.replace(/\{name\}/g,S.name).replace(/\{([^{}|]*)\|([^{}|]*)\}/g,(_,a,b)=>f?b:a)}
 const you=t=>S&&S.sex==='f'?String(t).replace(/你/g,'妳'):t;
@@ -2044,9 +2046,10 @@ function vBattle(){const s=stats(),fx=B.fx||{},intro=B.intro,a=AREAS[RUN.area];B
   const foeFx=foeFx0+(()=>{const x=(B.pops||[]).slice(-4).map((p,i)=>`<span class="dmg pop p-${POPK[p.k]}" style="animation-delay:${(sk?1.1:.35)+i*.22}s;margin-left:${(i%2?1:-1)*(18+i*6)}px">-${p.d}<small>${p.k}</small></span>`).join('');B.pops=[];return x})();
   const meFx=(theirs?(fx.miss?'<span class="dmg miss">MISS</span>':fx.d>0?(fk?`<span class="dmg late ${fx.cr?'cr':''}">-${fx.d}</span>`:`<span class="dmg">-${fx.d}</span>`):fx.d===0?'<span class="dmg miss">擋下</span>':''):'')+(fx.heal?`<span class="dmg heal ${sk?'late':''}">+${fx.heal}</span>`:'');
   /* 動作依時間發生：先出手，命中瞬間才受傷／倒地，之後回到待機 */
-  const fB='mob_'+B.id,fIdle=h=>fB+(h<=0?'_lose':(B.chg||(B.next&&SKM[B.next]&&isDng(SKM[B.next])))&&ARTSET&&ARTSET.has(fB+'_charge')?'_charge':h<30?'_low':''),mB=AK(),mIdle=h=>mB+(h<30?'_fh':'_fn');
+  const fB='mob_'+B.id,fIdle=h=>fB+(h<=0?'_lose':(B.chg||(B.next&&SKM[B.next]&&isDng(SKM[B.next])))&&ARTSET&&(ARTSET.has(fB+'_charge')||ARTSET.has(fB+'_a3'))?'_charge':h<30?'_low':''),mB=AK(),mIdle=h=>mB+(h<30?'_fh':'_fn');
   const fHit=atk&&fx.d>0,mHit=theirs&&fx.d>0,tF=sk?950:250,tM=fk?950:250;
-  const fKey0=theirs&&!fx.stun?fB+'_atk':fHit?fIdle(fp??100):B.hp<=0?fB+'_lose':fIdle(B.fhp);
+  const fNew=ARTSET&&ARTSET.has(fB+'_a1'),fAtk=!fNew?fB+'_atk':fB+(fk&&ARTSET.has(fB+'_a3')?'_a3':theirs&&((fx.an??=(B.fan=(B.fan||0)+1))%2===0)?'_a2':'_a1');
+  const fKey0=theirs&&!fx.stun?fAtk:fHit?fIdle(fp??100):B.hp<=0?fB+'_lose':fIdle(B.fhp);
   const mKey0=(sk||atk)?mB+'_fa':mHit?mIdle(pp??100):mIdle(B.php);
   const RV=B.rv=(B.rv||0)+1,swap=(sel,key,ms)=>setTimeout(()=>{if(!B||B.rv!==RV)return;const im=document.querySelector(sel+' .art img:not(.under)'),k=artSrc(key);if(im&&k&&!im.src.endsWith('/'+k+'.webp')){const u='art/'+k+'.webp',pre=new Image();pre.onload=()=>{if(B&&B.rv===RV)im.src=u};pre.onerror=()=>MISS.add(k);pre.src=u}},ms);
   if(fHit){const sv=fx.d/B.max*5,dd=B.hp<=0,cc=fx.cr;const fn=PFX.heroFxn(fx);setTimeout(()=>PFX.impact('foe',dd?1:sv,cc,dd,fn),tF);}
@@ -2757,6 +2760,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'12.7',d:'2026-11-25',t:'魔物動作圖',b:'42 種魔物換上新畫風的動作圖，全部正面朝向你：待機、兩種攻擊動作與倒地；首領與特殊魔物多一個大招動作。普通攻擊會輪流使出兩種動作，首領施放技能時改用大招姿勢，被擊倒會換成倒地圖。原本靠調色區分的亞種（毒沼史萊姆、熔岩蝙蝠、水晶魔像等）現在都有自己的造型。街道盜賊重畫中，暫時維持舊圖。'},
   {v:'12.6',d:'2026-11-25',t:'魔物攻擊衝擊感、隨時撤退',b:'魔物的普通攻擊現在會撲向畫面，並依類型打出不同的衝擊演出（爪擊、重砸、魔彈），命中時頭像被擊退、畫面震動，重擊會更強烈。魔物圖不再被上方資訊欄或下方隊伍欄蓋住，會自動縮放到中間的空位。冒險途中任何時候（戰鬥以外）都能從右上角「撤退」回城，戰利品照樣保留。'},
   {v:'12.5',d:'2026-11-25',t:'畫風重製與全新戰鬥畫面',b:'主角與露娜全面換上新的動畫畫風：12 個職業男女各一套全新立繪。戰鬥畫面重新設計——魔物站在畫面中央，我方改在下方以頭像顯示；普通攻擊與受傷時頭像會換表情，施放技能會切入職業專屬的招式姿勢圖，受到重創時會跳出戰損插圖；魔物放技能時改用全螢幕動畫演出（爪擊、震地、咆哮、魔彈），並打出招式名稱。'},
   {v:'12.4',d:'2026-11-23',t:'夜探奇襲、兩種新霧紋、魔力彈',b:'營地與霧窯多了第四個選擇「夜探」：不休息，摸黑去探前面的路，下一場強敵或首領戰由你奇襲——牠第一回合來不及行動，你的第一擊傷害 +50%。中段強敵新增兩種霧紋：「漲潮」（每回合攻擊 +12%，拖越久越痛，要速戰速決）與「反震」（單次打太重會震回自己身上，多段攻擊和持續傷害比較吃香）。魔法型首領（樹王、霜龍等）的普通攻擊改成「魔力彈」，看的是魔抗而不是防禦，法系職業比較扛得住、只堆防禦的角色要留意。九顆精鍛霧核換上帶金色箍環的正式圖示。修正：敵人暈眩時預告仍顯示牠下回合會出招，現在會標示「暈眩中」。'},
@@ -2917,7 +2921,7 @@ const TRT=k=>BTRAIT[k]||ETRAIT[k];
 const trIc=(k,z)=>('icon_trait_'+k) in ATL?`<i class="bi at" style="width:${z||18}px;height:${z||18}px;margin-right:3px;vertical-align:middle;background-position:${(ATL['icon_trait_'+k]%ATC)/(ATC-1)*100}% ${Math.floor(ATL['icon_trait_'+k]/ATC)/(ATR-1)*100}%"></i>`:'⚠ ';
 const grudgeM=()=>B&&B.trait==='grudge'?1+.12*Math.min(3,Math.floor((1-B.hp/B.max)/.25+1e-9)):B&&B.trait==='swell'?1+.12*Math.min(6,Math.max(0,B.turn-1)):1;
 const weekTrait=id=>{const ks=Object.keys(BTRAIT),i=Math.max(0,AREAS.findIndex(a=>a.boss===id));return ks[(weekNo()+i)%ks.length]};
-function startBattle(id,kind,nAdds){const F=mkFoe(id,kind),m=F.m,bs=F.kind==='boss';try{preload(['','_atk','_hurt','_low','_lose','_charge'].filter(x=>x!=='_charge'||(ARTSET&&ARTSET.has('mob_'+id+'_charge'))).map(x=>'mob_'+id+x))}catch(e){}
+function startBattle(id,kind,nAdds){const F=mkFoe(id,kind),m=F.m,bs=F.kind==='boss';try{preload(['','_atk','_hurt','_low','_lose','_charge','_a1','_a2','_a3'].filter(x=>!/_charge|_a\d/.test(x)||(ARTSET&&ARTSET.has('mob_'+id+x))).map(x=>'mob_'+id+x))}catch(e){}
   const pool=RUN?AREAS[RUN.area].mobs:[id],adds=[];for(let i=0;i<(nAdds||0);i++){const f=mkFoe(pick(pool),'');f.hp=f.max=Math.round(f.max*.75);adds.push(f)}
   preload([...['','_hurt','_low','_win','_lose','_atk','_skill','_cast'].map(x=>HK()+x),...(id==='shadow'?[]:['','_hurt','_low','_win','_lose'].map(x=>'mob_'+id+x)),...adds.map(f=>'mob_'+f.id),'battle_'+(AREAS.find(a=>a.boss===id||a.mobs.includes(id))||{id:'plain'}).id]);
   allyAuto();const ally=id==='shadow'?null:mkAlly();if(ally)ally.hp=ally.max;
