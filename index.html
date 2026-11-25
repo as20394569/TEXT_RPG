@@ -1661,7 +1661,9 @@ function minG(g){if(!g||GEAR[g.id].uniq)return g;g.q=.85;const t=GEAR[g.id].t||0
 function rollQ(){const x=Math.random();return x<.03?+(1.3+Math.random()*.1).toFixed(2):+(0.85+Math.random()*.4).toFixed(2)}
 function addGear(id,r,set){const g={u:S.uid++,id,r,p:0,q:GEAR[id].uniq?1:rollQ(),sub:rollSubs(GEAR[id].t,r+(r>=2&&Math.random()<.2?1:0)),lock:false,sock:r>=4?[null,null]:r>=3?[null]:[]};if(r>=4&&!GEAR[id].uniq)g.sp=pick(Object.keys(SPEC));if(set!=null)g.set=set;S.gear.push(g);if(S.dex)S.dex.g[id]=1;return g}
 function rollRar(minR,bonus){if(S&&fortK('drop'))bonus=(bonus||1)*1.3;const lu=1+Math.min(.5,(S?stats().A.LUK:0)*.004);const w=RW.map((x,i)=>i<minR?0:x*(i>=2?(bonus||1)*lu:1)),t=w.reduce((a,b)=>a+b);let r=Math.random()*t;for(let i=0;i<5;i++){if((r-=w[i])<0)return i}return 4}
-function makeGear(tier,r,hard){const sl=pick(Object.keys(SLOTS)),alt=Math.random()<.5,id=sl==='weapon'?(alt&&S.adv&&GEAR[`w_${S.adv}_${tier}`]?`w_${S.adv}_${tier}`:`w_${S.cls}_${tier}`):(alt&&GEAR[`${SLOTP[sl]}b_${tier}`]?`${SLOTP[sl]}b_${tier}`:`${SLOTP[sl]}_${tier}`);
+function makeGear(tier,r,hard){const sl=pick(Object.keys(SLOTS)),alt=Math.random()<.5;let id=sl==='weapon'?(alt&&S.adv&&GEAR[`w_${S.adv}_${tier}`]?`w_${S.adv}_${tier}`:`w_${S.cls}_${tier}`):(alt&&GEAR[`${SLOTP[sl]}b_${tier}`]?`${SLOTP[sl]}b_${tier}`:`${SLOTP[sl]}_${tier}`);
+  /* 該階級沒有這個部位的裝備時，往下找最近一階（否則掉寶會讓戰鬥結算卡住） */
+  for(let t=tier;!GEAR[id]&&t>=0;t--){id=sl==='weapon'?`w_${S.cls}_${t}`:`${SLOTP[sl]}_${t}`}if(!GEAR[id])id=Object.keys(GEAR).find(k=>GEAR[k].slot===sl&&!GEAR[k].uniq&&(!GEAR[k].cls||GEAR[k].cls===S.cls))||Object.keys(GEAR)[0];
   const g=addGear(id,r,hard&&r>=3&&Math.random()<.4?CSET[S.cls]:r>=2&&Math.random()<.35?ASET(tier):null);if(r>=1&&Math.random()<.05)shine(g);if((r===2||r===3)&&!g.sp&&!GEAR[id].uniq&&Math.random()<(r===3?.4:.15))g.sp=pick(Object.keys(SPEC));if(r>=3||g.sh||g.sp)DROPS.push(g);if(r>=3||g.sh||g.sp)sys(`恭喜 ${S.name} 獲得【${gearName(g)}】！`);return g}
 /* 閃耀裝備：多一條詞條、最高詞條 ×1.5 */
 let DROPS=[];
@@ -2771,7 +2773,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
-  {v:'13.4',d:'2026-11-25',t:'戰鬥卡住保險、露娜招式改名',b:'有玩家回報打完會卡住：新增保險機制，戰鬥指令鎖住超過 10 秒會自動解開，敵人已倒下則直接結算，不會再停在原地。露娜的招式改成一般魔法師的名稱：魔法彈、火球術、治癒術、魔法護盾、驅散術、奧義星光爆裂（效果不變）。'},
+  {v:'13.4',d:'2026-11-25',t:'戰鬥卡住保險、露娜招式改名',b:'修正「沉沒書庫」打倒魔物後卡住不動：該區掉落裝備時會出錯，導致戰鬥無法結算（感謝回報）。另外新增保險機制，戰鬥指令鎖住超過 10 秒會自動解開，敵人已倒下則直接結算，不會再停在原地。露娜的招式改成一般魔法師的名稱：魔法彈、火球術、治癒術、魔法護盾、驅散術、奧義星光爆裂（效果不變）。'},
   {v:'13.3',d:'2026-11-25',t:'露娜台詞調整、切回分頁不再卡頓',b:'露娜新增一批依戰況說的話：首領蓄力、暴走、成功打斷、你閃開攻擊、敵人快倒下、戰鬥拖太久，以及遇到成群、精英、飛行魔物或你血量偏低時的開場提醒。切到別的 App 或分頁再回來時，不會再把積欠的音樂音符與戰鬥特效一口氣播出來而卡住。露娜放招時不再喊口號（像「照路之光・撐住！」這類），只顯示招式名。另外拿掉、改寫了一批比較尷尬的台詞（戰鬥喊話、出發前的話、營火閒聊與戰敗後的安慰），讓她說話更自然。'},
   {v:'13.2',d:'2026-11-25',t:'旅途插圖換新畫風',b:'旅途中遇到的五位人物（阿蕾、葛蕾塔、米洛、賽門、托比）的插圖換成新畫風，共 25 張。第三章首領預告圖重畫完成。露娜的「燈光術」演出換成新姿勢。'},
   {v:'13.1',d:'2026-11-25',t:'露娜立繪重畫、NPC 與蓋爾換新畫風',b:'露娜的全身立繪與招式圖重畫：提燈掛在腰間，招式改為放出燈光與祈禱治癒（不再揮拳）；治癒時出現祈禱演出，攻擊時偶爾出現燈光術演出。晨星鎮 9 位 NPC（含三種表情）、5 位旅途中遇到的人物、夥伴蓋爾都換成新畫風；蓋爾在戰鬥中改用頭像表情並有出招演出。章節首領預告圖 6 張與牧羊女阿蕾的旅途插圖也換新。其餘旅途插圖繪製中。'},
@@ -3165,7 +3167,7 @@ function spoil(){const m=B.m,L=B.L,bs=B.kind==='boss',el=B.kind==='elite',T=B.to
   got.push(...liveDrop(bs));
   track('kill',B.id);S.st.kills++;if(S.dex)S.dex.m[B.id]=(S.dex.m[B.id]||0)+1;if(bs&&B.nm)S.st.nmboss=(S.st.nmboss||0)+1;
   if(bs&&!fld&&!RUN.trial&&!RUN.tower){S.cleared[RUN.area]=1;track('boss',B.id);sys(`${S.name} 討伐了首領【${m.n}】！`)}}
-function win(){if(!B||B.hp>0)return;try{const ds=B.ds||{},tot=Object.values(ds).reduce((a,b)=>a+b,0);if(tot>0&&(B.kind==='boss'||B.kind==='elite'||Object.keys(ds).length>=3)){const top=Object.entries(ds).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([k,v])=>`${k} ${Math.round(v/tot*100)}%`).join('・');B.log.push(`📊 戰報（${B.turn} 回合）：${top}`);B.rep=top}}catch(e){}spoil();if(B.kind==='boss')bondGain(.5,'並肩打倒首領');try{talk('win')}catch(e){}{const s=stats();if(s.REAP&&S.hp>0){const rk=s.KW.reap||0,h=Math.round(s.HP*s.REAP/100*(rk>=2?2:1)),m=Math.round(s.MP*s.REAP/100*(rk>=2?2:1));if(rk>=3)S.reapFree=1;S.hp=Math.min(s.HP,S.hp+h);S.mp=Math.min(s.MP,S.mp+m);B.rp=`【收割】回復 ${h} HP、${m} MP`;B.log.push(B.rp)}}
+function win(){if(!B||B.hp>0)return;try{const ds=B.ds||{},tot=Object.values(ds).reduce((a,b)=>a+b,0);if(tot>0&&(B.kind==='boss'||B.kind==='elite'||Object.keys(ds).length>=3)){const top=Object.entries(ds).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([k,v])=>`${k} ${Math.round(v/tot*100)}%`).join('・');B.log.push(`📊 戰報（${B.turn} 回合）：${top}`);B.rep=top}}catch(e){}try{spoil()}catch(e){try{localStorage.setItem('ao_err','spoil '+e);const T=B.tot||(B.tot={exp:0,gold:0,got:[],names:[]});if(!T.names.includes(B.name))T.names.push(B.name)}catch(_){}}if(B.kind==='boss')bondGain(.5,'並肩打倒首領');try{talk('win')}catch(e){}{const s=stats();if(s.REAP&&S.hp>0){const rk=s.KW.reap||0,h=Math.round(s.HP*s.REAP/100*(rk>=2?2:1)),m=Math.round(s.MP*s.REAP/100*(rk>=2?2:1));if(rk>=3)S.reapFree=1;S.hp=Math.min(s.HP,S.hp+h);S.mp=Math.min(s.MP,S.mp+m);B.rp=`【收割】回復 ${h} HP、${m} MP`;B.log.push(B.rp)}}
   const nx=(B.adds||[]).findIndex(f=>f.hp>0);
   if(nx>=0){const dn=B.name;swapFoe(nx);B.adds=B.adds.filter(f=>f.hp>0);B.log.push(`${dn} 倒下了！${B.name} 衝了上來`);B.fx=null;B.busy=true;B.intro=true;render();setTimeout(foeTurn,900);return}
   SFX.win();const T=B.tot,bs=B.kind==='boss',bid=B.id;if(RUN.core==='temper'&&!RUN.tower&&!RUN.trial)RUN.coreN=(RUN.coreN||0)+1;
