@@ -40,6 +40,64 @@ def fb_token():
     except Exception:
         return ''
 
+# ---- 匿名留存統計：只記隨機 ID、上線日期、進度，不記個資 ----
+ST_DATA = os.path.join(HERE, 'stats_data.json')
+ST_LAST = {}
+def st_load():
+    try:
+        with open(ST_DATA, encoding='utf-8') as f:
+            d = json.load(f)
+            return d if isinstance(d, dict) else {}
+    except Exception:
+        return {}
+ST = st_load()
+ST_DIRTY = [0]
+def st_save():
+    tmp = ST_DATA + '.tmp'
+    with open(tmp, 'w', encoding='utf-8') as f:
+        json.dump(ST, f, ensure_ascii=False)
+    os.replace(tmp, ST_DATA)
+def tw_day(t=None):
+    return time.strftime('%Y%m%d', time.gmtime((t or time.time()) + 8 * 3600))
+def day_add(day, n):
+    import datetime
+    return (datetime.datetime.strptime(day, '%Y%m%d') + datetime.timedelta(days=n)).strftime('%Y%m%d')
+def st_report():
+    today = tw_day()
+    days = [day_add(today, -i) for i in range(13, -1, -1)]
+    rows = list(ST.values())
+    out = {'today': today, 'total': len(rows), 'days': []}
+    for d in days:
+        new = [r for r in rows if r.get('f') == d]
+        dau = sum(1 for r in rows if d in r.get('d', []))
+        def ret(n):
+            t = day_add(d, n)
+            if t > today or not new:
+                return None
+            return round(100 * sum(1 for r in new if t in r.get('d', [])) / len(new))
+        act = [r for r in rows if d in r.get('d', [])]
+        mins = round(sum((r.get('m') or {}).get(d, 0) for r in act) / len(act)) if act else 0
+        out['days'].append({'d': d, 'new': len(new), 'dau': dau, 'd1': ret(1), 'd3': ret(3), 'd7': ret(7), 'min': mins})
+    ch = {}
+    for r in rows:
+        k = str(min(99, int(r.get('ch', 0))))
+        ch[k] = ch.get(k, 0) + 1
+    out['ch'] = ch
+    gone = [r for r in rows if r.get('d') and r['d'][-1] <= day_add(today, -2)]
+    lv = {}
+    for r in gone:
+        k = r.get('v') or '?'
+        lv[k] = lv.get(k, 0) + 1
+    out['gone'] = len(gone)
+    out['gone_view'] = dict(sorted(lv.items(), key=lambda x: -x[1])[:12])
+    gl = {}
+    for r in gone:
+        k = str(int(r.get('lv', 1)) // 5 * 5)
+        gl[k] = gl.get(k, 0) + 1
+    out['gone_lv'] = gl
+    out['ab'] = sorted((int(r.get('ab', 0)) for r in rows if r.get('ab')), reverse=True)[:20]
+    return out
+
 # ---- 存檔轉移：上傳存檔換 6 碼轉移碼，24 小時內在另一台裝置輸入即可下載（取用一次即刪除） ----
 XF_DATA = os.path.join(HERE, 'xfer_data.json')
 XF_LAST = {}
@@ -285,6 +343,51 @@ class H(BaseHTTPRequestHandler):
                 return self.reply(200, {'ok': True})
             except Exception:
                 return self.reply(400, {'error': 'bad request'})
+        if path == '/api/ev':
+            try:
+                d = self.body(1024)
+                pid = str(d.get('id', ''))
+                if not re.fullmatch(r'[a-z0-9]{4,16}', pid):
+                    return self.reply(400, {'error': 'bad id'})
+                now = time.time()
+                if now - ST_LAST.get(pid, 0) < 30:
+                    return self.reply(200, {'ok': True})
+                ST_LAST[pid] = now
+                day = tw_day(now)
+                with LOCK:
+                    if pid not in ST and len(ST) >= 50000:
+                        return self.reply(200, {'ok': True})
+                    r = ST.setdefault(pid, {'f': day, 'd': [], 'm': {}})
+                    if day not in r['d']:
+                        r['d'] = (r['d'] + [day])[-90:]
+                    m = r.setdefault('m', {})
+                    m[day] = min(1440, m.get(day, 0) + max(0, min(5, int(d.get('min', 0)))))
+                    for k in list(m.keys()):
+                        if k not in r['d']:
+                            m.pop(k, None)
+                    r['ch'] = max(int(r.get('ch', 0)), max(0, min(99, int(d.get('ch', 0)))))
+                    r['lv'] = max(1, min(999, int(d.get('lv', 1))))
+                    r['ab'] = max(int(r.get('ab', 0)), max(0, min(9999, int(d.get('ab', 0)))))
+                    r['v'] = clean(d.get('view'), 24)
+                    ST_DIRTY[0] += 1
+                    if ST_DIRTY[0] >= 5:
+                        ST_DIRTY[0] = 0
+                        st_save()
+                return self.reply(200, {'ok': True})
+            except Exception:
+                return self.reply(400, {'error': 'bad request'})
+        if path == '/api/stats':
+            try:
+                d = self.body(1024)
+                tok = fb_token()
+                if not tok or str(d.get('token', '')) != tok:
+                    return self.reply(403, {'error': 'forbidden'})
+                with LOCK:
+                    st_save()
+                    rep = st_report()
+                return self.reply(200, rep)
+            except Exception:
+                return self.reply(400, {'error': 'bad request'})
         if path == '/api/fb/reply':
             try:
                 d = self.body(4096)
@@ -363,7 +466,7 @@ def backup_loop():
                 tmp = name + '.tmp'
                 with LOCK:
                     with zipfile.ZipFile(tmp, 'w', zipfile.ZIP_DEFLATED) as z:
-                        for fn in ('rank_data.json', 'feedback_data.json', 'xfer_data.json'):
+                        for fn in ('rank_data.json', 'feedback_data.json', 'xfer_data.json', 'stats_data.json'):
                             fp = os.path.join(HERE, fn)
                             if os.path.isfile(fp):
                                 z.write(fp, fn)

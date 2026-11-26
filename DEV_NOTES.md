@@ -428,3 +428,9 @@
 - 每日備份：`backup_loop()` 把 accounts/、rank_data、feedback、xfer 打包到 `backups/YYYYMMDD.zip`，留 14 份。
 
 - 排行重複（2026-11-26）：原因是玩家 ID 存在存檔裡，開新角色或換裝置就換 ID，伺服器只合併「同名同職業」。修正：伺服器同名且舊紀錄超過 1 天沒上線就併掉、45 天沒上線清除；前端同名只顯示最新一筆；ID 另存 `localStorage ao_pid`，同一台裝置開新角色沿用。同名的兩個真人若都在一天內上線，伺服器兩筆都留，但前端只顯示較新的（已知限制，要靠帳號才能真正區分）。
+
+## v16.2（2026-11-26）留存數據（營運規劃階段二）
+- 前端：`evPing()` 開啟後 8 秒送一次，之後每 5 分鐘、以及切到背景時送：`{id, ch, lv, ab, view, min}`；`evView()` 回報所在畫面（town／adv／battle:a1:boss／dg0／abyss…）。設定頁最下面有一行告知。
+- 伺服器：`POST /api/ev`（每 ID 30 秒限一次，存 `stats_data.json`：首日 f、上線日 d[]、每日分鐘 m{}、最高章節、等級、霧淵、最後畫面）；`POST /api/stats {token}`（token＝fb_token.txt）回 14 天的新玩家、上線數、次日／3 日／7 日留存、平均分鐘、章節分布、流失者最後畫面與等級。
+- 數據頁：`stats.html`（https://as20394569.github.io/TEXT_RPG/stats.html），輸入 fb_token.txt 的內容；金鑰只存在該裝置 localStorage。
+- 用假資料 120 人驗過報表與頁面；真實資料要等伺服器自動更新後才開始累積。

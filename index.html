@@ -1911,6 +1911,11 @@ const GREET={
   '艾德溫':[['我年輕時也在自己的影子面前跪過。它比{你|妳}想像的還了解{你|妳}。',null],['守燈人的事知道得越多，越會明白……我們只是在跟霧借時間。',()=>chA(1)],['露娜那孩子，很像她母親。固執，卻溫柔。',()=>chA(1)],['轉職不是終點。換了一身衣服，該面對的東西還是一樣。',()=>S.lv>=18]]};
 /* 線上排行榜（伺服器在製作人電腦，網址記在 rank.json） */
 let RANKURL=null,RANKTOP=null,RANKERR=0,RANKT=0;
+/* 匿名留存回報：只送隨機 ID、章節、等級、霧淵層數、所在畫面；每 5 分鐘一次 */
+let EVT=0;
+function evView(){try{if(B)return 'battle:'+(RUN&&RUN.tower?'abyss':RUN&&RUN.dg?'dg'+RUN.dg.d:'a'+(RUN?RUN.area:''))+(B.kind==='boss'?':boss':'');if(RUN)return RUN.tower?'abyss':RUN.dg?'dg'+RUN.dg.d:'run:a'+RUN.area;if(MODAL)return 'm:'+MODAL.k;return TAB+(TAB==='town'&&typeof FAC!=='undefined'&&FAC?':'+FAC:'')}catch(e){return '?'}}
+async function evPing(first){try{if(!S||!S.created&&!S.name||document.hidden)return;if(!S.pid){let p0=null;try{p0=localStorage.getItem('ao_pid')}catch(e){}S.pid=/^[a-z0-9]{4,16}$/.test(p0||'')?p0:Math.random().toString(36).slice(2,10);try{localStorage.setItem('ao_pid',S.pid)}catch(e){}}const now=Date.now();if(!first&&now-EVT<280e3)return;const min=first?0:Math.min(5,Math.round((now-EVT)/60e3));EVT=now;const u=await rankUrl();if(!u)return;fetch(u+'/api/ev',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:S.pid,ch:S.main.done?CH.length:S.main.ch,lv:S.lv,ab:(S.tower&&S.tower.best)||0,view:evView(),min}),keepalive:true}).catch(()=>{})}catch(e){}}
+setInterval(()=>evPing(false),60e3);setTimeout(()=>evPing(true),8000);document.addEventListener('visibilitychange',()=>{if(document.hidden){try{const u=RANKURL;if(u&&S&&S.pid&&EVT){const min=Math.min(5,Math.round((Date.now()-EVT)/60e3));EVT=Date.now();fetch(u+'/api/ev',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:S.pid,ch:S.main.done?CH.length:S.main.ch,lv:S.lv,ab:(S.tower&&S.tower.best)||0,view:evView(),min}),keepalive:true}).catch(()=>{})}}catch(e){}}else EVT=EVT||Date.now()});
 async function rankUrl(){if(RANKURL)return RANKURL;try{const r=await fetch('rank.json?'+Date.now(),{cache:'no-store'});const j=await r.json();if(j&&j.url)RANKURL=j.url.replace(/\/$/,'')}catch(e){}return RANKURL}
 /* 玩家意見回報：與排行榜共用伺服器，資料分開 */
 let ACCOK=null;
@@ -2483,7 +2488,7 @@ const MV={
     <div class="panel"><h3>存檔</h3><p class="sub">進度會自動存在這台裝置的瀏覽器。換裝置或清除瀏覽資料前，請先複製存檔碼。</p><button class="btn" data-a="exportSave">產生存檔碼</button><textarea id="saveTxt" class="mono" rows="3" placeholder="存檔碼會顯示在這裡，也可以貼上存檔碼後按「讀取」"></textarea><button class="btn" data-a="importSave">讀取存檔碼</button></div>
     <div class="panel"><h3>聲音</h3><div class="row"><button class="btn grow" data-a="mute">音效：${MUTE?'關閉':'開啟'}</button><button class="btn grow" data-a="bgmT">音樂：${BGMOFF?'關閉':'開啟'}</button></div><div class="row" style="margin-top:6px"><button class="btn grow" data-a="shakeT">畫面震動＋手機震動：${SHAKEOFF?'關閉':'開啟'}</button></div></div>
     <div class="panel"><h3>重新開始</h3><button class="btn" data-a="reset" data-v="${MODAL&&MODAL.v==='sure'?'go':'ask'}">${MODAL&&MODAL.v==='sure'?'確定刪除所有進度':'刪除存檔'}</button></div>${location.hash==='#dev'?`<div class="panel"><h3>插畫清單（給 Codex）</h3><p class="sub">把圖檔命名為下列檔名，放進 art/ 資料夾，預留框就會自動換成插畫。共 ${artList().length} 張。</p><button class="btn" data-a="copyArt">複製清單</button><textarea id="artTxt" class="mono" rows="6" readonly>${artList().map(a=>`art/${a[0]}.png\t${a[2]}\t${a[1]}`).join('\n')}</textarea></div>
-    `:''}`}}
+    `:''}<p class="sub" style="text-align:center">遊戲會回傳匿名的進度（隨機代號、章節、等級），用來調整難度，不含個人資料。</p>`}}
 };
 const gearSell=g=>Math.round(GEAR[g.id].price*.3*(1+g.r)*(1+g.p*.2));
 function artList(){const L=[['title_bg','標題主視覺','1280×720'],['town_bg','晨星鎮全景','1280×720']];
@@ -3025,6 +3030,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'16.2',d:'2026-11-26',t:'開測準備',b:'排行榜不再出現同一個人的多筆紀錄。遊戲會回傳匿名的進度（隨機代號、章節、等級），用來調整難度。'},
   {v:'16.1',d:'2026-11-26',t:'每週目標、霧淵換新圖',b:'任務頁的「每日」底下多了三個每週目標，跟霧淵同一天換週。霧淵換上新插圖。霧淵裡灼燒與中毒的傷害有上限。第一章結尾多了一段。'},
   {v:'16.0',d:'2026-11-26',t:'霧淵開放',b:'無盡之塔改成「霧淵」：每週換一組規則，層數沒有上限，每 5 層強敵、每 10 層首領。越深掉得越好，深處會掉帶兩個詞綴的裝備。排行榜多了霧淵週榜。'},
   {v:'15.14',d:'2026-11-26',t:'文字修改',b:'職業、進階職、打法、夥伴的說明改成比較直白的寫法。'},

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
+<title>蒼藍誓約・營運數據</title>
+<style>
+body{margin:0;background:#17171a;color:#ece9e2;font:14px/1.5 system-ui,"Noto Sans TC",sans-serif;padding:14px;max-width:760px;margin:auto}
+h1{font-size:18px;margin:0 0 10px}h2{font-size:15px;margin:18px 0 6px;color:#ecd08a}
+input,button{font:inherit;padding:8px 10px;border-radius:6px;border:1px solid #6b5a36;background:#26262c;color:inherit}
+button{background:#d9ae4c;color:#17171a;font-weight:700}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th,td{padding:4px 6px;border-bottom:1px solid #33333b;text-align:right;white-space:nowrap}th:first-child,td:first-child{text-align:left}
+th{color:#a39f96;font-weight:400;font-size:12px}
+.ok{color:#6fd27c}.bad{color:#ff8a8a}.sub{color:#a39f96;font-size:12px}
+.kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.kpi div{background:#26262c;border:1px solid #33333b;border-radius:8px;padding:8px}.kpi b{display:block;font-size:20px}
+.bar{display:inline-block;height:8px;background:#d9ae4c;vertical-align:middle;margin-right:6px}
+.wrap{overflow-x:auto}
+</style></head><body>
+<h1>蒼藍誓約・營運數據</h1>
+<div id="login"><p class="sub">輸入管理金鑰（伺服器資料夾裡 fb_token.txt 的內容）。只存在這台裝置。</p><input id="tok" type="password" placeholder="管理金鑰" style="width:60%"> <button id="go">查看</button><p id="err" class="bad"></p></div>
+<div id="out"></div>
+<script>
+const $=s=>document.querySelector(s),esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const VIEW={town:'城鎮',adv:'冒險選單',char:'角色頁',bag:'背包',quest:'任務頁',abyss:'霧淵（路上）'};
+function vname(v){if(VIEW[v])return VIEW[v];let m;if(m=/^battle:(.+?)(:boss)?$/.exec(v))return '戰鬥中・'+vname2(m[1])+(m[2]?'（首領）':'');if(m=/^run:(.+)$/.exec(v))return '冒險途中・'+vname2(m[1]);if(m=/^m:(.+)$/.exec(v))return '視窗・'+m[1];if(/^dg/.test(v))return '大副本途中・'+vname2(v);return v}
+function vname2(k){const A=['草原','森林','礦坑','雪山','要塞','街道','書庫'],D=['翠原迷森','凍脈深坑','霧都長征'];let m;if(k==='abyss')return '霧淵';if(m=/^a(\d+)$/.exec(k))return A[+m[1]]||k;if(m=/^dg(\d+)$/.exec(k))return D[+m[1]]||k;return k}
+const pc=(v,line)=>v==null?'<span class="sub">—</span>':`<span class="${v>=line?'ok':'bad'}">${v}%</span>`;
+async function load(){const tok=$('#tok').value.trim()||localStorage.getItem('ao_admin')||'';if(!tok)return;$('#err').textContent='讀取中…';
+  try{const j=await (await fetch('rank.json?'+Date.now(),{cache:'no-store'})).json();const u=j.url.replace(/\/$/,'');
+    const r=await fetch(u+'/api/stats',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:tok})});
+    if(r.status===403){$('#err').textContent='金鑰不對';localStorage.removeItem('ao_admin');return}
+    if(!r.ok){$('#err').textContent='伺服器還沒更新到有數據的版本，或暫時連不上（'+r.status+'）';return}
+    const d=await r.json();localStorage.setItem('ao_admin',tok);$('#login').style.display='none';draw(d)}
+  catch(e){$('#err').textContent='連不上伺服器：'+e.message}}
+function draw(d){const days=d.days,last=days[days.length-1],w=days.slice(-7);
+  const newW=w.reduce((a,x)=>a+x.new,0),d1=days.filter(x=>x.d1!=null&&x.new),d7=days.filter(x=>x.d7!=null&&x.new);
+  const wavg=(arr,k)=>{const n=arr.reduce((a,x)=>a+x.new,0);return n?Math.round(arr.reduce((a,x)=>a+x[k]*x.new,0)/n):null};
+  const chK=Object.keys(d.ch).map(Number).sort((a,b)=>a-b),tot=d.total||1;let cum=0;const chRows=chK.slice().reverse().map(k=>{cum+=d.ch[k];return [k,cum]}).reverse();
+  const gv=Object.entries(d.gone_view||{}),gl=Object.entries(d.gone_lv||{}).sort((a,b)=>a[0]-b[0]);
+  $('#out').innerHTML=`
+  <div class="kpi"><div><span class="sub">總玩家</span><b>${d.total}</b></div><div><span class="sub">今日上線</span><b>${last.dau}</b></div><div><span class="sub">次日留存</span><b>${pc(wavg(d1,'d1'),30)}</b></div><div><span class="sub">7 日留存</span><b>${pc(wavg(d7,'d7'),10)}</b></div></div>
+  <p class="sub">過關線：次日 ≥ 30%、7 日 ≥ 10%、每天 ≥ 15 分鐘。近 7 天新玩家 ${newW} 人；至少 200 人、兩週才算數。</p>
+  <h2>每日</h2><div class="wrap"><table><tr><th>日期</th><th>新玩家</th><th>上線</th><th>次日</th><th>3 日</th><th>7 日</th><th>平均分鐘</th></tr>
+  ${days.slice().reverse().map(x=>`<tr><td>${x.d.slice(4,6)}/${x.d.slice(6)}</td><td>${x.new}</td><td>${x.dau}</td><td>${pc(x.d1,30)}</td><td>${pc(x.d3,18)}</td><td>${pc(x.d7,10)}</td><td class="${x.min>=15?'ok':''}">${x.min}</td></tr>`).join('')}</table></div>
+  <h2>主線進度（走到這一章以上的人）</h2><table>${chRows.map(([k,c])=>`<tr><td>第 ${k+1} 章${k>=7?'（已通關）':''}</td><td><span class="bar" style="width:${Math.round(c/tot*160)}px"></span>${c} 人（${Math.round(c/tot*100)}%）</td></tr>`).join('')}</table>
+  <h2>流失的人（兩天以上沒上線：${d.gone} 人）最後停在哪</h2><table>${gv.length?gv.map(([k,c])=>`<tr><td>${esc(vname(k))}</td><td>${c} 人</td></tr>`).join(''):'<tr><td class="sub">還沒有資料</td></tr>'}</table>
+  <h2>流失時的等級</h2><table>${gl.length?gl.map(([k,c])=>`<tr><td>Lv ${k}～${+k+4}</td><td>${c} 人</td></tr>`).join(''):'<tr><td class="sub">還沒有資料</td></tr>'}</table>
+  <h2>霧淵最深（前 20）</h2><p>${(d.ab||[]).join('、')||'<span class="sub">還沒有資料</span>'}</p>
+  <p class="sub">資料日：${d.today}（台灣時間）。只記隨機代號，沒有個人資料。</p>`}
+$('#go').onclick=load;if(localStorage.getItem('ao_admin'))load();
+</script></body></html>
