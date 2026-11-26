@@ -644,8 +644,10 @@ const CLS={
   mage:{n:'法師',d:'魔法傷害最高，但血少、不耐打。',f:'技能會在敵人身上留下印記，再用引爆招式一起炸開。',base:{STR:2,DEX:4,INT:10,VIT:5,LUK:5},grow:{INT:2},atk:'STR',basic:'MAG',adv:['archmage','warlock']},
   ranger:{n:'遊俠',d:'閃避和爆擊都高，出手快。',f:'攻擊和閃避會累積「專注」，專注越高，下一招越痛。',base:{STR:4,DEX:10,INT:3,VIT:9,LUK:6},grow:{DEX:1,LUK:1},atk:'DEX',basic:'ATK',adv:['sniper','assassin']},
   cleric:{n:'神官',d:'能補血又耐打，傷害比較低。',f:'補血和攻擊會累積「信仰」，集滿後自動發動一次。',base:{STR:4,DEX:4,INT:8,VIT:8,LUK:4},grow:{INT:1,VIT:1},atk:'STR',basic:'MAG',adv:['bishop','templar']},
-  dual:{n:'雙劍士',ex:1,d:'雙手各拿一把單手劍，一招砍很多下。血不厚。',f:'每砍中一下累積「連段」，連段越高越痛；被打中會掉 3 層。',base:{STR:7,DEX:8,INT:3,VIT:7,LUK:5},grow:{STR:1,DEX:1},atk:'STR',basic:'ATK',adv:[]}
+  dual:{n:'雙劍士',ex:1,hide:1,d:'雙手各拿一把單手劍，一招砍很多下。血不厚。',f:'每砍中一下累積「連段」，連段越高越痛；被打中會掉 3 層。',base:{STR:7,DEX:8,INT:3,VIT:7,LUK:5},grow:{STR:1,DEX:1},atk:'STR',basic:'ATK',adv:[]}
 };
+/* 還沒開放的職業（hide:1）不出現在創角與篩選；已經是該職業的存檔照常運作 */
+const CLSV=()=>Object.keys(CLS).filter(k=>!CLS[k].hide||(S&&S.cls===k));
 const ADV={
   knight:{n:'騎士',d:'主打防禦的前排。體質 +5、力量 +3。',bonus:{VIT:5,STR:3}},
   berserker:{n:'狂戰士',d:'扣自己的血換高傷害。力量 +8。',bonus:{STR:8}},
@@ -2133,7 +2135,7 @@ function vTitle(){const c=CLS[NEWCLS];return `<div class="title">${art('title_bg
   <h1>蒼藍誓約</h1><p class="en">AZURE OATH ONLINE · 晨星 1 服</p>
   <div class="panel"><label for="nm">冒險者名稱</label><input id="nm" maxlength="8" value="${esc(NEWNAME)}" placeholder="最多 8 個字" autocomplete="off">
   <div class="lbl">選擇主角</div><div class="seg">${[['m','男主角','栗棕亂髮、直來直往的少年'],['f','女主角','短髮綁辮、倔強愛笑的少女']].map(([k,n,d])=>`<button class="${NEWSEX===k?'on':''}" data-a="pickSex" data-v="${k}">${n}<small>${d}</small></button>`).join('')}</div>
-  <div class="lbl">選擇職業</div><div class="cls-grid">${Object.keys(CLS).map(k=>`<button class="cls ${NEWCLS===k?'on':''}" data-a="pickCls" data-v="${k}">${art(`class_${k}_${NEWSEX}`,CLS[k].n,'r34')}<b>${CLS[k].n}${CLS[k].ex?'<i class="ex">EX</i>':''}</b></button>`).join('')}</div>
+  <div class="lbl">選擇職業</div><div class="cls-grid" style="grid-template-columns:repeat(${CLSV().length},1fr)">${CLSV().map(k=>`<button class="cls ${NEWCLS===k?'on':''}" data-a="pickCls" data-v="${k}">${art(`class_${k}_${NEWSEX}`,CLS[k].n,'r34')}<b>${CLS[k].n}${CLS[k].ex?'<i class="ex">EX</i>':''}</b></button>`).join('')}</div>
   <p>${c.d}</p><p class="sub">${c.f}</p><div class="chips">${Object.keys(ATTR).map(k=>`<span class="chip">${ATTR[k]} ${c.base[k]}</span>`).join('')}</div>
   <p class="sub">男女主角的部分劇情對話不同。</p><button class="btn pri big" data-a="start">開始冒險</button></div></div>`}
 function vTown(){
@@ -2477,7 +2479,7 @@ const MV={
     const ago=t=>{const m=(Date.now()-t)/6e4;return m<60?'剛剛上線':m<1440?Math.floor(m/60)+' 小時前':Math.floor(m/1440)+' 天前'};
     const medal=i=>i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1;
     return{t:'排行榜',b:`<div class="tabs rk">${Object.entries(TABS).map(([k,v])=>`<button class="${k===tab?'on':''}" data-a="rkTab" data-v="${k}">${v[0]}</button>`).join('')}</div>
-      <div class="panel" style="gap:6px"><div class="fchips">${[['all','全部'],...Object.keys(CLS).map(k=>[k,CLS[k].n+'系'])].map(([k,n])=>`<button class="${k===cf?'on':''}" data-a="rkCls" data-v="${k}">${n}</button>`).join('')}</div>
+      <div class="panel" style="gap:6px"><div class="fchips">${[['all','全部'],...CLSV().map(k=>[k,CLS[k].n+'系'])].map(([k,n])=>`<button class="${k===cf?'on':''}" data-a="rkCls" data-v="${k}">${n}</button>`).join('')}</div>
       <div class="rkme">你的名次：<b>${myi>=0?myi+1:'-'}</b> / ${L.length}　${T[0]} <b>${T[2](P[0])}</b></div>
       <div class="list">${L.slice(0,100).map((x,i)=>`<div class="item rkrow${i<3?' top':''}" data-a="pview" data-v="${x.me?'me':x.id}" style="cursor:pointer${x.me?';border:2px solid var(--navy);background:var(--panel2)':''}"><span class="rkn">${medal(i)}</span><span class="rkav">${x.hk?art(x.hk.replace('class_','portrait_'),x.n,'r11','mini'):''}</span><span class="grow"><b>${esc(x.n)}</b>${x.me?' <span class="tag">我</span>':''}<span class="sub">${esc(x.c||'')}・Lv.${x.l}${x.ex&&x.ex.ch?`・第 ${Math.min(x.ex.ch+1,CH.length)} 章`:''}${x.t?`・${ago(x.t)}`:''}</span></span><b class="rkv">${T[2](x)}</b></div>`).join('')}</div>
       <p class="sub">${online?`🟢 線上排行榜・共 ${P.length} 位玩家，顯示前 100 名。點玩家可查看裝備，你的資料每分鐘自動上傳。`:'⚪ 排行榜伺服器暫時連不上，稍後再試。'}</p></div>`}},
@@ -3045,7 +3047,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
-  {v:'16.3',d:'2026-11-26',t:'EX 職業：雙劍士',b:'新職業「雙劍士」：雙手各一把單手劍，招式都是多段連斬（最多十六連）。砍中累積連段，用終式收尾。創角時可選；沒有轉職，招式隨等級學會。另外修正星象台打不開的問題。'},
+  {v:'16.3',d:'2026-11-26',t:'修正星象台',b:'星象台打不開的問題修好了。'},
   {v:'16.2',d:'2026-11-26',t:'開測準備',b:'排行榜不再出現同一個人的多筆紀錄。遊戲會回傳匿名的進度（隨機代號、章節、等級），用來調整難度。'},
   {v:'16.1',d:'2026-11-26',t:'每週目標、霧淵換新圖',b:'任務頁的「每日」底下多了三個每週目標，跟霧淵同一天換週。霧淵換上新插圖。霧淵裡灼燒與中毒的傷害有上限。第一章結尾多了一段。'},
   {v:'16.0',d:'2026-11-26',t:'霧淵開放',b:'無盡之塔改成「霧淵」：每週換一組規則，層數沒有上限，每 5 層強敵、每 10 層首領。越深掉得越好，深處會掉帶兩個詞綴的裝備。排行榜多了霧淵週榜。'},
