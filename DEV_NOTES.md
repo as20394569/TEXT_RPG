@@ -379,3 +379,7 @@
 - 對話泡泡佇列：`bub()` 入列 → `bubPump()`；`B.bubAt`（render 內依出手者設定：我方招式 950+pd+320、普攻 570、敵方招式 1270、敵方普攻 640）之前不顯示；兩句間隔 1.5s，佇列最多 2 句。`bubShow()` 是原本的顯示函式。
 - 勝利：`winSoon(ms)`（招式 2150+pd、其餘 1350），結束前 260ms 給 `.stage` 加 `bout` 淡出；結算面板 `.panel.resin` 滑入 .34s。原本有圖卡時 1.9s 就切畫面，倒地動畫被切掉。
 - 測試：/tmp/sim/pace.py。
+
+## v15.8（2026-11-26）
+- 戰鬥中 `#app.inb`：隱藏 `#hud`，`.stage.v2` 高度改 clamp(300px,58vh,500px)。
+- 配色調暗：`--sky #6e8fb4`、`--paper #d9ceb4`、`--panel #ece3cd`、`--panel2 #d8c9a4`、`--line #86622c`、`--navy #1a2344`、`--navy2 #2b3a6e`、`--gold #e0b03e`；寫死的 `background:#fff` 改 `#f3ecda`。
