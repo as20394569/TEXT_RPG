@@ -3243,7 +3243,7 @@ const TIPS={
   quest:['任務','主線推進劇情與地區；人物故事是鎮民的支線劇情；每日任務每天重置。'],
   adv:['冒險','選一個地區出發。每段路會遇到戰鬥、事件或岔路，終點是精英或首領。'],
   fork:['岔路','兩條路二選一。戰鬥拿經驗，寶箱和商人拿資源，營地回血，祭壇給整趟的祝福。'],
-  battle:['戰鬥','行動條跑滿就能出手。敵人亮紅圈是在出招：格擋可以擋下並反擊，閃避可以躲開，防禦可以減傷。魔法無法格擋，毀滅一擊無法閃避。上方可以開「自動」。'],
+  battle:['戰鬥','行動條跑滿就能出手。敵人亮紅圈是在出招：格擋可以擋下並反擊，防禦可以減傷。魔法無法格擋。上方可以開「自動」。'],
   event:['事件檢定','擲 d20＋屬性修正，大於等於難度就成功。屬性越高，相關選項越容易過。'],
   char:['角色','升級拿到的屬性點和技能點在這裡分配。裝備點下去可以看詳情、更換。'],
   smith:['鐵匠鋪','強化提升主屬性，+10 以後失敗會掉級。用不到的裝備可以分解成星塵，拿去洗練詞條或合成。'],
@@ -3266,6 +3266,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'17.2',d:'2026-11-27',t:'拿掉閃避按鈕',b:'戰鬥指令剩攻擊、防禦、格擋。魔法無法格擋，用防禦減傷。'},
   {v:'17.1',d:'2026-11-27',t:'戰鬥演出與魔物型態',b:'「全自動」拿掉了，只留戰鬥裡的自動。招式特效回來了，順序改成：招式名 → 特效 → 命中時數字、震動、血條一起動。橫幅大字換新字體。魔物分四種型態：迅捷出手快會追擊、蠻力慢而重、重甲最慢、施法詠唱久。魔法無法格擋；毀滅一擊無法閃避；格擋重招會讓對方踉蹌。狀態時間改用秒計算，說明文字一併更新。'},
   {v:'17.0',d:'2026-11-26',t:'戰鬥改成即時制',b:'行動條跑滿就能出手，敵人亮紅圈時是在出招。新增「閃避」與「格擋」：閃避整招躲開，格擋擋下並反擊。戰鬥畫面換成新版面，上方可以切換自動、速度與暫停。電腦可用鍵盤：Z 攻擊、X 防禦、C 閃避、空白鍵格擋、數字鍵放技能、P 暫停。'},
   {v:'16.3',d:'2026-11-26',t:'修正星象台',b:'星象台打不開的問題修好了。'},
@@ -3809,7 +3810,7 @@ function rtDo(c){const R=B&&B.rt;if(!R||R.done)return;R.vh0=B.hp;R.q=null;
   if(c==='@parry'||c==='@evade'){if(c==='@parry')R.pr=R.t+1;else R.ev=R.t+1.6;R.pg=0;try{SFX.ui()}catch(e){}rtPop($('#rtb .bhc'),c==='@parry'?'格擋':'閃避','t');return}
   if(c==='@atk')pAct('atk');else if(c==='@guard')pAct('guard');else if(c==='@flee')pAct('flee');else if(String(c).startsWith('item:'))pAct('item',c.slice(5));else if(SK[c])pAct('skill',c)}
 function rtAfterP(type){const R=B.rt;R.pg=0;R.q=null;if(type==='guard')R.gu=R.t+6;if(B.opn2){B.opening=0;B.opn2=0}render();if(B&&B.rt&&B.hp<=0)winSoon(type==='skill'?2300:1100)}
-function rtAuto(){const R=B.rt,w=B.rtw;R.vh0=B.hp;if(w&&w.dg&&!B.guard){const rem=w.dur-w.t;if(rem<.85&&rem>.15&&Math.random()<.3){rtDo(w.mg?(w.nd?'@guard':'@evade'):'@parry');return}}autoAct()}
+function rtAuto(){const R=B.rt,w=B.rtw;R.vh0=B.hp;if(w&&w.dg&&!B.guard){const rem=w.dur-w.t;if(rem<.85&&rem>.15&&Math.random()<.3){rtDo(w.mg?'@guard':'@parry');return}}autoAct()}
 function rtLose(){if(B&&B.rt)B.rt.done=1;render();setTimeout(lose,1100)}
 /* ---- 時間推進 ---- */
 function rtStep(dt){const R=B.rt;R.t+=dt;if(R.t<0)return;
@@ -3852,7 +3853,7 @@ function rtHero(){const el=$('#xhero');if(!el)return;const A=B.ally;
 function rtSkIc(k){const q='skill_'+k;return q in ATL?`<i class="bi at" style="background-position:${(ATL[q]%ATC)/(ATC-1)*100}% ${Math.floor(ATL[q]/ATC)/(ATR-1)*100}%"></i>`:ARTSET&&ARTSET.has(q)?`<img class="bi" src="art/${q}.webp" alt="">`:''}
 function rtCmdB(){const el=$('#xcmds');if(!el)return;const sk=battleSkills(),sp=sk.length?Math.round(60/sk.length):60;
   const a=sk.map(k=>{const x=SK[k];return `<button class="bcm sk ${x.ult?'ult':''} c-${x.heal?'heal':x.dmg?'atk':'sup'}" style="grid-column:span ${sp}" data-a="rtCmd" data-v="${k}"><span class="ci">${rtSkIc(k)}</span><span class="cn">${esc(x.n)}</span><span class="cf"></span><span class="cq">預約</span><span class="kn">${sk.indexOf(k)+1}</span></button>`}).join('');
-  const b=[['atk','攻擊','c-atk','','Z'],['guard','防禦','c-def','減傷','X'],['evade','閃避','c-def','躲開','C'],['parry','格擋','c-par','擋下反擊','空白']].map(([k,n,c,f,kb])=>`<button class="bcm ${c}" style="grid-column:span 15" data-a="rtCmd" data-v="@${k}"><span class="ci">${RTI[k]}</span><span class="cn">${n}</span><span class="cf">${f}</span><span class="cq">預約</span><span class="kn">${kb}</span></button>`).join('');
+  const b=[['atk','攻擊','c-atk','','Z'],['guard','防禦','c-def','減傷','X'],['parry','格擋','c-par','擋下反擊','空白']].map(([k,n,c,f,kb])=>`<button class="bcm ${c}" style="grid-column:span 20" data-a="rtCmd" data-v="@${k}"><span class="ci">${RTI[k]}</span><span class="cn">${n}</span><span class="cf">${f}</span><span class="cq">預約</span><span class="kn">${kb}</span></button>`).join('');
   el.innerHTML=a+b;RTK.cb=[...el.querySelectorAll('.bcm')]}
 function rtCards(){const el=$('#xew');if(!el)return;const R=B.rt,ad=B.adds||[],sig=B.id+B.name+'|'+ad.map(f=>f.id+f.name).join(',');if(R.sig===sig&&el.children.length)return;R.sig=sig;
   const L=[{f:B,i:-1},...ad.map((f,i)=>({f,i}))];
@@ -3894,7 +3895,7 @@ function rtFrame(){const R=B.rt,now=performance.now(),s=rtS(),slow=now-RTK.stT>2
     let cn='';if(alive&&!stun&&R.t>=0){const rem=w?(w.dur-w.t)/fr:(100-g)/(100/rtFT(f,!c.m))/fr;cn=rem<9.95?rem.toFixed(1):''}if(c.cnt.textContent!==cn)c.cnt.textContent=cn;
     const cl=c.el.classList;cl.toggle('wind',!!w&&alive);cl.toggle('soon',!w&&alive&&g>75);cl.toggle('stun',!!stun&&alive);
     if(!alive&&!c.dead){c.dead=1;cl.add('dead');if(c.m){rtStamp(B.kind==='boss'?'首領擊破':'擊破','',B.kind==='boss'?esc(B.m.n):'');try{SFX.hit(0)}catch(e){}}}
-    const it=w&&alive?(w.mg?'<i>魔法</i>':'')+(w.nd?'<i class="nd">躲不掉</i>':'')+esc(w.n):'';if(c.it._h!==it){c.it.innerHTML=it;c.it._h=it}
+    const it=w&&alive?(w.mg?'<i>魔法</i>':'')+esc(w.n):'';if(c.it._h!==it){c.it.innerHTML=it;c.it._h=it}
     if(c.b2){const on=!!(B.chg&&B.chgNeed);c.b2.classList.toggle('on',on);if(on)c.b2.firstChild.style.width=Math.min(100,brkDone()/B.chgNeed*100)+'%'}
     if(slow){const st=rtFstat(f,c.m);if(c.sts._h!==st){c.sts.innerHTML=st;c.sts._h=st}}
     rtSwap(c)}
@@ -3960,7 +3961,7 @@ function rtPauseV(){const p=$('#bpause');if(!p||!B||!B.rt)return;const R=B.rt;p.
 function rtItems(){const el=$('#xitems');if(!el)return;if(!el.hidden){el.hidden=true;return}const us=Object.keys(S.items).filter(k=>ITEMS[k]&&ITEMS[k].use&&S.items[k]>0);
   el.innerHTML=us.map(k=>`<button data-a="rtCmd" data-v="item:${k}"><span>${esc(ITEMS[k].n)} ×${S.items[k]}</span><small>${esc(ITEMS[k].d)}</small></button>`).join('')||'<p>沒有可用的道具</p>';el.hidden=false}
 function rtKey(e){if(!B||!B.rt||!document.getElementById('rtb')||MODAL||STORY)return;if(e.target&&/INPUT|TEXTAREA/.test(e.target.tagName))return;const k=e.key.toLowerCase();
-  const sk=battleSkills(),m={z:'@atk',x:'@guard',c:'@evade',' ':'@parry'};let c=m[k];if(!c&&/^[1-6]$/.test(k))c=sk[+k-1];
+  const sk=battleSkills(),m={z:'@atk',x:'@guard',' ':'@parry'};let c=m[k];if(!c&&/^[1-6]$/.test(k))c=sk[+k-1];
   if(k==='p'||k==='escape'){e.preventDefault();ACT.rtPause();return}if(c){e.preventDefault();ACT.rtCmd(c)}}
 document.addEventListener('keydown',rtKey);
 
