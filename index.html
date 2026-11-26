@@ -61,7 +61,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
 #nav button.on{color:var(--gold)}#nav button.on i{background:rgba(240,194,75,.18)}
 .ico svg{width:22px;height:22px}
 #nav .dot{position:absolute;top:5px;right:22%;width:8px;height:8px;border-radius:50%;background:var(--hp)}
-.pre #hud,.pre #chat,.pre #nav{display:none}.inb #hud{display:none}
+.pre #hud,.pre #chat,.pre #nav{display:none}.nohud #hud{display:none}
 
 /* 共用 */
 h2{font-family:var(--display);font-size:18px;color:var(--hd);text-wrap:balance}
@@ -2055,7 +2055,7 @@ let WARM=0;function warm(){if(WARM||!S)return;WARM=1;try{preload(['','_hurt','_l
 function render(){try{bgmAuto()}catch(e){}try{faDraw()}catch(e){}setTimeout(()=>{try{pcDraw()}catch(e){}},0);if(!B)document.querySelectorAll('.spb').forEach(e=>e.remove());setTimeout(()=>{try{PFX.marks(B&&B.hp>0?B.cls.marks:[])}catch(e){}},280);if(!WARM)setTimeout(warm,400);setTimeout(()=>{try{tipCheck()}catch(e){}},60);
   const app=$('#app');
   if(!S){app.className='pre';$('#main').innerHTML=vTitle();return}
-  app.className=B&&TAB==='adv'?'inb':'';clamp();const s=stats();
+  app.className=(TAB==='town'?'':'nohud')+(B&&TAB==='adv'?' inb':'');clamp();const s=stats();
   $('#hud').innerHTML=`<button class="ava" data-a="tab" data-v="char" aria-label="角色">${art(PKEY(),clsName(),'r11','mini')}</button>
     <div class="hud-mid"><div class="hud-n"><b>${esc(S.name)}</b>${title()?`<span style="color:#ffd27a">「${title()}」</span>`:''}<span>Lv.${S.lv} ${clsName()}</span><span class="pw">戰力 ${power()}</span></div>${bar('hp',S.hp,s.HP)}${bar('mp',S.mp,s.MP)}${bar('exp',S.exp,need(S.lv))}</div>
     <div class="hud-r"><span class="cur g">G ${S.gold}</span><button class="set" data-a="openM" data-v="settings">設定</button></div>`;
@@ -2964,6 +2964,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'15.11',d:'2026-11-26',t:'狀態列只在城鎮出現',b:'上方的角色狀態列只留在城鎮首頁，其他頁面收起來。'},
   {v:'15.10',d:'2026-11-26',t:'配色定為墨黑',b:'全遊戲改用墨黑配色，其他配色與切換選項收掉。'},
   {v:'15.9',d:'2026-11-26',t:'五種配色可以換',b:'米色底拿掉了。設定最上面的「配色」可選：夜藍（預設）、墨黑、深林、酒紫、霧灰。'},
   {v:'15.8',d:'2026-11-26',t:'戰鬥畫面變大、整體配色調暗',b:'進戰鬥時上方的角色狀態列收起來，戰鬥畫面變大。全遊戲的底色、面板、框線都調暗一階。'},
