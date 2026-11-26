@@ -331,7 +331,7 @@ class H(BaseHTTPRequestHandler):
                 row['eq'] = out
             ex = d.get('ex')
             if isinstance(ex, dict):
-                row['ex'] = {k: max(0, min(9999999, int(ex[k]))) for k in ('ch', 'kills', 'enh', 'nm', 'boss') if k in ex and str(ex[k]).lstrip('-').isdigit()}
+                row['ex'] = {k: max(0, min(9999999, int(ex[k]))) for k in ('ch', 'kills', 'enh', 'nm', 'boss', 'ab', 'abw') if k in ex and str(ex[k]).lstrip('-').isdigit()}
             st = d.get('st')
             if isinstance(st, list) and len(st) <= 8:
                 row['st'] = [max(0, min(9999999, int(v))) for v in st]

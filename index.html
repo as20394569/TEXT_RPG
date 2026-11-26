@@ -1286,7 +1286,7 @@ const CHTXT=[
    ['艾德溫','礦坑那幅壁畫是三百年前的東西。霧以前就來過，而且那時候，有人是笑著走進去的。'],
    ['艾德溫','王國把這件事藏了二十年。……我想知道為什麼。'],
    ['旁白','晨星鎮的冒險者名冊上，多了一個被稱為「破霧者」的名字。'],
-   ['旁白','【第一部「北方大道」完】第二部製作中。在那之前，各地首領仍會復活，人物故事、無盡之塔和傳說裝備還在等{你|妳}。']]}];
+   ['旁白','【第一部「北方大道」完】第二部製作中。在那之前，各地首領仍會復活，人物故事、霧淵和傳說裝備還在等{你|妳}。']]}];
 
 CHTXT.forEach((x,i)=>Object.assign(CH[i],x));
 /* ===== 第二部「霧之彼岸」：P2 開啟後才加入第六章（美術到齊前保持關閉） ===== */
@@ -1804,7 +1804,7 @@ const RZ={
 const SETKW={輕裝:'gale',森林:'ls',火山:'burn',雪地:'thorn',遠征隊:'shield',劍士:'guard',法師:'burn',弓手:'double',祭司:'reap',雷擊:'stun',書庫:'back'};
 function setFold(g){if(g&&g.set!=null){const st=SETS[g.set];if(st&&!g.sp&&!(GEAR[g.id]&&GEAR[g.id].uniq))g.sp=SETKW[st.n];delete g.set}return g}
 function setFoldAll(){try{if(S&&S.gear)S.gear.forEach(setFold)}catch(e){}}
-function kwCount(){const c={};if(!S||!S.eq)return c;const sets={};for(const sl in SLOTS){const g=gearBy(S.eq[sl]);if(!g)continue;if(g.sp&&RZ[g.sp])c[g.sp]=(c[g.sp]||0)+1;const u=GEAR[g.id]&&GEAR[g.id].uq;if(u)for(const k in u)if(RZ[k])c[k]=(c[k]||0)+(GEAR[g.id].core?2:1);}return c}
+function kwCount(){const c={};if(!S||!S.eq)return c;const sets={};for(const sl in SLOTS){const g=gearBy(S.eq[sl]);if(!g)continue;if(g.sp&&RZ[g.sp])c[g.sp]=(c[g.sp]||0)+1;if(g.sp2&&RZ[g.sp2])c[g.sp2]=(c[g.sp2]||0)+1;const u=GEAR[g.id]&&GEAR[g.id].uq;if(u)for(const k in u)if(RZ[k])c[k]=(c[k]||0)+(GEAR[g.id].core?2:1);}return c}
 function buildName(c){c=c||kwCount();const top=Object.entries(c).filter(([k,n])=>n>=2).sort((a,b)=>b[1]-a[1]).slice(0,2);return top.length?top.map(([k])=>RZ[k].n).join('・'):''}
 function power(){const s=stats();return Math.round(s.HP/4+s.MP/4+s.ATK*3+s.MAG*3+s.DEF*2.5+s.CRIT*4+(s.CD-150)*1.5+s.EVA*3+s.LS*5+(s.BURN+s.DOUBLE+s.STUN+s.GUARD+s.SHIELD+s.BACK+s.THORN+s.REAP)*3+s.GALE*40)}
 const baseAttr=()=>{const a=Object.assign({},CLS[S.cls].base),g=CLS[S.cls].grow;for(const k in g)a[k]+=g[k]*(S.lv-1);if(S.adv){const b=ADV[S.adv].bonus;for(const k in b)a[k]+=b[k]}return a};
@@ -1920,7 +1920,7 @@ async function fbSend(){const ta=$('#fbText'),cat=$('#fbCat');const text=(ta&&ta
 async function rankSync(force){if(!S||!S.cls)return;if(!force&&Date.now()-RANKT<5*60e3)return;RANKT=Date.now();const u=await rankUrl();if(!u){RANKERR=1;return}
   if(!S.pid){S.pid=Math.random().toString(36).slice(2,10);save()}
   try{const ctl=new AbortController();setTimeout(()=>ctl.abort(),6000);
-    await fetch(u+'/api/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:S.pid,name:S.name,cls:clsName(),lv:S.lv,power:power(),hk:HK(),eq:Object.keys(SLOTS).map(sl=>{const g=gearBy(S.eq[sl]);return g?[g.id,g.r,g.p||0,g.sh?1:0,g.set!=null?g.set:-1]:null}),st:(()=>{const s=stats();return[s.HP,s.MP,s.ATK,s.MAG,s.DEF,s.CRIT]})(),ex:{ch:S.main.done?CH.length:S.main.ch,kills:S.st.kills||0,enh:Math.max(0,...(S.gear||[]).map(g=>g.p||0)),nm:S.st.nmboss||0}}),signal:ctl.signal});
+    await fetch(u+'/api/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:S.pid,name:S.name,cls:clsName(),lv:S.lv,power:power(),hk:HK(),eq:Object.keys(SLOTS).map(sl=>{const g=gearBy(S.eq[sl]);return g?[g.id,g.r,g.p||0,g.sh?1:0,g.set!=null?g.set:-1]:null}),st:(()=>{const s=stats();return[s.HP,s.MP,s.ATK,s.MAG,s.DEF,s.CRIT]})(),ex:{ch:S.main.done?CH.length:S.main.ch,kills:S.st.kills||0,enh:Math.max(0,...(S.gear||[]).map(g=>g.p||0)),nm:S.st.nmboss||0,ab:abSt().best,abw:abW()}}),signal:ctl.signal});
     const r=await fetch(u+'/api/top?n=300',{signal:ctl.signal});RANKTOP=await r.json();RANKERR=0;if(MODAL&&MODAL.k==='rank')drawModal()}catch(e){RANKERR=1;RANKURL=null}}
 setInterval(()=>rankSync(),60e3);setTimeout(()=>rankSync(true),8000);
 function myCode(){if(!S.pid){S.pid=Math.random().toString(36).slice(2,10);save()}const j=JSON.stringify({i:S.pid,n:S.name,c:clsName(),l:S.lv,p:power(),t:Date.now()});return 'AO1-'+btoa(unescape(encodeURIComponent(j)))}
@@ -2143,7 +2143,7 @@ function vAreas(){return `<h2>選擇冒險地點</h2>`+vGift()+vIdle()+vDg()+ARE
   <div class="row"><h3 class="grow">${a.n}</h3><span class="tag">Lv ${a.lv}</span>${S.cleared[i]?'<span class="tag ok">已通關</span>':''}</div>
   <p class="sub">${a.d}</p><div class="chips">${a.mobs.map(m=>`<span class="chip">${MOBS[m].n}</span>`).join('')}<span class="chip" style="color:var(--hp)">首領 ${MOBS[a.boss].n}${bossOn?'':'（未現身）'}</span></div>${open&&bossOn&&!S.cleared[i]&&S.lv<MOBS[a.boss].lv?`<p class="sub" style="color:var(--hp)">⚠ ${MOBS[a.boss].n} 已在深處等著（Lv ${MOBS[a.boss].lv}）。現在 Lv ${S.lv}，這趟終點會直接碰上它——不夠強就先在岔路多打幾場、換好裝備。</p>`:''}
   ${open?`<div class="row"><button class="btn pri grow" data-a="startRun" data-v="${i}">出發冒險</button>${S.cleared[i]?`<button class="btn grow" data-a="startNm" data-v="${i}" style="background:linear-gradient(#5a2a4a,#2a1430);color:#ffb3d0;border-color:#a04a7a">惡夢 Lv${AREAS[i].base+10}+</button>`:''}</div>${S.cleared[i]?'<p class="sub">惡夢模式：怪物 +10 級並帶詞綴，掉寶更好。</p>':''}`:`<button class="btn" disabled>完成${CH[i-1].t.slice(0,3)}後開放</button>`}</div>`}).join('')+vTowerCard()}
-function vTowerCard(){return towerOpen()?`<div class="panel area">${art('area_tower','無盡之塔')}<div class="row"><h3 class="grow">無盡之塔</h3><span class="tag red">挑戰</span></div><p class="sub">一層一層往上爬，看你能走多高。最高紀錄：第 ${S.tower.best||0} 層。</p><button class="btn pri" data-a="startTower">進入高塔</button></div>`:`<div class="panel area lock"><div class="row"><h3 class="grow">無盡之塔</h3></div><button class="btn" disabled>完成第三章後開放</button></div>`}
+function vTowerCard(){if(!towerOpen())return `<div class="panel area lock"><div class="row"><h3 class="grow">霧淵</h3></div><button class="btn" disabled>完成第三章後開放</button></div>`;const W=abWeek(),A=abSt();return `<div class="panel area" style="border-color:var(--r3)">${art('area_tower','霧淵')}<div class="row"><h3 class="grow">霧淵</h3><span class="tag red">每週更換</span></div><p class="sub">本週　${ABB[W.b].n}・${TRX(W.a).n}　｜　最深 第 ${A.best} 層　｜　剩 ${abDays()} 天</p><button class="btn pri" data-a="startTower">走進霧淵</button></div>`}
 /* 首領前哨的戰前準備：三選一，各有代價 */
 const PREP={scout:{n:'🔭 偵察動向',d:'摸清首領的習慣，開戰時首領 HP -12%'},trap:{n:'🪤 布置陷阱',d:'用一瓶治療藥水當誘餌，首領開場中毒 4 回合、攻擊下降 2 回合'},camp:{n:'🔥 營火調息',d:'免費回復 30% HP／MP，但火光驚動首領：攻擊 +12%'}};
 const prepCost=L=>20+L*8;
@@ -2446,9 +2446,9 @@ const MV={
       <div class="list">${Object.keys(RZ).map(k=>`<button class="item" data-a="inscGo" data-v="${g.u}|${k}" ${ok&&g.sp!==k?'':'disabled'} style="text-align:left"><span class="grow"><b>${RZ[k].ic} ${RZ[k].n}</b>　<span class="sub">${SPEC[k].d}</span><span class="sub">目前身上 ${cnt[k]||0} 件　2 件：${RZ[k].i}</span></span></button>`).join('')}</div></div>`}},
   rank(){if(!RANKTOP||Date.now()-RANKT>60e3)rankSync(true);const online=Array.isArray(RANKTOP);const tab=RKTAB||'power',cf=RKCLS||'all';
     const base=c=>{for(const k in CLS){if(CLS[k].n===c)return k;if((CLS[k].adv||[]).some(a=>ADV[a].n===c))return k}return ''};
-    const P=[{n:S.name,p:power(),me:1,c:clsName(),l:S.lv,hk:HK(),ex:{ch:S.main.done?CH.length:S.main.ch,kills:S.st.kills||0,enh:Math.max(0,...(S.gear||[]).map(g=>g.p||0))}}];
+    const P=[{n:S.name,p:power(),me:1,c:clsName(),l:S.lv,hk:HK(),ex:{ch:S.main.done?CH.length:S.main.ch,kills:S.st.kills||0,enh:Math.max(0,...(S.gear||[]).map(g=>g.p||0)),ab:abSt().best,abw:abW()}}];
     if(online){const seen={};RANKTOP.filter(x=>x.id!==S.pid&&!(x.name===S.name&&x.cls===clsName())).sort((a,b)=>b.ts-a.ts).forEach(x=>{const k=x.name+'|'+x.cls;if(seen[k])return;seen[k]=1;P.push({n:x.name,p:x.power,c:x.cls,l:x.lv,t:x.ts,on:1,id:x.id,hk:x.hk,ex:x.ex||{}})})}
-    const TABS={power:['戰力',x=>x.p,x=>x.p],lv:['等級',x=>x.l*1e7+x.p,x=>'Lv.'+x.l],kills:['討伐',x=>(x.ex.kills||0),x=>(x.ex.kills||0)+' 隻'],enh:['強化',x=>(x.ex.enh||0)*1e7+x.p,x=>'+'+(x.ex.enh||0)]};
+    const TABS={power:['戰力',x=>x.p,x=>x.p],lv:['等級',x=>x.l*1e7+x.p,x=>'Lv.'+x.l],kills:['討伐',x=>(x.ex.kills||0),x=>(x.ex.kills||0)+' 隻'],enh:['強化',x=>(x.ex.enh||0)*1e7+x.p,x=>'+'+(x.ex.enh||0)],ab:['霧淵',x=>(x.ex.abw===abW()?(x.ex.ab||0):0)*1e7+x.p,x=>(x.ex.abw===abW()?(x.ex.ab||0):0)+' 層']};
     const T=TABS[tab],L=P.filter(x=>cf==='all'||base(x.c)===cf).sort((a,b)=>T[1](b)-T[1](a));const myi=L.findIndex(x=>x.me);
     const ago=t=>{const m=(Date.now()-t)/6e4;return m<60?'剛剛上線':m<1440?Math.floor(m/60)+' 小時前':Math.floor(m/1440)+' 天前'};
     const medal=i=>i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1;
@@ -2464,7 +2464,7 @@ const MV={
      ${g.sh?`<div class="gsec"><b style="color:#1593b3">✧ 閃耀</b><span class="sub">比同級裝備多一條詞條，最強的詞條 ×1.5。洗練後依然保留。</span></div>`:''}${(g.sub||[]).length?`<div class="gsec"><b>附加詞條</b>${g.sub.map(x=>`<span class="subl c${g.r}">◆ ${fmt(x.k,x.v)}</span>`).join('')}</div>`:''}
      ${GEAR[g.id].uniq?`<div class="gsec"><b class="c4">首領專屬效果</b><span class="sub">${GEAR[g.id].ud}</span></div>`:''}
      ${(g.sock||[]).length?`<div class="gsec"><b>鑲嵌孔</b>${g.sock.map((gm,i)=>gm?`<span class="subl">◆ ${ITEMS[gm].n}：${Object.entries(ITEMS[gm].gem).map(([k,v])=>fmt(k,v)).join('')}</span>`:`<span class="subl sub">◇ 空孔</span>`).join('')}${GEMS.some(x=>S.items[x])?`<div class="chips">${GEMS.filter(x=>S.items[x]).map(x=>`<button class="btn sm" data-a="sockIn" data-v="${u}|${x}">鑲入${ITEMS[x].n}×${S.items[x]}</button>`).join('')}</div><span class="sub">孔滿時會替換第一顆，舊寶石會碎掉。</span>`:'<span class="sub">寶石只有首領會掉落：主線首領與區域領主各有固定寶石，點首領圖像可查看。</span>'}</div>`:''}
-     ${g.sp?`<div class="gsec"><b class="c4">${g.r>=4?'傳說':'稀有'}詞綴【${SPEC[g.sp].n}】</b><span class="sub">${specD(g)}${specV(g)<SPEC[g.sp].v?`（第 ${GEAR[g.id].t+1} 階，滿階為 ${SPEC[g.sp].v}）`:''}</span></div>`:''}
+     ${g.sp2&&RZ[g.sp2]?`<div class="gsec" style="border-color:var(--r3)"><b class="c3">第二詞綴【${RZ[g.sp2].n}】</b><span class="sub">共鳴多算 1 件。</span></div>`:''}${g.sp?`<div class="gsec"><b class="c4">${g.r>=4?'傳說':'稀有'}詞綴【${SPEC[g.sp].n}】</b><span class="sub">${specD(g)}${specV(g)<SPEC[g.sp].v?`（第 ${GEAR[g.id].t+1} 階，滿階為 ${SPEC[g.sp].v}）`:''}</span></div>`:''}
      ${set?`<div class="gsec"><b>${set.n}套裝（已裝備 ${sc} 件）</b><span class="sub ${sc>=2?'son':''}">2 件：${set.d2}</span><span class="sub ${sc>=4?'son':''}">4 件：${set.d4}</span></div>`:''}
      ${!on&&cur?`<p class="sub">目前裝備：<b class="c${cur.r}">${gearName(cur)}</b>（評分 ${gearPower(cur)}）</p>`:''}
      ${on?`<button class="btn big" data-a="unequip" data-v="${b.slot}">卸下</button>`:`<button class="btn pri big" data-a="equip" data-v="${u}" ${can?'':'disabled'}>${can?'裝備':'等級或職業不符'}</button>`}
@@ -2944,9 +2944,9 @@ const ACH=[
   {id:'story',n:'晨星鎮的朋友',d:'完成所有人物故事',c:()=>NST.every(q=>(S.nst[q.id]||{}).done),rw:{gold:8000,items:{gem_w:1}}},
   {id:'bond10',n:'燈火的搭檔',d:'與露娜的羈絆達到 10',c:()=>(S.bond||0)>=10,rw:{items:{eth2:5}}},
   {id:'main',n:'蒼藍勇者',d:'完成第一部主線',c:()=>S.main.ch>=5,rw:{gold:10000}},
-  {id:'t10',n:'登塔者',d:'無盡之塔到達第 10 層',c:()=>S.tower.best>=10,rw:{items:{stone:3}}},
-  {id:'t30',n:'雲上之人',d:'無盡之塔到達第 30 層',c:()=>S.tower.best>=30,rw:{items:{gem_y:1,stone:5}}},
-  {id:'t50',n:'塔頂的風',d:'無盡之塔到達第 50 層',c:()=>S.tower.best>=50,rw:{gold:50000}},
+  {id:'t10',n:'登塔者',d:'霧淵到達第 10 層',c:()=>S.tower.best>=10,rw:{items:{stone:3}}},
+  {id:'t30',n:'雲上之人',d:'霧淵到達第 30 層',c:()=>S.tower.best>=30,rw:{items:{gem_y:1,stone:5}}},
+  {id:'t50',n:'塔頂的風',d:'霧淵到達第 50 層',c:()=>S.tower.best>=50,rw:{gold:50000}},
   {id:'craft10',n:'巧手',d:'合成 10 次',c:()=>S.st.craft>=10,rw:{items:{dust:20}}},
   {id:'rich',n:'晨星鎮首富',d:'持有 50000 G',c:()=>S.gold>=50000,rw:{items:{stone:3}}}];
 function checkAch(){if(!S||!S.ach)return;for(const a of ACH){if(S.ach[a.id])continue;let ok=false;try{ok=a.c()}catch(e){}
@@ -2963,21 +2963,34 @@ const RECIPE=[
 const canCraft=r=>S.gold>=r.g&&Object.entries(r.need).every(([k,v])=>(S.items[k]||0)>=v);
 function vCraft(){return{t:'合成工坊',b:npcSay('npc_bald','巴爾德','材料拿來，我幫你湊成好東西。手續費照收。')+`<div class="list">${RECIPE.map((r,i)=>`<div class="item"><span class="ico c${ITEMS[r.out].gem?3:1}">${icon('item_'+r.out,ic(ITEMS[r.out].gem?'mat':'potion'))}</span><span class="grow"><b>${ITEMS[r.out].n}</b><span class="sub">${Object.entries(r.need).map(([k,v])=>`${ITEMS[k].n} ${S.items[k]||0}/${v}`).join('・')}・${r.g} G</span></span><button class="btn sm ${canCraft(r)?'pri':''}" data-a="craft" data-v="${i}" ${canCraft(r)?'':'disabled'}>合成</button></div>`).join('')}</div><p class="sub">星塵來自分解裝備，魔物素材在各地掉落。</p>`}}
 
-/* ============ 無盡之塔 ============ */
+/* ============ 霧淵（原無盡之塔）：每週換詞條，層數無上限 ============ */
 const towerOpen=()=>S.main.ch>=3;
-function towerLv(f){return 15+Math.round(f*1.1)}
-function startTower(){dexInit();if(S.hp<=1){toast('HP 太低，先到旅店休息');return}
-  RUN={tower:true,floor:0,area:0,nm:false,step:-1,nodes:['battle'],forks:[null],bless:null,loot:{gold:0,exp:0,items:[]},view:{type:'tstart'}};TAB='adv';render();$('#main').scrollTop=0}
-function towerNext(){const f=++RUN.floor;RUN.area=Math.floor((f-1)/5)%5;RUN.tlv=towerLv(f);const a=AREAS[RUN.area];
-  if(f>1&&f%5===1){const s=stats();S.hp=Math.min(s.HP,S.hp+Math.round(s.HP*.3));S.mp=Math.min(s.MP,S.mp+Math.round(s.MP*.3))}
-  if(f%5===0)startBattle(a.boss,'boss');else startBattle(pick(a.mobs),f%3===0?'elite':'',f>=8?(Math.random()<.4?1:0)+(f>=20&&Math.random()<.3?1:0):0);
+function towerLv(f){return 15+Math.round(f*1.1+Math.max(0,f-30)*.9)}
+const abW=()=>Math.floor((Date.now()+8*3600e3-4*86400e3)/604800e3);
+const ABA={plate:'魔物的殼一層疊一層。',veil:'魔物的輪廓看不清楚。',grudge:'受傷的魔物記得每一刀。',swell:'魔物越拖越兇。',rebound:'打得越重，震得越痛。',spike:'魔物身上長滿了刺。'};
+const ABB={dusk:{n:'黃昏',s:'霧裡的鐘停在黃昏。',d:'魔物攻擊 +20%、HP -20%'},thick:{n:'濃霧',s:'霧濃得化不開。',d:'每隻魔物都纏著霧'},crowd:{n:'群聚',s:'牠們不再單獨行動。',d:'魔物多帶一隻同伴'},dry:{n:'枯竭',s:'這裡的水是靜止的。',d:'突破後的回復減半'}};
+const ABFRAG=['地上有一排腳印，走到一半就停了。沒有回頭的痕跡。','一只茶杯浮在半空，茶還冒著煙。','遠征隊的旗子插在這裡。布面沒有褪色，像昨天才插的。','有人在石頭上刻了記號：第七天。旁邊又刻了一次：第七天。','一頂營帳。裡面的人睜著眼，沒有呼吸，也沒有腐壞。','簽到簿翻開在最後一頁。最後一個名字只寫到一半。','霧裡有人在哼歌，調子很舊。','一封沒寄出的信：「告訴他們，我們沒有死。只是這裡的今天還沒過完。」'];
+function abWeek(){const w=abW();let x=(w*7919+13)>>>0;const r=()=>{x=(x+0x6D2B79F5)>>>0;let t=Math.imul(x^x>>>15,1|x);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
+  const ak=Object.keys(ABA),bk=Object.keys(ABB),a=ak[Math.floor(r()*ak.length)],b=bk[Math.floor(r()*bk.length)],ord=AREAS.map((_,i)=>i);for(let i=ord.length-1;i>0;i--){const k=Math.floor(r()*(i+1));[ord[i],ord[k]]=[ord[k],ord[i]]}return{w,a,b,ord}}
+function abSt(){const w=abW();if(!S.ab||S.ab.w!==w)S.ab={w,best:0};return S.ab}
+const abDays=()=>{const ms=(abW()+1)*604800e3-(Date.now()+8*3600e3-4*86400e3);return Math.max(1,Math.ceil(ms/86400e3))};
+function startTower(from){dexInit();if(S.hp<=1){toast('HP 太低，先到旅店休息');return}const W=abWeek();
+  RUN={tower:true,floor:Math.max(0,(+from||1)-1),area:0,nm:false,step:-1,nodes:['battle'],forks:[null],bless:null,loot:{gold:0,exp:0,items:[]},view:{type:'tstart'},ab:W};TAB='adv';render();$('#main').scrollTop=0}
+function towerNext(){const f=++RUN.floor,W=RUN.ab||(RUN.ab=abWeek());RUN.area=W.ord[Math.floor((f-1)/5)%W.ord.length];RUN.tlv=towerLv(f);const a=AREAS[RUN.area],X=DGX[a.id];
+  if(f>1&&f%5===1&&RUN.view&&RUN.view.type!=='tstart'){const s=stats(),k=W.b==='dry'?.15:.3;S.hp=Math.min(s.HP,S.hp+Math.round(s.HP*k));S.mp=Math.min(s.MP,S.mp+Math.round(s.MP*k))}
+  const ad=(f>=8?(Math.random()<.4?1:0)+(f>=20&&Math.random()<.3?1:0):0)+(W.b==='crowd'?1:0);
+  if(f%10===0)startBattle(a.boss,'boss');else if(f%5===0&&X){startBattle(X.mid,'elite',0);if(B)B.name='中首領・'+MOBS[X.mid].n}else startBattle(pick([...a.mobs,...(X?X.mobs:[])]),f%3===0?'elite':'',ad);
   render();$('#main').scrollTop=0}
-function vTower(){const v=RUN.view,f=RUN.floor;let body='';
-  if(v.type==='tstart')body=`<div class="panel">${art('area_tower','無盡之塔')}<h3>無盡之塔</h3><p>古王國留下的高塔。每一層都會映出大陸各地的幻影，越往上，魔物越強。</p><p class="sub">每 5 層換一個地區的幻影，第 5 層是該地區首領；突破首領後回復 30% HP／MP。倒下會被送回城鎮。目前最高紀錄：第 ${S.tower.best} 層</p><p class="sub">⚠ 塔裡掉落的裝備階級不會超過你主線推進到的地區（目前最高：${AREAS[Math.min(S.main.ch,AREAS.length-1)].n}），首領專屬裝備要先在主線打倒該首領才會掉落。</p><button class="btn pri big" data-a="towerNext">從第 1 層開始</button><button class="btn" data-a="retreat">返回</button></div>`;
-  else{if(f>S.tower.best){S.tower.best=f;save()}
-    body=`<div class="panel">${v.img?`<div class="duo">${art(v.img,'勝利','r34')}${v.mimg?art(v.mimg,'','r11'):''}</div>`:''}<h3>第 ${f} 層突破</h3><p>${v.text}</p>
-    <button class="btn pri big" data-a="towerNext">前往第 ${f+1} 層${(f+1)%5===0?'（首領）':''}</button><button class="btn" data-a="finish">離開高塔（保留戰利品）</button></div>`}
-  return `<div class="row"><h2 class="grow">無盡之塔　${f?'第 '+f+' 層':''}</h2><span class="sub">最高 ${S.tower.best} 層・已獲得 ${RUN.loot.gold} G</span></div>${body}`}
+function vTower(){const v=RUN.view,f=RUN.floor,W=RUN.ab||abWeek(),A=abSt();let body='';
+  const rule=`<div class="gsec"><b>本週　${ABB[W.b].n}・${TRX(W.a).n}</b><span class="sub">${ABB[W.b].s}${ABA[W.a]}</span><span class="sub">${ABB[W.b].d}；${TRX(W.a).d}</span></div>`;
+  if(v.type==='tstart'){const cp=Math.floor(A.best/10)*10+1;body=`<div class="panel">${art('area_tower','霧淵')}<h3>霧淵</h3><p>門的另一邊。這裡的今天還沒過完。</p>${rule}<p class="sub">本週最深 第 ${A.best} 層・歷來 第 ${S.tower.best} 層・${abDays()} 天後換週</p><button class="btn pri big" data-a="towerNext">從第 ${f+1} 層開始</button>${cp>1&&f+1!==cp?`<button class="btn" data-a="startTower" data-v="${cp}">從第 ${cp} 層開始</button>`:''}<button class="btn" data-a="retreat">返回</button></div>`}
+  else{if(f>S.tower.best){S.tower.best=f}if(f>A.best){A.best=f;save();try{rankSync(true)}catch(e){}}
+    let frag='';if(f%10===0){const n=f/10;S.abf=S.abf||0;if(n>S.abf&&ABFRAG[n-1]){S.abf=n;save()}if(ABFRAG[n-1]&&RUN.fragF!==f&&S.abf===n){RUN.fragF=f}if(RUN.fragF===f)frag=`<div class="gsec"><span class="sub">${ABFRAG[n-1]}</span></div>`}
+    body=`<div class="panel resin">${v.img?`<div class="duo">${art(v.img,'勝利','r34')}${v.mimg?art(v.mimg,'','r11'):''}</div>`:''}<h3>第 ${f} 層</h3>${v.drop||''}<p>${v.text}</p>${frag}
+    <button class="btn pri big" data-a="towerNext">往下第 ${f+1} 層${(f+1)%10===0?'（首領）':(f+1)%5===0?'（強敵）':''}</button><button class="btn" data-a="finish">帶著戰利品回去</button></div>`}
+  return `<div class="row"><h2 class="grow">霧淵　${f&&v.type!=='tstart'?'第 '+f+' 層':''}</h2><span class="sub">本週 ${A.best} 層・${RUN.loot.gold} G</span></div>${body}`}
+/* 霧淵限定：第二詞綴（只算共鳴件數） */
+function ab2(g,f){try{if(!g||g.r<3||g.sp2||!g.sp||(GEAR[g.id]&&GEAR[g.id].uniq))return;const p=f>=20?Math.min(.6,.25+(f-20)*.012):f>=10?.04:.01;if(Math.random()<p){const ks=Object.keys(RZ).filter(k=>k!==g.sp);g.sp2=pick(ks);sys(`${S.name} 在霧淵找到雙詞綴的【${gearName(g)}】！`)}}catch(e){}}
 
 /* ============ 新手引導 ============ */
 const TIPS={
@@ -2991,7 +3004,7 @@ const TIPS={
   smith:['鐵匠鋪','強化提升主屬性，+10 以後失敗會掉級。用不到的裝備可以分解成星塵，拿去洗練詞條或合成。'],
   bag:['背包','裝備依部位分類。紫色史詩、金色傳說有鑲嵌孔，可以放寶石。'],
   adv20:['轉職','Lv.20 可以到轉職神殿接受試煉，打贏自己的影子就能轉職，學會新技能。'],
-  tower:['無盡之塔','一層一層往上爬，每 5 層換地區、出現首領。打到哪裡都會記錄最高層數。'],
+  tower:['霧淵','每週規則不同。能走多深就走多深。'],
   ally:['夥伴','露娜會跟你一起戰鬥。她會攻擊，也會在你危險時治療。可以在角色頁更換或取消夥伴。']};
 function tipCheck(){const el0=$('#tip');if(!S||STORY||(MODAL&&MODAL.k!=='smith')){if(el0)el0.hidden=true;return}if(!S.tut)S.tut={};let k=null;
   if(MODAL)k='smith';else if(B)k=S.tut.battle?(B.ally&&!S.tut.ally?'ally':null):'battle';
@@ -3008,6 +3021,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'16.0',d:'2026-11-26',t:'霧淵開放',b:'無盡之塔改成「霧淵」：每週換一組規則，層數沒有上限，每 5 層強敵、每 10 層首領。越深掉得越好，深處會掉帶兩個詞綴的裝備。排行榜多了霧淵週榜。'},
   {v:'15.14',d:'2026-11-26',t:'文字修改',b:'職業、進階職、打法、夥伴的說明改成比較直白的寫法。'},
   {v:'15.13',d:'2026-11-26',t:'角色頁分頁、屬性專精取消',b:'角色頁分成總覽、流派、屬性、裝備、夥伴、技能，每頁一個畫面看完；技能點一下才展開說明。屬性點到 30／60 的固定加成拿掉了。'},
   {v:'15.12',d:'2026-11-26',t:'角色頁改版',b:'角色頁換成新介面：能力雷達、戰力與數值面板、屬性量表。另外，自己按撤退時全自動會跟著關掉。'},
@@ -3217,6 +3231,7 @@ function startBattle(id,kind,nAdds){const F=mkFoe(id,kind),m=F.m,bs=F.kind==='bo
      buffs:[],shield:0,pst:{poison:0,regen:0,burn:0,bleed:0,weak:0,stun:0},guard:false,
      log:[bs?`首領 ${m.n} 擋住了去路！`:F.mut?`被蝕霧侵蝕的 ${m.n} 出現了！氣息完全不同……`:adds.length?`${F.name} 帶著 ${adds.map(f=>f.name).join('、')} 出現了！`:`${F.name} 出現了！`,...(F.aff.length?[`詞綴：${F.aff.map(x=>AFF[x].n).join('、')}`]:[]),...(F.bm?[id==='zenos'?'蓋爾從側面牽制住了澤諾斯！':'你事先摸清了牠的弱點！']:[]),...(ally?[`${ally.n}與你並肩作戰`]:[])],busy:false,auto:AUTO,menu:'main',turn:1,fx:null,intro:true,shown:0,last:0},F);SFX.enc();
   scaleFoe();
+  if(RUN&&RUN.tower&&RUN.ab){const W=RUN.ab;if(!bs&&!B.trait){B.trait=W.a;const T=TRX(W.a);B.log.push(`⚠【${T.n}】${T.d}`)}if(W.b==='dusk'){B.atk=Math.round(B.atk*1.2);B.mag=Math.round(B.mag*1.2);B.max=Math.round(B.max*.8);B.hp=Math.min(B.hp,B.max);(B.adds||[]).forEach(a=>{a.atk=Math.round(a.atk*1.2);a.max=Math.round(a.max*.8);a.hp=Math.min(a.hp,a.max)})}if(W.b==='thick'&&!(B.fog>0)){B.fog=B.fogMax=3}}
   if(bs&&RUN&&(RUN.nm||RUN.tower)){B.trait=weekTrait(id);const T=BTRAIT[B.trait];B.log.push(`⚠ 本週特性【${T.n}】${T.d}`)}
   if(B.fog>0)B.log.push(`☁ 牠身上纏著霧（${B.fog} 層）`);
   if(B.trait&&m.mech===B.trait){const T=TRX(B.trait);if(T)B.log.push(`⚠【${T.n}】${T.d}`)}
@@ -3344,7 +3359,8 @@ function foeTurn(){if(!B)return;if(B.treasure&&B.turn>=3&&B.hp>0){B=null;RUN.vie
   if(B.trait==='undying'&&B.hp>0){if(B.st.burn>0||B.st.poison>0)blog(`${B.name} 的【不死】被灼燒／中毒壓制，無法再生`);else{const h=Math.round(B.max*.05);B.hp=Math.min(B.max,B.hp+h);blog(`${B.name} 的【不死】再生 ${h} HP`)}}
   if(B.spk){blog(`【尖刺】這回合你被反彈了 ${B.spk} 傷害`);B.spk=0}
   if(B.aff.includes('regen')&&B.turn<20){const h=Math.round(B.max*.06);B.hp=Math.min(B.max,B.hp+h);blog(`${B.name} 再生了 ${h} HP`)}
-  if(B.turn>=20){const d=Math.round(B.max*Math.min(.15,.02*(B.turn-19)));B.hp=Math.max(0,B.hp-d);blog(`久戰之下，${B.name} 開始力竭，流失 ${d} HP`);if(B.hp<=0){render();winSoon(1350);return}}
+  if(RUN&&RUN.tower&&B.turn>=12&&B.hp>0){B.atk=Math.round(B.atk*1.1);B.mag=Math.round(B.mag*1.1);if(B.turn===12)blog('霧越來越濃，牠的力氣變大了')}
+  if(B.turn>=20&&!(RUN&&RUN.tower)){const d=Math.round(B.max*Math.min(.15,.02*(B.turn-19)));B.hp=Math.max(0,B.hp-d);blog(`久戰之下，${B.name} 開始力竭，流失 ${d} HP`);if(B.hp<=0){render();winSoon(1350);return}}
   const fx=B.fx={by:'foe'};if(B.turn===8&&!B.talkDrag){B.talkDrag=1;setTimeout(()=>{try{talk('drag')}catch(e){}},900)}
   if(B.kind==='boss'&&!B.rage&&B.hp<B.max*.5){B.rage=1;B.atk=Math.round(B.atk*1.3);B.mag=Math.round(B.mag*1.3);fx.cut=`${B.m.n} 暴走`;fx.fsk='m_rage';blog(`${B.name} 進入暴走狀態！攻擊大幅提升`);setTimeout(()=>{try{talk('rage',1)}catch(e){}},900)}
   else if(B.st.stun>0){B.st.stun--;fx.stun=1;blog(`${B.name} 暈眩中，無法行動`)}
@@ -3441,7 +3457,7 @@ function spoil(){const m=B.m,L=B.L,bs=B.kind==='boss',el=B.kind==='elite',T=B.to
   if(Math.random()<.06){addItem('pot',1);got.push('治療藥水')}
   if(bs||Math.random()<.03){addItem('stone',bs?2:1);got.push(bs?'強化石×2':'強化石')}
   const fld=!!m.field;const first=bs&&!fld&&!S.cleared[RUN.area];
-  {const tw=RUN.tower,gt=tw?Math.min(RUN.area,S.main.ch):dropTier(RUN.area),hard=B.mut||B.nm,hd=B.hoard?1:0,n=(FA&&!bs&&!B.hoard&&Math.random()<.5)?0:hd+(bs?(Math.random()<(tw?.15:B.nm?.3:.2)?1:0)+(!tw&&B.nm&&Math.random()<.15?1:0):(Math.random()<(B.mut?.5:el?.25:B.nm?.15:lk||(RUN&&RUN.core==='greed')?.1:.06)*(tw?.6:1)?1:0));for(let i=0;i<n;i++){const g=rollGear(gt,bs?(tw?1:B.nm?3:2):hard?2:el?1:0,(bs||hard?(tw?1.3:2):1)*dgB(),hard);if(i<hd||(B.mut&&!bs))minG(g);got.push(gearName(g))}if(tw&&RUN.area>S.main.ch&&Math.random()<.5){addItem('stone',1);got.push('強化石')}
+  {const tw=RUN.tower,gt=tw?Math.min(RUN.area,S.main.ch):dropTier(RUN.area),hard=B.mut||B.nm,hd=B.hoard?1:0,n=(FA&&!bs&&!B.hoard&&Math.random()<.5)?0:hd+(bs?(Math.random()<(tw?.15:B.nm?.3:.2)?1:0)+(!tw&&B.nm&&Math.random()<.15?1:0):(Math.random()<(B.mut?.5:el?.25:B.nm?.15:lk||(RUN&&RUN.core==='greed')?.1:.06)*(tw?Math.min(1.3,.6+RUN.floor*.02):1)?1:0));for(let i=0;i<n;i++){const g=rollGear(gt,bs?(tw?(RUN.floor>=20?2:1):B.nm?3:2):hard?2:el?1:0,(bs||hard?(tw?1.3:2):1)*dgB()*(tw?1+Math.min(1.5,RUN.floor*.03):1),hard);ab2(g,tw?RUN.floor:0);if(i<hd||(B.mut&&!bs))minG(g);got.push(gearName(g))}if(tw&&RUN.area>S.main.ch&&Math.random()<.5){addItem('stone',1);got.push('強化石')}
     if(MDROP[B.id]&&Math.random()<(B.wander?.25:B.treasure?.15:B.kind==='elite'?.06:B.nm?.05:.02)*(FA?.5:1)){const u=addGear(MDROP[B.id],3);DROPS.push(u);got.push(gearName(u));sys(`${S.name} 取得魔物專屬裝備【${GEAR[u.id].n}】！`)}
     if(bs&&BOSSU[B.id]&&(!RUN.tower||S.cleared[AREAS.findIndex(a=>a.boss===B.id)])&&Math.random()<(RUN.tower?.015:B.nm?.1:.04)*(RUN.dg&&RUN.dg.depth?1.2:1)){const u=addGear(BOSSU[B.id],4);DROPS.push(u);got.push(gearName(u));sys(`${S.name} 取得首領專屬裝備【${GEAR[u.id].n}】！`)}
     if(RUN.dg&&(bs||String(B.name).startsWith('中首領'))&&Math.random()<(bs?.05:.03)*(1+.5*(RUN.dg.diff||0))*(RUN.dg.depth?1.2:1)){const u=addGear(pick(dgCore(RUN.dg.d||0)),4);DROPS.push(u);got.push(gearName(u));sys(`${S.name} 取得流派核心裝備【${GEAR[u.id].n}】！`)}
@@ -4155,7 +4171,7 @@ const ACT={
   replay(i){const c=CH[+i];play([...c.intro,...(c.mid||[]),...(c.pre||[]),...c.outro],SKEY(+i+1,'intro'),c.t,null,true)},
   dexTab(v){DEXTAB=v;drawModal()},setTitle(v){S.title=v||null;save();render();drawModal()},
   craft(v){const r=RECIPE[+v];if(!r||!canCraft(r))return;for(const k in r.need)addItem(k,-r.need[k]);S.gold-=r.g;addItem(r.out,r.n);S.st.craft=(S.st.craft||0)+1;SFX.buff();toast(`合成了 ${ITEMS[r.out].n}`);save();render();drawModal()},
-  startTower(){if(!towerOpen())return;startTower()},towerNext(){if(RUN&&RUN.tower&&!B)towerNext()},
+  startTower(v){if(!towerOpen())return;startTower(v)},towerNext(){if(RUN&&RUN.tower&&!B)towerNext()},
   tipOk(v){if(!S.tut)S.tut={};S.tut[v]=1;save();tipCheck()},
   lbuy(v){const e=liveNow().find(x=>x.shop);if(!e)return;if(!S.lbuy)S.lbuy={};const x=e.shop[+v],key=e.id+':'+v,tk=e.tok.id;if((S.items[tk]||0)<x.c||(S.lbuy[key]||0)>=x.lim)return;addItem(tk,-x.c);addItem(x.k,x.n);S.lbuy[key]=(S.lbuy[key]||0)+1;SFX.buff();toast(`兌換了 ${ITEMS[x.k].n}×${x.n}`);save();render();drawModal()},
   nstStart(v){nstStart(v)},nstEnd(v){nstEnd(v)},
@@ -4232,7 +4248,7 @@ function faTick(){faDraw();if(!FA||!S||FA.busy)return;if(FA.hold&&Date.now()-FA.
     if(RUN.view&&RUN.view.type==='gate'){const L=MOBS[AREAS[RUN.area].boss].lv+(RUN.nm?10:0)+(RUN.dg?[0,1,3][RUN.dg.diff||0]:0),st=stats();if(((!S.cleared[RUN.area]||(RUN.dg&&RUN.dg.diff))&&S.lv<L-1)||(S.hp<st.HP*.35&&!S.items.pot&&!S.items.pot2&&!S.items.pot3)){toast('全自動：首領太強，先撤退練功');FA.selfRet=1;faClick('#main [data-a="retreat"]');if(FA)FA.selfRet=0}else{if(!RUN.prep){if(S.hp<st.HP*.6)doPrep('camp');else if(S.gold>=prepCost(L)*3)doPrep('scout');else if((S.items.pot||0)>2)doPrep('trap')}faClick('#main [data-a="bossGo"]')}return}
     (RUN.view&&RUN.view.type==='camp'&&(faCamp(),1))||((RUN.view&&RUN.view.type==='kiln'&&!RUN.view.done)?(kilnPick(S.hp>=stats().HP*.65?'forge':'rest'),true):false)||faClick('#main [data-a="bossBox"]',1)||faClick('#main [data-a="core"][data-fit]:not([data-v="greed"]):not([data-v="temper"])',1)||faClick('#main [data-a="core"]:not([data-v="greed"]):not([data-v="temper"])',1)||(document.querySelector('#main [data-a="pickFork"]')&&(faSmartFork()||faDice('#main [data-a="pickFork"]','岔路')))||(document.querySelector('#main [data-a="evPick"]')&&faDice('#main [data-a="evPick"]','事件抉擇'))||faClick('#main [data-a="evFight"]')||faClick('#main [data-a="bless"]',1)||faDeep()||faClick('#main [data-a="runNext"]')||faClick('#main [data-a="towerNext"]')||faClick('#main [data-a="finish"]');return}
   /* 回城：休息後重新出發同一地區 */
-  if(FA.tower){faStop('高塔挑戰結束');return}
+  if(FA.tower){faStop('離開霧淵');return}
   if(!FA.towned){FA.towned=1;faTown();return}
   const s=stats();if(S.hp<s.HP*.7||S.mp<s.MP*.5){const c=S.lv*4;if(S.gold>=c){ACT.rest();return}if(S.hp<s.HP*.4){faStop('金幣不足以休息，全自動停止');return}}
   FA.towned=0;TAB='adv';if(FA.dg){DGDIFF=FA.dg.diff;startDg(FA.dg.d,0);if(!RUN)faStop('進不了副本，全自動停止')}else startRun(FA.area,FA.nm)}
@@ -4245,7 +4261,7 @@ function faTown(){const msgs=[];try{checkDaily();
   if(typeof fortune==='function'&&!fortune()&&S.main.ch>=1){ACT.fortune()}
   if(S.pts>0){const main=CLS[S.cls].basic==='MAG'?'INT':CLS[S.cls].atk;let n=0;while(S.pts>0){S.pts--;S.attr[(n++%3===2)?'VIT':main]++}msgs.push('配點')}
   if(S.sp>0){const ks=mySkills().filter(k=>(S.skl[k]||1)<5&&SK[k].dmg).sort((a,b)=>(S.skl[a]||1)-(S.skl[b]||1));const all=ks.length?ks:mySkills().filter(k=>(S.skl[k]||1)<5);let i=0;while(S.sp>0&&all.length){const k=all[i++%all.length];if((S.skl[k]||1)<5){S.sp--;S.skl[k]=(S.skl[k]||1)+1}else if(all.every(x=>(S.skl[x]||1)>=5))break}msgs.push('升技能')}
-  const kc=kwCount(),dom=Object.keys(kc).sort((a,b)=>kc[b]-kc[a])[0]||faDom(),kwOf=g=>{const u=GEAR[g.id]&&GEAR[g.id].uq;return g.sp===dom||(u&&dom in u)},fp=g=>gearPower(g)*(dom&&kwOf(g)?1.4:1);
+  const kc=kwCount(),dom=Object.keys(kc).sort((a,b)=>kc[b]-kc[a])[0]||faDom(),kwOf=g=>{const u=GEAR[g.id]&&GEAR[g.id].uq;return g.sp===dom||g.sp2===dom||(u&&dom in u)},fp=g=>gearPower(g)*(dom&&kwOf(g)?1.4:1);
   let ch=0;for(const sl in SLOTS){const cur=gearBy(S.eq[sl]);let best=cur,bp=cur?fp(cur):-1;
     for(const g of S.gear){const b=GEAR[g.id];if(!b||b.slot!==sl||g===cur)continue;if((b.cls&&b.cls!==S.cls)||(b.adv&&b.adv!==S.adv)||S.lv<b.lv||sealed(g))continue;const p=fp(g);if(p>bp*1.02){bp=p;best=g}}
     if(best&&best!==cur){S.eq[sl]=best.u;ch++}}if(ch)msgs.push(`換上 ${ch} 件裝備`);
