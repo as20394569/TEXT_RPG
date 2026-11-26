@@ -576,6 +576,214 @@ body.pc #app{margin:0;flex:none;box-shadow:0 0 40px rgba(0,0,0,.45)}
 .stage.v2 .spr.foe.lunge-foe.mv-insect{animation:mvinsect .56s}.stage.v2 .spr.foe.lunge2.mv-insect{animation:mvinsect .56s .5s}@keyframes mvinsect{0%{transform:none}18%{transform:translateX(-13%)}38%{transform:translateX(13%)}66%{transform:translateY(22%) scale(1.26)}100%{transform:none}}
 .stage.v2 .spr.foe.lunge-foe.mv-demon{animation:mvdemon .6s}.stage.v2 .spr.foe.lunge2.mv-demon{animation:mvdemon .6s .5s}@keyframes mvdemon{0%{transform:none}30%{transform:translateY(-5%) scale(1.16)}58%{transform:translateY(23%) scale(1.36) rotate(-6deg)}100%{transform:none}}
 body.noanim *{transition:none!important}
+/* ===== v17 即時戰鬥畫面（搬自無盡冒險・暗夜版型，配色改墨黑） ===== */
+#app.rt{width:100%;max-width:480px}
+#app.rt #main{padding:0;overflow:hidden;position:relative;gap:0}
+#app.rt #chat,#app.rt #bcast,#app.rt #nav{display:none!important}
+#app.rt #fab{top:50px;bottom:auto;right:10px;padding:4px 10px;font-size:12px}
+#rtb{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden;color:#ece9e2;background:radial-gradient(ellipse at 50% 0%,#34343b 0%,#18181c 46%,#0a0a0c 100%);-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+#rtb .xpart{position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(1.5px 1.5px at 20% 30%,rgba(236,208,138,.7),transparent),radial-gradient(1px 1px at 70% 20%,rgba(255,255,255,.55),transparent),radial-gradient(1.5px 1.5px at 40% 70%,rgba(217,174,76,.55),transparent),radial-gradient(1px 1px at 85% 60%,rgba(255,255,255,.45),transparent);background-size:220px 260px;animation:rtdrift 34s linear infinite;opacity:.6}
+@keyframes rtdrift{to{background-position:0 -520px}}
+#rtb.shake{animation:rtshk .32s}
+@keyframes rtshk{20%{transform:translate(-6px,3px)}40%{transform:translate(5px,-3px)}60%{transform:translate(-3px,2px)}80%{transform:translate(2px,-1px)}}
+#rtb #xhd{flex:none;display:flex;align-items:center;gap:6px;min-height:36px;margin:6px 6px 0;padding:4px 8px;font-size:12.5px;position:relative;z-index:3;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:12px}
+#rtb #xhd .hl{flex:1;min-width:0;display:flex;align-items:baseline;gap:7px;white-space:nowrap;overflow:hidden}
+#rtb #xhd .hl b{font-size:14px;overflow:hidden;text-overflow:ellipsis;max-width:150px;color:var(--hd,#ecd08a)}
+#rtb #xhd .hpt{font-size:11px;opacity:.75}
+#rtb #xhd .hr{display:flex;align-items:center;gap:4px;flex:none}
+#rtb #xhd .hr a{display:flex;align-items:center;padding:3px 8px;border-radius:12px;font-size:11.5px;cursor:pointer;white-space:nowrap;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);color:#e6e2d8}
+#rtb #xhd .hr a.on{border-color:var(--gold,#d9ae4c);color:var(--hd,#ecd08a);box-shadow:0 0 8px rgba(217,174,76,.4)}
+#rtb #xfield{flex:1 1 auto;min-height:180px;position:relative;overflow:hidden}
+#rtb #xscene{position:absolute;inset:0;pointer-events:none}
+#rtb #xscene img{width:100%;height:100%;object-fit:cover;filter:brightness(.5) saturate(.75) contrast(1.05);opacity:.9}
+#rtb #xmist{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(10,10,12,.55) 0%,rgba(10,10,12,0) 26%,rgba(10,10,12,0) 52%,rgba(10,10,12,.9) 100%)}
+#rtb #xew{position:absolute;left:6px;right:6px;bottom:10px;display:flex;justify-content:center;align-items:flex-end;gap:6px;z-index:2}
+#rtb .bec{position:relative;min-width:0;flex:0 0 25%;height:clamp(108px,17vh,140px);cursor:pointer;display:flex;flex-direction:column;overflow:visible;transition:transform .15s,opacity .4s,filter .4s}
+#rtb .bec.big{flex:0 0 44%;height:clamp(150px,29vh,232px)}
+#rtb #xew:has(.bec:only-child) .bec.big{flex-basis:58%}
+#rtb .bec .ecbg{position:absolute;inset:0;z-index:0;background:linear-gradient(165deg,rgba(58,54,64,.72),rgba(16,16,20,.88));border:1px solid rgba(255,255,255,.16);border-radius:14px;box-shadow:0 8px 20px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.12)}
+#rtb .bec.boss .ecbg{border-color:rgba(255,120,90,.65);box-shadow:0 0 18px rgba(255,90,60,.3),0 8px 20px rgba(0,0,0,.5)}
+#rtb .bec>*:not(.ecbg){position:relative;z-index:1}
+#rtb .bec .ehd{display:flex;align-items:baseline;gap:4px;padding:5px 7px 0;white-space:nowrap;overflow:hidden}
+#rtb .bec .rk{font-size:9px;letter-spacing:-.05em;color:var(--hd,#ecd08a)}
+#rtb .bec .en{font-weight:900;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;color:#fff}
+#rtb .bec.big .en{font-size:15px}
+#rtb .bec .elv{font-size:10px;flex:none;background:rgba(255,255,255,.14);padding:0 5px;border-radius:6px}
+#rtb .bec .eart{flex:1;position:relative;display:grid;place-items:center;min-height:0}
+#rtb .bec .eart>.art{position:absolute;inset:2px 6px;width:auto;height:auto;aspect-ratio:auto;border:0;border-radius:0;background:none;overflow:visible;animation:none}
+#rtb .bec .eart>.art img{object-fit:contain;filter:drop-shadow(0 4px 6px rgba(0,0,0,.55))}
+#rtb .bec .eart>.art .art-ph{display:none}
+#rtb .bec .eart>.art.shadowimg img{filter:brightness(.22) saturate(0) drop-shadow(0 0 10px #9a7aff)}
+#rtb .bec .xrg{--p:0;grid-area:1/1;position:absolute;right:4px;top:2px;width:38px;height:38px;border-radius:50%;background:conic-gradient(#ecd08a calc(var(--p)*1%),rgba(255,255,255,.16) 0);-webkit-mask:radial-gradient(circle,transparent 52%,#000 55%);mask:radial-gradient(circle,transparent 52%,#000 55%);filter:drop-shadow(0 0 3px rgba(236,208,138,.7))}
+#rtb .bec .cnt::before{content:'';position:absolute;inset:9px;border-radius:50%;background:rgba(0,0,0,.6);z-index:-1}#rtb .bec.big .cnt::before{inset:12px}#rtb .bec .cnt:empty::before{display:none}
+#rtb .bec.big .xrg{width:50px;height:50px}
+#rtb .bec .cnt{position:absolute;right:4px;top:2px;width:38px;height:38px;z-index:1;display:grid;place-items:center;font-size:11px;font-weight:900;color:#fff;font-variant-numeric:tabular-nums;text-shadow:0 1px 2px #000}
+#rtb .bec.big .cnt{width:50px;height:50px;font-size:13px}
+#rtb .bec.wind .xrg{background:conic-gradient(#ff4d6d calc(var(--p)*1%),rgba(255,77,109,.18) 0);filter:drop-shadow(0 0 8px #ff4d6d)}
+#rtb .bec.wind .cnt{color:#ffc2cc}
+#rtb .bec.wind .ecbg{border-color:#ff4d6d;box-shadow:0 0 20px rgba(255,77,109,.5)}
+#rtb .bec.soon .xrg{animation:rtsoon .5s infinite alternate}
+@keyframes rtsoon{to{filter:brightness(1.5) drop-shadow(0 0 6px #ecd08a)}}
+#rtb .bec .eflash{position:absolute;inset:0;pointer-events:none;opacity:0;border-radius:14px;background:radial-gradient(circle,#fff,transparent 70%)}
+#rtb .bec .xint{position:absolute!important;top:-13px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:11.5px;font-weight:900;padding:1px 9px;border-radius:10px;z-index:4!important;display:none;color:#fff;background:linear-gradient(90deg,#d8344f,#e87a3c);box-shadow:0 0 10px rgba(255,77,109,.6)}
+#rtb .bec.wind .xint{display:block;animation:rtintp .35s infinite alternate}
+#rtb .bec .xint i{font-style:normal;margin-right:4px;padding:0 4px;border-radius:6px;font-size:10px;background:#6b45d8}
+@keyframes rtintp{to{transform:translateX(-50%) scale(1.07)}}
+#rtb .bec .sts{position:absolute!important;left:5px;top:26px;display:flex;flex-direction:column;gap:2px;align-items:flex-start;pointer-events:none}
+#rtb .bec .sts b{font-size:9.5px;line-height:14px;padding:0 4px;border-radius:5px;background:rgba(0,0,0,.6);color:#ffc2cc;font-weight:700;white-space:nowrap}
+#rtb .bec .sts b.g{color:#ecd08a}#rtb .bec .sts b.w{color:#9fe3a8}
+#rtb .bec .ehpr{display:flex;justify-content:flex-end;padding:0 7px;font-size:11px;font-weight:700;font-variant-numeric:tabular-nums}
+#rtb .bec.big .ehpr{font-size:13px}
+#rtb .bec .eb{padding:2px 7px 7px;display:flex;flex-direction:column;gap:3px}
+#rtb .bec .eb>div{position:relative;overflow:hidden;border-radius:5px;background:rgba(255,255,255,.1)}
+#rtb .bec .b1{height:7px}#rtb .bec.big .b1{height:10px}
+#rtb .bec .b1 i,#rtb .bec .b1 u{position:absolute;left:0;top:0;bottom:0;width:100%;border-radius:5px}
+#rtb .bec .b1 i{background:linear-gradient(90deg,#d8344f,#f08a5d);transition:width .12s}
+#rtb .bec .b1 u{background:rgba(255,255,255,.55);transition:width .7s .25s}
+#rtb .bec .b2{height:4px;display:none}#rtb .bec .b2.on{display:block}
+#rtb .bec .b2 i{display:block;height:100%;background:#ecd08a;box-shadow:0 0 6px #ecd08a}
+#rtb .bec.focus .ecbg{border-color:var(--gold,#d9ae4c)}
+#rtb .bec.hit{animation:rtehit .22s}
+#rtb .bec.hitc{animation:rtehitc .32s}
+#rtb .bec.hit .eflash,#rtb .bec.hitc .eflash{animation:rtefl .18s}
+@keyframes rtehit{30%{transform:translate(5px,-2px) scale(.98)}100%{transform:none}}
+@keyframes rtehitc{20%{transform:translate(9px,-4px) rotate(2deg) scale(.95)}60%{transform:translate(-3px,1px)}100%{transform:none}}
+@keyframes rtefl{from{opacity:.85}to{opacity:0}}
+#rtb .bec.wind{animation:rtwshk .14s infinite}
+@keyframes rtwshk{25%{transform:translateX(-1.5px)}75%{transform:translateX(1.5px)}}
+#rtb .bec.lunge{animation:rtlunge .38s ease-out}
+@keyframes rtlunge{35%{transform:translateY(14px) scale(1.06)}100%{transform:none}}
+#rtb .bec.stun .eart>.art{filter:saturate(.4) brightness(.8)}
+#rtb .bec.dead{opacity:.35;filter:grayscale(.9);transform:scale(.94);pointer-events:none}
+#rtb .bec.dead .xrg,#rtb .bec.dead .cnt,#rtb .bec.dead .xint{display:none}
+#rtb .bec.parried{animation:rtprd .45s}
+@keyframes rtprd{20%{transform:translateY(-12px) rotate(-3deg)}100%{transform:none}}
+#rtb .pop{position:absolute;z-index:8;left:50%;transform:translate(-50%,0);font-weight:900;font-size:22px;white-space:nowrap;pointer-events:none;animation:rtpop 1s cubic-bezier(.2,.8,.3,1) forwards;color:#fff;-webkit-text-stroke:1px rgba(0,0,0,.7);text-shadow:0 0 10px rgba(236,208,138,.8),0 2px 0 #000;font-variant-numeric:tabular-nums}
+#rtb .bec.big .pop{font-size:28px}
+#rtb .pop small{display:block;font-size:11px;text-align:center;letter-spacing:.1em;-webkit-text-stroke:0}
+#rtb .pop.c{font-size:30px;color:#ffd76a;text-shadow:0 0 14px #ff8a4d,0 2px 0 #000}
+#rtb .bec.big .pop.c{font-size:38px}
+#rtb .pop.h{color:#7dffb5;text-shadow:0 0 10px rgba(60,255,150,.6),0 2px 0 #000}
+#rtb .pop.k{color:#ff6b80;text-shadow:0 0 10px rgba(255,60,90,.6),0 2px 0 #000}
+#rtb .bec .pop.m,#rtb .pop.m{color:#cfd6e6;font-size:17px}
+#rtb .pop.p{color:#ffe9a8;font-size:20px;text-shadow:0 0 14px #ecd08a,0 2px 0 #000}
+#rtb .bec .pop.d,#rtb .pop.d{font-size:15px;color:#ffb38a}
+#rtb .bec .pop.a,#rtb .pop.a{font-size:17px;color:#c9b8ff;text-shadow:0 0 10px rgba(160,130,255,.7),0 2px 0 #000}
+#rtb .bec .pop.t,#rtb .pop.t{font-size:12px;color:#ecd08a;padding:0 6px;border-radius:6px;background:rgba(0,0,0,.6);-webkit-text-stroke:0;text-shadow:none}
+@keyframes rtpop{0%{transform:translate(-50%,6px) scale(.4);opacity:0}14%{transform:translate(calc(-50% + var(--dx,0px)*.3),-14px) scale(1.25);opacity:1}30%{transform:translate(calc(-50% + var(--dx,0px)*.5),-20px) scale(1)}100%{transform:translate(calc(-50% + var(--dx,0px)),-46px) scale(.9);opacity:0}}
+#rtb .warnb{position:absolute;left:-4%;right:-4%;top:16%;z-index:6;padding:4px 0;text-align:center;font-weight:900;font-size:21px;letter-spacing:.2em;color:#fff;background:repeating-linear-gradient(-45deg,rgba(0,0,0,.82) 0 14px,rgba(120,0,10,.82) 14px 28px);border-top:2px solid #ff4d6d;border-bottom:2px solid #ff4d6d;pointer-events:none;animation:rtwb .25s ease-out}
+@keyframes rtwb{from{transform:scaleY(0);opacity:0}}
+#rtb .skb{position:absolute;left:0;right:0;top:18%;z-index:6;text-align:center;pointer-events:none;font-weight:900;font-size:20px;letter-spacing:.15em;color:#fff;text-shadow:0 0 12px var(--c,#ecd08a),0 2px 0 #000;animation:rtskb .8s ease-out forwards}
+@keyframes rtskb{0%{opacity:0;transform:scale(1.3)}15%{opacity:1;transform:scale(1)}75%{opacity:1}100%{opacity:0;transform:translateY(-8px)}}
+#rtb .stamp{position:absolute;left:0;right:0;top:34%;z-index:20;text-align:center;pointer-events:none;font-weight:900;font-size:40px;letter-spacing:.12em;color:#ffe9a8;text-shadow:0 0 20px currentColor,0 0 4px #fff;-webkit-text-stroke:1px rgba(0,0,0,.4);animation:rtstamp 1.3s ease-out forwards}
+#rtb .stamp small{display:block;font-size:15px;letter-spacing:.2em;margin-top:2px;-webkit-text-stroke:0}
+#rtb .stamp.red{color:#ff6b80}#rtb .stamp.cy{color:#8fe9ff}#rtb .stamp.gray{color:#c9c4b8}
+@keyframes rtstamp{0%{opacity:0;transform:scale(1.8)}12%{opacity:1;transform:scale(1)}75%{opacity:1}100%{opacity:0;transform:scale(.96)}}
+#rtb .rtfl{position:absolute;inset:0;z-index:19;pointer-events:none;animation:rtfl .4s ease-out forwards}
+@keyframes rtfl{from{opacity:.75}to{opacity:0}}
+#rtb .vig{position:absolute;inset:0;z-index:19;pointer-events:none;box-shadow:inset 0 0 80px 20px rgba(220,20,40,.6);animation:rtfl .5s ease-out forwards}
+#rtb #xlog{flex:none;height:104px;overflow-y:auto;overflow-x:hidden;margin:6px 6px 0;padding:4px 6px;position:relative;z-index:2;background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.06));border:1px solid rgba(255,255,255,.1);border-radius:12px;scroll-behavior:smooth}
+#rtb #xlog::-webkit-scrollbar{width:3px}
+#rtb .blg{display:grid;grid-template-columns:18px 1fr auto;align-items:center;gap:6px;padding:2px 4px;margin:1px 0;border-radius:8px;background:rgba(255,255,255,.035);font-size:12px;line-height:1.35;animation:rtlgi .25s ease-out}
+#rtb .blg:nth-last-child(n+5){opacity:.5}
+@keyframes rtlgi{from{opacity:0;transform:translateY(6px)}}
+#rtb .blg .lgi{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.1);color:#d8d3c6}
+#rtb .blg .lgi svg{width:12px;height:12px}
+#rtb .blg .lt{color:#d6d1c4;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+#rtb .blg .lv{font-size:14px;font-weight:900;min-width:30px;text-align:right;font-variant-numeric:tabular-nums;color:#fff}
+#rtb .blg.t-atk .lgi{color:#ffb38a}#rtb .blg.t-crit .lgi{color:#ffd76a;background:rgba(255,215,106,.2)}#rtb .blg.t-crit .lv{color:#ffd76a;text-shadow:0 0 8px #ff8a4d;font-size:15px}
+#rtb .blg.t-foe .lgi,#rtb .blg.t-kill .lgi{color:#ff6b80;background:rgba(255,77,109,.2)}#rtb .blg.t-foe .lv{color:#ff6b80}
+#rtb .blg.t-parry .lgi,#rtb .blg.t-evade .lgi{color:#8fe9ff;background:rgba(94,224,255,.16)}#rtb .blg.t-parry .lv,#rtb .blg.t-evade .lv{color:#8fe9ff}
+#rtb .blg.t-heal .lgi{color:#7dffb5;background:rgba(109,255,176,.14)}#rtb .blg.t-heal .lv{color:#7dffb5}
+#rtb .blg.t-buff .lgi{color:#ecd08a}#rtb .blg.t-ally .lgi{color:#c9b8ff;background:rgba(160,130,255,.18)}#rtb .blg.t-ally .lv{color:#c9b8ff}
+#rtb .blg.t-sys .lt{color:#a7a296}
+#rtb #xhero{flex:none;display:grid;grid-template-columns:1fr auto 56px;gap:6px;padding:6px 6px 0;position:relative;z-index:2}
+#rtb .bhc{position:relative;display:grid;grid-template-columns:54px 1fr auto;grid-template-rows:auto auto;column-gap:8px;row-gap:4px;padding:7px 9px 8px;cursor:pointer;min-width:0;background:linear-gradient(160deg,rgba(217,174,76,.14),rgba(24,24,28,.75));border:1px solid rgba(255,255,255,.15);border-radius:14px;box-shadow:0 8px 20px rgba(0,0,0,.5);--rc:#ecd08a}
+#rtb .bhc .hpt{--g:0;grid-row:1/3;width:54px;height:54px;border-radius:50%;position:relative;display:grid;place-items:center;align-self:center}
+#rtb .bhc .xhr,#rtb .xal .aring{position:absolute;inset:0;border-radius:50%;background:conic-gradient(var(--rc,#ecd08a) calc(var(--g)*1%),rgba(128,128,128,.25) 0);-webkit-mask:radial-gradient(circle,transparent 60%,#000 63%);mask:radial-gradient(circle,transparent 60%,#000 63%)}
+#rtb .bhc .hface{width:44px;height:44px;border-radius:50%;overflow:hidden;background:#222;position:relative}
+#rtb .hface>.art,#rtb .aface>.art{position:absolute;inset:0;width:100%;height:100%;border:0;border-radius:50%;background:none;aspect-ratio:auto}
+#rtb .hface>.art img,#rtb .aface>.art img{object-fit:cover;object-position:50% 12%}
+#rtb .hface .art-ph,#rtb .aface .art-ph{display:none}
+#rtb .bhc.ready .xhr{filter:drop-shadow(0 0 6px var(--rc))}
+#rtb .bhc.ready .hpt{animation:rtrdy .9s infinite alternate}
+@keyframes rtrdy{to{transform:scale(1.06)}}
+#rtb .bhc .hmain{min-width:0}
+#rtb .bhc .hnm{display:flex;align-items:baseline;gap:6px;white-space:nowrap;overflow:hidden}
+#rtb .bhc .hnm b{font-size:15px}
+#rtb .bhc .hnm small{font-size:11px;opacity:.75}
+#rtb .bhc .hauto{font-size:10px;padding:0 5px;border-radius:6px;background:var(--gold,#d9ae4c);color:#1a1206;font-weight:700}
+#rtb .bhc .hauto:empty{display:none}
+#rtb .bhc .stc{display:flex;gap:3px;flex-wrap:nowrap;overflow:hidden;margin-top:3px;min-height:15px}
+#rtb .bhc .stc b,#rtb .bhc .stc span{font-size:10px;padding:0 5px;border-radius:6px;line-height:15px;white-space:nowrap}
+#rtb .bhc .stc b{background:#ecd08a;color:#1a1206}
+#rtb .bhc .stc span{background:rgba(255,255,255,.1)}
+#rtb .bhc .stc span.bad{color:#ff9aa8}
+#rtb .bhc .hnum{text-align:right;align-self:start}
+#rtb .bhc .hnum b{display:block;font-size:19px;font-weight:900;font-variant-numeric:tabular-nums;line-height:1.1}
+#rtb .bhc .hnum small{font-size:10px;opacity:.8;white-space:nowrap;font-variant-numeric:tabular-nums}
+#rtb .bhc.low .hnum b{color:#ff8a9a}
+#rtb .bhc .hbars{grid-column:2/4;display:grid;grid-template-columns:26px 1fr auto;align-items:center;column-gap:5px;row-gap:3px}
+#rtb .bhc .hbars span{font-size:9.5px;font-weight:700;opacity:.8}
+#rtb .bhc .hbars .br.hp,#rtb .bhc .hbars .br.mp{grid-column:2/4}
+#rtb .br{height:6px;border-radius:3px;overflow:hidden;background:rgba(255,255,255,.08)}
+#rtb .br.hp{height:10px}
+#rtb .br i{display:block;height:100%;transition:width .15s}
+#rtb .bhc .hp i{background:linear-gradient(90deg,#2ee6a0,#7dffb5);box-shadow:0 0 8px rgba(109,255,176,.45)}
+#rtb .bhc.low .hp i{background:linear-gradient(90deg,#ff4d6d,#ff8a6d)}
+#rtb .bhc .mp i{background:linear-gradient(90deg,#4d8dff,#8fc2ff)}
+#rtb .bhc .as i{background:linear-gradient(90deg,#b8862e,#ecd08a);transition:none}
+#rtb .bhc.ready .as i{background:linear-gradient(90deg,#ecd08a,#fff)}
+#rtb .bhc .asv{font-style:normal;font-size:10.5px;font-weight:700;font-variant-numeric:tabular-nums;min-width:30px;text-align:right;color:#ecd08a}
+#rtb .bhc.tg{border-color:#ff4d6d;box-shadow:0 0 18px rgba(255,77,109,.45)}
+#rtb .bhc.shake{animation:rtshk .3s}
+#rtb .bhc.evd{animation:rtevd .45s}
+@keyframes rtevd{30%{transform:translateX(-14px);opacity:.5;filter:blur(1px)}100%{transform:none}}
+#rtb .bhc .pburst{position:absolute;left:27px;top:34px;width:20px;height:20px;margin:-10px;border-radius:50%;border:3px solid #ffe9a8;animation:rtpb .55s ease-out forwards;pointer-events:none;z-index:6}
+@keyframes rtpb{to{transform:scale(9);opacity:0;border-width:1px}}
+#rtb .bhc .pop,#rtb .xal .pop{top:20%}
+#rtb .xal{position:relative;width:58px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px;border-radius:14px;background:linear-gradient(160deg,rgba(150,120,255,.16),rgba(24,24,28,.75));border:1px solid rgba(255,255,255,.14)}
+#rtb .xal .apt{--g:0;width:42px;height:42px;position:relative;display:grid;place-items:center;--rc:#c9b8ff}
+#rtb .xal .aface{width:34px;height:34px;border-radius:50%;overflow:hidden;position:relative;background:#222}
+#rtb .xal b{font-size:10.5px;white-space:nowrap}
+#rtb .xal .br{width:46px;height:5px}
+#rtb .xal .ahp i{background:linear-gradient(90deg,#2ee6a0,#7dffb5)}
+#rtb .xal.down{filter:grayscale(1);opacity:.5}
+#rtb .xal.shake{animation:rtshk .3s}
+#rtb .xbtns{display:grid;grid-template-rows:1fr 1fr;gap:6px}
+#rtb .xb{border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);color:#ece9e2;padding:0}
+#rtb .xb:active,#rtb .bcm:active{transform:scale(.94)}
+#rtb #xcmds{flex:none;display:grid;grid-template-columns:repeat(60,1fr);gap:5px;padding:6px 6px calc(8px + env(safe-area-inset-bottom,0px));position:relative;z-index:2}
+#rtb .bcm{position:relative;height:54px;padding:3px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;transition:transform .08s,opacity .15s;touch-action:manipulation;background:linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.16);border-radius:14px;color:#ece9e2;min-width:0}
+#rtb .bcm .ci{display:grid;place-items:center;height:18px}
+#rtb .bcm .ci svg{width:16px;height:16px}
+#rtb .bcm .ci .bi{width:20px;height:20px;margin:0;border-radius:4px}
+#rtb .bcm .cn{font-size:13px;font-weight:700;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+#rtb .bcm .cf{font-size:10px;line-height:1.1;opacity:.7;white-space:nowrap}
+#rtb .bcm .kn{position:absolute;left:5px;top:2px;font-size:9px;opacity:.4}
+#rtb .bcm .cq{display:none;position:absolute;left:3px;bottom:3px;font-size:9px;padding:0 3px;border-radius:4px;background:var(--gold,#d9ae4c);color:#1a1206;font-weight:700}
+#rtb .bcm.qd .cq{display:block}
+#rtb .bcm.qd{box-shadow:0 0 0 2px var(--gold,#d9ae4c)}
+#rtb .bcm.c-atk{border-color:rgba(255,138,77,.45)}#rtb .bcm.c-atk .ci{color:#ff9a5d}
+#rtb .bcm.c-def{border-color:rgba(143,233,255,.45);background:linear-gradient(180deg,rgba(143,233,255,.13),rgba(143,233,255,.02))}#rtb .bcm.c-def .ci{color:#8fe9ff}
+#rtb .bcm.c-par{border-color:rgba(236,208,138,.6);background:linear-gradient(180deg,rgba(236,208,138,.2),rgba(236,208,138,.03))}#rtb .bcm.c-par .ci{color:#ecd08a}
+#rtb .bcm.c-heal{border-color:rgba(109,255,176,.45)}#rtb .bcm.c-sup .ci{color:#c9b8ff}
+#rtb .bcm.ult{border-color:rgba(255,176,74,.75);box-shadow:inset 0 0 12px rgba(255,176,74,.25)}
+#rtb #xcmds.xdim .bcm,#rtb .bcm.na{opacity:.42}
+#rtb #xcmds.xdim .bcm.qd{opacity:.8}
+#rtb #xitems{position:absolute;right:8px;bottom:8px;z-index:9;width:min(250px,72%);max-height:80%;overflow:auto;padding:8px;border-radius:12px;background:rgba(20,20,24,.95);border:1px solid rgba(255,255,255,.2);display:flex;flex-direction:column;gap:5px}
+#rtb #xitems[hidden]{display:none}
+#rtb #xitems button{display:flex;justify-content:space-between;align-items:center;gap:6px;padding:7px 9px;border-radius:9px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:#ece9e2;font-size:13px;text-align:left}
+#rtb #xitems button small{opacity:.65;font-size:10.5px}
+#rtb #xitems p{margin:4px;font-size:12px;opacity:.7}
+#rtb #bpause{position:absolute;inset:0;z-index:25;display:none;align-items:center;justify-content:center;background:rgba(8,8,10,.6)}
+#rtb #bpause .pw{width:78%;max-width:280px;padding:14px;display:flex;flex-direction:column;gap:7px;border-radius:12px;background:rgba(28,28,33,.95);border:1px solid rgba(255,255,255,.2)}
+#rtb #bpause .pt2{text-align:center;font-weight:900;font-size:16px;letter-spacing:.2em;color:var(--hd,#ecd08a)}
+#rtb #bpause .xb{height:40px}
+#rtb #bpause .xb.go{background:linear-gradient(90deg,#d9ae4c,#ecd08a);color:#1a1206;border:0}
+#rtb .posein{z-index:15}
+@media (hover:none){#rtb .bcm .kn{display:none}}
+@media (max-height:720px){#rtb #xlog{height:84px}#rtb .bcm{height:48px}}
 </style>
 </head>
 <body>
@@ -2010,7 +2218,7 @@ const LOUT=[['出發前檢查一下：藥水、繩子、{你|妳}的劍。',cI('
   ['藥水帶夠了嗎？不夠我這裡還有。',null],['路上小心，霧濃的地方跟緊我的燈。',null]];
 {const _sr=startRun;startRun=function(){const r=_sr.apply(this,arguments);try{if(withLuna()&&Math.random()<.4){const l=lunaOut();if(l)setTimeout(()=>toast('露娜：「'+l+'」'),600)}}catch(e){}return r}}
 function lunaOut(){if(!withLuna())return '';const l=pickC(LOUT);return l?you(tx(l)):''}
-function bubShow(who,text){try{const el=document.querySelector(who==='luna'?'.stage .ally':'.stage .spr.me'),app=$('#app');if(!el||!app||!text)return;const r=el.getBoundingClientRect(),a=app.getBoundingClientRect();
+function bubShow(who,text){try{const el=document.querySelector(who==='luna'?'.stage .ally, #rtb .xal':'.stage .spr.me, #rtb .bhc'),app=$('#app');if(!el||!app||!text)return;const r=el.getBoundingClientRect(),a=app.getBoundingClientRect();
   const d=document.createElement('div');d.className='spb '+(who==='luna'?'bubL':'bubM');d.innerHTML=`<b>${who==='luna'?'露娜':esc(S.name)}</b>${esc(you(tx(text)))}`;d.style.left=Math.max(4,Math.min(a.width-200,r.left-a.left+r.width*(who==='luna'?.1:.35)))+'px';d.style.top=Math.max(4,r.top-a.top-8)+'px';app.appendChild(d);setTimeout(()=>d.classList.add('out'),2300);setTimeout(()=>d.remove(),2700)}catch(e){}}
 /* 對話泡泡排隊：等圖卡與命中演完才出現，一次一句 */
 let BUBQ=[],BUBW=0,BUBN=0;
@@ -2120,15 +2328,15 @@ let WARM=0;function warm(){if(WARM||!S)return;WARM=1;try{preload(['','_hurt','_l
 function render(){try{bgmAuto()}catch(e){}try{faDraw()}catch(e){}setTimeout(()=>{try{pcDraw()}catch(e){}},0);if(!B)document.querySelectorAll('.spb').forEach(e=>e.remove());setTimeout(()=>{try{PFX.marks(B&&B.hp>0?B.cls.marks:[])}catch(e){}},280);if(!WARM)setTimeout(warm,400);setTimeout(()=>{try{tipCheck()}catch(e){}},60);
   const app=$('#app');
   if(!S){app.className='pre';$('#main').innerHTML=vTitle();return}
-  app.className=(TAB==='town'?'':'nohud')+(B&&TAB==='adv'?' inb':'');clamp();const s=stats();
+  app.className=(TAB==='town'?'':'nohud')+(B&&TAB==='adv'?' inb':'')+(B&&B.rt&&TAB==='adv'?' rt':'');clamp();const s=stats();
   $('#hud').innerHTML=`<button class="ava" data-a="tab" data-v="char" aria-label="角色">${art(PKEY(),clsName(),'r11','mini')}</button>
     <div class="hud-mid"><div class="hud-n"><b>${esc(S.name)}</b>${title()?`<span style="color:#ffd27a">「${title()}」</span>`:''}<span>Lv.${S.lv} ${clsName()}</span><span class="pw">戰力 ${power()}</span></div>${bar('hp',S.hp,s.HP)}${bar('mp',S.mp,s.MP)}${bar('exp',S.exp,need(S.lv))}</div>
     <div class="hud-r"><span class="cur g">G ${S.gold}</span><button class="set" data-a="openM" data-v="settings">設定</button></div>`;
   $('#nav').innerHTML=[['town','城','城鎮'],['adv','冒','冒險'],['char','角','角色'],['bag','包','背包'],['quest','任','任務']].map(([k,c,n])=>
     `<button class="${TAB===k?'on':''}" data-a="tab" data-v="${k}"><i>${ic(k)}</i>${n}${k==='quest'&&questDot()?'<em class="dot"></em>':''}</button>`).join('');
   const v={town:vTown,adv:()=>B?vBattle():RUN?vRun():vAreas(),char:vChar,bag:vBag,quest:vQuest}[TAB];
-  $('#main').innerHTML=v();
-  if(B&&TAB==='adv')afterBattle();
+  if(B&&B.rt&&TAB==='adv'){if(!$('#rtb')){$('#main').innerHTML=vRT();rtBuild()}rtSync()}else $('#main').innerHTML=v();
+  if(B&&TAB==='adv'&&!B.rt)afterBattle();
   if(MODAL)drawModal();
 }
 function vTitle(){const c=CLS[NEWCLS];return `<div class="title">${art('title_bg','標題主視覺')}
@@ -2199,11 +2407,11 @@ const coreM0=()=>{const c=RUN&&RUN.core;if(!c||!B)return 1;const u=cUp();return 
 const honeM=()=>RUN&&RUN.hone&&!RUN.tower&&!RUN.trial?1+.12*RUN.hone:1;
 const coreM=()=>coreM0()*honeM();
 /* ===== 營地抉擇：沒有可重鍛的霧核時，營地是 休整／磨刃／搜刮 三選一；帶著霧核時走霧窯（休息／重鍛／磨刃） ===== */
-const CAMPO={rest:['☘','休整','回復 35% 的 HP 與 MP'],hone:['⚔','磨刃','不休息，把武器整備到最好：本趟冒險傷害 +12%（最多兩次）'],forage:['🎒','搜刮','不休息，把營地周圍翻一遍：金幣與一瓶治療藥水'],raid:['🌙','夜探','不休息，摸黑去探前面的路：下一場強敵或首領戰由你奇襲——牠第一回合來不及行動，你的第一擊 +50%'],core:['⚒','重鍛','']};
+const CAMPO={rest:['☘','休整','回復 35% 的 HP 與 MP'],hone:['⚔','磨刃','不休息，把武器整備到最好：本趟冒險傷害 +12%（最多兩次）'],forage:['🎒','搜刮','不休息，把營地周圍翻一遍：金幣與一瓶治療藥水'],raid:['🌙','夜探','不休息，摸黑去探前面的路：下一場強敵或首領戰由你奇襲——牠一開始來不及反應，你的第一擊 +50%'],core:['⚒','重鍛','']};
 const campIc=(k,z)=>('icon_camp_'+k) in ATL?`<i class="bi at" style="width:${z||34}px;height:${z||34}px;margin-right:6px;vertical-align:middle;background-position:${(ATL['icon_camp_'+k]%ATC)/(ATC-1)*100}% ${Math.floor(ATL['icon_camp_'+k]/ATC)/(ATR-1)*100}%"></i>`:CAMPO[k][0]+' ';
 const honeMax=()=>(RUN.hone||0)>=2;
 /* 夜探：營地選擇，RUN.raid=1；下一場精英／首領戰開場奇襲（敵人暈眩 1 回合＋破綻），用掉就沒有 */
-function raidDo(){RUN.raid=1;try{SFX.miss()}catch(e){}return you(`你把火壓小，一個人摸進前面的霧裡。繞過兩道稜線之後，你看見了牠——還有牠睡覺時習慣把背朝向哪一邊。<br><b style="color:var(--exp)">🌙 下一場強敵或首領戰：奇襲（牠第一回合無法行動，你的第一擊 +50%）</b>${withLuna()?'<br><span class="sub">回到營地時露娜還醒著，把留給你的半塊麵包遞過來：「下次要去，叫我一聲。」</span>':''}`)}
+function raidDo(){RUN.raid=1;try{SFX.miss()}catch(e){}return you(`你把火壓小，一個人摸進前面的霧裡。繞過兩道稜線之後，你看見了牠——還有牠睡覺時習慣把背朝向哪一邊。<br><b style="color:var(--exp)">🌙 下一場強敵或首領戰：奇襲（牠一開始動不了，你的第一擊 +50%）</b>${withLuna()?'<br><span class="sub">回到營地時露娜還醒著，把留給你的半塊麵包遞過來：「下次要去，叫我一聲。」</span>':''}`)}
 const campOff=k=>k==='hone'?(honeMax()?'武器已經磨到極限了':''):k==='raid'?(RUN.raid?'前面的路已經探過了':''):'';
 function honeDo(){RUN.hone=(RUN.hone||0)+1;try{SFX.buff()}catch(e){}return you(`你沒有躺下。就著火光，你把${CLS[S.cls].basic==='MAG'?'法器上磨損的紋路重新描了一遍':'武器從頭到尾磨了一遍'}，直到它映得出火焰的形狀。<br><b style="color:var(--exp)">⚔ 本趟冒險傷害 +${RUN.hone*12}%</b>${withLuna()?'<br><span class="sub">露娜打了個呵欠：「{你|妳}不睡，那我也陪{你|妳}撐著……明天打輸了可不准怪我。」</span>':''}`)}
 function campHtml(){const s=stats(),hp=Math.round(S.hp/s.HP*100),mp=Math.round(S.mp/Math.max(1,s.MP)*100);
@@ -2431,7 +2639,7 @@ const MV={
       <div class="sub">HP ${B.hp}/${B.max}　攻擊 ${B.atk}　魔力 ${B.mag}　防禦 ${B.def}　魔抗 ${B.mres??B.def}</div>
       ${e?`<div class="sub">弱點：<b style="color:#ffd34a">${ELN[e[0]]}</b>（傷害 ×1.5）${e[1]?`　抗性：<b>${ELN[e[1]]}</b>（傷害 ×0.6）`:''}</div>`:''}
       <div class="sub">${{tank:'防禦高，用魔法打比較痛',caster:'魔抗高，用物理打比較痛',brute:'防禦略高於魔抗',swift:'迴避高，物理魔法都可以'}[m.ty]}</div></div></div></div>
-      <div class="panel"><h3>招牌技能</h3><div class="list">${(m.sk||[]).map(k=>SKM[k]?`<div class="item"><span class="grow"><b>${SKM[k].n}</b><span class="sub">${SKM[k].d}</span></span></div>`:'').join('')}</div>${B.kind==='boss'?'<p class="sub">首領會每隔幾回合蓄力，看到提示就先防禦。半血時會張開護盾。</p>':''}</div>
+      <div class="panel"><h3>招牌技能</h3><div class="list">${(m.sk||[]).map(k=>SKM[k]?`<div class="item"><span class="grow"><b>${SKM[k].n}</b><span class="sub">${SKM[k].d}</span></span></div>`:'').join('')}</div>${B.kind==='boss'?'<p class="sub">首領會不時蓄力放出大招。半血時會張開護盾。</p>':''}</div>
       ${B.aff&&B.aff.length?`<div class="panel"><h3>詞綴</h3>${B.aff.map(x=>`<div class="sub"><b>${AFF[x].n}</b>　${AFF[x].d}</div>`).join('')}</div>`:''}
       <button class="btn big" data-a="closeM">返回戰鬥</button>`}},
   msg:v=>v,news(){return vNews()},lshop(){return vLShop()},dex(){return vDex()},ach(){return vAch()},craft(){return vCraft()},
@@ -2923,7 +3131,7 @@ function allyHurt(base,nm,src){const A=B.ally;let d=base*100/(100+A.def)*(.9+Mat
   blog(`${src} 的${nm}擊中了${A.n}，造成 ${d} 傷害`);if(A.hp<=0)blog(`${A.n}倒下了！`)}
 
 /* ============ 多隻魔物 ============ */
-const FK=['fog','fogMax','fogV','fogRe','fogRd','id','m','L','a','kind','mut','nm','aff','name','hp','max','atk','mag','def','crit','eva','fb','fshield','st','rage','bm','trait','wardBrk','vlX','mres'];
+const FK=['rtg','rtw','rta','rth','fog','fogMax','fogV','fogRe','fogRd','id','m','L','a','kind','mut','nm','aff','name','hp','max','atk','mag','def','crit','eva','fb','fshield','st','rage','bm','trait','wardBrk','vlX','mres'];
 function swapFoe(i){const a=B.adds[i],cur={};FK.forEach(k=>{cur[k]=B[k];B[k]=a[k]});B.adds[i]=cur;B.fhp=null}
 function addsAct(fx){const s=stats();for(const f of B.adds||[]){if(f.hp<=0||S.hp<=0)continue;
     if(f.st.stun>0){f.st.stun--;blog(`${f.name} 暈眩中`);continue}
@@ -3024,7 +3232,7 @@ const TIPS={
   quest:['任務','主線推進劇情與地區；人物故事是鎮民的支線劇情；每日任務每天重置。'],
   adv:['冒險','選一個地區出發。每段路會遇到戰鬥、事件或岔路，終點是精英或首領。'],
   fork:['岔路','兩條路二選一。戰鬥拿經驗，寶箱和商人拿資源，營地回血，祭壇給整趟的祝福。'],
-  battle:['戰鬥','點「攻擊」或「技能」行動。每個職業都有自己的資源（破綻、印記、專注、信仰），累積後放技能更強。打不贏可以開「自動」。'],
+  battle:['戰鬥','行動條跑滿就能出手。敵人亮紅圈是在出招：格擋可以擋下並反擊，閃避可以躲開，防禦可以減傷。打不贏可以開「自動」。'],
   event:['事件檢定','擲 d20＋屬性修正，大於等於難度就成功。屬性越高，相關選項越容易過。'],
   char:['角色','升級拿到的屬性點和技能點在這裡分配。裝備點下去可以看詳情、更換。'],
   smith:['鐵匠鋪','強化提升主屬性，+10 以後失敗會掉級。用不到的裝備可以分解成星塵，拿去洗練詞條或合成。'],
@@ -3047,6 +3255,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'17.0',d:'2026-11-26',t:'戰鬥改成即時制',b:'行動條跑滿就能出手，敵人亮紅圈時是在出招。新增「閃避」與「格擋」：閃避整招躲開，格擋擋下並反擊。戰鬥畫面換成新版面，上方可以切換自動、速度與暫停。電腦可用鍵盤：Z 攻擊、X 防禦、C 閃避、空白鍵格擋、數字鍵放技能、P 暫停。'},
   {v:'16.3',d:'2026-11-26',t:'修正星象台',b:'星象台打不開的問題修好了。'},
   {v:'16.2',d:'2026-11-26',t:'開測準備',b:'排行榜不再出現同一個人的多筆紀錄。遊戲會回傳匿名的進度（隨機代號、章節、等級），用來調整難度。'},
   {v:'16.1',d:'2026-11-26',t:'每週目標、霧淵換新圖',b:'任務頁的「每日」底下多了三個每週目標，跟霧淵同一天換週。霧淵換上新插圖。霧淵裡灼燒與中毒的傷害有上限。第一章結尾多了一段。'},
@@ -3086,7 +3295,7 @@ const NEWS=[
   {v:'12.7',d:'2026-11-25',t:'魔物動作圖',b:'42 種魔物換上新畫風的動作圖，全部正面朝向你：待機、兩種攻擊動作與倒地；首領與特殊魔物多一個大招動作。普通攻擊會輪流使出兩種動作，首領施放技能時改用大招姿勢，被擊倒會換成倒地圖。原本靠調色區分的亞種（毒沼史萊姆、熔岩蝙蝠、水晶魔像等）現在都有自己的造型。'},
   {v:'12.6',d:'2026-11-25',t:'魔物攻擊衝擊感、隨時撤退',b:'魔物的普通攻擊現在會撲向畫面，並依類型打出不同的衝擊演出（爪擊、重砸、魔彈），命中時頭像被擊退、畫面震動，重擊會更強烈。魔物圖不再被上方資訊欄或下方隊伍欄蓋住，會自動縮放到中間的空位。冒險途中任何時候（戰鬥以外）都能從右上角「撤退」回城，戰利品照樣保留。'},
   {v:'12.5',d:'2026-11-25',t:'畫風重製與全新戰鬥畫面',b:'主角與露娜全面換上新的動畫畫風：12 個職業男女各一套全新立繪。戰鬥畫面重新設計——魔物站在畫面中央，我方改在下方以頭像顯示；普通攻擊與受傷時頭像會換表情，施放技能會切入職業專屬的招式姿勢圖，受到重創時會跳出戰損插圖；魔物放技能時改用全螢幕動畫演出（爪擊、震地、咆哮、魔彈），並打出招式名稱。'},
-  {v:'12.4',d:'2026-11-23',t:'夜探奇襲、兩種新霧紋、魔力彈',b:'營地與霧窯多了第四個選擇「夜探」：不休息，摸黑去探前面的路，下一場強敵或首領戰由你奇襲——牠第一回合來不及行動，你的第一擊傷害 +50%。中段強敵新增兩種霧紋：「漲潮」（每回合攻擊 +12%，拖越久越痛，要速戰速決）與「反震」（單次打太重會震回自己身上，多段攻擊和持續傷害比較吃香）。魔法型首領（樹王、霜龍等）的普通攻擊改成「魔力彈」，看的是魔抗而不是防禦，法系職業比較扛得住、只堆防禦的角色要留意。九顆精鍛霧核換上帶金色箍環的正式圖示。修正：敵人暈眩時預告仍顯示牠下回合會出招，現在會標示「暈眩中」。'},
+  {v:'12.4',d:'2026-11-23',t:'夜探奇襲、兩種新霧紋、魔力彈',b:'營地與霧窯多了第四個選擇「夜探」：不休息，摸黑去探前面的路，下一場強敵或首領戰由你奇襲——牠一開始來不及反應，你的第一擊傷害 +50%。中段強敵新增兩種霧紋：「漲潮」（每回合攻擊 +12%，拖越久越痛，要速戰速決）與「反震」（單次打太重會震回自己身上，多段攻擊和持續傷害比較吃香）。魔法型首領（樹王、霜龍等）的普通攻擊改成「魔力彈」，看的是魔抗而不是防禦，法系職業比較扛得住、只堆防禦的角色要留意。九顆精鍛霧核換上帶金色箍環的正式圖示。修正：敵人暈眩時預告仍顯示牠下回合會出招，現在會標示「暈眩中」。'},
   {v:'12.3',d:'2026-11-23',t:'營地抉擇：休整、磨刃、搜刮',b:'營地不再只是回血，天亮前只夠做一件事：休整（回復 35% HP／MP）、磨刃（不休息，本趟冒險傷害 +12%，最多兩次）、搜刮（不休息，拿金幣與治療藥水）。帶著霧核時的霧窯也多了「磨刃」可以選。五張地圖各多一個新事件，路邊的磨刀匠、岩縫裡的溫泉、封死的軍械庫也有機會磨刃。營地選項、裂紋霧核與三種霧紋換上正式圖示。修正手機戰鬥中「全自動」按鈕蓋住指令按鈕的問題。'},
   {v:'12.2',d:'2026-11-23',t:'崩解霧核、換霧核的老人',b:'新增第十一顆「崩解霧核」：每命中敵人 5 下（多段招式每段都算）就打出「崩解」，下一次行動傷害 +50%，狀態列會顯示累積進度，連擊流和多段招式特別吃香（精鍛後只要 4 下）。選霧核時，和你目前流派契合的那顆會標出來。帶著霧核冒險時，路上可能遇到「換霧核的老人」，補差價或殺價把霧核換成另一顆。握有「下一擊 +50%」時狀態列會亮起提示。全自動遇到打不斷的首領蓄力會先防禦，不再硬吃毀滅一擊。草原首領哥布林戰酋調弱（攻擊約 -19%、HP 約 -15%），畢竟那時露娜還沒加入。'},
   {v:'12.1',d:'2026-11-23',t:'霧窯：休息，還是重鍛霧核',b:'帶著霧核走到營地時，營地旁多了一座「霧窯」，今晚只夠做一件事：在營火旁休息（回復 35% HP 與 MP），或是不休息、把霧核送進窯裡重鍛成「精鍛霧核」——十顆霧核的效果都會提升（例如獵牙 +30% → +45%、磐石護盾 20% → 32%、湧泉每回合回魔 6% → 10%）。血還夠就賭一把變強，殘血就老實睡覺。另外：成功打斷首領蓄力後，首領會露出破綻，你的下一擊傷害 +50%。平衡：霜雪山脈與黑霧要塞的首領再加強一些；大魔導士「墜星」威力下修（原本兩回合就能打倒雪山首領）。'},
@@ -3271,7 +3480,7 @@ function startBattle(id,kind,nAdds){const F=mkFoe(id,kind),m=F.m,bs=F.kind==='bo
     else if(p==='trap'){B.st.poison=4;B.st.weak=2;B.log.push('🪤 首領踩進陷阱！中毒、攻擊下降')}
     else if(p==='camp'){B.atk=Math.round(B.atk*1.12);B.mag=Math.round(B.mag*1.12);B.log.push('🔥 營火的光驚動了首領，牠怒氣沖沖（攻擊 +12%）')}}
   if(hasP('cl2'))B.cls.faith=30;
-  if(RUN&&RUN.raid&&!RUN.tower&&!RUN.trial&&(B.kind==='boss'||B.kind==='elite')&&id!=='shadow'){RUN.raid=0;B.st.stun=Math.max(B.st.stun||0,1);B.opening=1;B.raidFx=1;B.log.push(`🌙【奇襲】你從 ${B.name} 的背後摸上去——牠第一回合來不及行動，你的第一擊傷害 +50%`)}
+  if(RUN&&RUN.raid&&!RUN.tower&&!RUN.trial&&(B.kind==='boss'||B.kind==='elite')&&id!=='shadow'){RUN.raid=0;B.st.stun=Math.max(B.st.stun||0,1);B.opening=1;B.raidFx=1;B.log.push(`🌙【奇襲】你從 ${B.name} 的背後摸上去——牠一開始來不及反應，你的第一擊傷害 +50%`)}
   if(honeM()>1)B.log.push(`⚔【磨刃】傷害 +${RUN.hone*12}%`);
   const s0=stats();if(s0.SHIELD){B.shield=Math.round(s0.HP*s0.SHIELD/100);B.log.push(`裝備效果：獲得 ${B.shield} 點護盾`)}
   if(RUN&&RUN.core&&MCORE[RUN.core]&&!RUN.tower&&!RUN.trial){const c=RUN.core,M={i:MCORE[c].i,n:coreNm(c),d:coreDs(c)},u=cUp();
@@ -3280,7 +3489,7 @@ function startBattle(id,kind,nAdds){const F=mkFoe(id,kind),m=F.m,bs=F.kind==='bo
     else if(c==='greed'){B.atk=Math.round(B.atk*1.15);B.mag=Math.round(B.mag*1.15);B.gmul=(B.gmul||1)*(u?2:1.6);B.log.push(`${M.i}【${M.n}】金幣的氣味讓 ${B.name} 更兇了（攻擊 +15%、金幣 +${u?100:60}%）`)}
     else if(c==='temper'){if(RUN.coreN>=1){const hv=Math.min(s0.HP-S.hp,Math.round(s0.HP*(u?.22:.15)));if(hv>0)S.hp+=hv;B.log.push(`${M.i}【${M.n}】淬鍊完成：傷害 +${u?35:25}%${hv>0?`、回復 ${hv} HP`:''}`)}else{B.atk=Math.round(B.atk*1.25);B.mag=Math.round(B.mag*1.25);B.log.push(`${M.i}【${M.n}】霧核還在燒：這一場 ${B.name} 攻擊 +25%，撐過去就換你變強`)}}
     else B.log.push(`${M.i}【${M.n}】${M.d}`)}
-  if(B.auto)setTimeout(autoAct,AS(700))}
+  rtInit()}
 const rmax=b=>b+(stats().RESMAX||0);
 const fbSum=k=>B.fb.reduce((a,b)=>a+(b[k]||0),0);
 const blog=t=>B.log.push(you(t));
@@ -3330,7 +3539,7 @@ function pAct(type,arg){if(!B||B.busy)return;const s=stats();
   if(type==='skill'&&S.mp<mpCost(arg)){toast('MP 不足');return}
   if(type==='skill'&&SK[arg].ult&&B.ultUsed){toast('奧義每場戰鬥只能用一次');return}
   if(type==='flee'&&B.kind==='boss'){toast('首領戰無法逃跑');return}
-  if(B.opening&&type!=='guard'&&type!=='item'){B.opn2=1}B.guard=false;B.elHit=null;B.curEl=type==='atk'?basicEl():type==='skill'?(SKEL2[arg]||'phys'):null;
+  if(B.opening&&type!=='guard'&&type!=='item'){B.opn2=1}if(!B.rt)B.guard=false;B.elHit=null;B.curEl=type==='atk'?basicEl():type==='skill'?(SKEL2[arg]||'phys'):null;
   if(type==='atk'){B.srcNow='普攻';const c=CLS[S.cls],pw=c.basic==='MAG'?.8:S.cls==='swordsman'?1.15:1,r=hitFoe(c.basic,pw);let d=r.d,cr=r.cr,ex='';
     const rs=S.cls==='ranger'&&stn(),dbl=s.DOUBLE+(rs?9*B.cls.focus:0);if(B.hp>0&&dbl&&Math.random()*100<dbl){B.srcNow='連擊';const r2=hitFoe(c.basic,pw*((s.KW.double||0)>=3||rs?1:.6));d+=r2.d;cr=cr||r2.cr;ex='，觸發連擊';B.srcNow='普攻'}
     B.fx={by:'me',d,cr,el:c.basic==='MAG'?'holy':'phys',cut:B.chain?`${B.chain}！`:undefined,chain:B.chain||null};B.chain=null;SFX[cr?'crit':'hit']();const pr=procs(s,d),C=B.cls,cl=S.cls;
@@ -3366,6 +3575,7 @@ function pAct(type,arg){if(!B||B.busy)return;const s=stats();
     const h0=S.hp;if(it.use.hp)S.hp=Math.min(s.HP,S.hp+it.use.hp);if(it.use.mp)S.mp=Math.min(s.MP,S.mp+it.use.mp);B.fx={by:'me',glow:1,heal:S.hp-h0||0};SFX.heal();blog(`你使用了${it.n}，${it.d}`)}
   else if(type==='guard'){B.guard=true;S.mp=Math.min(s.MP,S.mp+Math.max(2,Math.round(s.MP*.08)));if((s.KW.guard||0)>=3){const h=Math.round(s.HP*.08);S.hp=Math.min(s.HP,S.hp+h);B.gdUp=1;blog(`【守護共鳴】穩住架式，回復 ${h} HP，下次攻擊 +30%`)}B.fx={by:'me',glow:1};SFX.buff();blog('你擺出防禦架式，並回復少許 MP')}
   else if(type==='flee'){if(Math.random()<.6+S.attr.DEX*.005){B=null;RUN.view={type:'res',title:'成功逃離',text:'你甩開了魔物，繼續趕路。'};render();return}blog('逃跑失敗！')}
+  if(B.rt){rtAfterP(type);return}
   B.menu='main';B.busy=true;render();
   if(B.hp<=0){winSoon(type==='skill'?2150+(B.pd||0):1350);return}
   setTimeout(foeTurn,AS(type==='skill'?1750+(B&&B.pd||PD):850))}
@@ -3383,7 +3593,7 @@ function foeTurn(){if(!B)return;if(B.treasure&&B.turn>=3&&B.hp>0){B=null;RUN.vie
   {const kw=s.KW||{};if((kw.shield||0)>=3&&B.turn>0&&B.turn%4===0&&s.SHIELD){const sh=Math.round(s.HP*s.SHIELD/200);B.shield=Math.max(B.shield||0,sh);blog(`【先機共鳴】重新張開護盾 ${sh}`)}}
   addsDot();
   if(B.hp<=0){render();winSoon(1350);return}
-  allyAct();if(B.hp<=0){render();winSoon(1350);return}
+  if(!B.rt)allyAct();if(B.hp<=0){render();winSoon(1350);return}
   if((B.trait==='cleanse'||B.trait==='grove')&&B.hp>0&&(B.st.burn>0||B.st.poison>0||B.st.bleed>0)){B.st.burn=0;B.st.poison=0;B.st.bleed=0;const h=Math.round(B.max*.04);B.hp=Math.min(B.max,B.hp+h);blog(`${B.name} 的【${TRX(B.trait).n}】清除了持續傷害，並回復 ${h} HP`)}
   if((B.trait==='summon'||B.trait==='grove')&&B.hp>0&&B.turn%3===0&&(B.adds||[]).filter(f=>f.hp>0).length<2&&RUN){try{const f=mkFoe(pick(AREAS[RUN.area].mobs.slice(0,2)),'');f.hp=f.max=Math.round(f.max*.6);B.adds=(B.adds||[]).filter(x=>x.hp>0);B.adds.push(f);blog(`${B.name} 叫來了 ${f.name}！`)}catch(e){}}
   if(B.trait==='undying'&&B.hp>0){if(B.st.burn>0||B.st.poison>0)blog(`${B.name} 的【不死】被灼燒／中毒壓制，無法再生`);else{const h=Math.round(B.max*.05);B.hp=Math.min(B.max,B.hp+h);blog(`${B.name} 的【不死】再生 ${h} HP`)}}
@@ -3394,8 +3604,8 @@ function foeTurn(){if(!B)return;if(B.treasure&&B.turn>=3&&B.hp>0){B=null;RUN.vie
   const fx=B.fx={by:'foe'};if(B.turn===8&&!B.talkDrag){B.talkDrag=1;setTimeout(()=>{try{talk('drag')}catch(e){}},900)}
   if(B.kind==='boss'&&!B.rage&&B.hp<B.max*.5){B.rage=1;B.atk=Math.round(B.atk*1.3);B.mag=Math.round(B.mag*1.3);fx.cut=`${B.m.n} 暴走`;fx.fsk='m_rage';blog(`${B.name} 進入暴走狀態！攻擊大幅提升`);setTimeout(()=>{try{talk('rage',1)}catch(e){}},900)}
   else if(B.st.stun>0){B.st.stun--;fx.stun=1;blog(`${B.name} 暈眩中，無法行動`)}
-  else if(B.kind==='boss'&&!B.chg&&!B.big&&B.turn>=3&&B.turn%4===3){B.chg=1;B.chgHp=B.hp;B.chgSh=B.fshield||0;B.chgNeed=brkNeed();fx.cut='蓄力';fx.fsk='m_rage';blog(`⚠ ${B.name} 開始蓄力……下回合將發動【毀滅一擊】！先防禦，或這回合打出 ${B.chgNeed} 傷害打斷牠！`);toast(`${B.m.n} 正在蓄力：防禦，或打出 ${B.chgNeed} 傷害打斷！`);setTimeout(()=>{try{talk('charge',1)}catch(e){}},900)}
-  else if(B.chg&&B.chgNeed&&brkDone()>=B.chgNeed){B.chg=0;B.brkN=(B.brkN||0)+1;fx.stun=1;fx.brk=1;fx.cut='打斷！';setTimeout(()=>{try{talk('brk',1)}catch(e){}},700);B.st.weak=Math.max(B.st.weak||0,2);const bc=brkCore();if(bc)B.st.stun=Math.max(B.st.stun||0,1);B.opening=1;try{SFX.thunder();buzz([40,30,90])}catch(e){}blog(`✦ 打斷成功！${B.name} 的【毀滅一擊】被打散，陷入虛弱${bc?'並暈眩 1 回合（破勢霧核）':''}，還露出破綻（下次攻擊傷害 +50%）。牠學乖了，下次會更難打斷`);setTimeout(()=>{try{talk('guard')}catch(e){}},600)}
+  else if(B.kind==='boss'&&!B.chg&&!B.big&&B.turn>=3&&B.turn%4===3){B.chg=1;B.chgHp=B.hp;B.chgSh=B.fshield||0;B.chgNeed=brkNeed();fx.cut='蓄力';fx.fsk='m_rage';blog(`⚠ ${B.name} 開始蓄力，要放【毀滅一擊】了`);setTimeout(()=>{try{talk('charge',1)}catch(e){}},900)}
+  else if(B.chg&&B.chgNeed&&brkDone()>=B.chgNeed){B.chg=0;B.brkN=(B.brkN||0)+1;fx.stun=1;fx.brk=1;fx.cut='打斷！';setTimeout(()=>{try{talk('brk',1)}catch(e){}},700);B.st.weak=Math.max(B.st.weak||0,2);const bc=brkCore();if(bc)B.st.stun=Math.max(B.st.stun||0,1);B.opening=1;try{SFX.thunder();buzz([40,30,90])}catch(e){}blog(`✦ 打斷成功！${B.name} 的【毀滅一擊】散掉了，陷入虛弱${bc?'、暈眩':''}，露出破綻`);setTimeout(()=>{try{talk('guard')}catch(e){}},600)}
   else{const big=B.chg?(B.chg=0,1):0,id=big?null:('next' in B?B.next:foePick());delete B.next;const dng=!big&&!!id&&isDng(SKM[id]),k=big?{n:'毀滅一擊',pow:2.6,mag:B.mag>B.atk?1:0}:id?SKM[id]:null,mb=!k&&mgB(),nm=k?`【${k.n}】`:mb?'魔力彈':'攻擊';
     if(k){fx.cut=k.n;fx.fsk=id}
     if(k&&k.cost)B.hp=Math.max(1,B.hp-Math.round(B.max*k.cost));
@@ -3405,7 +3615,8 @@ function foeTurn(){if(!B)return;if(B.treasure&&B.turn>=3&&B.hp>0){B=null;RUN.vie
       if(k.shield){B.fshield=Math.round(B.max*k.shield);ps.push(`獲得 ${B.fshield} 點護盾`)}
       if(k.hst&&Math.random()<(k.p||1))for(const h in k.hst){B.pst[h]=Math.max(1,k.hst[h]-(hasP('cl3')?1:0));ps.push(`你陷入${HST[h]}`)}
       blog(`${B.name} 使用${nm}，${ps.join('，')}`)}
-    else if(allyTgt()){allyHurt((k&&k.mag?B.mag:mb?B.mag*.6:B.atk)*(k?k.pow:1)*(k&&k.h||1)*(1+fbSum('atk')),nm,B.name)}
+    else if(!(B.rt&&(B.rt.pr>B.rt.t||B.rt.ev>B.rt.t))&&allyTgt()){allyHurt((k&&k.mag?B.mag:mb?B.mag*.6:B.atk)*(k?k.pow:1)*(k&&k.h||1)*(1+fbSum('atk')),nm,B.name)}
+    else if(B.rt&&rtReact(fx,nm)){}
     else{let tot=0,hit=0,cr=false;
       for(let i=0;i<(k&&k.h||1);i++){if(!big&&Math.random()*100<s.EVA+buffSum('eva')+(S.cls==='dual'&&!stn()&&B.cls.combo>=6?18:0))continue;hit++;
         const base=(k&&k.mag?B.mag:mb?B.mag*.6:B.atk)*(k?k.pow:1)*(1+fbSum('atk'))*(B.st.weak>0?.75:1)*(B.trait==='enrage'&&B.turn>=8?1.8:1)*grudgeM();
@@ -3414,7 +3625,7 @@ function foeTurn(){if(!B)return;if(B.treasure&&B.turn>=3&&B.hp>0){B=null;RUN.vie
       if(!hit){fx.miss=1;SFX.miss();blog(`你閃開了 ${B.name} 的${nm}！`);setTimeout(()=>{try{talk('dodge')}catch(e){}},500);if(S.cls==='ranger'){B.cls.focus=Math.min(rmax(5),B.cls.focus+2);blog(`專注 ${B.cls.focus}`)}}
       else{let d=tot;if(B.lunaWard){d*=.6;B.lunaWard=0;blog('魔法護盾擋下了部分衝擊')}if(B.guard)d*=(big||dng)?.25:.5;if(B.guard&&(big||dng)){B.opening=1;blog('✦ 完美防禦！看穿破綻，下次攻擊傷害 +50%');setTimeout(()=>talk('guard'),600)}let gd=false;if(s.GUARD&&Math.random()*100<s.GUARD){d*=.5;gd=true;if((s.KW.guard||0)>=2&&B.hp>0){B.srcNow='守護反擊';const r=hitFoe(CLS[S.cls].basic==='MAG'?'MAG':'ATK',.5,{sure:1});blog(`【守護共鳴】順勢反擊 ${r.d}`)}}if(S.cls==='swordsman'&&stn()&&B.cls.brk)d*=1-.09*Math.min(5,B.cls.brk);if(S.cls==='dual'&&B.cls.combo){const c0=B.cls.combo;B.cls.combo=Math.max(0,c0-(hasP('db3')?1:3));if(B.cls.combo<c0)blog(`連段 ${c0} → ${B.cls.combo}`)}if(S.cls==='cleric'&&!stn())d*=1-.0015*Math.min(100,B.cls.faith||0);d=Math.max(1,Math.round(d));let ctr=false;if(B.counter){d=Math.max(1,Math.round(d*.3));B.counter=0;ctr=true}
         let ab=0;if(B.shield>0){ab=Math.min(B.shield,d);B.shield-=ab;d-=ab}
-        fx.d=d;fx.cr=cr;fx.quake=!!k||d>s.HP*.15;SFX.hurt(k?.85:0);buzz(k?120:50);S.hp=Math.max(0,S.hp-d);
+        fx.d=d;fx.cr=cr;fx.quake=!!k||d>s.HP*.15;SFX.hurt(k&&!B.rt?.85:0);buzz(k?120:50);S.hp=Math.max(0,S.hp-d);
         blog(`${B.name} 的${nm}造成 ${d} 傷害${cr?'（爆擊）':''}${ab?`（護盾吸收 ${ab}）`:''}${gd?'（格擋）':''}${ctr?'（招架成功）':''}`);
         if(S.hp<=0&&B.endure){S.hp=1;B.endure=0;blog('鬥氣護體！以 1 HP 撐了下來')}if(S.hp<=0&&((stats().KW||{}).back||0)>=3&&!B.backSave){S.hp=1;B.backSave=1;blog('【絕境共鳴】咬牙撐住了致命一擊！')}
         if(s.THORN&&d>0&&B.hp>((s.KW.thorn||0)>=2?0:1)){const tk=s.KW.thorn||0,raw=Math.round(d*s.THORN/100*(tk>=3?1.5:1)*(tk>=3&&B.guard?2:1)),r=tk>=2?Math.max(1,raw):Math.min(B.hp-1,Math.max(1,raw));B.hp=Math.max(0,B.hp-r);dsrc('荊棘',r);blog(`【荊棘】反彈 ${r} 傷害`)}
@@ -3426,7 +3637,7 @@ function foeTurn(){if(!B)return;if(B.treasure&&B.turn>=3&&B.hp>0){B=null;RUN.vie
   if(B.opn2){B.opening=0;B.opn2=0}
   if(B.brkP){B.brkP=0;if(B.hp>0&&S.hp>0){B.opening=1;B.brkFx=1;blog(`✴【崩解霧核】${B.name} 的架勢崩解了！你的下一次行動傷害 +50%`)}}
   if(!('next' in B)&&!B.chg)B.next=foePick();
-  addsAct(fx);
+  if(!B.rt)addsAct(fx);
   for(const [h,r,n] of [['poison',.04,'毒素發作'],['burn',.05,'灼燒'],['bleed',.035,'流血']])if(S.hp>0&&B.pst[h]>0){const d=Math.max(1,Math.round(s.HP*r));S.hp=Math.max(0,S.hp-d);B.pst[h]--;blog(`${n}，損失 ${d} HP`)}
   if(B.pst.weak>0)B.pst.weak--;
   if(S.hp>0&&B.pst.regen>0){const h=Math.round(s.HP*.08);S.hp=Math.min(s.HP,S.hp+h);B.pst.regen--;blog(`再生效果回復 ${h} HP`)}
@@ -3437,7 +3648,8 @@ function foeTurn(){if(!B)return;if(B.treasure&&B.turn>=3&&B.hp>0){B=null;RUN.vie
   B.fb.forEach(b=>b.t--);B.fb=B.fb.filter(b=>b.t>0);
   B.buffs.forEach(b=>b.t--);B.buffs=B.buffs.filter(b=>b.t>0);B.turn++;
   if(RUN&&RUN.core==='flow'&&!RUN.tower&&S.hp>0&&B.hp>0){const mm=stats().MP,v=Math.min(mm-S.mp,Math.round(mm*(cUp()?.1:.06)));if(v>0){S.mp+=v;blog(`💧【${coreNm('flow')}】回復 ${v} MP`)}}
-  if(S.hp<=0){render();setTimeout(lose,1100);return}
+  if(S.hp<=0){if(B.rt)B.rt.done=1;render();setTimeout(lose,1100);return}
+  if(B.rt){rtFoeDone(fx);render();return}
   const wait=fx.fsk?1300:0;
   if(B.pst.stun>0){B.pst.stun--;blog(`你${HST.stun}了，這回合無法行動`);B.busy=true;render();setTimeout(foeTurn,AS(wait+1100));return}
   B.busy=!!wait;render();setTimeout(()=>{if(!B)return;B.busy=false;if(B.auto)autoAct()},AS(wait+(B.auto?(FA?2000+wait:1000):0)))}
@@ -3445,7 +3657,7 @@ function myPd(k,s){s=s||stats();const x=k&&SK[k],st=x?x.dmg.s:'ATK',v=st==='BOTH
   return clsDm()*coreM()*v*(x?x.dmg.p*(x.dmg.h||1)*(1+.15*((S.skl[k]||1)-1)):S.cls==='swordsman'?1.15:1)*100/(100+df)*(1+buffSum('atk'))*(B.opening?1.5:1)*(B.fog>0?.75:B.fogMax&&(B.fogV||0)>=B.turn?1.2:1)*(x&&x.dmg.rend?Math.max(1,elMul(B.id,SKEL2[k]||'phys')):elMul(B.id,x?SKEL2[k]||'phys':'phys'))*.85}
 /* 自動模式節奏加快 25% */
 const AS=ms=>B&&B.auto?Math.round(ms*.8):ms;
-function autoAct(){if(!B||B.busy||!B.auto)return;if(MODAL&&MODAL.k==='foe')return;const s=stats(),sk=battleSkills().filter(k=>S.mp>=mpCost(k)&&!(SK[k].ult&&B.ultUsed));
+function autoAct(){if(!B||B.busy||!B.auto)return;if(B.rt&&(B.rt.pg<100||B.rt.done||B.rt.t<B.rt.pstun))return;if(MODAL&&MODAL.k==='foe')return;const s=stats(),sk=battleSkills().filter(k=>S.mp>=mpCost(k)&&!(SK[k].ult&&B.ultUsed));
   /* 先算能不能贏：這招收得掉就直接打，不防禦也不補血 */
   {const sl=!(B.adds||[]).some(f=>f.hp>0);if(sl){const k1=[null,...sk.filter(k=>SK[k].dmg)].filter(k=>myPd(k,s)>=B.hp).sort((a,b)=>(a?mpCost(a):0)-(b?mpCost(b):0))[0];if(k1!==undefined)return k1?pAct('skill',k1):pAct('atk')}}
   /* 蓄力優先：打得斷就打斷，打不斷就先防禦，補血排後面 */
@@ -3496,10 +3708,10 @@ function spoil(){const m=B.m,L=B.L,bs=B.kind==='boss',el=B.kind==='elite',T=B.to
   got.push(...liveDrop(bs));
   track('kill',B.id);S.st.kills++;if(S.dex)S.dex.m[B.id]=(S.dex.m[B.id]||0)+1;if(bs&&B.nm)S.st.nmboss=(S.st.nmboss||0)+1;
   if(bs&&!fld&&!RUN.trial&&!RUN.tower){S.cleared[RUN.area]=1;track('boss',B.id);sys(`${S.name} 討伐了首領【${m.n}】！`)}}
-function winSoon(ms){setTimeout(()=>{try{if(B&&B.hp<=0&&!(B.adds||[]).some(f=>f.hp>0)){const st=document.querySelector('.stage');if(st)st.classList.add('bout')}}catch(e){}},Math.max(0,ms-260));setTimeout(win,ms)}
-function win(){if(!B||B.hp>0)return;try{const ds=B.ds||{},tot=Object.values(ds).reduce((a,b)=>a+b,0);if(tot>0&&(B.kind==='boss'||B.kind==='elite'||Object.keys(ds).length>=3)){const top=Object.entries(ds).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([k,v])=>`${k} ${Math.round(v/tot*100)}%`).join('・');B.log.push(`📊 戰報（${B.turn} 回合）：${top}`);B.rep=top}}catch(e){}try{spoil()}catch(e){try{localStorage.setItem('ao_err','spoil '+e);const T=B.tot||(B.tot={exp:0,gold:0,got:[],names:[]});if(!T.names.includes(B.name))T.names.push(B.name)}catch(_){}}if(B.kind==='boss')bondGain(.5,'並肩打倒首領');try{talk('win')}catch(e){}{const s=stats();if(s.REAP&&S.hp>0){const rk=s.KW.reap||0,h=Math.round(s.HP*s.REAP/100*(rk>=2?2:1)),m=Math.round(s.MP*s.REAP/100*(rk>=2?2:1));if(rk>=3)S.reapFree=1;S.hp=Math.min(s.HP,S.hp+h);S.mp=Math.min(s.MP,S.mp+m);B.rp=`【收割】回復 ${h} HP、${m} MP`;B.log.push(B.rp)}}
+function winSoon(ms){if(B&&B.rt){if(B.rt.done)return;B.rt.done=1}setTimeout(()=>{try{if(B&&B.hp<=0&&!(B.adds||[]).some(f=>f.hp>0)){const st=document.querySelector('.stage');if(st)st.classList.add('bout')}}catch(e){}},Math.max(0,ms-260));setTimeout(win,ms)}
+function win(){if(!B||B.hp>0)return;try{const ds=B.ds||{},tot=Object.values(ds).reduce((a,b)=>a+b,0);if(tot>0&&(B.kind==='boss'||B.kind==='elite'||Object.keys(ds).length>=3)){const top=Object.entries(ds).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([k,v])=>`${k} ${Math.round(v/tot*100)}%`).join('・');B.log.push(`📊 戰報：${top}`);B.rep=top}}catch(e){}try{spoil()}catch(e){try{localStorage.setItem('ao_err','spoil '+e);const T=B.tot||(B.tot={exp:0,gold:0,got:[],names:[]});if(!T.names.includes(B.name))T.names.push(B.name)}catch(_){}}if(B.kind==='boss')bondGain(.5,'並肩打倒首領');try{talk('win')}catch(e){}{const s=stats();if(s.REAP&&S.hp>0){const rk=s.KW.reap||0,h=Math.round(s.HP*s.REAP/100*(rk>=2?2:1)),m=Math.round(s.MP*s.REAP/100*(rk>=2?2:1));if(rk>=3)S.reapFree=1;S.hp=Math.min(s.HP,S.hp+h);S.mp=Math.min(s.MP,S.mp+m);B.rp=`【收割】回復 ${h} HP、${m} MP`;B.log.push(B.rp)}}
   const nx=(B.adds||[]).findIndex(f=>f.hp>0);
-  if(nx>=0){const dn=B.name;swapFoe(nx);B.adds=B.adds.filter(f=>f.hp>0);B.log.push(`${dn} 倒下了！${B.name} 衝了上來`);B.fx=null;B.busy=true;B.intro=true;render();setTimeout(foeTurn,900);return}
+  if(nx>=0){const dn=B.name;swapFoe(nx);B.adds=B.adds.filter(f=>f.hp>0);B.log.push(`${dn} 倒下了！${B.name} 衝了上來`);B.fx=null;if(B.rt){B.rt.done=0;B.rt.vhT=0;B.rtw=null;render();return}B.busy=true;B.intro=true;render();setTimeout(foeTurn,900);return}
   SFX.win();const T=B.tot,bs=B.kind==='boss',bid=B.id;if(RUN.core==='temper'&&!RUN.tower&&!RUN.trial)RUN.coreN=(RUN.coreN||0)+1;
   RUN.loot.gold+=T.gold;RUN.loot.exp+=T.exp;RUN.loot.items.push(...T.got);
   if(RUN.trial){S.trial=1;for(const k in TRIAL.items)addItem(k,-TRIAL.items[k]);S.gold=Math.max(0,S.gold-TRIAL.gold)}
@@ -3510,6 +3722,211 @@ function win(){if(!B||B.hp>0)return;try{const ds=B.ds||{},tot=Object.values(ds).
   B=null;gainExp(T.exp);save();render();$('#main').scrollTop=0}
 function lose(){SFX.lose();const lid=B?B.id:null;const lost=Math.round(S.gold*.1),s=stats();S.gold-=lost;S.hp=Math.round(s.HP*.3);B=null;RUN=null;TAB='town';save();render();
   openM('msg',{t:'戰敗',b:`<div class="panel"><div class="duo">${art(ARTSET&&ARTSET.has(AK()+'_dm')?AK()+'_dm':HK()+'_lose','戰敗','r34')}${lid&&lid!=='shadow'?art('mob_'+lid+'_win','','r11'):''}</div><p>${you('你')}倒下了。巡邏隊把你送回晨星鎮，途中遺失了 ${lost} G。</p><p class="sub">強化裝備、分配屬性點，或先到旅店休息再出發吧。</p></div><button class="btn pri big" data-a="closeM">確定</button>`})}
+
+/* ============ v17 即時戰鬥：行動條跑滿出手，敵人亮紅圈出招，可格擋／閃避／防禦 ============ */
+const RTK={raf:0,lt:0,sl:0,hs:0,cb:[],cards:[],stT:0};
+const RTB=()=>!!(B&&B.rt);
+const RTI={
+  atk:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6M16 16l4 4M19 21l2-2"/></svg>',
+  guard:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+  evade:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17c4 0 6-2 8-5s4-5 8-5"/><path d="M4 12c3 0 4.5-1.5 6-3.5M14 15.5c1.5 2 3 3.5 6 3.5"/></svg>',
+  parry:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-3.5 7-9V6l-7-3-7 3v6c0 5.5 7 9 7 9z"/><path d="M12 8v5M9.5 10.5h5"/></svg>',
+  l:{atk:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M14.5 17.5L3 6V3h3l11.5 11.5M13 19l6-6"/></svg>',
+     crit:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.5 7H22l-6 4.5 2.3 7.5L12 16.5 5.7 21 8 13.5 2 9h7.5z"/></svg>',
+     foe:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 4l4 8-4 8M12 4l4 8-4 8"/></svg>',
+     parry:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 21s7-3.5 7-9V6l-7-3-7 3v6c0 5.5 7 9 7 9z"/></svg>',
+     evade:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 17c4 0 6-2 8-5s4-5 8-5"/></svg>',
+     heal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+     buff:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg>',
+     kill:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg>',
+     ally:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l2 6 6 .5-4.7 3.9 1.5 6.1L12 16l-4.8 3.5 1.5-6.1L4 9.5 10 9z"/></svg>',
+     sys:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="3.5"/></svg>'}};
+function rtInit(){if(!B)return;const bs=B.kind==='boss';
+  B.rt={t:bs?-1.4:-.7,pg:30+Math.random()*30,ag:Math.random()*40,q:null,ev:-9,pr:-9,gu:-9,pstun:-9,done:0,paused:0,li:Math.max(0,B.log.length-30),sig:'',ac:0,vh:B.hp,vh0:B.hp,vhT:0,hurt:0,atk:0,an:0,np:0,nf:0,warn:1,lw:null};
+  B.rtg=Math.random()*25;B.rtw=null;(B.adds||[]).forEach(f=>{f.rtg=15+Math.random()*35;f.rtw=null});B.busy=false;
+  if(!RTK.raf){RTK.lt=performance.now();RTK.raf=requestAnimationFrame(rtLoop)}}
+function rtS(){const R=B.rt;if(!R.sc||Math.abs(R.t-R.scT)>.25){R.sc=stats();R.scT=R.t}return R.sc}
+function rtPT(){const a=rtS().A||{};let t=2.9/(1+Math.min(.3,(a.DEX||0)*.005));if(S.cls==='dual')t*=.85;return t}
+function rtFT(f,add){let t={swift:1.7,brute:2.2,tank:2.4,caster:2}[(f.m&&f.m.ty)||'']||2;if(f.kind==='boss')t+=.2;if(add)t*=1.35;return t}
+function rtTitle(){try{if(RUN.trial)return '轉職試煉';if(RUN.tower)return `霧淵 第 ${RUN.floor} 層`;if(RUN.dg&&DG[RUN.dg.d])return DG[RUN.dg.d].n;return AREAS[RUN.area].n}catch(e){return '戰鬥'}}
+function rtSub(){if(!B)return '';if(B.kind==='boss')return '首領';if(B.kind==='elite')return '精英';try{if(RUN&&RUN.nodes&&!RUN.tower)return `${Math.min(RUN.nodes.length,(RUN.step||0)+1)} / ${RUN.nodes.length}`}catch(e){}return ''}
+/* ---- 敵人出招 ---- */
+function rtWind(){const R=B.rt;
+  if(B.st.stun>0||(B.chg&&B.chgNeed&&brkDone()>=B.chgNeed)){rtFoeGo();return}
+  let k='atk',n='攻擊',dur=.9,mg=false,dg=false;
+  if(B.kind==='boss'&&!B.rage&&B.hp<B.max*.5){k='rage';n='暴走';dur=.7}
+  else if(B.kind==='boss'&&!B.chg&&!B.big&&B.turn>=3&&B.turn%4===3){k='chg';n='蓄力';dur=.6}
+  else if(B.chg){k='big';n='毀滅一擊';dur=2.2;dg=true;mg=B.mag>B.atk}
+  else{if(!('next' in B))B.next=foePick();const x=B.next&&SKM[B.next];
+    if(x){n='【'+x.n+'】';if(!x.pow){k='sup';dur=.8}else if(isDng(x)){k='dng';dur=1.6;dg=true;mg=!!x.mag}else{k='sk';dur=1.2;mg=!!x.mag}}
+    else if(mgB()){n='魔力彈';mg=true}}
+  B.rtw={t:0,dur,k,n,mg,dg};B.rtg=100;
+  if(dg){try{sq(220,.12,.08,0,0,.5);sq(220,.12,.08,.16,0,.5)}catch(e){}rtWarn(k==='big'?'毀滅一擊':n.replace(/[【】]/g,''),dur)}}
+function rtFoeGo(){const R=B.rt,w=B.rtw;B.rtw=null;B.rtg=0;R.lw=w||{k:'stun'};if(w&&w.k!=='chg'&&w.k!=='sup'&&w.k!=='rage'){R.atk=performance.now()+420;R.an++}B.fx=null;$('#rtb .warnb')&&$('#rtb .warnb').remove();foeTurn()}
+function rtFoeDone(fx){const R=B.rt;B.guard=false;if(B.chg&&B.rtg<35)B.rtg=35;if(B.pst.stun>0){B.pst.stun--;R.pstun=R.t+2.2;blog(`你${HST.stun}了，動彈不得`)}}
+function rtAddGo(f){f.rtw=null;f.rtg=0;f.rta=performance.now()+420;const s=rtS(),fx=B.fx&&B.fx.by==='foe'?B.fx:(B.fx={by:'foe'});fx.af=f;
+  const base=f.atk*(.9+Math.random()*.2);
+  if(rtReact(fx,'攻擊',f))return;
+  if(allyTgt()){allyHurt(base,'攻擊',f.name);return}
+  if(Math.random()*100<s.EVA+buffSum('eva')){fx.miss=1;blog(`你閃開了 ${f.name} 的攻擊`);return}
+  let d=base*100/(100+s.DEF*(1+buffSum('def')));if(B.guard)d*=.5;d=Math.max(1,Math.round(d));
+  let ab=0;if(B.shield>0){ab=Math.min(B.shield,d);B.shield-=ab;d-=ab}
+  S.hp=Math.max(0,S.hp-d);fx.d=(fx.d||0)+d;blog(`${f.name} 的攻擊造成 ${d} 傷害${ab?`（護盾吸收 ${ab}）`:''}`);
+  if(S.hp<=0&&B.endure){S.hp=1;B.endure=0;blog('鬥氣護體！以 1 HP 撐了下來')}if(S.hp<=0&&((s.KW||{}).back||0)>=3&&!B.backSave){S.hp=1;B.backSave=1;blog('【絕境共鳴】咬牙撐住了致命一擊！')}}
+/* 格擋：擋下並反擊；閃避：整招躲掉 */
+function rtReact(fx,nm,f){const R=B.rt,who=f?f.name:B.name;
+  if(R.pr>R.t){R.pr=0;R.np++;fx.parry=1;fx.miss=1;const s=rtS(),mg=CLS[S.cls].basic==='MAG';let d;
+    if(f){d=Math.max(1,Math.round((mg?s.MAG:s.ATK)*1.5*100/(100+(f.def||0))));f.hp=Math.max(0,f.hp-d);f.rth=performance.now()+450;if(f.hp<=0)blog(`${f.name} 倒下了`)}
+    else{const _s=B.srcNow;B.srcNow='格擋反擊';d=hitFoe(mg?'MAG':'ATK',1.5,{sure:1}).d;B.srcNow=_s}
+    B.opening=1;R.pg=Math.min(100,R.pg+50);fx.ctr=d;fx.ctrF=f||null;
+    blog(`【格擋】擋下 ${who} 的${nm}，反擊 ${d}`);try{SFX.crit(0)}catch(e){}return true}
+  if(R.ev>R.t){R.ev=0;R.nf++;fx.evade=1;fx.miss=1;R.pg=Math.min(100,R.pg+40);blog(`【閃避】躲開 ${who} 的${nm}`);try{SFX.miss(0)}catch(e){}return true}
+  return false}
+/* ---- 玩家出手 ---- */
+function rtDo(c){const R=B&&B.rt;if(!R||R.done)return;R.vh0=B.hp;R.q=null;
+  if(c==='@parry'||c==='@evade'){if(c==='@parry')R.pr=R.t+1;else R.ev=R.t+1.6;R.pg=0;try{SFX.ui()}catch(e){}rtPop($('#rtb .bhc'),c==='@parry'?'格擋':'閃避','t');return}
+  if(c==='@atk')pAct('atk');else if(c==='@guard')pAct('guard');else if(c==='@flee')pAct('flee');else if(String(c).startsWith('item:'))pAct('item',c.slice(5));else if(SK[c])pAct('skill',c)}
+function rtAfterP(type){const R=B.rt;R.pg=0;R.q=null;if(type==='guard')R.gu=R.t+6;if(B.opn2){B.opening=0;B.opn2=0}render();if(B&&B.rt&&B.hp<=0)winSoon(type==='skill'?1150:850)}
+function rtAuto(){const R=B.rt,w=B.rtw;R.vh0=B.hp;if(w&&w.dg&&!B.guard){const rem=w.dur-w.t;if(rem<.85&&rem>.15&&Math.random()<.45){rtDo('@parry');return}}autoAct()}
+function rtLose(){if(B&&B.rt)B.rt.done=1;render();setTimeout(lose,1100)}
+/* ---- 時間推進 ---- */
+function rtStep(dt){const R=B.rt;R.t+=dt;if(R.t<0)return;
+  if(B.guard&&R.t>R.gu)B.guard=false;
+  const can=R.t>=R.pstun;
+  if(can&&R.pg<100)R.pg=Math.min(100,R.pg+dt*100/rtPT());
+  if(can&&R.pg>=100){if(R.q){rtDo(R.q);if(!B||!B.rt||R.done)return}else if(B.auto){if(!R.ac)R.ac=R.t+.12;if(R.t>=R.ac){R.ac=0;rtAuto();if(!B||!B.rt||R.done)return}}}
+  const fr=(!B.auto&&can&&R.pg>=100)?.5:1;
+  if(B.hp>0){
+    if(B.rtw){if(B.st.stun>0||(B.rtw.k==='big'&&B.chgNeed&&brkDone()>=B.chgNeed))rtFoeGo();else{B.rtw.t+=dt*fr;if(B.rtw.t>=B.rtw.dur)rtFoeGo()}}
+    else{B.rtg=(B.rtg||0)+dt*fr*100/rtFT(B);if(B.rtg>=100)rtWind()}
+    if(!B||!B.rt||R.done)return}
+  for(const f of B.adds||[]){if(f.hp<=0)continue;
+    if(f.rtw){f.rtw.t+=dt*fr;if(f.rtw.t>=f.rtw.dur){rtAddGo(f);render();if(S.hp<=0){rtLose();return}}}
+    else{f.rtg=(f.rtg||0)+dt*fr*100/rtFT(f,1);if(f.rtg>=100){if(f.st.stun>0){f.st.stun--;f.rtg=20;blog(`${f.name} 暈眩中`)}else{f.rtw={t:0,dur:.8,n:'攻擊'};f.rtg=100}}}}
+  const A=B.ally;if(A&&A.hp>0&&B.hp>0){R.ag+=dt*fr*100/3.3;if(R.ag>=100){R.ag=0;B.allyTurn=-1;allyAct();render();if(B&&B.rt&&B.hp<=0&&!R.done)winSoon(900)}}}
+function rtLoop(ts){RTK.raf=requestAnimationFrame(rtLoop);RTK.now=ts;const dt=Math.min(.1,Math.max(0,(ts-RTK.lt)/1000));RTK.lt=ts;
+  if(!B||!B.rt){cancelAnimationFrame(RTK.raf);RTK.raf=0;return}
+  const R=B.rt,el=document.getElementById('rtb'),tip=$('#tip');
+  if(el&&!MODAL&&!STORY&&!(tip&&!tip.hidden)&&!R.paused&&!R.done){let sc=(S.rtSpd||1)*(window.RTX||1)*(ts<RTK.sl?.18:1);if(RTK.hs>0){RTK.hs-=dt*1000;sc=0}let g=dt*sc;while(g>0&&B&&B.rt&&!B.rt.done){const st=Math.min(.05,g);rtStep(st);g-=st}}
+  if(el&&B&&B.rt)rtFrame()}
+/* ---- 畫面 ---- */
+function vRT(){const a=AREAS[RUN.area]||AREAS[0],bg=bgKey(a);
+  return `<div class="bt" id="rtb"><div class="xpart"></div>
+  <div id="xhd"><span class="hl"><b>${esc(rtTitle())}</b><span class="hpt" id="xsub"></span></span><span class="hr"><a data-a="rtAuto" id="xauto">自動</a><a data-a="rtSpd" id="xspd">×1</a><a data-a="rtPause">暫停</a></span></div>
+  <div id="xfield"><div id="xscene"><img src="art/${bg}.webp" alt="" onerror="this.remove()"></div><div id="xmist"></div><div id="xew"></div><div id="xitems" hidden></div><div id="bpause"></div></div>
+  <div id="xlog"><div id="blogi"></div></div><div id="xhero"></div><div id="xcmds"></div></div>`}
+function rtBuild(){const R=B.rt;R.sig='';R.li=Math.max(0,B.log.length-30);rtHero();rtCmdB();rtPauseV()}
+function rtHero(){const el=$('#xhero');if(!el)return;const A=B.ally;
+  el.innerHTML=`<div class="bhc" data-a="rtAuto"><div class="hpt"><div class="xhr"></div><div class="hface">${art(PKEY(),'','r11','mini')}</div></div>
+   <div class="hmain"><div class="hnm"><b>${esc(S.name)}</b><small>Lv${S.lv}・${esc(clsName())}</small><span class="hauto"></span></div><div class="stc"></div></div>
+   <div class="hnum"><b class="hpn"></b><small class="mpn"></small></div>
+   <div class="hbars"><span>HP</span><div class="br hp"><i></i></div><span>MP</span><div class="br mp"><i></i></div><span>行動</span><div class="br as"><i></i></div><em class="asv"></em></div></div>
+   ${A?`<div class="xal"><div class="apt"><div class="aring"></div><div class="aface">${art('portrait_npc_'+A.id,'','r11','mini')}</div></div><b>${esc(A.n)}</b><div class="br ahp"><i></i></div></div>`:'<span></span>'}
+   <div class="xbtns"><button class="xb" data-a="rtItems">道具</button><button class="xb" data-a="rtCmd" data-v="@flee">逃跑</button></div>`;
+  const d=el.querySelector('.bhc');RTK.h={el:d,hp:d.querySelector('.hp i'),mp:d.querySelector('.mp i'),as:d.querySelector('.as i'),asv:d.querySelector('.asv'),pt:d.querySelector('.hpt'),hv:d.querySelector('.hpn'),mv:d.querySelector('.mpn'),stc:d.querySelector('.stc'),au:d.querySelector('.hauto')};
+  const a=el.querySelector('.xal');RTK.a=a?{el:a,pt:a.querySelector('.apt'),hp:a.querySelector('.ahp i')}:null}
+function rtSkIc(k){const q='skill_'+k;return q in ATL?`<i class="bi at" style="background-position:${(ATL[q]%ATC)/(ATC-1)*100}% ${Math.floor(ATL[q]/ATC)/(ATR-1)*100}%"></i>`:ARTSET&&ARTSET.has(q)?`<img class="bi" src="art/${q}.webp" alt="">`:''}
+function rtCmdB(){const el=$('#xcmds');if(!el)return;const sk=battleSkills(),sp=sk.length?Math.round(60/sk.length):60;
+  const a=sk.map(k=>{const x=SK[k];return `<button class="bcm sk ${x.ult?'ult':''} c-${x.heal?'heal':x.dmg?'atk':'sup'}" style="grid-column:span ${sp}" data-a="rtCmd" data-v="${k}"><span class="ci">${rtSkIc(k)}</span><span class="cn">${esc(x.n)}</span><span class="cf"></span><span class="cq">預約</span><span class="kn">${sk.indexOf(k)+1}</span></button>`}).join('');
+  const b=[['atk','攻擊','c-atk','','Z'],['guard','防禦','c-def','減傷','X'],['evade','閃避','c-def','躲開','C'],['parry','格擋','c-par','擋下反擊','空白']].map(([k,n,c,f,kb])=>`<button class="bcm ${c}" style="grid-column:span 15" data-a="rtCmd" data-v="@${k}"><span class="ci">${RTI[k]}</span><span class="cn">${n}</span><span class="cf">${f}</span><span class="cq">預約</span><span class="kn">${kb}</span></button>`).join('');
+  el.innerHTML=a+b;RTK.cb=[...el.querySelectorAll('.bcm')]}
+function rtCards(){const el=$('#xew');if(!el)return;const R=B.rt,ad=B.adds||[],sig=B.id+B.name+'|'+ad.map(f=>f.id+f.name).join(',');if(R.sig===sig&&el.children.length)return;R.sig=sig;
+  const L=[{f:B,i:-1},...ad.map((f,i)=>({f,i}))];
+  el.innerHTML=L.map(({f,i},j)=>{const big=i<0,bs=f.kind==='boss';return `<div class="bec ${big?'big':''} ${bs?'boss':''}" style="order:${big?1:j===1?0:2}" data-a="rtFoe" data-v="${i}">
+   <div class="ecbg"></div><div class="ehd"><span class="rk">${bs?'★★★':f.kind==='elite'?'★★':'★'}</span><span class="en">${esc(f.name)}</span><span class="elv">Lv${f.L}</span></div>
+   <div class="eart">${f.id==='shadow'?art(HK(),'試煉之影','r11','shadowimg'):art('mob_'+f.id,f.m.n,'r11','','mob_'+f.id)}<div class="xrg"></div><b class="cnt"></b><div class="eflash"></div></div>
+   <div class="xint"></div><div class="sts"></div><div class="ehpr"><span class="ehp"></span></div>
+   <div class="eb"><div class="b1"><u></u><i></i></div>${big?'<div class="b2"><i></i></div>':''}</div></div>`}).join('');
+  RTK.cards=[...el.querySelectorAll('.bec')].map(d=>{const i=+d.dataset.v;return {el:d,m:i<0,f:i<0?null:ad[i],k:'',ring:d.querySelector('.xrg'),cnt:d.querySelector('.cnt'),hp:d.querySelector('.b1 i'),hu:d.querySelector('.b1 u'),b2:d.querySelector('.b2'),n:d.querySelector('.ehp'),sts:d.querySelector('.sts'),it:d.querySelector('.xint'),dead:0}})}
+const rtMain=()=>RTK.cards.find(c=>c.m);
+const rtCardOf=f=>f?RTK.cards.find(c=>c.f===f):rtMain();
+function rtArtKey(c){const f=c.m?B:c.f,R=B.rt;if(!f||f.id==='shadow')return null;const b='mob_'+f.id,now=performance.now(),has=k=>ARTSET&&ARTSET.has(k);
+  if(f.hp<=0&&(!c.m||now>=R.vhT))return b+'_lose';
+  const at=c.m?R.atk:f.rta||0,hu=c.m?R.hurt:f.rth||0;
+  if(now<at){if(c.m&&R.lw&&R.lw.k==='big'&&has(b+'_a3'))return b+'_a3';return has(b+'_a1')?(c.m&&R.an%2===0&&has(b+'_a2')?b+'_a2':b+'_a1'):b+'_atk'}
+  if(now<hu)return b+'_hurt';
+  if(c.m&&(B.chg||(B.rtw&&B.rtw.dg))&&(has(b+'_charge')||has(b+'_a3')))return b+'_charge';
+  return f.hp<f.max*.3?b+'_low':b}
+function rtSwap(c){const k=rtArtKey(c);if(!k)return;const src=artSrc(k);if(!src||c.k===src)return;c.k=src;const im=c.el.querySelector('.art img:not(.under)');if(im)im.src='art/'+src+'.webp'}
+function rtFstat(f,m){const o=[];if(m){const e=MEL[f.id];if(e&&e[0]&&(S.dex&&S.dex.m&&S.dex.m[f.id]||f.kind==='boss'))o.push(`<b class="w">弱 ${(ELI[e[0]]||e[0]).replace(/^[^\u4e00-\u9fff]+/,'')}</b>`);if(f.trait&&TRX(f.trait))o.push(`<b class="g">${TRX(f.trait).n}</b>`);if(f.fog>0)o.push(`<b>霧 ${f.fog}</b>`);if(B.chg)o.push('<b>蓄力</b>');if(f.rage)o.push('<b>暴走</b>');if(f.fshield>0)o.push('<b class="g">盾</b>')}
+  for(const k in f.st||{})if(f.st[k]>0)o.push(`<b>${FOE[k]||k}</b>`);(f.aff||[]).forEach(x=>AFF[x]&&o.push(`<b class="g">${AFF[x].n}</b>`));return o.slice(0,m?5:3).join('')}
+function rtPchips(R){const o=[],C=B.cls;if(R.t<R.pstun)o.push('<b>暈眩</b>');if(R.pr>R.t)o.push('<b>格擋</b>');if(R.ev>R.t)o.push('<b>閃避</b>');if(B.guard)o.push('<b>防禦</b>');if(B.opening)o.push('<b>下一擊 +50%</b>');
+  if(C.brk)o.push(`<span>破綻 ${C.brk}</span>`);if(C.marks&&C.marks.length)o.push(`<span>印記 ${C.marks.join('')}</span>`);if(C.focus)o.push(`<span>專注 ${C.focus}</span>`);if(S.cls==='dual')o.push(`<span>連段 ${C.combo||0}</span>`);if(S.cls==='cleric')o.push(`<span>信仰 ${C.faith}</span>`);
+  if(B.shield>0)o.push(`<span>護盾 ${B.shield}</span>`);if(B.counter)o.push('<span>招架</span>');if(B.endure)o.push('<span>鬥氣</span>');B.buffs.forEach(b=>b.id!=='bless'&&o.push(`<span>${esc(b.n)}</span>`));
+  ['poison','burn','bleed','weak'].forEach(h=>B.pst[h]>0&&o.push(`<span class="bad">${HST[h]}</span>`));if(B.pst.regen>0)o.push('<span>再生</span>');return o.join('')}
+function rtFrame(){const R=B.rt,now=performance.now(),s=rtS(),slow=now-RTK.stT>220;if(slow)RTK.stT=now;
+  if(R.warn&&R.t>-1.2){R.warn=0;if(B.kind==='boss')rtStamp('WARNING','red',esc(B.m.n))}
+  const can=R.t>=R.pstun,rdy=R.pg>=100&&can&&!R.done,fr=(!B.auto&&rdy)?.5:1;
+  const h=RTK.h;if(h){h.hp.style.width=Math.max(0,S.hp/s.HP*100)+'%';h.mp.style.width=Math.max(0,S.mp/s.MP*100)+'%';h.as.style.width=Math.max(0,Math.min(100,R.pg))+'%';h.pt.style.setProperty('--g',Math.max(0,Math.min(100,R.pg)));
+    const hv=`${Math.max(0,S.hp)}/${s.HP}`;if(h.hv.textContent!==hv)h.hv.textContent=hv;const mv=`MP ${S.mp}/${s.MP}`;if(h.mv.textContent!==mv)h.mv.textContent=mv;
+    const c=h.el.classList;c.toggle('ready',rdy);c.toggle('low',S.hp<s.HP*.3);c.toggle('tg',!!(B.rtw||(B.adds||[]).some(f=>f.hp>0&&f.rtw)));
+    if(slow){const av=rtPT().toFixed(1)+'秒';if(h.asv.textContent!==av)h.asv.textContent=av;const st=rtPchips(R);if(h.stc._h!==st){h.stc.innerHTML=st;h.stc._h=st}const au=B.auto?'自動':'';if(h.au.textContent!==au)h.au.textContent=au;
+      const xa=$('#xauto');if(xa){xa.classList.toggle('on',!!B.auto)}const xs=$('#xspd');if(xs)xs.textContent='×'+(S.rtSpd||1);const sb=$('#xsub');if(sb){const t=rtSub();if(sb.textContent!==t)sb.textContent=t}}}
+  const A=B.ally,a=RTK.a;if(a&&A){a.hp.style.width=Math.max(0,A.hp/A.max*100)+'%';a.pt.style.setProperty('--g',A.hp>0?Math.min(100,R.ag):0);a.el.classList.toggle('down',A.hp<=0)}
+  for(const c of RTK.cards){const f=c.m?B:c.f;if(!f)continue;const hp=c.m&&now<R.vhT?R.vh:f.hp,p=Math.max(0,hp/f.max*100);c.hp.style.width=p+'%';c.hu.style.width=p+'%';
+    const hv=`${Math.max(0,Math.round(hp))}/${f.max}`;if(c.n.textContent!==hv)c.n.textContent=hv;
+    const w=c.m?B.rtw:f.rtw,g=(c.m?B.rtg:f.rtg)||0,alive=hp>0,stun=f.st&&f.st.stun>0;
+    c.ring.style.setProperty('--p',!alive?0:w?w.t/w.dur*100:Math.min(100,g));
+    let cn='';if(alive&&!stun&&R.t>=0){const rem=w?(w.dur-w.t)/fr:(100-g)/(100/rtFT(f,!c.m))/fr;cn=rem<9.95?rem.toFixed(1):''}if(c.cnt.textContent!==cn)c.cnt.textContent=cn;
+    const cl=c.el.classList;cl.toggle('wind',!!w&&alive);cl.toggle('soon',!w&&alive&&g>75);cl.toggle('stun',!!stun&&alive);
+    if(!alive&&!c.dead){c.dead=1;cl.add('dead');if(c.m){rtStamp(B.kind==='boss'?'首領擊破':'擊破','',B.kind==='boss'?esc(B.m.n):'');try{SFX.hit(0)}catch(e){}}}
+    const it=w&&alive?(w.mg?'<i>魔法</i>':'')+esc(w.n):'';if(c.it._h!==it){c.it.innerHTML=it;c.it._h=it}
+    if(c.b2){const on=!!(B.chg&&B.chgNeed);c.b2.classList.toggle('on',on);if(on)c.b2.firstChild.style.width=Math.min(100,brkDone()/B.chgNeed*100)+'%'}
+    if(slow){const st=rtFstat(f,c.m);if(c.sts._h!==st){c.sts.innerHTML=st;c.sts._h=st}}
+    rtSwap(c)}
+  const cm=$('#xcmds');if(cm){cm.classList.toggle('xdim',!rdy);for(const b of RTK.cb){const k=b.dataset.v;let na=R.done;
+    if(k[0]!=='@'&&SK[k]){const c=mpCost(k),u=SK[k].ult&&B.ultUsed;na=na||S.mp<c||u;const t=SK[k].ult?(u?'已使用':'奧義'):'MP '+c;const e=b.querySelector('.cf');if(e.textContent!==t)e.textContent=t}
+    b.classList.toggle('na',!!na);b.classList.toggle('qd',R.q===k)}}}
+function rtSync(){if(!B||!B.rt)return;rtCards();rtLog();rtFx()}
+/* ---- 戰鬥紀錄 ---- */
+function rtLT(t){if(/【格擋】|招架/.test(t))return 'parry';if(/閃開|【閃避】|躲開/.test(t))return 'evade';if(/倒下了|衝了上來|擊破/.test(t))return 'kill';if(/^(露娜|蓋爾)/.test(t))return 'ally';
+  const me=/^(你|妳)/.test(t);if(me){if(/爆擊/.test(t))return 'crit';if(/造成/.test(t))return 'atk';if(/回復/.test(t))return 'heal';return 'buff'}
+  if(/^(毒素發作|灼燒|流血)，損失/.test(t)||/的.{0,12}造成 \d+ 傷害/.test(t)&&!/(受到|露娜)/.test(t))return 'foe';
+  if(/^(裝備效果|再生效果|神回應)/.test(t))return 'heal';return 'sys'}
+function rtLog(){const el=$('#blogi');if(!el)return;const R=B.rt;let n=0;while(R.li<B.log.length){const t=String(B.log[R.li++]),ty=rtLT(t);let v='';const m=t.match(/(?:造成|反擊|回復|吸取|損失|反彈)\s*(\d+)/);if(m)v=(ty==='heal'?'+':ty==='foe'?'-':'')+m[1];
+    const d=document.createElement('div');d.className='blg t-'+ty;d.innerHTML=`<span class="lgi">${RTI.l[ty]||RTI.l.sys}</span><span class="lt">${esc(t)}</span>${v?`<b class="lv">${v}</b>`:''}`;el.appendChild(d);n++}
+  if(n){while(el.children.length>40)el.firstChild.remove();const b=$('#xlog');if(b)b.scrollTop=b.scrollHeight}}
+/* ---- 特效 ---- */
+function rtPop(el,txt,cls,dl,lab){if(!el)return;const go=()=>{const d=document.createElement('div');d.className='pop '+(cls||'');d.innerHTML=(lab?`<small>${lab}</small>`:'')+txt;const dx=Math.random()*50-25;d.style.left=(50+dx*.5)+'%';d.style.top=(cls==='c'?22:32)+Math.random()*14+'%';d.style.setProperty('--dx',dx*.6+'px');(el.querySelector('.eart')||el).appendChild(d);setTimeout(()=>d.remove(),1000)};dl?setTimeout(go,dl):go()}
+function rtStamp(t,cls,sub){const rb=$('#rtb');if(!rb)return;const d=document.createElement('div');d.className='stamp '+(cls||'');d.innerHTML=t+(sub?`<small>${sub}</small>`:'');rb.appendChild(d);setTimeout(()=>d.remove(),1300)}
+function rtFlash(c){const rb=$('#rtb');if(!rb)return;const d=document.createElement('div');d.className='rtfl';d.style.background=c;rb.appendChild(d);setTimeout(()=>d.remove(),420)}
+function rtCls(el,c){if(!el)return;el.classList.remove(c);void el.offsetWidth;el.classList.add(c)}
+function rtWarn(n,dur){const x=$('#xfield');if(!x)return;$('#rtb .warnb')&&$('#rtb .warnb').remove();const d=document.createElement('div');d.className='warnb';d.textContent=n;x.appendChild(d);setTimeout(()=>d.remove(),Math.min(2400,dur*1000/((S.rtSpd||1)*(window.RTX||1))))}
+function rtPose(k){const ks=battleSkills(),i=ks.indexOf(k),n=(SK[k]&&SK[k].ult)||i%2?2:1,key=AK()+'_s'+n,x=$('#xfield');if(!x||!(ARTSET&&ARTSET.has(key)))return false;
+  const d=document.createElement('div');d.className='posein p'+n;d.style.setProperty('--c',(SKA[k]||[])[1]||'#ffd86b');d.innerHTML=`<i></i><img src="art/${key}.webp" alt=""><b>${esc(SK[k].n)}</b>`;x.appendChild(d);setTimeout(()=>d.remove(),650);return true}
+function rtFx(){const R=B.rt,now=performance.now(),fx=B.fx,s=rtS();B.fx=null;const mc=rtMain(),hero=$('#rtb .bhc');
+  if(fx&&fx.by==='me'){let dl=0;
+    if(fx.skill&&SK[fx.skill]){if(rtPose(fx.skill)){dl=430;RTK.sl=(RTK.now||now)+500}else{dl=120;const x=$('#xfield');if(x&&fx.cut){const b=document.createElement('div');b.className='skb';b.style.setProperty('--c',(SKA[fx.skill]||[])[1]||'#ecd08a');b.textContent=SK[fx.skill].n;x.appendChild(b);setTimeout(()=>b.remove(),800)}}}
+    if(fx.d===0)rtPop(mc&&mc.el,'閃開','m',dl);
+    else if(fx.d>0){const hl=fx.hl&&fx.hl.length>1?fx.hl:null;if(hl){hl.forEach((d,i)=>{rtPop(mc&&mc.el,d,'',dl+i*110);setTimeout(()=>{rtCls(mc&&mc.el,'hit');R.hurt=performance.now()+400},dl+i*110)});rtPop(mc&&mc.el,`${hl.length} HIT`,'c',dl+hl.length*110,fx.cr?'爆擊':'')}
+      else{rtPop(mc&&mc.el,fx.d,fx.cr?'c':'',dl,fx.cr?'爆擊':'');setTimeout(()=>{rtCls(mc&&mc.el,fx.cr?'hitc':'hit');R.hurt=performance.now()+450;if(fx.cr)RTK.hs=Math.max(RTK.hs,70)},dl)}
+      R.vh=R.vh0;R.vhT=now+dl+(hl?hl.length*110:0)}
+    if(fx.heal)rtPop(hero,'+'+fx.heal,'h',dl);
+    (fx.tags||[]).forEach((t,i)=>rtPop(mc&&mc.el,esc(t),'t',dl+260+i*200))}
+  if(fx&&fx.by==='foe'){const c=fx.af?rtCardOf(fx.af):mc,dg=R.lw&&R.lw.dg&&!fx.af;
+    if(c&&!fx.stun&&(fx.d!=null||fx.miss||fx.parry||fx.evade))rtCls(c.el,'lunge');
+    if(fx.parry){rtPop(hero,'格擋','p');rtStamp('格擋','cy','反擊');RTK.sl=(RTK.now||now)+380;rtFlash('rgba(255,250,230,.8)');if(hero){const r=document.createElement('div');r.className='pburst';hero.appendChild(r);setTimeout(()=>r.remove(),600)}
+      const cc=fx.ctrF?rtCardOf(fx.ctrF):mc;if(cc){rtCls(cc.el,'parried');if(fx.ctr)rtPop(cc.el,fx.ctr,'c',140,'反擊')}if(!fx.ctrF)R.hurt=now+450}
+    else if(fx.evade){rtPop(hero,'閃避','m');rtCls(hero,'evd')}
+    else if(fx.miss&&!fx.d)rtPop(hero,'閃開','m');
+    if(fx.d>0){rtPop(hero,'-'+fx.d,'k');rtCls(hero,'shake');if(dg||fx.d>=s.HP*.2){rtCls($('#rtb'),'shake');const rb=$('#rtb');if(rb){const v=document.createElement('div');v.className='vig';rb.appendChild(v);setTimeout(()=>v.remove(),520)}RTK.hs=Math.max(RTK.hs,80)}
+      if(S.hp>0&&fx.d>=s.HP*.3&&(B.dmc||0)<2&&ARTSET&&ARTSET.has(AK()+'_dm')){B.dmc=(B.dmc||0)+1;const x=$('#xfield');if(x){const d=document.createElement('div');d.className='dmgin';d.innerHTML=`<i></i><img src="art/${AK()}_dm.webp" alt=""><b>重創</b>`;x.appendChild(d);RTK.sl=(RTK.now||now)+700;setTimeout(()=>d.remove(),1900)}}}
+    if(fx.fheal&&c)rtPop(c.el,'+'+fx.fheal,'h');
+    if(fx.stun&&!fx.brk&&c)rtPop(c.el,'暈眩','m');
+    if(fx.brk){rtStamp('打斷','cy');RTK.sl=(RTK.now||now)+300}
+    if(fx.cut&&!fx.brk&&/蓄力|暴走/.test(fx.cut))rtStamp(fx.cut,'red')}
+  if(B.pops&&B.pops.length){B.pops.slice(-4).forEach((p,i)=>rtPop(mc&&mc.el,p.d,'d',i*160,p.k));B.pops=[]}
+  if(B.allyD){rtPop(mc&&mc.el,B.allyD,'a',0,B.ally?B.ally.n:'');setTimeout(()=>{if(B&&B.rt){B.rt.hurt=performance.now()+400;rtCls(mc&&mc.el,'hit')}},0);B.allyD=0}
+  if(B.allyH){rtPop(hero,'+'+B.allyH,'h',120);B.allyH=0}
+  if(B.allyHit){const a=$('#rtb .xal');rtPop(a,'-'+B.allyHit,'k');rtCls(a,'shake');B.allyHit=0}}
+function rtPauseV(){const p=$('#bpause');if(!p||!B||!B.rt)return;const R=B.rt;p.style.display=R.paused?'flex':'none';
+  if(R.paused)p.innerHTML=`<div class="pw"><div class="pt2">暫停</div><button class="xb" data-a="rtAuto">自動戰鬥：${B.auto?'開':'關'}</button><button class="xb" data-a="rtSpd">戰鬥速度：×${S.rtSpd||1}</button><button class="xb go" data-a="rtPause">繼續</button></div>`}
+function rtItems(){const el=$('#xitems');if(!el)return;if(!el.hidden){el.hidden=true;return}const us=Object.keys(S.items).filter(k=>ITEMS[k]&&ITEMS[k].use&&S.items[k]>0);
+  el.innerHTML=us.map(k=>`<button data-a="rtCmd" data-v="item:${k}"><span>${esc(ITEMS[k].n)} ×${S.items[k]}</span><small>${esc(ITEMS[k].d)}</small></button>`).join('')||'<p>沒有可用的道具</p>';el.hidden=false}
+function rtKey(e){if(!B||!B.rt||!document.getElementById('rtb')||MODAL||STORY)return;if(e.target&&/INPUT|TEXTAREA/.test(e.target.tagName))return;const k=e.key.toLowerCase();
+  const sk=battleSkills(),m={z:'@atk',x:'@guard',c:'@evade',' ':'@parry'};let c=m[k];if(!c&&/^[1-6]$/.test(k))c=sk[+k-1];
+  if(k==='p'||k==='escape'){e.preventDefault();ACT.rtPause();return}if(c){e.preventDefault();ACT.rtCmd(c)}}
+document.addEventListener('keydown',rtKey);
 
 /* ============ 粒子特效（Canvas） ============ */
 const PFX=(()=>{let HS=0,cv,cx,P=[],Q=[],raf=0,W=0,Hh=0,t0=0,SR={x:0,y:0,w:360,h:260};
@@ -4127,6 +4544,8 @@ const PFX=(()=>{let HS=0,cv,cx,P=[],Q=[],raf=0,W=0,Hh=0,t0=0,SR={x:0,y:0,w:360,h
       if(fx.miss)return wind([H[0]+.05,H[1]],'#ffffff',{dir:-1,n:3,life:.35});
       if(fx.d>0){claw(H,'#ff6a6a',{n:3,ang:-.9});later(90,()=>hitFx(H,'#ff9a8a',.7))}}};
 })();
+/* 即時戰鬥畫面沒有舊舞台，粒子特效略過 */
+['impact','marks','ally','me','foe'].forEach(k=>{const f=PFX[k];if(typeof f==='function')PFX[k]=function(){if(B&&B.rt)return;return f.apply(this,arguments)}});
 {const _imp=PFX.impact;PFX.impact=function(side,str,cr,dead){_imp.apply(this,arguments);try{if(side==='foe'&&cr&&!dead)setTimeout(()=>talk('crit'),350);else if(side==='foe'&&!dead&&B&&B.kind!==''&&B.kind&&B.hp<B.max*.25&&!B.talkNear){B.talkNear=1;setTimeout(()=>talk('near'),350)}if(side==='me'&&!dead&&lowHP())setTimeout(()=>talk('low'),450)}catch(e){}}}
 const S_CLS=()=>S.cls;
 
@@ -4164,6 +4583,14 @@ const ACT={
   bAtk(){pAct('atk')},bGuard(){pAct('guard')},bFlee(){pAct('flee')},bSkill(v){pAct('skill',v)},bItem(v){pAct('item',v)},
   bMenu(v){if(B.busy)return;B.menu=v;render()},
   bAuto(){AUTO=B.auto=!B.auto;render();if(B.auto)setTimeout(autoAct,300)},
+  rtCmd(v){if(!B||!B.rt||B.rt.done)return;const R=B.rt,xi=$('#xitems');if(xi)xi.hidden=true;if(R.paused)return;
+    if(v[0]!=='@'&&SK[v]&&(S.mp<mpCost(v)||(SK[v].ult&&B.ultUsed))){toast(SK[v].ult&&B.ultUsed?'奧義每場戰鬥只能用一次':'MP 不足');return}
+    if(R.pg>=100&&R.t>=R.pstun&&R.t>=0)rtDo(v);else R.q=R.q===v?null:v;try{SFX.ui()}catch(e){}},
+  rtAuto(){if(!B)return;AUTO=B.auto=!B.auto;if(B.rt)B.rt.ac=0;rtPauseV()},
+  rtSpd(){S.rtSpd=((S.rtSpd||1)%3)+1;save();rtPauseV()},
+  rtPause(){if(!B||!B.rt||B.rt.done)return;B.rt.paused=!B.rt.paused;rtPauseV()},
+  rtItems(){rtItems()},
+  rtFoe(v){if(!B||!B.rt)return;const i=+v;if(i<0||!B.adds||!B.adds[i]){openM('foe');return}if(B.adds[i].hp<=0)return;swapFoe(i);B.rt.vhT=0;B.fx=null;render()},
   addPt(v){if(S.pts<1)return;S.pts--;S.attr[v]++;save();render()},
   respec(){const c=respecCost();if(S.gold<c){toast(`需要 ${c} G`);return}const fr=freePts();if(fr<1){toast('目前沒有分配過的點數');return}if(!confirmTap('respec'))return;S.gold-=c;S.attr=baseAttr();S.pts+=fr;clamp();toast(`已重置，退回 ${fr} 點`);save();render()},
   skUp(v){if(S.sp<1||(S.skl[v]||1)>=5)return;S.sp--;S.skl[v]=(S.skl[v]||1)+1;toast(`【${SK[v].n}】提升到 Lv.${S.skl[v]}`);save();render()},
