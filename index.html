@@ -671,14 +671,26 @@ body.noanim *{transition:none!important}
 #rtb .bec .pop.a,#rtb .pop.a{font-size:17px;color:#c9b8ff;text-shadow:0 0 10px rgba(160,130,255,.7),0 2px 0 #000}
 #rtb .bec .pop.t,#rtb .pop.t{font-size:12px;color:#ecd08a;padding:0 6px;border-radius:6px;background:rgba(0,0,0,.6);-webkit-text-stroke:0;text-shadow:none}
 @keyframes rtpop{0%{transform:translate(-50%,6px) scale(.4);opacity:0}14%{transform:translate(calc(-50% + var(--dx,0px)*.3),-14px) scale(1.25);opacity:1}30%{transform:translate(calc(-50% + var(--dx,0px)*.5),-20px) scale(1)}100%{transform:translate(calc(-50% + var(--dx,0px)),-46px) scale(.9);opacity:0}}
-#rtb .warnb{position:absolute;left:-4%;right:-4%;top:16%;z-index:6;padding:4px 0;text-align:center;font-weight:900;font-size:21px;letter-spacing:.2em;color:#fff;background:repeating-linear-gradient(-45deg,rgba(0,0,0,.82) 0 14px,rgba(120,0,10,.82) 14px 28px);border-top:2px solid #ff4d6d;border-bottom:2px solid #ff4d6d;pointer-events:none;animation:rtwb .25s ease-out}
-@keyframes rtwb{from{transform:scaleY(0);opacity:0}}
-#rtb .skb{position:absolute;left:0;right:0;top:18%;z-index:6;text-align:center;pointer-events:none;font-weight:900;font-size:20px;letter-spacing:.15em;color:#fff;text-shadow:0 0 12px var(--c,#ecd08a),0 2px 0 #000;animation:rtskb .8s ease-out forwards}
-@keyframes rtskb{0%{opacity:0;transform:scale(1.3)}15%{opacity:1;transform:scale(1)}75%{opacity:1}100%{opacity:0;transform:translateY(-8px)}}
-#rtb .stamp{position:absolute;left:0;right:0;top:34%;z-index:20;text-align:center;pointer-events:none;font-weight:900;font-size:40px;letter-spacing:.12em;color:#ffe9a8;text-shadow:0 0 20px currentColor,0 0 4px #fff;-webkit-text-stroke:1px rgba(0,0,0,.4);animation:rtstamp 1.3s ease-out forwards}
-#rtb .stamp small{display:block;font-size:15px;letter-spacing:.2em;margin-top:2px;-webkit-text-stroke:0}
-#rtb .stamp.red{color:#ff6b80}#rtb .stamp.cy{color:#8fe9ff}#rtb .stamp.gray{color:#c9c4b8}
-@keyframes rtstamp{0%{opacity:0;transform:scale(1.8)}12%{opacity:1;transform:scale(1)}75%{opacity:1}100%{opacity:0;transform:scale(.96)}}
+/* 橫幅大字：襯線黑體、斜切、金屬漸層；一條暗帶上下各一道細線 */
+#rtb .stamp{--bc:#ecd08a;--bd:#9a6a18;--bg:rgba(236,208,138,.55);position:absolute;left:0;right:0;top:27%;z-index:20;display:flex;flex-direction:column;align-items:center;gap:1px;padding:9px 0 11px;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(6,6,8,.9) 16% 84%,transparent);animation:rtstamp 1.15s cubic-bezier(.2,.8,.2,1) forwards}
+#rtb .stamp::before,#rtb .stamp::after{content:'';position:absolute;left:6%;right:6%;height:1px;background:linear-gradient(90deg,transparent,var(--bc) 30% 70%,transparent);animation:rtline .5s ease-out}
+#rtb .stamp::before{top:3px}#rtb .stamp::after{bottom:3px}
+#rtb .stamp b{font-family:var(--display);font-weight:900;font-size:40px;line-height:1.15;letter-spacing:.3em;margin-right:-.3em;transform:skewX(-10deg);background:linear-gradient(180deg,#fff 18%,var(--bc) 58%,var(--bd) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 0 rgba(0,0,0,.9)) drop-shadow(0 0 12px var(--bg));animation:rtsb 1.15s cubic-bezier(.2,.8,.2,1) forwards;white-space:nowrap;max-width:96%}
+#rtb .stamp small{font-family:var(--display);font-size:11px;font-weight:700;letter-spacing:.55em;margin-right:-.55em;color:var(--bc);opacity:.92}
+#rtb .stamp.red{--bc:#ff9a9a;--bd:#b3172f;--bg:rgba(255,60,90,.6)}#rtb .stamp.cy{--bc:#c9f5ff;--bd:#2f9fd0;--bg:rgba(120,220,255,.6)}#rtb .stamp.gray{--bc:#d8d3c6;--bd:#77736a;--bg:rgba(200,200,200,.3)}
+@keyframes rtstamp{0%{opacity:0;transform:scaleY(.2)}10%{opacity:1;transform:none}78%{opacity:1}100%{opacity:0}}
+@keyframes rtsb{0%{transform:translateX(-46px) skewX(-10deg);letter-spacing:.6em}14%{transform:skewX(-10deg);letter-spacing:.3em}80%{transform:translateX(4px) skewX(-10deg)}100%{transform:translateX(40px) skewX(-10deg)}}
+@keyframes rtline{from{left:50%;right:50%}}
+#rtb .warnb{position:absolute;left:0;right:0;top:12%;z-index:6;display:flex;flex-direction:column;align-items:center;padding:5px 0 7px;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(70,4,14,.88) 18% 82%,transparent);border-top:1px solid rgba(255,90,110,.8);border-bottom:1px solid rgba(255,90,110,.8);animation:rtwb .22s ease-out}
+#rtb .warnb i{font-style:normal;font-size:9px;font-weight:700;letter-spacing:.7em;margin-right:-.7em;color:#ff9aa8;animation:rtblink .45s steps(2) infinite}
+#rtb .warnb b{font-family:var(--display);font-weight:900;font-size:24px;letter-spacing:.26em;margin-right:-.26em;transform:skewX(-10deg);color:#fff;text-shadow:0 0 12px #ff3a5a,0 2px 0 #000}
+@keyframes rtwb{from{transform:scaleY(0);opacity:0}}@keyframes rtblink{50%{opacity:.35}}
+#rtb .skb{position:absolute;left:0;right:0;top:14%;z-index:6;text-align:center;pointer-events:none;animation:rtskb .9s ease-out forwards}
+#rtb .skb b{display:inline-block;padding:2px 22px 4px;font-family:var(--display);font-weight:900;font-size:22px;letter-spacing:.22em;transform:skewX(-10deg);color:#fff;text-shadow:0 0 12px var(--c,#ecd08a),0 2px 0 #000;background:linear-gradient(90deg,transparent,rgba(6,6,8,.8) 20% 80%,transparent);border-bottom:1px solid var(--c,#ecd08a)}
+@keyframes rtskb{0%{opacity:0;transform:translateX(-30px)}14%{opacity:1;transform:none}78%{opacity:1}100%{opacity:0;transform:translateX(20px)}}
+#rtb .posein>b{font-size:26px;letter-spacing:.2em;transform:skewX(-10deg);padding-bottom:2px;border-bottom:1px solid var(--c,#ffd86b)}
+#rtb .bec .xint i.nd{background:#111;color:#ffb3c1;border:1px solid #ff4d6d}
+#rtb .pop{font-family:var(--display)}
 #rtb .rtfl{position:absolute;inset:0;z-index:19;pointer-events:none;animation:rtfl .4s ease-out forwards}
 @keyframes rtfl{from{opacity:.75}to{opacity:0}}
 #rtb .vig{position:absolute;inset:0;z-index:19;pointer-events:none;box-shadow:inset 0 0 80px 20px rgba(220,20,40,.6);animation:rtfl .5s ease-out forwards}
@@ -794,7 +806,6 @@ body.noanim *{transition:none!important}
   <main id="main"></main>
   <nav id="nav"></nav>
   <div id="tip" hidden></div>
-  <button id="fab" data-a="fullAuto" hidden>全自動 關</button>
   <div id="modal" hidden></div>
   <div id="story" hidden></div>
   <div id="toast"></div>
@@ -870,65 +881,65 @@ const SK={
   slash:{n:'裂甲擊',c:'swordsman',lv:1,mp:4,dmg:{s:'ATK',p:1.55,rend:1},brk:2,d:'踏前一步重砍，敵人破綻 +2。劈開護甲：無視物理抗性。'},
   guard:{n:'招架反擊',c:'swordsman',lv:1,mp:4,counter:1,brk:1,d:'擺好架勢，破綻 +1。下次被攻擊只受 30% 傷害，並反擊 150%。'},
   whirl:{n:'十字裂斬',c:'swordsman',lv:3,mp:8,dmg:{s:'ATK',p:1.2},fin:.6,d:'清算所有破綻，每層傷害 +60%。'},
-  warcry:{n:'鬥氣解放',c:'swordsman',lv:8,mp:8,buff:{atk:.35,def:.2,t:3},endure:1,d:'3 回合攻擊 +35%、防禦 +20%，受到致命傷時以 1 HP 撐住一次。'},
-  bash:{n:'重盾衝擊',c:'knight',lv:20,mp:12,dmg:{s:'ATK',p:2.2},foe:{stun:1},brk:2,d:'舉盾撞上去：暈眩 1 回合，破綻 +2。'},
+  warcry:{n:'鬥氣解放',c:'swordsman',lv:8,mp:8,buff:{atk:.35,def:.2,t:3},endure:1,d:'9 秒攻擊 +35%、防禦 +20%，受到致命傷時以 1 HP 撐住一次。'},
+  bash:{n:'重盾衝擊',c:'knight',lv:20,mp:12,dmg:{s:'ATK',p:2.2},foe:{stun:1},brk:2,d:'舉盾撞上去：暈眩 3 秒，破綻 +2。'},
   rage:{n:'捨身猛擊',c:'berserker',lv:20,mp:10,dmg:{s:'ATK',p:2.6},cost:.1,fin:.8,d:'燒掉 10% HP，清算破綻，每層傷害 +80%。'},
   db_twin:{n:'雙燕',c:'dual',lv:1,mp:4,dmg:{s:'ATK',p:.73,h:2},d:'左右各一劍。'},
   db_flurry:{n:'亂刃',c:'dual',lv:1,mp:7,dmg:{s:'ATK',p:.45,h:4},d:'四連斬。'},
-  db_step:{n:'踏影',c:'dual',lv:3,mp:6,buff:{eva:30,t:3},combo:2,d:'3 回合迴避 +30%，連段 +2。'},
+  db_step:{n:'踏影',c:'dual',lv:3,mp:6,buff:{eva:30,t:3},combo:2,d:'9 秒迴避 +30%，連段 +2。'},
   db_fin:{n:'終式・十字',c:'dual',lv:5,mp:10,dmg:{s:'ATK',p:1.05,h:2,cr:15},cfin:.11,d:'用掉所有連段，每層傷害 +11%。用這招打倒敵人會回 MP，連段留一半。'},
   db_gale:{n:'八重疾風',c:'dual',lv:10,mp:12,dmg:{s:'ATK',p:.335,h:8},d:'八連斬。'},
-  db_feint:{n:'佯攻',c:'dual',lv:12,mp:8,dmg:{s:'ATK',p:.5,h:2},foe:{weak:2},d:'虛晃兩劍，敵人攻擊下降 2 回合。'},
+  db_feint:{n:'佯攻',c:'dual',lv:12,mp:8,dmg:{s:'ATK',p:.5,h:2},foe:{weak:2},d:'虛晃兩劍，敵人攻擊下降 6 秒。'},
   db_ult:{n:'千刃繚亂',c:'dual',lv:18,mp:0,ult:1,dmg:{s:'ATK',p:.265,h:16},d:'【奧義・每場一次】十六連斬。'},
   db_cross:{n:'逆十字',c:'dual',lv:22,mp:12,dmg:{s:'ATK',p:.95,h:2,pierce:.5},d:'兩劍都無視 50% 防禦。'},
-  db_dance:{n:'劍舞',c:'dual',lv:30,mp:14,buff:{atk:.3,t:3},combo:3,d:'3 回合攻擊 +30%，連段 +3。'},
-  fire:{n:'點火',c:'mage',lv:1,mp:5,dmg:{s:'MAG',p:1.4},foe:{burn:2},mark:'灼',d:'留下「灼」印記，灼燒 2 回合。'},
-  ice:{n:'霜針',c:'mage',lv:1,mp:7,dmg:{s:'MAG',p:1.5},foe:{weak:2},mark:'凍',d:'留下「凍」印記，敵人攻擊下降 2 回合。'},
+  db_dance:{n:'劍舞',c:'dual',lv:30,mp:14,buff:{atk:.3,t:3},combo:3,d:'9 秒攻擊 +30%，連段 +3。'},
+  fire:{n:'點火',c:'mage',lv:1,mp:5,dmg:{s:'MAG',p:1.4},foe:{burn:2},mark:'灼',d:'留下「灼」印記，灼燒 6 秒。'},
+  ice:{n:'霜針',c:'mage',lv:1,mp:7,dmg:{s:'MAG',p:1.5},foe:{weak:2},mark:'凍',d:'留下「凍」印記，敵人攻擊下降 6 秒。'},
   barrier:{n:'薄冰鏡',c:'mage',lv:3,mp:8,shield:1.5,mark:'凍',d:'凝出一面冰鏡吸收傷害，寒氣在敵人身上留下「凍」印記。'},
   thunder:{n:'引雷',c:'mage',lv:8,mp:12,dmg:{s:'MAG',p:1.8},det:.9,d:'引爆所有印記，每個印記傷害 +90%。'},
   meteor:{n:'墜星',c:'archmage',lv:20,mp:20,dmg:{s:'MAG',p:2.4},mark2:1,det:.5,d:'先留下兩個印記，再連同既有印記一起引爆，每個 +50%。'},
   drain:{n:'汲魂',c:'warlock',lv:20,mp:14,dmg:{s:'MAG',p:2.2},drain:.5,mark:'蝕',d:'傷害的 50% 轉為 HP，留下「蝕」印記。'},
   dshot:{n:'雙矢',c:'ranger',lv:1,mp:4,dmg:{s:'ATK',p:1,h:2},focus:1,d:'連射兩箭，專注 +1。'},
-  pshot:{n:'蛇牙箭',c:'ranger',lv:1,mp:6,dmg:{s:'ATK',p:1.2},foe:{poison:3},focus:1,d:'淬毒的箭，中毒 3 回合，專注 +1。'},
-  dodge:{n:'伏身',c:'ranger',lv:3,mp:6,buff:{eva:40,t:3},focus:1,d:'3 回合迴避 +40%，專注 +1。每次閃過攻擊，專注再 +2。'},
+  pshot:{n:'蛇牙箭',c:'ranger',lv:1,mp:6,dmg:{s:'ATK',p:1.2},foe:{poison:3},focus:1,d:'淬毒的箭，中毒 9 秒，專注 +1。'},
+  dodge:{n:'伏身',c:'ranger',lv:3,mp:6,buff:{eva:40,t:3},focus:1,d:'9 秒迴避 +40%，專注 +1。每次閃過攻擊，專注再 +2。'},
   snipe:{n:'屏息',c:'ranger',lv:5,mp:10,dmg:{s:'ATK',p:1.7,cr:30},aim:.55,d:'耗盡專注，每層傷害 +55%，爆擊率 +30%。'},
   rain:{n:'驟雨',c:'sniper',lv:20,mp:16,dmg:{s:'ATK',p:.8,h:4},aim:.15,keep:1,d:'連射四箭，每層專注讓每一箭 +15%，不消耗專注。'},
   stab:{n:'影縫',c:'assassin',lv:20,mp:12,dmg:{s:'ATK',p:2,sure:1},aim:.3,d:'必定爆擊，耗盡專注，每層傷害 +30%。'},
   heal:{n:'微光',c:'cleric',lv:1,mp:6,heal:2,faith:25,d:'回復 HP，信仰 +25。'},
   holy:{n:'審光',c:'cleric',lv:1,mp:6,dmg:{s:'MAG',p:1.6},faithAmp:1,faith:10,d:'信仰越高越痛（最多 +100%），信仰 +10。'},
-  bless:{n:'晨禱',c:'cleric',lv:3,mp:8,buff:{atk:.25,def:.25,t:4},faith:20,d:'4 回合攻防 +25%，信仰 +20。'},
+  bless:{n:'晨禱',c:'cleric',lv:3,mp:8,buff:{atk:.25,def:.25,t:4},faith:20,d:'12 秒攻防 +25%，信仰 +20。'},
   purify:{n:'洗禮',c:'cleric',lv:8,mp:6,heal:1,cleanse:1,faith:30,d:'回復 HP，解除中毒、灼燒與流血，信仰 +30。'},
-  sanct:{n:'庇護所',c:'bishop',lv:20,mp:18,heal:3,regen:3,faith:40,d:'大量回復並持續再生 3 回合，信仰 +40。'},
+  sanct:{n:'庇護所',c:'bishop',lv:20,mp:18,heal:3,regen:3,faith:40,d:'大量回復並持續再生 9 秒，信仰 +40。'},
   judge:{n:'天秤',c:'templar',lv:20,mp:14,dmg:{s:'BOTH',p:2},faithSpend:1,d:'耗盡信仰，每 10 點傷害 +12%。'}
 };
 Object.assign(SK,{
-  charge:{n:'衝鋒突刺',c:'swordsman',lv:10,mp:9,dmg:{s:'ATK',p:1.7},brk:1,foe:{weak:2},d:'衝上去一記突刺，敵人攻擊下降 2 回合，破綻 +1。'},
+  charge:{n:'衝鋒突刺',c:'swordsman',lv:10,mp:9,dmg:{s:'ATK',p:1.7},brk:1,foe:{weak:2},d:'衝上去一記突刺，敵人攻擊下降 6 秒，破綻 +1。'},
   flurry:{n:'疾風連斬',c:'swordsman',lv:12,mp:10,dmg:{s:'ATK',p:.6,h:3},brk:3,d:'三連斬，破綻 +3。'},
   skyslash:{n:'斷空斬',c:'swordsman',lv:18,mp:0,ult:1,dmg:{s:'ATK',p:3},fin:.5,d:'【奧義・每場一次】橫斷全場的一刀，清算破綻，每層 +50%。'},
-  nova:{n:'冰霜新星',c:'mage',lv:10,mp:11,dmg:{s:'MAG',p:1.5},foe:{stun:1},mark:'凍',d:'寒氣炸開，暈眩 1 回合，留下「凍」印記。'},
-  firestorm:{n:'火焰風暴',c:'mage',lv:12,mp:13,dmg:{s:'MAG',p:.6,h:3},foe:{burn:3},mark:'灼',d:'三道火柱落下，灼燒 3 回合，留下「灼」印記。'},
+  nova:{n:'冰霜新星',c:'mage',lv:10,mp:11,dmg:{s:'MAG',p:1.5},foe:{stun:1},mark:'凍',d:'寒氣炸開，暈眩 3 秒，留下「凍」印記。'},
+  firestorm:{n:'火焰風暴',c:'mage',lv:12,mp:13,dmg:{s:'MAG',p:.6,h:3},foe:{burn:3},mark:'灼',d:'三道火柱落下，灼燒 9 秒，留下「灼」印記。'},
   collapse:{n:'元素崩解',c:'mage',lv:18,mp:0,ult:1,dmg:{s:'MAG',p:2.8},det:1.2,d:'【奧義・每場一次】引爆所有印記，每個 +120%。'},
   pierce:{n:'穿透箭',c:'ranger',lv:10,mp:8,dmg:{s:'ATK',p:1.7,pierce:.6},focus:1,d:'無視 60% 防禦的一箭，專注 +1。'},
-  trap:{n:'捕獸陷阱',c:'ranger',lv:12,mp:9,dmg:{s:'ATK',p:.8},foe:{stun:1},focus:2,d:'踩中陷阱的敵人暈眩 1 回合，專注 +2。'},
+  trap:{n:'捕獸陷阱',c:'ranger',lv:12,mp:9,dmg:{s:'ATK',p:.8},foe:{stun:1},focus:2,d:'踩中陷阱的敵人暈眩 3 秒，專注 +2。'},
   arrowstorm:{n:'萬箭齊發',c:'ranger',lv:18,mp:0,ult:1,dmg:{s:'ATK',p:.5,h:8},aim:.08,keep:1,d:'【奧義・每場一次】八連射，每層專注讓每箭 +8%。'},
   aegis:{n:'聖盾',c:'cleric',lv:10,mp:9,shield:2,faith:15,d:'張開聖光護盾，信仰 +15。'},
-  smite:{n:'制裁之光',c:'cleric',lv:12,mp:10,dmg:{s:'MAG',p:1.8},faithAmp:1,foe:{weak:2},faith:10,d:'信仰越高越痛，敵人攻擊下降 2 回合。'},
+  smite:{n:'制裁之光',c:'cleric',lv:12,mp:10,dmg:{s:'MAG',p:1.8},faithAmp:1,foe:{weak:2},faith:10,d:'信仰越高越痛，敵人攻擊下降 6 秒。'},
   miracle:{n:'神蹟',c:'cleric',lv:18,mp:0,ult:1,heal:3,dmg:{s:'MAG',p:2},faith:100,d:'【奧義・每場一次】大量回復並降下聖光，信仰直接補滿。'},
-  hold:{n:'堅守',c:'knight',lv:23,mp:10,buff:{def:.8,t:3},counter:1,brk:2,d:'3 回合防禦 +80%，進入招架姿勢，破綻 +2。'},
-  holycharge:{n:'聖騎衝鋒',c:'knight',lv:26,mp:16,dmg:{s:'ATK',p:2.8},foe:{stun:1},brk:3,d:'全力衝鋒，暈眩 1 回合，破綻 +3。'},
-  berserk:{n:'狂暴化',c:'berserker',lv:23,mp:8,cost:.1,buff:{atk:.6,t:3},brk:2,d:'燒掉 10% HP，3 回合攻擊 +60%，破綻 +2。'},
+  hold:{n:'堅守',c:'knight',lv:23,mp:10,buff:{def:.8,t:3},counter:1,brk:2,d:'9 秒防禦 +80%，進入招架姿勢，破綻 +2。'},
+  holycharge:{n:'聖騎衝鋒',c:'knight',lv:26,mp:16,dmg:{s:'ATK',p:2.8},foe:{stun:1},brk:3,d:'全力衝鋒，暈眩 3 秒，破綻 +3。'},
+  berserk:{n:'狂暴化',c:'berserker',lv:23,mp:8,cost:.1,buff:{atk:.6,t:3},brk:2,d:'燒掉 10% HP，9 秒攻擊 +60%，破綻 +2。'},
   feast:{n:'血之饗宴',c:'berserker',lv:26,mp:14,dmg:{s:'ATK',p:2.4},drain:.5,fin:.5,d:'清算破綻，吸取 50% 傷害。'},
   missiles:{n:'奧術飛彈',c:'archmage',lv:23,mp:14,dmg:{s:'MAG',p:.5,h:5},mark:'奧',d:'五發追蹤飛彈，留下「奧」印記。'},
-  field:{n:'元素領域',c:'archmage',lv:26,mp:16,buff:{atk:.5,t:4},mark:'奧',d:'4 回合物攻與魔攻 +50%，留下「奧」印記。'},
-  curse:{n:'詛咒',c:'warlock',lv:23,mp:10,dmg:{s:'MAG',p:1.1},foe:{weak:3,poison:3},mark:'蝕',d:'虛弱與中毒 3 回合，留下「蝕」印記。'},
+  field:{n:'元素領域',c:'archmage',lv:26,mp:16,buff:{atk:.5,t:4},mark:'奧',d:'12 秒物攻與魔攻 +50%，留下「奧」印記。'},
+  curse:{n:'詛咒',c:'warlock',lv:23,mp:10,dmg:{s:'MAG',p:1.1},foe:{weak:3,poison:3},mark:'蝕',d:'虛弱與中毒 9 秒，留下「蝕」印記。'},
   reap:{n:'靈魂收割',c:'warlock',lv:26,mp:18,dmg:{s:'MAG',p:2.4},det:.7,drain:.3,d:'引爆印記，每個 +70%，吸取 30% 傷害。'},
-  explo:{n:'爆裂箭',c:'sniper',lv:23,mp:12,dmg:{s:'ATK',p:2.2},foe:{burn:3},focus:1,d:'命中後爆炸，灼燒 3 回合，專注 +1。'},
+  explo:{n:'爆裂箭',c:'sniper',lv:23,mp:12,dmg:{s:'ATK',p:2.2},foe:{burn:3},focus:1,d:'命中後爆炸，灼燒 9 秒，專注 +1。'},
   deadshot:{n:'致命狙擊',c:'sniper',lv:26,mp:16,dmg:{s:'ATK',p:2.2,cr:50},aim:.6,d:'耗盡專注，每層 +60%，爆擊率 +50%。'},
-  smoke:{n:'煙霧彈',c:'assassin',lv:23,mp:8,buff:{eva:50,t:3},focus:2,d:'3 回合迴避 +50%，專注 +2。'},
+  smoke:{n:'煙霧彈',c:'assassin',lv:23,mp:8,buff:{eva:50,t:3},focus:2,d:'9 秒迴避 +50%，專注 +2。'},
   thousand:{n:'千刃',c:'assassin',lv:26,mp:16,dmg:{s:'ATK',p:.55,h:6},aim:.1,keep:1,d:'六連斬，每層專注讓每刀 +10%。'},
   revive:{n:'復活之光',c:'bishop',lv:23,mp:14,heal:2,endure:1,faith:20,d:'回復 HP，受到致命傷時以 1 HP 撐住一次。'},
   wrath:{n:'天罰',c:'bishop',lv:26,mp:16,dmg:{s:'MAG',p:2.6},faithAmp:1,faith:10,d:'信仰越高越痛的天雷。'},
-  hammer:{n:'聖光鎚擊',c:'templar',lv:23,mp:12,dmg:{s:'BOTH',p:1.7},foe:{stun:1},faith:20,d:'暈眩 1 回合，信仰 +20。'},
+  hammer:{n:'聖光鎚擊',c:'templar',lv:23,mp:12,dmg:{s:'BOTH',p:1.7},foe:{stun:1},faith:20,d:'暈眩 3 秒，信仰 +20。'},
   doom:{n:'審判之日',c:'templar',lv:26,mp:20,dmg:{s:'BOTH',p:2.8},faithSpend:1,d:'耗盡信仰，每 10 點傷害 +12%。'}});
 /* 被動技能：達到等級自動生效 */
 const PASS={
@@ -937,7 +948,7 @@ const PASS={
   sw3:{n:'連續技',c:'swordsman',lv:25,d:'普攻有 30% 機率多疊 1 層破綻。'},
   mg1:{n:'魔力親和',c:'mage',lv:6,st:{mpp:15},d:'MP +15%。'},
   mg2:{n:'元素共鳴',c:'mage',lv:15,d:'敵人身上每個印記，法師技能傷害 +8%。'},
-  mg3:{n:'冥想',c:'mage',lv:25,st:{mpreg:5},d:'每回合回復 5% MP。'},
+  mg3:{n:'冥想',c:'mage',lv:25,st:{mpreg:5},d:'每 3 秒回復 5% MP。'},
   db1:{n:'雙持',c:'dual',lv:6,st:{crit:6},d:'爆擊率 +6%。'},
   db2:{n:'收不住手',c:'dual',lv:15,d:'連段上限 +4。'},
   db3:{n:'站穩',c:'dual',lv:25,d:'被打中時連段只掉 1 層。'},
@@ -946,11 +957,11 @@ const PASS={
   rg3:{n:'獵人直覺',c:'ranger',lv:25,d:'專注滿 5 層時，爆擊傷害 +30%。'},
   cl1:{n:'堅定信仰',c:'cleric',lv:6,st:{healp:20},d:'治療量 +20%。'},
   cl2:{n:'神佑',c:'cleric',lv:15,d:'戰鬥開始時信仰 30。'},
-  cl3:{n:'聖光護體',c:'cleric',lv:25,st:{defp:15},d:'防禦 +15%，受到的異常狀態少 1 回合。'},
+  cl3:{n:'聖光護體',c:'cleric',lv:25,st:{defp:15},d:'防禦 +15%，受到的異常狀態少 3 秒。'},
   kn:{n:'守護者',c:'knight',lv:20,sx:[{st:{atkp:12},d:'攻擊 +12%'},{st:{guard:15,thorn:10},d:'受擊 15% 機率傷害減半、反彈 10%'}],st:{defp:20},d:'防禦 +20%。'},
-  bk:{n:'嗜血',c:'berserker',lv:20,sx:[{st:{cd:30},d:'爆擊傷害 +30%'},{st:{ls:6,regen:2},d:'吸血再 +6%、每回合回復 2% HP'}],st:{ls:8},d:'吸血 +8%。'},
+  bk:{n:'嗜血',c:'berserker',lv:20,sx:[{st:{cd:30},d:'爆擊傷害 +30%'},{st:{ls:6,regen:2},d:'吸血再 +6%、每 3 秒回復 2% HP'}],st:{ls:8},d:'吸血 +8%。'},
   am:{n:'奧術精通',c:'archmage',lv:20,sx:[{st:{detamp:25},d:'引爆加成 +25%'},{st:{burn:20,magp:5},d:'攻擊 20% 機率灼燒、魔攻再 +5%'}],st:{magp:15},d:'魔攻 +15%。'},
-  wl:{n:'黑暗契約',c:'warlock',lv:20,sx:[{st:{detamp:15,cd:15},d:'引爆加成 +15%、爆擊傷害 +15%'},{st:{ls:8,regen:1.5},d:'吸血再 +8%、每回合回復 1.5% HP'}],st:{ls:5,magp:8},d:'吸血 +5%、魔攻 +8%。'},
+  wl:{n:'黑暗契約',c:'warlock',lv:20,sx:[{st:{detamp:15,cd:15},d:'引爆加成 +15%、爆擊傷害 +15%'},{st:{ls:8,regen:1.5},d:'吸血再 +8%、每 3 秒回復 1.5% HP'}],st:{ls:5,magp:8},d:'吸血 +5%、魔攻 +8%。'},
   sn:{n:'穩定瞄準',c:'sniper',lv:20,sx:[{st:{cd:15,crit:5},d:'爆擊傷害再 +15%、爆擊率 +5%'},{st:{double:12},d:'連擊率 +12%'}],st:{cd:30},d:'爆擊傷害 +30%。'},
   as:{n:'暗殺術',c:'assassin',lv:20,sx:[{st:{gale:1},d:'每場第一擊必定命中且爆擊'},{st:{eva:8,double:8},d:'迴避 +8%、連擊率 +8%'}],st:{crit:10},d:'爆擊率 +10%。'},
   bp:{n:'慈悲',c:'bishop',lv:20,sx:[{st:{answer:10},d:'神回應時多回復 10% HP'},{st:{faithg:30,magp:10},d:'信仰獲得再 +30%、魔攻 +10%'}],st:{healp:30,faithg:50},d:'治療量 +30%，信仰獲得 +50%。'},
@@ -990,7 +1001,7 @@ const ICON={town:'<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1
 const ic=k=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k]}</svg>`;
 const SLOTCH={weapon:ic('weapon'),head:ic('head'),body:ic('body'),feet:ic('feet'),ring:ic('ring'),neck:ic('neck')};
 const SLOTP={weapon:'w',head:'h',body:'a',feet:'f',ring:'r',neck:'n'};
-const STATN={atk:'物理攻擊',mag:'魔法攻擊',mres:'魔抗',mresp:'魔抗',rfire:'火抗',rice:'冰抗',rthunder:'雷抗',rdark:'暗抗',def:'防禦',hp:'HP',mp:'MP',crit:'爆擊率',cd:'爆擊傷害',eva:'迴避',ls:'吸血',atkp:'物理攻擊',magp:'魔法攻擊',defp:'防禦',hpp:'HP',regen:'每回合回復',mpcut:'MP 消耗減少',mpp:'MP',resmax:'資源上限',brkcd:'每層破綻爆傷',detamp:'引爆傷害',focusatk:'專注滿攻擊',answer:'回應回復',mpreg:'每回合回 MP',healp:'治療量',faithg:'信仰獲得',burn:'灼燒機率',double:'連擊機率',stun:'暈眩機率',guard:'格擋機率',shield:'開場護盾',back:'背水增傷',thorn:'荊棘反彈',gale:'疾風',reap:'擊倒回復',STR:'力量',DEX:'敏捷',INT:'智力',VIT:'體質',LUK:'幸運'};
+const STATN={atk:'物理攻擊',mag:'魔法攻擊',mres:'魔抗',mresp:'魔抗',rfire:'火抗',rice:'冰抗',rthunder:'雷抗',rdark:'暗抗',def:'防禦',hp:'HP',mp:'MP',crit:'爆擊率',cd:'爆擊傷害',eva:'迴避',ls:'吸血',atkp:'物理攻擊',magp:'魔法攻擊',defp:'防禦',hpp:'HP',regen:'每 3 秒回復',mpcut:'MP 消耗減少',mpp:'MP',resmax:'資源上限',brkcd:'每層破綻爆傷',detamp:'引爆傷害',focusatk:'專注滿攻擊',answer:'回應回復',mpreg:'每 3 秒回 MP',healp:'治療量',faithg:'信仰獲得',burn:'灼燒機率',double:'連擊機率',stun:'暈眩機率',guard:'格擋機率',shield:'開場護盾',back:'背水增傷',thorn:'荊棘反彈',gale:'疾風',reap:'擊倒回復',STR:'力量',DEX:'敏捷',INT:'智力',VIT:'體質',LUK:'幸運'};
 const PCT=new Set(['brkcd','detamp','focusatk','answer','mpp','mpreg','healp','faithg','crit','cd','eva','ls','atkp','magp','defp','hpp','regen','mpcut','burn','double','stun','guard','shield','back','thorn','reap']);
 const fmt=(k,v)=>`${STATN[k]} +${v}${PCT.has(k)?'%':''}`;
 const GEAR={};
@@ -1010,7 +1021,7 @@ const SPEC={burn:{n:'烈焰',d:'攻擊時 20% 機率使敵人灼燒',v:20},doubl
 /* 套裝：每個地區一套，稀有以上才會掉落 */
 const SETS=[
   {n:'輕裝',b2:{eva:5},b4:{crit:8},d2:'迴避 +5%',d4:'爆擊率 +8%'},
-  {n:'森林',b2:{hpp:10,rdark:20},b4:{regen:3},d2:'HP +10%、暗抗 +20%',d4:'每回合回復 3% HP'},
+  {n:'森林',b2:{hpp:10,rdark:20},b4:{regen:3},d2:'HP +10%、暗抗 +20%',d4:'每 3 秒回復 3% HP'},
   {n:'火山',b2:{atkp:10,rfire:20},b4:{burn:25},d2:'物攻 +10%、火抗 +20%',d4:'攻擊時 25% 機率灼燒'},
   {n:'雪地',b2:{magp:12,rice:20},b4:{mpcut:25},d2:'魔攻 +12%、冰抗 +20%',d4:'技能 MP 消耗 -25%'},
   {n:'遠征隊',b2:{atkp:8,magp:8,defp:8,hpp:8},b4:{cd:40,shield:15},d2:'物攻、魔攻、防禦、HP +8%',d4:'爆擊傷害 +40%、開場護盾 15%'},
@@ -1023,7 +1034,7 @@ const CSET={swordsman:5,mage:6,ranger:7,cleric:8};
 /* 首領專屬傳說裝備 */
 Object.assign(GEAR,{
   u_gob:{n:'哥布林戰酋的護符',slot:'neck',t:0,lv:5,price:800,hp:60,crit:5,uq:{resmax:1},ud:'職業資源上限 +1（破綻、印記、專注）',uniq:1},
-  u_tree:{n:'樹王的心',slot:'ring',t:1,lv:10,price:2000,mp:40,hp:80,uq:{regen:4},ud:'每回合回復 4% HP',uniq:1},
+  u_tree:{n:'樹王的心',slot:'ring',t:1,lv:10,price:2000,mp:40,hp:80,uq:{regen:4},ud:'每 3 秒回復 4% HP',uniq:1},
   u_worm:{n:'巨蟲的牙',slot:'neck',t:2,lv:15,price:4000,hp:150,cd:20,uq:{ls:8,burn:15},ud:'吸血 +8%，攻擊時 15% 機率灼燒',uniq:1},
   u_dragon:{n:'冰龍鱗甲',slot:'body',t:3,lv:20,price:7000,def:45,hp:260,uq:{guard:20,shield:10},ud:'受擊 20% 機率傷害減半，開場護盾 10%',uniq:1},
   u_zenos:{n:'澤諾斯的頭冠',slot:'head',t:4,lv:25,price:12000,def:30,hp:220,uq:{cd:40,resmax:1,atkp:8,magp:8},ud:'爆擊傷害 +40%、資源上限 +1、物攻與魔攻 +8%',uniq:1}});
@@ -1122,47 +1133,47 @@ const MOBS={
 for(const k of ['bat','icesprite','phantom','icedragon','zenos'])MOBS[k].fly=1;
 /* 怪物技能：pow 威力、mag 魔法、h 段數、pierce 無視防禦、hst 對主角的狀態、p 狀態機率、drain 吸血、heal 自癒、self 自身強化、shield 護盾。fx 決定特效 */
 const SKM={
-  m_goo:{n:'黏液噴射',mag:1,pow:.9,hst:{weak:2},fx:'orb',c:'#7fd3ff',d:'噴出黏液，主角攻擊下降 2 回合'},
+  m_goo:{n:'黏液噴射',mag:1,pow:.9,hst:{weak:2},fx:'orb',c:'#7fd3ff',d:'噴出黏液，主角攻擊下降 6 秒'},
   m_split:{n:'分裂再生',heal:.2,fx:'heal',c:'#7fd3ff',d:'分出一小塊身體，回復 20% HP'},
   m_horn:{n:'尖角衝撞',pow:1.6,cr:25,fx:'slam',c:'#ffffff',d:'低頭猛衝，爆擊率高'},
-  m_hop:{n:'蹦跳閃避',self:{eva:30,t:2},fx:'aura',c:'#cfff9a',d:'迴避 +30%，持續 2 回合'},
+  m_hop:{n:'蹦跳閃避',self:{eva:30,t:2},fx:'aura',c:'#cfff9a',d:'迴避 +30%，持續 6 秒'},
   m_sneak:{n:'偷襲',pow:1.4,pierce:.4,fx:'claw',c:'#ffd27a',d:'無視 40% 防禦'},
   m_rock:{n:'投石',pow:.55,h:3,fx:'orb',c:'#c9b08a',d:'連丟三顆石頭'},
   m_cleave:{n:'黑晶重擊',pow:1.8,hst:{stun:1},p:.3,fx:'slam',c:'#b06cff',d:'重擊，30% 機率使主角暈眩'},
-  m_rally:{n:'戰吼號令',self:{atk:.4,t:3},fx:'roar',c:'#ff9a4a',d:'攻擊 +40%，持續 3 回合'},
-  m_spore:{n:'毒孢子',mag:1,pow:.8,hst:{poison:3},fx:'spore',c:'#9ae05a',d:'使主角中毒 3 回合'},
-  m_sleep:{n:'催眠花粉',mag:1,pow:.4,hst:{stun:1},p:.55,fx:'spore',c:'#d6a8ff',d:'55% 機率讓主角睡著 1 回合'},
-  m_bite:{n:'撕咬',pow:1.3,hst:{bleed:3},fx:'claw',c:'#ff5a4a',d:'造成流血 3 回合'},
+  m_rally:{n:'戰吼號令',self:{atk:.4,t:3},fx:'roar',c:'#ff9a4a',d:'攻擊 +40%，持續 9 秒'},
+  m_spore:{n:'毒孢子',mag:1,pow:.8,hst:{poison:3},fx:'spore',c:'#9ae05a',d:'使主角中毒 9 秒'},
+  m_sleep:{n:'催眠花粉',mag:1,pow:.4,hst:{stun:1},p:.55,fx:'spore',c:'#d6a8ff',d:'55% 機率讓主角睡著 3 秒'},
+  m_bite:{n:'撕咬',pow:1.3,hst:{bleed:3},fx:'claw',c:'#ff5a4a',d:'造成流血 9 秒'},
   m_howl:{n:'月下狼嚎',self:{atk:.3,crit:15,t:3},fx:'roar',c:'#ffe0a0',d:'攻擊 +30%、爆擊 +15%'},
-  m_root:{n:'根鬚纏繞',pow:1,hst:{weak:2},fx:'slam',c:'#8fbf5a',d:'纏住主角，攻擊下降 2 回合'},
+  m_root:{n:'根鬚纏繞',pow:1,hst:{weak:2},fx:'slam',c:'#8fbf5a',d:'纏住主角，攻擊下降 6 秒'},
   m_photo:{n:'光合作用',heal:.15,fx:'heal',c:'#cfff9a',d:'回復 15% HP'},
-  m_rotmist:{n:'腐敗毒霧',mag:1,pow:1.2,hst:{poison:3},fx:'spore',c:'#b06cff',d:'紫色孢霧，中毒 3 回合'},
-  m_rootcage:{n:'荊棘牢籠',pow:1.5,hst:{stun:1},p:.4,fx:'slam',c:'#7a5a3a',d:'40% 機率困住主角 1 回合'},
+  m_rotmist:{n:'腐敗毒霧',mag:1,pow:1.2,hst:{poison:3},fx:'spore',c:'#b06cff',d:'紫色孢霧，中毒 9 秒'},
+  m_rootcage:{n:'荊棘牢籠',pow:1.5,hst:{stun:1},p:.4,fx:'slam',c:'#7a5a3a',d:'40% 機率困住主角 3 秒'},
   m_sap:{n:'樹液再生',heal:.18,fx:'heal',c:'#d6b25a',d:'回復 18% HP'},
   m_sonic:{n:'超音波',mag:1,pow:1,hst:{weak:2},fx:'roar',c:'#d6a8ff',d:'刺耳音波，主角攻擊下降'},
   m_suck:{n:'吸血',pow:1.1,drain:.6,fx:'drain',c:'#ff5a7a',d:'吸取 60% 傷害'},
   m_bone:{n:'骨刃斬',pow:1.6,fx:'claw',c:'#ffffff',d:'鋒利的骨頭斬擊'},
   m_rebuild:{n:'骸骨重組',heal:.25,fx:'heal',c:'#e8e0c8',d:'把散掉的骨頭裝回去，回復 25% HP'},
   m_boulder:{n:'落石',pow:1.7,fx:'slam',c:'#c9b08a',d:'舉起巨石砸下'},
-  m_petrify:{n:'岩石硬化',self:{def:.7,t:3},fx:'aura',c:'#c9b08a',d:'防禦 +70%，持續 3 回合'},
+  m_petrify:{n:'岩石硬化',self:{def:.7,t:3},fx:'aura',c:'#c9b08a',d:'防禦 +70%，持續 9 秒'},
   m_quake:{n:'震地衝撞',pow:1.9,hst:{stun:1},p:.25,fx:'slam',c:'#d6b25a',d:'25% 機率使主角暈眩'},
   m_devour:{n:'吞噬',pow:1.4,drain:.5,fx:'drain',c:'#7fd3ff',d:'吞下光芒，吸取 50% 傷害'},
-  m_burrow:{n:'遁地',self:{eva:40,t:2},fx:'aura',c:'#d6b25a',d:'迴避 +40%，持續 2 回合'},
+  m_burrow:{n:'遁地',self:{eva:40,t:2},fx:'aura',c:'#d6b25a',d:'迴避 +40%，持續 6 秒'},
   m_frostfang:{n:'冰牙',pow:1.4,hst:{weak:2},fx:'claw',c:'#8fdcff',d:'冰凍咬擊，主角攻擊下降'},
   m_icicle:{n:'冰錐',mag:1,pow:.75,h:2,fx:'orb',c:'#8fdcff',d:'連射兩根冰錐'},
-  m_fog:{n:'寒霧',self:{eva:30,t:3},fx:'aura',c:'#d8f2ff',d:'迴避 +30%，持續 3 回合'},
+  m_fog:{n:'寒霧',self:{eva:30,t:3},fx:'aura',c:'#d8f2ff',d:'迴避 +30%，持續 9 秒'},
   m_avalanche:{n:'雪崩重拳',pow:2,fx:'slam',c:'#e8f6ff',d:'一拳砸碎地面'},
   m_icebody:{n:'寒冰之軀',shield:.18,fx:'aura',c:'#8fdcff',d:'獲得 18% 最大 HP 的冰盾'},
   m_zero:{n:'絕對零度',mag:1,pow:2,hst:{stun:1},p:.3,fx:'beam',c:'#8fdcff',d:'冰之吐息，30% 機率凍住主角'},
   m_wingshard:{n:'冰翼亂舞',mag:1,pow:.6,h:3,fx:'orb',c:'#d8f2ff',d:'振翅射出三片冰刃'},
-  m_scale:{n:'冰鱗護體',self:{def:.5,t:3},fx:'aura',c:'#8fdcff',d:'防禦 +50%，持續 3 回合'},
+  m_scale:{n:'冰鱗護體',self:{def:.5,t:3},fx:'aura',c:'#8fdcff',d:'防禦 +50%，持續 9 秒'},
   m_darkblade:{n:'暗影劍擊',pow:1.7,pierce:.5,fx:'claw',c:'#b06cff',d:'無視 50% 防禦的斬擊'},
   m_blackshield:{n:'暗黑之盾',shield:.15,fx:'aura',c:'#6a3a9a',d:'獲得 15% 最大 HP 的護盾'},
   m_soul:{n:'噬魂',mag:1,pow:1.3,drain:.5,hst:{poison:2},fx:'drain',c:'#b06cff',d:'吸取靈魂並使主角中毒'},
-  m_vanish:{n:'隱身',self:{eva:50,t:2},fx:'aura',c:'#d6a8ff',d:'迴避 +50%，持續 2 回合'},
-  m_hellfire:{n:'煉獄火戟',pow:1.6,hst:{burn:3},fx:'beam',c:'#ff7a2a',d:'帶火的突刺，灼燒 3 回合'},
+  m_vanish:{n:'隱身',self:{eva:50,t:2},fx:'aura',c:'#d6a8ff',d:'迴避 +50%，持續 6 秒'},
+  m_hellfire:{n:'煉獄火戟',pow:1.6,hst:{burn:3},fx:'beam',c:'#ff7a2a',d:'帶火的突刺，灼燒 9 秒'},
   m_pact:{n:'惡魔契約',self:{atk:.5,t:3},cost:.1,fx:'roar',c:'#ff4a4a',d:'燒掉 10% HP，攻擊 +50%'},
-  m_end:{n:'終焉之闇',mag:1,pow:2.1,hst:{poison:3},fx:'beam',c:'#7a3aff',d:'黑暗洪流，中毒 3 回合'},
+  m_end:{n:'終焉之闇',mag:1,pow:2.1,hst:{poison:3},fx:'beam',c:'#7a3aff',d:'黑暗洪流，中毒 9 秒'},
   m_engulf:{n:'黑霧吞噬',mag:1,pow:1.5,drain:.5,fx:'drain',c:'#5a2a8a',d:'吸取 50% 傷害'},
   m_dread:{n:'煉獄威壓',hst:{stun:1},p:.6,self:{atk:.3,t:3},fx:'roar',c:'#ff4a4a',d:'60% 機率震懾主角，自身攻擊 +30%'}};
 /* 高難度詞綴：異變種與惡夢模式的怪物會帶上 */
@@ -1171,10 +1182,10 @@ Object.assign(SKM,{s_cut:{n:'影斬',pow:1.7,pierce:.3,fx:'claw',c:'#9a7aff',d:'
   s_bolt:{n:'暗影彈',mag:1,pow:.8,h:2,fx:'orb',c:'#9a7aff',d:'模仿你的魔法，連射兩發'},
   s_arrow:{n:'暗影箭雨',pow:.6,h:3,fx:'orb',c:'#9a7aff',d:'模仿你的箭術，連射三箭'},
   s_light:{n:'偽聖光',mag:1,pow:1.6,fx:'beam',c:'#9a7aff',d:'扭曲的聖光'},
-  s_mirror:{n:'鏡像分身',self:{atk:.3,def:.3,t:3},fx:'aura',c:'#9a7aff',d:'攻防 +30%，持續 3 回合'}});
+  s_mirror:{n:'鏡像分身',self:{atk:.3,def:.3,t:3},fx:'aura',c:'#9a7aff',d:'攻防 +30%，持續 9 秒'}});
 const SHADOW={swordsman:['brute',['s_cut','m_dread','s_mirror']],mage:['caster',['s_bolt','m_engulf','s_mirror']],ranger:['swift',['s_arrow','s_cut','s_mirror']],dual:['swift',['s_cut','s_cut','s_mirror']],cleric:['tank',['s_light','m_sap','s_mirror']]};
 const TRIAL={lv:20,gold:3000,items:{m_ore:5,m_ice:3}};
-const AFF={rage:{n:'狂暴',d:'攻擊 +40%'},shell:{n:'堅殼',d:'防禦 +80%'},regen:{n:'再生',d:'每回合回復 6% HP'},leech:{n:'吸血',d:'攻擊吸取 30% 傷害'},
+const AFF={rage:{n:'狂暴',d:'攻擊 +40%'},shell:{n:'堅殼',d:'防禦 +80%'},regen:{n:'再生',d:'每 3 秒回復 6% HP'},leech:{n:'吸血',d:'攻擊吸取 30% 傷害'},
   reflect:{n:'反射',d:'反彈 15% 受到的傷害'},swift:{n:'迅捷',d:'迴避 +15%、爆擊 +15%'},venom:{n:'劇毒',d:'攻擊附帶中毒'}};
 const HST={poison:'中毒',burn:'灼燒',bleed:'流血',weak:'虛弱',stun:'暈眩'};
 function mobBuild(m,lv,mult,kindHP){const w=MTY[m.ty].w,pts=20+lv*5,a={};for(const k in w)a[k]=Math.max(1,Math.round(pts*w[k]*mult));
@@ -1202,9 +1213,9 @@ for(const k in MVAR){const v=MVAR[k];MOBS[k]={n:v.n,lv:v.lv,ty:v.ty,hpM:v.hpM,sk
 const LORD=['rabbitking','moonwolf','foreman','giantking','mistgeneral'];
 /* 魔物專屬掉落（史詩・專屬效果） */
 Object.assign(GEAR,{
-  x_bog:{n:'毒沼結晶戒',slot:'ring',t:0,lv:3,price:600,mp:20,uq:{regen:2,thorn:10},ud:'每回合回復 2% HP，被擊中時反彈 10% 傷害',uniq:1},
+  x_bog:{n:'毒沼結晶戒',slot:'ring',t:0,lv:3,price:600,mp:20,uq:{regen:2,thorn:10},ud:'每 3 秒回復 2% HP，被擊中時反彈 10% 傷害',uniq:1},
   x_spark:{n:'雷角兔皮靴',slot:'feet',t:0,lv:4,price:700,def:6,eva:4,uq:{gale:1,eva:3},ud:'每場第一擊必中且爆擊，迴避 +3%',uniq:1},
-  x_soul:{n:'紫菇帽',slot:'head',t:1,lv:7,price:1600,def:10,mp:40,uq:{mpreg:3,magp:6},ud:'每回合回復 3 MP，魔攻 +6%',uniq:1},
+  x_soul:{n:'紫菇帽',slot:'head',t:1,lv:7,price:1600,def:10,mp:40,uq:{mpreg:3,magp:6},ud:'每 3 秒回復 3 MP，魔攻 +6%',uniq:1},
   x_shade:{n:'影狼皮甲',slot:'body',t:1,lv:9,price:1900,def:20,hp:60,uq:{eva:6,double:10},ud:'迴避 +6%，普攻 10% 機率追加一擊',uniq:1},
   x_lava:{n:'蝙蝠翼墜飾',slot:'neck',t:2,lv:12,price:3200,hp:120,cd:15,uq:{burn:20,ls:4},ud:'攻擊時 20% 機率灼燒，吸血 +4%',uniq:1},
   x_crystal:{n:'魔像的水晶',slot:'ring',t:2,lv:14,price:3600,mp:50,crit:4,uq:{shield:12,defp:8},ud:'開場護盾 12%，防禦 +8%',uniq:1},
@@ -1532,7 +1543,7 @@ if(P2){
     m_smoke:{n:'煙霧彈',self:{eva:35,t:2},hst:{weak:2},fx:'spore',c:'#a8a8a8',d:'迴避 +35%，主角攻擊下降'},
     m_oldoath:{n:'舊日劍誓',pow:1.8,pierce:.35,fx:'claw',c:'#e8d27a',d:'王國劍術，無視 35% 防禦'},
     m_shieldbash:{n:'盾牌猛擊',pow:1.2,hst:{stun:1},p:.35,fx:'slam',c:'#c9c9c9',d:'35% 機率使主角暈眩'},
-    m_thunderdive:{n:'雷霆俯衝',mag:1,pow:1.7,hst:{burn:2},fx:'beam',c:'#ffe45a',d:'帶電俯衝，灼燒 2 回合'},
+    m_thunderdive:{n:'雷霆俯衝',mag:1,pow:1.7,hst:{burn:2},fx:'beam',c:'#ffe45a',d:'帶電俯衝，灼燒 6 秒'},
     m_galewing:{n:'疾風振翼',self:{eva:30,crit:15,t:3},fx:'aura',c:'#cfe8ff',d:'迴避 +30%、爆擊 +15%'},
     m_storm:{n:'狂風三連',mag:1,pow:.7,h:3,hst:{weak:2},fx:'orb',c:'#8fdcff',d:'三道暴風，主角攻擊下降'},
     m_lightning:{n:'雷霆落擊',mag:1,pow:2.2,hst:{stun:1},p:.3,fx:'beam',c:'#ffe45a',d:'巨大落雷，30% 機率暈眩'},
@@ -1615,8 +1626,8 @@ if(P2&&P3){
   GEAR.u_archive={n:'封存司的鑰匙',slot:'neck',t:5,lv:33,price:18000,hp:420,cd:30,uq:{magp:10,atkp:10,mpcut:15},ud:'物攻與魔攻 +10%、技能 MP 消耗 -15%',uniq:1};
   BOSSU.archivist='u_archive';BGEM.archivist='gem_w';
   Object.assign(GEAR,{
-    x_ink:{n:'書蠹墨晶戒',slot:'ring',t:5,lv:30,price:12500,mp:90,crit:6,uq:{magp:8,mpreg:3},ud:'魔攻 +8%，每回合回復 3 MP',uniq:1,mx:1},
-    x_tide:{n:'積水妖的淚滴',slot:'neck',t:5,lv:31,price:13000,hp:360,cd:25,uq:{regen:3,eva:4},ud:'每回合回復 3% HP，迴避 +4%',uniq:1,mx:1},
+    x_ink:{n:'書蠹墨晶戒',slot:'ring',t:5,lv:30,price:12500,mp:90,crit:6,uq:{magp:8,mpreg:3},ud:'魔攻 +8%，每 3 秒回復 3 MP',uniq:1,mx:1},
+    x_tide:{n:'積水妖的淚滴',slot:'neck',t:5,lv:31,price:13000,hp:360,cd:25,uq:{regen:3,eva:4},ud:'每 3 秒回復 3% HP，迴避 +4%',uniq:1,mx:1},
     x_rust:{n:'鏽蝕守衛的舊盔',slot:'head',t:5,lv:32,price:13500,def:40,hp:300,uq:{thorn:15,defp:10},ud:'被擊中時反彈 15% 傷害，防禦 +10%',uniq:1,mx:1}});
   Object.assign(MDROP,{bookworm:'x_ink',waterwraith:'x_tide',rustguard:'x_rust'});
   AREAS.push({id:'archive',n:'王都地下書庫',lv:'30–33',base:30,d:'大教堂底下的舊書庫。地下水滲進來，三百年的紀錄泡在黑水裡。',mobs:['bookworm','waterwraith','rustguard'],boss:'archivist'});
@@ -1791,10 +1802,10 @@ const NST=[
 /* 露娜的職業：燈術士 */
 const LUNASK={
   bolt:{n:'魔法彈',d:'普通攻擊，射出一發魔法彈。',ok:()=>true,say:''},
-  flame:{n:'火球術',d:'每 3 回合一次，強力火焰攻擊，40% 灼燒。',ok:()=>true,say:'燒起來吧！'},
-  heal:{n:'治癒術',d:'你的 HP 低於 45% 時治療你（冷卻 3 回合）。',ok:()=>true,say:'撐住！'},
-  ward:{n:'魔法護盾',d:'看到敵人準備大招時，替你展開結界，下一次傷害 -40%（冷卻 4 回合）。',ok:()=>S.main.ch>=2||(S.bond||0)>=3,say:'躲到燈後面！',need:'第 3 章或羈絆 3'},
-  clear:{n:'驅散術',d:'敵人身上有增益或你中毒、灼燒時，削弱敵人 2 回合（冷卻 4 回合）。',ok:()=>S.main.ch>=3,say:'霧，散開！',need:'第 4 章'},
+  flame:{n:'火球術',d:'每 9 秒一次，強力火焰攻擊，40% 灼燒。',ok:()=>true,say:'燒起來吧！'},
+  heal:{n:'治癒術',d:'你的 HP 低於 45% 時治療你（冷卻 9 秒）。',ok:()=>true,say:'撐住！'},
+  ward:{n:'魔法護盾',d:'看到敵人準備大招時，替你展開結界，下一次傷害 -40%（冷卻 12 秒）。',ok:()=>S.main.ch>=2||(S.bond||0)>=3,say:'躲到燈後面！',need:'第 3 章或羈絆 3'},
+  clear:{n:'驅散術',d:'敵人身上有增益或你中毒、灼燒時，削弱敵人 6 秒（冷卻 12 秒）。',ok:()=>S.main.ch>=3,say:'霧，散開！',need:'第 4 章'},
   oath:{n:'星光爆裂',d:'奧義・每場一次。首領戰或敵人半血後發動，巨大傷害並治療你 15%。',ok:()=>(S.bond||0)>=6,say:'這盞燈，絕不熄滅！',need:'羈絆 6'}};
 /* 同行夥伴 */
 const ALLY={
@@ -2007,8 +2018,8 @@ const MSAT=[30,60];
 const MS={
   STR:[{n:'蠻力',d:'爆擊傷害 +25%',f:r=>{r.CD+=25}},{n:'碎骨',d:'攻擊有 8% 機率暈眩敵人',f:r=>{r.STUN+=8}}],
   DEX:[{n:'迅捷',d:'連擊率 +10%',f:r=>{r.DOUBLE+=10}},{n:'殘影',d:'迴避 +8%、反擊率 +15%',f:r=>{r.EVA+=8;r.BACK+=15}}],
-  INT:[{n:'博學',d:'每回合回復 2 MP',f:r=>{r.MPREG+=2}},{n:'過載',d:'魔法攻擊 +12%',f:r=>{r.MAG=Math.round(r.MAG*1.12)}}],
-  VIT:[{n:'鐵壁',d:'反彈 10% 受到的傷害',f:r=>{r.THORN+=10}},{n:'不屈',d:'最大 HP +12%、每回合多回 1.5% HP',f:r=>{r.HP=Math.round(r.HP*1.12);r.REGEN+=1.5}}],
+  INT:[{n:'博學',d:'每 3 秒回復 2 MP',f:r=>{r.MPREG+=2}},{n:'過載',d:'魔法攻擊 +12%',f:r=>{r.MAG=Math.round(r.MAG*1.12)}}],
+  VIT:[{n:'鐵壁',d:'反彈 10% 受到的傷害',f:r=>{r.THORN+=10}},{n:'不屈',d:'最大 HP +12%、每 3 秒多回 1.5% HP',f:r=>{r.HP=Math.round(r.HP*1.12);r.REGEN+=1.5}}],
   LUK:[{n:'強運',d:'爆擊率 +6%',f:r=>{r.CRIT+=6}},{n:'奇蹟',d:'擊倒敵人回復 5% HP 與 MP',f:r=>{r.REAP+=5}}]
 };
 function stats(){const e=gearTotals(),a={},c=CLS[S.cls],v=k=>e[k]||0,p=k=>1+v(k)/100;for(const k in ATTR)a[k]=S.attr[k]+v(k);
@@ -2023,10 +2034,10 @@ const RZ={
   stun:{n:'震擊',ic:'💫',i:'對暈眩中的敵人傷害 +30%',ii:'首領不再抵抗震擊，暈眩結束時追加一次重擊'},
   ls:{n:'吸血',ic:'🩸',i:'滿血時吸到的血轉為護盾（最多 20% HP）',ii:'HP 低於一半時吸血量 ×2'},
   guard:{n:'守護',ic:'🛡',i:'守護觸發時立刻反擊（50% 攻擊力）',ii:'防禦指令額外回復 8% HP，且下次攻擊 +30%'},
-  shield:{n:'先機',ic:'✦',i:'護盾還在時傷害 +15%',ii:'每 4 回合重新獲得一半的開場護盾'},
+  shield:{n:'先機',ic:'✦',i:'護盾還在時傷害 +15%',ii:'每 12 秒重新獲得一半的開場護盾'},
   back:{n:'絕境',ic:'💢',i:'觸發門檻從 35% 提高到 50% HP',ii:'每場戰鬥一次，致命傷改為留下 1 HP'},
   thorn:{n:'荊棘',ic:'🌵',i:'反彈傷害可以擊倒敵人',ii:'反彈比例 ×1.5，防禦時再 ×2'},
-  gale:{n:'疾風',ic:'🌪',i:'前兩次攻擊必定命中且爆擊',ii:'之後每 4 回合再觸發一次'},
+  gale:{n:'疾風',ic:'🌪',i:'前兩次攻擊必定命中且爆擊',ii:'之後每 12 秒再觸發一次'},
   reap:{n:'收割',ic:'🌾',i:'收割回復量 ×2，殘血的敵人更痛',ii:'擊倒敵人後，下一招技能不消耗 MP'}};
 /* 套裝已併入流派：原本的套裝標記換成對應的詞綴（一件一個詞綴，湊 2、3 件觸發共鳴） */
 const SETKW={輕裝:'gale',森林:'ls',火山:'burn',雪地:'thorn',遠征隊:'shield',劍士:'guard',法師:'burn',弓手:'double',祭司:'reap',雷擊:'stun',書庫:'back'};
@@ -2043,16 +2054,16 @@ const mpCost=k=>Math.max(1,Math.round(SK[k].mp*(1-stats().MPCUT/100)));
 function clamp(){const s=stats();S.hp=Math.min(S.hp,s.HP);S.mp=Math.min(S.mp,s.MP)}
 /* 共鳴改寫技能：同一種詞綴湊到 2 件，就會改寫符合條件的招式（詞綴只出現在稀有以上裝備） */
 const SKX={
-  burn:{d:'傷害招式附帶灼燒 2 回合',ok:k=>k.dmg&&!(k.foe&&k.foe.burn),f:k=>{k.foe=Object.assign({},k.foe,{burn:2})}},
+  burn:{d:'傷害招式附帶灼燒 6 秒',ok:k=>k.dmg&&!(k.foe&&k.foe.burn),f:k=>{k.foe=Object.assign({},k.foe,{burn:2})}},
   double:{d:'多段招式多打一段',ok:k=>k.dmg&&k.dmg.h>=2,f:k=>{k.dmg=Object.assign({},k.dmg,{h:k.dmg.h+1})}},
-  stun:{d:'奧義附帶暈眩 1 回合',ok:k=>k.ult&&k.dmg,f:k=>{k.foe=Object.assign({},k.foe,{stun:1})}},
+  stun:{d:'奧義附帶暈眩 3 秒',ok:k=>k.ult&&k.dmg,f:k=>{k.foe=Object.assign({},k.foe,{stun:1})}},
   ls:{d:'清算／引爆類招式吸取 20% 傷害',ok:k=>k.dmg&&(k.fin||k.det||k.aim||k.faithSpend),f:k=>{k.drain=(k.drain||0)+.2}},
-  guard:{d:'強化類招式多維持 1 回合',ok:k=>k.buff,f:k=>{k.buff=Object.assign({},k.buff,{t:k.buff.t+1})}},
+  guard:{d:'強化類招式多維持 3 秒',ok:k=>k.buff,f:k=>{k.buff=Object.assign({},k.buff,{t:k.buff.t+1})}},
   shield:{d:'治療、強化、護盾招式額外獲得 8% HP 護盾',ok:k=>k.heal||k.buff||k.shield,f:k=>{k.shp=.08}},
   back:{d:'HP 低於一半時，單發招式威力 +25%',ok:k=>k.dmg&&!k.dmg.h,f:k=>{k.backp=.25}},
-  thorn:{d:'招架類招式同時防禦 +30%（2 回合）',ok:k=>k.counter&&!k.buff,f:k=>{k.buff={def:.3,t:2}}},
+  thorn:{d:'招架類招式同時防禦 +30%（6 秒）',ok:k=>k.counter&&!k.buff,f:k=>{k.buff={def:.3,t:2}}},
   gale:{d:'單發招式爆擊率 +15%',ok:k=>k.dmg&&!k.dmg.h,f:k=>{k.dmg=Object.assign({},k.dmg,{cr:(k.dmg.cr||0)+15})}},
-  reap:{d:'招式造成的異常狀態多 1 回合',ok:k=>k.foe&&Object.keys(k.foe).some(f=>f!=='stun'),f:k=>{const o={};for(const f in k.foe)o[f]=k.foe[f]+(f==='stun'?0:1);k.foe=o}}
+  reap:{d:'招式造成的異常狀態多 3 秒',ok:k=>k.foe&&Object.keys(k.foe).some(f=>f!=='stun'),f:k=>{const o={};for(const f in k.foe)o[f]=k.foe[f]+(f==='stun'?0:1);k.foe=o}}
 };
 const skxOn=(id,c)=>Object.keys(SKX).filter(w=>(c[w]||0)>=2&&SKX[w].ok(SK[id]));
 function skx(id,c){c=c||kwCount();const on=skxOn(id,c);if(!on.length)return SK[id];const k=Object.assign({},SK[id]);for(const w of on)SKX[w].f(k);k.xw=on;return k}
@@ -2378,7 +2389,7 @@ function vAreas(){return `<h2>選擇冒險地點</h2>`+vGift()+vIdle()+vDg()+ARE
   ${open?`<div class="row"><button class="btn pri grow" data-a="startRun" data-v="${i}">出發冒險</button>${S.cleared[i]?`<button class="btn grow" data-a="startNm" data-v="${i}" style="background:linear-gradient(#5a2a4a,#2a1430);color:#ffb3d0;border-color:#a04a7a">惡夢 Lv${AREAS[i].base+10}+</button>`:''}</div>${S.cleared[i]?'<p class="sub">惡夢模式：怪物 +10 級並帶詞綴，掉寶更好。</p>':''}`:`<button class="btn" disabled>完成${CH[i-1].t.slice(0,3)}後開放</button>`}</div>`}).join('')+vTowerCard()}
 function vTowerCard(){if(!towerOpen())return `<div class="panel area lock"><div class="row"><h3 class="grow">霧淵</h3></div><button class="btn" disabled>完成第三章後開放</button></div>`;const W=abWeek(),A=abSt();return `<div class="panel area" style="border-color:var(--r3)">${art('area_tower','霧淵')}<div class="row"><h3 class="grow">霧淵</h3><span class="tag red">每週更換</span></div><p class="sub">本週　${ABB[W.b].n}・${TRX(W.a).n}　｜　最深 第 ${A.best} 層　｜　剩 ${abDays()} 天</p><button class="btn pri" data-a="startTower">走進霧淵</button></div>`}
 /* 首領前哨的戰前準備：三選一，各有代價 */
-const PREP={scout:{n:'🔭 偵察動向',d:'摸清首領的習慣，開戰時首領 HP -12%'},trap:{n:'🪤 布置陷阱',d:'用一瓶治療藥水當誘餌，首領開場中毒 4 回合、攻擊下降 2 回合'},camp:{n:'🔥 營火調息',d:'免費回復 30% HP／MP，但火光驚動首領：攻擊 +12%'}};
+const PREP={scout:{n:'🔭 偵察動向',d:'摸清首領的習慣，開戰時首領 HP -12%'},trap:{n:'🪤 布置陷阱',d:'用一瓶治療藥水當誘餌，首領開場中毒 12 秒、攻擊下降 6 秒'},camp:{n:'🔥 營火調息',d:'免費回復 30% HP／MP，但火光驚動首領：攻擊 +12%'}};
 const prepCost=L=>20+L*8;
 const BBOX={gold:{n:'👑 金冠寶箱',d:'穩穩到手：大把金幣＋強化石×1'},blue:{n:'💠 蒼紋寶箱',d:'一件稀有以上裝備，12% 升為史詩'},seal:{n:'⛓️ 封印寶箱',d:'賭一把：17% 史詩裝備，否則落空'}};
 /* 霧核：中段強敵掉落，三選一，本趟冒險生效（RUN.core）。改變打法而不是單純加數值 */
@@ -2386,12 +2397,12 @@ const MCORE={fang:{i:'⚡',n:'獵牙霧核',d:'敵人 HP 高於 70% 時，你的
   exec:{i:'🗡',n:'斷罪霧核',d:'敵人 HP 低於 35% 時，你的傷害 +40%',tip:'收尾、連擊流',d2:'敵人 HP 低於 35% 時，你的傷害 +60%'},
   blood:{i:'💢',n:'沸血霧核',d:'自己 HP 低於一半時，你的傷害 +35%',tip:'絕境流、吸血流',d2:'自己 HP 低於一半時，你的傷害 +50%'},
   wall:{i:'🛡',n:'磐石霧核',d:'每場戰鬥開始，獲得最大 HP 20% 的護盾',tip:'先機流、守護流',d2:'每場戰鬥開始，獲得最大 HP 32% 的護盾'},
-  flow:{i:'💧',n:'湧泉霧核',d:'每回合結束回復 6% MP',tip:'技能連發',d2:'每回合結束回復 10% MP'},
-  ember:{i:'🔥',n:'餘燼霧核',d:'每場戰鬥開始，敵人灼燒 3 回合、虛弱 2 回合',tip:'烈焰流、剋制會再生的對手',d2:'每場戰鬥開始，敵人灼燒 5 回合、虛弱 3 回合'},
+  flow:{i:'💧',n:'湧泉霧核',d:'每 3 秒回復 6% MP',tip:'技能連發',d2:'每 3 秒回復 10% MP'},
+  ember:{i:'🔥',n:'餘燼霧核',d:'每場戰鬥開始，敵人灼燒 9 秒、虛弱 6 秒',tip:'烈焰流、剋制會再生的對手',d2:'每場戰鬥開始，敵人灼燒 15 秒、虛弱 9 秒'},
   greed:{i:'💰',n:'貪婪霧核',d:'金幣 +60%、裝備掉落提升；但敵人攻擊 +15%',tip:'有把握再拿',d2:'金幣 +100%、裝備掉落提升；但敵人攻擊 +15%'},
   crack:{i:'🕸',n:'裂紋霧核',d:'敵人身上每有一種異常狀態（灼燒、中毒、流血、虛弱、暈眩），你的傷害 +12%',tip:'烈焰流、毒、控場',d2:'敵人身上每有一種異常狀態（灼燒、中毒、流血、虛弱、暈眩），你的傷害 +18%'},
   temper:{i:'⚒',n:'淬鍊霧核',d:'下一場戰鬥敵人攻擊 +25%；撐過之後，你的傷害 +25%，且每場開場回復 15% HP',tip:'先苦後甘，後面還有路時',d2:'下一場戰鬥敵人攻擊 +25%；撐過之後，你的傷害 +35%，且每場開場回復 22% HP'},
-  breaker:{i:'💥',n:'破勢霧核',d:'打斷首領蓄力所需的傷害 -30%；打斷成功後首領多暈眩 1 回合',tip:'爆發流、準備挑戰首領時',d2:'打斷首領蓄力所需的傷害 -45%；打斷成功後首領多暈眩 1 回合'},
+  breaker:{i:'💥',n:'破勢霧核',d:'打斷首領蓄力所需的傷害 -30%；打斷成功後首領多暈眩 3 秒',tip:'爆發流、準備挑戰首領時',d2:'打斷首領蓄力所需的傷害 -45%；打斷成功後首領多暈眩 3 秒'},
   shatter:{i:'✴',n:'崩解霧核',d:'每命中敵人 5 下（多段招式每段都算）就打出「崩解」：你的下一次行動傷害 +50%',tip:'連擊流、多段招式',d2:'每命中敵人 4 下（多段招式每段都算）就打出「崩解」：你的下一次行動傷害 +50%'}};
 /* 霧核與流派的契合：依目前的共鳴、招式與職業判斷，選擇畫面標出來，全自動優先拿 */
 const coreFit=k=>{try{const s=stats(),K=s.KW||{},g=x=>(K[x]||0)>=2,sk=battleSkills().filter(x=>SK[x].dmg),mh=sk.some(x=>(SK[x].dmg.h||1)>=2);return k==='fang'?g('gale'):k==='exec'?g('reap')||g('double'):k==='blood'?g('back')||g('ls'):k==='wall'?g('shield')||g('guard')||g('thorn'):k==='ember'?g('burn'):k==='crack'?g('burn')||g('stun'):k==='shatter'?mh||g('double'):k==='breaker'?sk.some(x=>SK[x].dmg.p*(SK[x].dmg.h||1)>=2.4):k==='flow'?CLS[S.cls].basic==='MAG':false}catch(e){return false}};
@@ -2553,7 +2564,7 @@ function vChar(){const s=stats(),sc=setCounts();
    <div class="cy-pw"><span>戰力</span><b>${power()}</b></div>${radar}</div>
    <div class="cy-bars">${gauge('hp',S.hp,s.HP)}${gauge('mp',S.mp,s.MP)}${gauge('exp',S.exp,need(S.lv))}</div>
    <div class="cy-grid">${mg?cell('魔法攻擊',s.MAG,'main')+cell('物理攻擊',s.ATK):cell('物理攻擊',s.ATK,'main')+cell('魔法攻擊',s.MAG)}${cell('防禦',s.DEF)}${cell('魔抗',s.MRES)}${cell('爆擊',s.CRIT+'%')}${cell('爆傷',s.CD+'%')}${cell('迴避',s.EVA+'%')}${cell('吸血',s.LS+'%')}</div>
-   ${s.RF||s.RI||s.RT||s.RD?`<div class="cy-res"><span>火 ${s.RF}%</span><span>冰 ${s.RI}%</span><span>雷 ${s.RT}%</span><span>暗 ${s.RD}%</span></div>`:''}</div>`:CTAB==='build'?`${buildPanel()}<div class="panel"><h3>職業特色</h3><p class="sub">${CLS[S.cls].f}</p><div class="gsec"><b>目前打法：${STN[S.cls][stn()].n}</b><span class="sub">${STN[S.cls][stn()].d}</span><span class="sub" style="opacity:.7">裝備的共鳴會影響打法。</span></div>${Object.keys(PASS).filter(id=>PASS[id].c===S.cls||PASS[id].c===S.adv).map(id=>`<span class="subl row ${hasP(id)?'':'sub'}" style="gap:6px"><span class="ico c4" style="width:30px;height:30px">${icon('pass_'+id,ic('skill'))}</span><span class="grow">被動【${PASS[id].n}】Lv.${PASS[id].lv}：${PASS[id].d}${PASS[id].sx?PASS[id].sx.map((x,i)=>`<br><span style="${stn()===i?'color:var(--r4);font-weight:700':'opacity:.6'}">${stn()===i?'✔ ':''}${STN[S.cls][i].n}：${x.d}</span>`).join(''):''}</span></span>`).join('')}${S.adv?`<p class="sub">${ADV[S.adv].n}：${ADV[S.adv].d}</p>`:''}</div>`:CTAB==='attr'?`<div class="panel"><h3>屬性　<span class="tag ${S.pts?'red':'off'}">可用 ${S.pts} 點</span><button class="btn sm" style="float:right" data-a="respec">重置（${respecCost()} G）</button></h3>${Object.keys(ATTR).map(k=>`<div class="attr"><span><b class="cy-k">${k}</b> ${ATTR[k]}<span class="sub">　${{STR:'物理攻擊',DEX:'迴避・爆擊・連擊',INT:'魔力・MP・技能省 MP',VIT:'HP・防禦・每回合回血',LUK:'爆擊・爆傷・掉寶・金幣'}[k]}</span></span><b>${S.attr[k]}${s.A[k]>S.attr[k]?`<small class="up">+${s.A[k]-S.attr[k]}</small>`:''}</b><button class="btn sm" data-a="addPt" data-v="${k}" ${S.pts?'':'disabled'}>＋</button></div><div class="cy-ab"><u style="width:${Math.min(100,s.A[k]/75*100)}%"></u></div>`).join('')}</div>`:CTAB==='gear'?`<div class="panel"><h3>裝備</h3>${eq}<p class="sub" style="text-align:center">點部位查看裝備詳細資料</p>${setHtml}</div>`:CTAB==='ally'?`${Object.keys(ALLY).some(k=>ALLY[k].open())?`<div class="panel"><h3>同行夥伴</h3><div class="party">${[...Object.keys(ALLY).filter(k=>ALLY[k].open()),'none'].map(k=>`<button class="btn ${(S.party||'none')===k?'on':''}" data-a="setParty" data-v="${k}">${k==='none'?'<b>獨自冒險</b><span class="sub">不帶夥伴</span>':`${art(ALLY[k].img,ALLY[k].n,'r11','mini')}<b>${ALLY[k].n}</b><span class="sub">${ALLY[k].role}</span>`}</button>`).join('')}</div><p class="sub">${S.party&&S.party!=='none'?ALLY[S.party].d+(S.party==='luna'?'　羈絆越高，露娜越強。':''):'沒有夥伴同行。'}</p>${S.party==='luna'?`<div class="gsec"><b>露娜・燈術士　羈絆 ${Math.floor(S.bond||0)}</b><span class="sub">下一級進度 ${Math.round(((S.bond||0)%1)*100)}%・今日已累積 ${(S.daily&&S.daily.bond||0).toFixed(2)}／1.5（一起冒險、打首領、營火閒聊）</span>${Object.values(LUNASK).map(k=>`<span class="sub ${k.ok()?'son':''}">${k.ok()?'◆':'◇'} 【${k.n}】${k.d}${k.ok()?'':`（解鎖：${k.need}）`}</span>`).join('')}</div>`:''}</div>`:''}`:`<div class="panel"><h3>技能　<span class="tag ${S.sp?'red':'off'}">技能點 ${S.sp}</span></h3><div class="list">${sk}</div>${nxt?`<div class="chips">${nxt}</div>`:''}</div>`;
+   ${s.RF||s.RI||s.RT||s.RD?`<div class="cy-res"><span>火 ${s.RF}%</span><span>冰 ${s.RI}%</span><span>雷 ${s.RT}%</span><span>暗 ${s.RD}%</span></div>`:''}</div>`:CTAB==='build'?`${buildPanel()}<div class="panel"><h3>職業特色</h3><p class="sub">${CLS[S.cls].f}</p><div class="gsec"><b>目前打法：${STN[S.cls][stn()].n}</b><span class="sub">${STN[S.cls][stn()].d}</span><span class="sub" style="opacity:.7">裝備的共鳴會影響打法。</span></div>${Object.keys(PASS).filter(id=>PASS[id].c===S.cls||PASS[id].c===S.adv).map(id=>`<span class="subl row ${hasP(id)?'':'sub'}" style="gap:6px"><span class="ico c4" style="width:30px;height:30px">${icon('pass_'+id,ic('skill'))}</span><span class="grow">被動【${PASS[id].n}】Lv.${PASS[id].lv}：${PASS[id].d}${PASS[id].sx?PASS[id].sx.map((x,i)=>`<br><span style="${stn()===i?'color:var(--r4);font-weight:700':'opacity:.6'}">${stn()===i?'✔ ':''}${STN[S.cls][i].n}：${x.d}</span>`).join(''):''}</span></span>`).join('')}${S.adv?`<p class="sub">${ADV[S.adv].n}：${ADV[S.adv].d}</p>`:''}</div>`:CTAB==='attr'?`<div class="panel"><h3>屬性　<span class="tag ${S.pts?'red':'off'}">可用 ${S.pts} 點</span><button class="btn sm" style="float:right" data-a="respec">重置（${respecCost()} G）</button></h3>${Object.keys(ATTR).map(k=>`<div class="attr"><span><b class="cy-k">${k}</b> ${ATTR[k]}<span class="sub">　${{STR:'物理攻擊',DEX:'迴避・爆擊・連擊',INT:'魔力・MP・技能省 MP',VIT:'HP・防禦・每 3 秒回血',LUK:'爆擊・爆傷・掉寶・金幣'}[k]}</span></span><b>${S.attr[k]}${s.A[k]>S.attr[k]?`<small class="up">+${s.A[k]-S.attr[k]}</small>`:''}</b><button class="btn sm" data-a="addPt" data-v="${k}" ${S.pts?'':'disabled'}>＋</button></div><div class="cy-ab"><u style="width:${Math.min(100,s.A[k]/75*100)}%"></u></div>`).join('')}</div>`:CTAB==='gear'?`<div class="panel"><h3>裝備</h3>${eq}<p class="sub" style="text-align:center">點部位查看裝備詳細資料</p>${setHtml}</div>`:CTAB==='ally'?`${Object.keys(ALLY).some(k=>ALLY[k].open())?`<div class="panel"><h3>同行夥伴</h3><div class="party">${[...Object.keys(ALLY).filter(k=>ALLY[k].open()),'none'].map(k=>`<button class="btn ${(S.party||'none')===k?'on':''}" data-a="setParty" data-v="${k}">${k==='none'?'<b>獨自冒險</b><span class="sub">不帶夥伴</span>':`${art(ALLY[k].img,ALLY[k].n,'r11','mini')}<b>${ALLY[k].n}</b><span class="sub">${ALLY[k].role}</span>`}</button>`).join('')}</div><p class="sub">${S.party&&S.party!=='none'?ALLY[S.party].d+(S.party==='luna'?'　羈絆越高，露娜越強。':''):'沒有夥伴同行。'}</p>${S.party==='luna'?`<div class="gsec"><b>露娜・燈術士　羈絆 ${Math.floor(S.bond||0)}</b><span class="sub">下一級進度 ${Math.round(((S.bond||0)%1)*100)}%・今日已累積 ${(S.daily&&S.daily.bond||0).toFixed(2)}／1.5（一起冒險、打首領、營火閒聊）</span>${Object.values(LUNASK).map(k=>`<span class="sub ${k.ok()?'son':''}">${k.ok()?'◆':'◇'} 【${k.n}】${k.d}${k.ok()?'':`（解鎖：${k.need}）`}</span>`).join('')}</div>`:''}</div>`:''}`:`<div class="panel"><h3>技能　<span class="tag ${S.sp?'red':'off'}">技能點 ${S.sp}</span></h3><div class="list">${sk}</div>${nxt?`<div class="chips">${nxt}</div>`:''}</div>`;
   return `<div class="cyb">${tabs}${sec}</div>`}
 function buildPanel(){const c=kwCount(),ks=Object.keys(RZ).filter(k=>c[k]),nm=buildName(c);
   return `<div class="panel bld"><h3>我的流派　${nm?`<span class="tag red">${nm}</span>`:'<span class="tag off">尚未成形</span>'}</h3>
@@ -2638,7 +2649,7 @@ const MV={
     return{t:B.name+'（暫停中）',b:`<p class="sub" style="text-align:center">戰鬥已暫停，關閉後繼續</p>${B.kind==='boss'?`<div class="gsec"><b class="c3">寶石掉落：${BGEM[B.id]?ITEMS[BGEM[B.id]].n+'（'+ITEMS[BGEM[B.id]].d.replace('鑲嵌寶石：','')+'）':'五種寶石隨機'}</b></div>`:''}${MDROP[B.id]?`<div class="gsec"><b class="c3">專屬掉落：${GEAR[MDROP[B.id]].n}</b><span class="sub">${GEAR[MDROP[B.id]].ud}</span></div>`:''}<div class="chips">${stc}</div><div class="panel"><div class="row"><div style="width:96px;flex:none">${art('mob_'+B.id,m.n,'r11')}</div><div class="grow"><b>Lv${B.L}　${MTY[m.ty].n}${B.kind==='boss'?'　<span class="tag red">首領</span>':''}</b>
       <div class="sub">HP ${B.hp}/${B.max}　攻擊 ${B.atk}　魔力 ${B.mag}　防禦 ${B.def}　魔抗 ${B.mres??B.def}</div>
       ${e?`<div class="sub">弱點：<b style="color:#ffd34a">${ELN[e[0]]}</b>（傷害 ×1.5）${e[1]?`　抗性：<b>${ELN[e[1]]}</b>（傷害 ×0.6）`:''}</div>`:''}
-      <div class="sub">${{tank:'防禦高，用魔法打比較痛',caster:'魔抗高，用物理打比較痛',brute:'防禦略高於魔抗',swift:'迴避高，物理魔法都可以'}[m.ty]}</div></div></div></div>
+      <div class="sub">${{tank:'重甲：出手最慢，防禦高、魔抗低',caster:'施法：詠唱久，招式多半是魔法，魔法無法格擋',brute:'蠻力：出手慢，一擊很重',swift:'迅捷：出手快，普攻後會追擊，迴避高'}[m.ty]}</div></div></div></div>
       <div class="panel"><h3>招牌技能</h3><div class="list">${(m.sk||[]).map(k=>SKM[k]?`<div class="item"><span class="grow"><b>${SKM[k].n}</b><span class="sub">${SKM[k].d}</span></span></div>`:'').join('')}</div>${B.kind==='boss'?'<p class="sub">首領會不時蓄力放出大招。半血時會張開護盾。</p>':''}</div>
       ${B.aff&&B.aff.length?`<div class="panel"><h3>詞綴</h3>${B.aff.map(x=>`<div class="sub"><b>${AFF[x].n}</b>　${AFF[x].d}</div>`).join('')}</div>`:''}
       <button class="btn big" data-a="closeM">返回戰鬥</button>`}},
@@ -3232,7 +3243,7 @@ const TIPS={
   quest:['任務','主線推進劇情與地區；人物故事是鎮民的支線劇情；每日任務每天重置。'],
   adv:['冒險','選一個地區出發。每段路會遇到戰鬥、事件或岔路，終點是精英或首領。'],
   fork:['岔路','兩條路二選一。戰鬥拿經驗，寶箱和商人拿資源，營地回血，祭壇給整趟的祝福。'],
-  battle:['戰鬥','行動條跑滿就能出手。敵人亮紅圈是在出招：格擋可以擋下並反擊，閃避可以躲開，防禦可以減傷。打不贏可以開「自動」。'],
+  battle:['戰鬥','行動條跑滿就能出手。敵人亮紅圈是在出招：格擋可以擋下並反擊，閃避可以躲開，防禦可以減傷。魔法無法格擋，毀滅一擊無法閃避。上方可以開「自動」。'],
   event:['事件檢定','擲 d20＋屬性修正，大於等於難度就成功。屬性越高，相關選項越容易過。'],
   char:['角色','升級拿到的屬性點和技能點在這裡分配。裝備點下去可以看詳情、更換。'],
   smith:['鐵匠鋪','強化提升主屬性，+10 以後失敗會掉級。用不到的裝備可以分解成星塵，拿去洗練詞條或合成。'],
@@ -3255,6 +3266,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'17.1',d:'2026-11-27',t:'戰鬥演出與魔物型態',b:'「全自動」拿掉了，只留戰鬥裡的自動。招式特效回來了，順序改成：招式名 → 特效 → 命中時數字、震動、血條一起動。橫幅大字換新字體。魔物分四種型態：迅捷出手快會追擊、蠻力慢而重、重甲最慢、施法詠唱久。魔法無法格擋；毀滅一擊無法閃避；格擋重招會讓對方踉蹌。狀態時間改用秒計算，說明文字一併更新。'},
   {v:'17.0',d:'2026-11-26',t:'戰鬥改成即時制',b:'行動條跑滿就能出手，敵人亮紅圈時是在出招。新增「閃避」與「格擋」：閃避整招躲開，格擋擋下並反擊。戰鬥畫面換成新版面，上方可以切換自動、速度與暫停。電腦可用鍵盤：Z 攻擊、X 防禦、C 閃避、空白鍵格擋、數字鍵放技能、P 暫停。'},
   {v:'16.3',d:'2026-11-26',t:'修正星象台',b:'星象台打不開的問題修好了。'},
   {v:'16.2',d:'2026-11-26',t:'開測準備',b:'排行榜不再出現同一個人的多筆紀錄。遊戲會回傳匿名的進度（隨機代號、章節、等級），用來調整難度。'},
@@ -3443,17 +3455,17 @@ function mkFoe(id,kind){const m=MOBS[id],bs=!!m.boss,el=kind==='elite',nm=!!(RUN
 /* 依玩家實力調整魔物：只在玩家太強、會一擊秒殺時才加強，前期不受影響 */
 function hitEst(def){const s=stats(),P=Math.max(s.ATK,s.MAG),best=Math.max(1,...battleSkills().map(k=>{const d=SK[k].dmg;return d?d.p*(d.h||1):0})),cr=1+Math.min(1,s.CRIT/100)*Math.max(0,s.CD/100-1);return clsDm()*P*best*100/(100+def)*cr}
 function rareFoe(){const r=Math.random();
-  if(r<.04){B.treasure=1;B.name='黃金'+B.m.n;B.hp=B.max=Math.round(B.max*1.5);B.def=Math.round(B.def*1.5);B.gmul=(B.gmul||1)*6;B.xmul=(B.xmul||1)*2;B.hoard=1;B.log.push('✨ 閃閃發亮的寶藏魔物！牠 3 回合後就會逃走，快打倒牠！')}
+  if(r<.04){B.treasure=1;B.name='黃金'+B.m.n;B.hp=B.max=Math.round(B.max*1.5);B.def=Math.round(B.def*1.5);B.gmul=(B.gmul||1)*6;B.xmul=(B.xmul||1)*2;B.hoard=1;B.log.push('✨ 閃閃發亮的寶藏魔物！牠 15 秒後就會逃走，快打倒牠！')}
   else if(r<.07){B.wander=1;B.kind='elite';B.name='【徘徊強敵】'+B.m.n;B.hp=B.max=Math.round(B.max*2.6);B.atk=Math.round(B.atk*1.45);B.mag=Math.round(B.mag*1.45);B.gmul=(B.gmul||1)*2.5;B.xmul=(B.xmul||1)*2.5;B.hoard=1;B.log.push('⚠ 一股危險的氣息逼近……這不是普通的魔物！');setTimeout(()=>{try{talk('boss',1)}catch(e){}},1400)}}
 function scaleFoe(){if(!B||B.id==='shadow')return;{const ar=RUN?RUN.area:0,bs=B.kind==='boss',el=B.kind==='elite';B.tough=Math.round(ar*4+(el?8:0)+(bs?15:0)+(RUN&&RUN.nm?10:0));B.cdr=Math.min(.6,.05+ar*.06+(el?.1:0)+(bs?.15:0)+(RUN&&RUN.nm?.1:0))}const mul=B.kind==='boss'?7:B.kind==='elite'?3.5:2.2,fl=hitEst(B.def)*mul,m=fl/B.max;
   if(m>1.25&&S.lv>=8){const k=Math.min(6,m);B.hp=B.max=Math.round(B.max*k);const a=B.kind==='boss'?Math.min(1.9,1+(k-1)*.4):Math.min(1.5,1+(k-1)*.3);B.atk=Math.round(B.atk*a);B.mag=Math.round(B.mag*a);B.xmul=(B.xmul||1)*Math.min(1.6,1+(k-1)*.25);B.gmul=(B.gmul||1)*Math.min(1.6,1+(k-1)*.25);B.str=1;B.tough+=10;B.cdr=Math.min(.7,B.cdr+.1);B.log.push('⚡ 牠感受到你的力量，變得更加凶猛！（強敵化：經驗與金幣增加）')}
   (B.adds||[]).forEach(f=>{const fl2=hitEst(f.def)*1.6;if(S.lv>=8&&fl2>f.max*1.25){const k=Math.min(5,fl2/f.max);f.hp=f.max=Math.round(f.max*k);f.atk=Math.round(f.atk*Math.min(1.4,1+(k-1)*.25))}})}
 
 /* ===== 首領特性：惡夢與高塔的首領每週輪換一種特性，要換流派來攻略 ===== */
-const BTRAIT={iron:{n:'鋼皮',d:'沒有暈眩時受到的傷害 -35%',tip:'震擊流、控場'},undying:{n:'不死',d:'每回合回復 5% HP；灼燒或中毒時無法再生',tip:'烈焰流、毒'},ward:{n:'魔障',d:'魔法傷害 -40%；被爆擊後魔障破除 2 回合',tip:'物理、疾風流、高爆擊'},enrage:{n:'狂怒',d:'第 8 回合起攻擊 +80%',tip:'速攻、連擊流'},spike:{n:'尖刺',d:'每次受到攻擊反彈 20% 傷害',tip:'吸血流、先機護盾、守護'}};
+const BTRAIT={iron:{n:'鋼皮',d:'沒有暈眩時受到的傷害 -35%',tip:'震擊流、控場'},undying:{n:'不死',d:'每 3 秒回復 5% HP；灼燒或中毒時無法再生',tip:'烈焰流、毒'},ward:{n:'魔障',d:'魔法傷害 -40%；被爆擊後魔障破除 6 秒',tip:'物理、疾風流、高爆擊'},enrage:{n:'狂怒',d:'開戰 24 秒後攻擊 +80%',tip:'速攻、連擊流'},spike:{n:'尖刺',d:'每次受到攻擊反彈 20% 傷害',tip:'吸血流、先機護盾、守護'}};
 const weekNo=()=>Math.floor((Date.now()/864e5+3)/7);
 /* 霧紋：冒險中段強敵的特性，出發時就公布，考驗不同打法 */
-const ETRAIT={cleanse:{n:'淨化',d:'每回合清掉異常並回血',tip:'直接傷害、爆發'},summon:{n:'召喚',d:'會叫幫手',tip:'範圍技能、速戰速決'},grove:{n:'古林',d:'淨化、回血，還會叫幫手',tip:'爆發、範圍、先清小怪'},plate:{n:'疊甲',d:'同一回合內每被打中一次，之後受到的傷害 -15%（最多 -60%），下回合重置',tip:'單發重擊、灼燒與中毒'},veil:{n:'霧隱',d:'每回合第一次受到的攻擊傷害減半；身上有灼燒、中毒或流血時霧隱失效',tip:'多段攻擊、持續傷害'},grudge:{n:'記仇',d:'HP 每少 25%，攻擊 +12%（最多 +36%）',tip:'爆發收尾、虛弱、留防禦到最後'},swell:{n:'漲潮',d:'每過一回合，攻擊 +12%（最多 +72%）',tip:'速戰速決、開場爆發、奇襲'},rebound:{n:'反震',d:'一擊打太重會震回你身上',tip:'多段攻擊、連擊、持續傷害'}};
+const ETRAIT={cleanse:{n:'淨化',d:'每 3 秒清掉異常並回血',tip:'直接傷害、爆發'},summon:{n:'召喚',d:'會叫幫手',tip:'範圍技能、速戰速決'},grove:{n:'古林',d:'淨化、回血，還會叫幫手',tip:'爆發、範圍、先清小怪'},plate:{n:'疊甲',d:'3 秒內每被打中一次，之後受到的傷害 -15%（最多 -60%），之後重置',tip:'單發重擊、灼燒與中毒'},veil:{n:'霧隱',d:'每 3 秒第一次受到的攻擊傷害減半；身上有灼燒、中毒或流血時霧隱失效',tip:'多段攻擊、持續傷害'},grudge:{n:'記仇',d:'HP 每少 25%，攻擊 +12%（最多 +36%）',tip:'爆發收尾、虛弱、留防禦到最後'},swell:{n:'漲潮',d:'每過 3 秒，攻擊 +12%（最多 +72%）',tip:'速戰速決、開場爆發、奇襲'},rebound:{n:'反震',d:'一擊打太重會震回你身上',tip:'多段攻擊、連擊、持續傷害'}};
 const TRT=k=>BTRAIT[k]||ETRAIT[k];
 const trIc=(k,z)=>('icon_trait_'+k) in ATL?`<i class="bi at" style="width:${z||18}px;height:${z||18}px;margin-right:3px;vertical-align:middle;background-position:${(ATL['icon_trait_'+k]%ATC)/(ATC-1)*100}% ${Math.floor(ATL['icon_trait_'+k]/ATC)/(ATR-1)*100}%"></i>`:'⚠ ';
 const grudgeM=()=>B&&B.trait==='grudge'?1+.12*Math.min(3,Math.floor((1-B.hp/B.max)/.25+1e-9)):B&&B.trait==='swell'?1+.12*Math.min(6,Math.max(0,B.turn-1)):1;
@@ -3519,13 +3531,13 @@ const basicEl=()=>({swordsman:'phys',dual:'phys',ranger:'phys',mage:'arcane',cle
 const capB=d=>{if(!B||B.kind!=='boss')return d;const lim=B.max,r=Math.max(1,Math.min(d,lim-(B.tk||0)));B.tk=(B.tk||0)+r;return r};
 function bossPhase(){if(B&&B.kind==='boss'&&!B.ph2&&B.hp>0&&B.hp<=B.max*.5){B.ph2=1;{const a=Math.round(B.max*.12);B.fshield=(B.fshield||0)+a;if(B.chg)B.chgSh=(B.chgSh||0)+a}blog(`${B.name} 被逼入絕境，張開了護盾！`)}}
 /* 霧蝕：被霧侵蝕的魔物（蝕化怪、第二章起的首領）身上纏著霧。霧散之前傷害 -25%、技能的暈眩與虛弱無效；
-   攻擊、爆擊與露娜的測霧燈都能驅霧，霧散時牠會僵住 1 回合、2 回合內多受 20% 傷害。首領的霧會再纏上來一次。 */
+   攻擊、爆擊與露娜的測霧燈都能驅霧，霧散時牠會僵住 3 秒、6 秒內多受 20% 傷害。首領的霧會再纏上來一次。 */
 const FOGN=(mut,bs)=>mut?3:(bs&&RUN&&!RUN.tower&&!RUN.trial&&RUN.area>=1)?5:0;
 function fogStrip(n,who){if(!B||!(B.fog>0)||B.hp<=0)return;B.fog=Math.max(0,B.fog-n);if(who==='luna')B.log.push('露娜的燈照散了一層霧');
   if(B.fog===0){B.fogBrkT=B.turn;B.fogV=B.turn+2;B.st.stun=Math.max(B.st.stun||0,1);B.frozen=0;B.log.push('【霧散】牠僵住了！');if(B.kind==='boss'&&!B.fogRd){B.fogRd=1;B.fogRe=B.turn+5}try{talk('fogbrk',true)}catch(e){}}}
 function hitFoe(stat,pow,o){o=o||{};const s=stats();if(s.GALE){const gt=(s.KW.gale||0);const tr=!B.gale||(gt>=2&&(B.gale||0)<2)||(gt>=3&&B.turn>0&&B.turn%4===0&&B.galeT!==B.turn);if(tr){B.gale=(B.gale||0)+1;if(B.gale>2)B.galeT=B.turn;o=Object.assign({},o,{sure:1});B.log.push('【疾風】先發制人！')}}if(!o.sure&&Math.random()*100<(B.eva+fbSum('eva'))*.6)return{d:0,cr:false,miss:true};let base=clsDm()*coreM()*(B.opening?1.5:1)*(S.cls==='swordsman'&&B.cls&&B.cls.brk?1+(stn()?.05:.06)*B.cls.brk:1)*(S.cls==='ranger'&&B.cls&&B.cls.focus?1+(stn()?.06:.12)*B.cls.focus:1)*(stat==='BOTH'?s.ATK+s.MAG:s[stat])*(1+buffSum('atk')+(s.FOCUSATK&&B.cls.focus>=rmax(5)?s.FOCUSATK/100:0))*(B.pst.weak>0?.75:1)*(s.BACK&&S.hp<s.HP*((s.KW.back||0)>=2?.5:.35)?1+s.BACK/100:1)*((s.KW.burn||0)>=3&&B.st.burn>0?1.25:1)*((s.KW.stun||0)>=2&&B.st.stun>0?1.3:1)*((s.KW.shield||0)>=2&&B.shield>0?1.15:1)*(B.gdUp?(B.gdUp=0,1.3):1);
   const fdef=stat==='MAG'?(B.mres??B.def):stat==='BOTH'?((B.mres??B.def)+B.def)/2:B.def;let em=elMul(B.id,B.curEl);{const ce=B.curEl,st=B.st||{};let cm=0,cn='';if(ce==='fire'&&B.frozen&&st.stun>0){cm=.5;cn='碎冰';st.stun=0;B.frozen=0}else if(ce==='ice'&&st.burn>0){cm=.3;cn='蒸發';st.burn=0}else if(ce==='thunder'&&B.frozen&&st.stun>0){cm=.3;cn='導電'}else if(ce==='thunder'&&st.poison>0){cm=.25;cn='毒爆';st.poison=Math.max(0,st.poison-1)}else if(ce==='holy'&&st.weak>0){cm=.2;cn='淨化'}else if(ce==='dark'&&st.bleed>0){cm=.25;cn='血蝕'}if(cm){if(fortK('chain'))cm+=.2;em*=1+cm;B.chain=cn;B.log.push(`【${cn}】屬性連鎖！傷害 +${Math.round(cm*100)}%`)}}if(o.rend&&em<1){em=1;B.elHit='rend'}else if(em!==1)B.elHit=em>1?'w':'r';let d=em*base*pow*100/(100+fdef*(1+fbSum('def'))*(1-(o.pierce||0)))*(.9+Math.random()*.2);const cr=!!o.sure||Math.random()*100<-(B.tough||0)+s.CRIT+(o.cr||0)+(hasP('sw1')&&B.cls.brk>=3?15:0);if(cr){const cdm=(s.CD+(hasP('rg3')&&B.cls.focus>=5?30:0)+s.BRKCD*B.cls.brk)/100;d*=1+(cdm-1)*(1-(B.cdr||0))}
-  if(B.trait==='iron'&&!(B.st.stun>0))d*=.65;if(B.trait==='plate'){if(B.plT!==B.turn){B.plT=B.turn;B.plN=0}d*=Math.max(.4,1-.15*B.plN);B.plN++;if(B.plN===2)B.log.push('【疊甲】甲殼越打越硬，這回合後續傷害遞減')}if(B.trait==='veil'&&B.vlT!==B.turn){B.vlT=B.turn;if(B.st.burn>0||B.st.poison>0||B.st.bleed>0){if(!B.vlX){B.vlX=1;B.log.push('【霧隱】被持續傷害逼出原形，失效了')}}else{d*=.5;B.elHit=B.elHit||'r';B.log.push('【霧隱】第一擊打進霧裡，傷害減半')}}if(B.trait==='ward'&&stat==='MAG'&&!((B.wardBrk||0)>B.turn))d*=.6;if(B.trait==='ward'&&cr&&!((B.wardBrk||0)>B.turn)){B.wardBrk=B.turn+2;B.log.push('【魔障】被爆擊打碎了！2 回合內失效')}
+  if(B.trait==='iron'&&!(B.st.stun>0))d*=.65;if(B.trait==='plate'){if(B.plT!==B.turn){B.plT=B.turn;B.plN=0}d*=Math.max(.4,1-.15*B.plN);B.plN++;if(B.plN===2)B.log.push('【疊甲】甲殼越打越硬，接下來的傷害遞減')}if(B.trait==='veil'&&B.vlT!==B.turn){B.vlT=B.turn;if(B.st.burn>0||B.st.poison>0||B.st.bleed>0){if(!B.vlX){B.vlX=1;B.log.push('【霧隱】被持續傷害逼出原形，失效了')}}else{d*=.5;B.elHit=B.elHit||'r';B.log.push('【霧隱】第一擊打進霧裡，傷害減半')}}if(B.trait==='ward'&&stat==='MAG'&&!((B.wardBrk||0)>B.turn))d*=.6;if(B.trait==='ward'&&cr&&!((B.wardBrk||0)>B.turn)){B.wardBrk=B.turn+2;B.log.push('【魔障】被爆擊打碎了！6 秒內失效')}
   if(S.cls==='dual'&&B.cls&&B.cls.combo)d*=1+(stn()?.02:.045)*B.cls.combo;
   if(B.fog>0)d*=.75;else if(B.fogMax&&(B.fogV||0)>=B.turn)d*=1.2;if(s&&s.KW&&(s.KW.reap||0)>=2&&B.hp<B.max*.5)d*=1.2+.05*Math.min(6,s.KW.reap);
   d=capB(Math.max(1,Math.round(d)));if(B.fog>0&&B.srcNow!=='荊棘'){if(B.fogHT!==B.turn){B.fogHT=B.turn;B.fogHN=0}if(B.fogHN<2){B.fogHN++;fogStrip(1)}else if(cr&&B.fogHN<3){B.fogHN++;fogStrip(1)}}if(B.fshield>0){const ab=Math.min(B.fshield,d);B.fshield-=ab;d-=ab}B.hp=Math.max(0,B.hp-d);if(B.trait==='rebound'&&d>B.max*.12&&B.srcNow!=='荊棘'){const r=Math.min(S.hp-1,Math.round(stats().HP*.15),Math.round((d-B.max*.12)*.4));if(r>0){S.hp-=r;B.spk=(B.spk||0)+r;B.log.push(`【反震】這一擊太重，${r} 點傷害震回你身上`)}}if(B.trait==='spike'&&d>0&&B.srcNow!=='荊棘'){const r=Math.max(1,Math.round(d*.2));S.hp=Math.max(1,S.hp-r);B.spk=(B.spk||0)+r}dsrc(B.srcNow||'攻擊',d);if(d>0&&RUN&&RUN.core==='shatter'&&!RUN.tower&&!RUN.trial&&B.hp>0){const th=RUN.coreUp?4:5;B.crk=(B.crk||0)+1;if(B.crk>=th){B.crk-=th;B.brkP=1}}if(S.cls==='dual'&&d>0&&B.cls&&!o.nocombo&&B.srcNow!=='荊棘')B.cls.combo=Math.min(rmax(12)+(hasP('db2')?4:0),B.cls.combo+1);bossPhase();return{d,cr}}
@@ -3580,6 +3592,7 @@ function pAct(type,arg){if(!B||B.busy)return;const s=stats();
   if(B.hp<=0){winSoon(type==='skill'?2150+(B.pd||0):1350);return}
   setTimeout(foeTurn,AS(type==='skill'?1750+(B&&B.pd||PD):850))}
 /* 魔法型首領（MAG 遠高於 ATK）的普通攻擊改成魔力彈：吃 MAG×0.6、看魔抗 */
+const chgDue=()=>B.rt?B.rt.acts>=3&&B.rt.acts%4===3:B.turn>=3&&B.turn%4===3;
 const mgB=()=>!!(B&&B.kind==='boss'&&B.id!=='shadow'&&B.mag>B.atk*1.5);
 const isDng=k=>!!k&&!!k.pow&&((k.pow||0)>=1.6||(k.h||1)>=3);
 const ELI={fire:'🔥火',ice:'❄冰',thunder:'⚡雷',dark:'🌑暗',holy:'✨聖',poison:'☠毒',phys:'⚔物理'};
@@ -3587,24 +3600,25 @@ function intentHtml(){if(!B||B.hp<=0)return '';if(B.chg){const nd=B.chgNeed||0,d
   if(!k)return mgB()?`<div class="intent">✦ 下回合：魔力彈　<small>魔法・看魔抗</small></div>`:`<div class="intent">⚔ 下回合：普通攻擊</div>`;if(!k.pow){if(k.heal){const pc=Math.round(k.heal*Math.pow(.6,B.hN||0)*(B.st.burn>0?.5:1)*100);return `<div class="intent buff">✚ 下回合：【${k.n}】　<small>回復約 ${pc}%${B.st.burn>0?'（灼燒壓制中）':'・灼燒可減半'}</small></div>`}return `<div class="intent buff">✚ 下回合：【${k.n}】</div>`}const me=MOBEL(k),st=stats(),rv=me?mobRes(k,st):0,et=me?`<small class="elt el-${me}">${ELI[me]}${rv?`・抗 ${rv}%`:'・無抗性'}</small>`:'';return isDng(k)?`<div class="intent dng">⚠ 下回合：【${k.n}】${et}　<small>防禦減傷 75%＋破綻</small></div>`:`<div class="intent sk">✦ 下回合：【${k.n}】${et}</div>`}
 function foePick(){const ks=(B.m.sk||[]).filter(id=>{const k=SKM[id];return !(k.heal&&(B.hp>B.max*.55||B.hcd>B.turn))&&!(k.self&&B.fb.some(b=>b.id===id))&&!(k.shield&&B.fshield>0)});
   const ch=B.kind==='boss'?.5:(B.kind==='elite'||B.mut||B.nm)?.42:.3;return ks.length&&Math.random()<ch?pick(ks):null}
-function foeTurn(){if(!B)return;if(B.treasure&&B.turn>=3&&B.hp>0){B=null;RUN.view={type:'res',title:'寶藏魔物逃走了',text:'牠抱著閃亮的寶物，一溜煙鑽進草叢裡不見了……下次要更快打倒牠！'};render();return}if(MODAL&&MODAL.k==='foe'){setTimeout(foeTurn,300);return}B.tk=0;const s=stats();
-  for(const k of ['poison','burn'])if(B.st[k]>0){const st=k==='burn'?(B.burnS||1):1,cap=RUN&&RUN.tower?Math.round(Math.max(s.ATK,s.MAG)*1.5*st):1e9,d=Math.min(cap,Math.max(1,Math.round(B.max*(k==='poison'?.05:.04)*(B.kind==='boss'?.5:1)*st*(S.cls==='mage'&&stn()&&B.cls?1+.45*B.cls.marks.length:1))));B.hp=Math.max(0,B.hp-d);dsrc(k==='burn'?'灼燒':'中毒',d);B.st[k]--;if(k==='burn'&&B.st.burn<=0)B.burnS=0;blog(`${B.name} 受到${FOE[k]}${st>1?`（${st} 層）`:''}傷害 ${d}`)}
+function foeTurn(){if(!B)return;if(B.treasure&&B.turn>=(B.rt?6:3)&&B.hp>0){B=null;RUN.view={type:'res',title:'寶藏魔物逃走了',text:'牠抱著閃亮的寶物，一溜煙鑽進草叢裡不見了……下次要更快打倒牠！'};render();return}if(MODAL&&MODAL.k==='foe'){setTimeout(foeTurn,300);return}const TK=!B.rt||B.rtPh==='tick',AC=!B.rt||B.rtPh==='act';if(TK)B.tk=0;const s=stats();
+  if(TK){for(const k of ['poison','burn'])if(B.st[k]>0){const st=k==='burn'?(B.burnS||1):1,cap=RUN&&RUN.tower?Math.round(Math.max(s.ATK,s.MAG)*1.5*st):1e9,d=Math.min(cap,Math.max(1,Math.round(B.max*(k==='poison'?.05:.04)*(B.kind==='boss'?.5:1)*st*(S.cls==='mage'&&stn()&&B.cls?1+.45*B.cls.marks.length:1))));B.hp=Math.max(0,B.hp-d);dsrc(k==='burn'?'灼燒':'中毒',d);B.st[k]--;if(k==='burn'&&B.st.burn<=0)B.burnS=0;blog(`${B.name} 受到${FOE[k]}${st>1?`（${st} 層）`:''}傷害 ${d}`)}
   if(B.stunHit&&!(B.st.stun>0)&&B.hp>0){B.stunHit=0;B.srcNow='震擊共鳴';const r=hitFoe(CLS[S.cls].basic,1.2);blog(`【震擊共鳴】暈眩結束的瞬間追加重擊 ${r.d}`)}
   {const kw=s.KW||{};if((kw.shield||0)>=3&&B.turn>0&&B.turn%4===0&&s.SHIELD){const sh=Math.round(s.HP*s.SHIELD/200);B.shield=Math.max(B.shield||0,sh);blog(`【先機共鳴】重新張開護盾 ${sh}`)}}
-  addsDot();
+  addsDot();}
   if(B.hp<=0){render();winSoon(1350);return}
   if(!B.rt)allyAct();if(B.hp<=0){render();winSoon(1350);return}
-  if((B.trait==='cleanse'||B.trait==='grove')&&B.hp>0&&(B.st.burn>0||B.st.poison>0||B.st.bleed>0)){B.st.burn=0;B.st.poison=0;B.st.bleed=0;const h=Math.round(B.max*.04);B.hp=Math.min(B.max,B.hp+h);blog(`${B.name} 的【${TRX(B.trait).n}】清除了持續傷害，並回復 ${h} HP`)}
+  if(TK){if((B.trait==='cleanse'||B.trait==='grove')&&B.hp>0&&(B.st.burn>0||B.st.poison>0||B.st.bleed>0)){B.st.burn=0;B.st.poison=0;B.st.bleed=0;const h=Math.round(B.max*.04);B.hp=Math.min(B.max,B.hp+h);blog(`${B.name} 的【${TRX(B.trait).n}】清除了持續傷害，並回復 ${h} HP`)}
   if((B.trait==='summon'||B.trait==='grove')&&B.hp>0&&B.turn%3===0&&(B.adds||[]).filter(f=>f.hp>0).length<2&&RUN){try{const f=mkFoe(pick(AREAS[RUN.area].mobs.slice(0,2)),'');f.hp=f.max=Math.round(f.max*.6);B.adds=(B.adds||[]).filter(x=>x.hp>0);B.adds.push(f);blog(`${B.name} 叫來了 ${f.name}！`)}catch(e){}}
   if(B.trait==='undying'&&B.hp>0){if(B.st.burn>0||B.st.poison>0)blog(`${B.name} 的【不死】被灼燒／中毒壓制，無法再生`);else{const h=Math.round(B.max*.05);B.hp=Math.min(B.max,B.hp+h);blog(`${B.name} 的【不死】再生 ${h} HP`)}}
-  if(B.spk){blog(`【尖刺】這回合你被反彈了 ${B.spk} 傷害`);B.spk=0}
+  if(B.spk){blog(`【尖刺】你被反彈了 ${B.spk} 傷害`);B.spk=0}
   if(B.aff.includes('regen')&&B.turn<20){const h=Math.round(B.max*.06);B.hp=Math.min(B.max,B.hp+h);blog(`${B.name} 再生了 ${h} HP`)}
   if(RUN&&RUN.tower&&B.turn>=12&&B.hp>0){B.atk=Math.round(B.atk*1.1);B.mag=Math.round(B.mag*1.1);if(B.turn===12)blog('霧越來越濃，牠的力氣變大了')}
-  if(B.turn>=20&&!(RUN&&RUN.tower)){const d=Math.round(B.max*Math.min(.15,.02*(B.turn-19)));B.hp=Math.max(0,B.hp-d);blog(`久戰之下，${B.name} 開始力竭，流失 ${d} HP`);if(B.hp<=0){render();winSoon(1350);return}}
-  const fx=B.fx={by:'foe'};if(B.turn===8&&!B.talkDrag){B.talkDrag=1;setTimeout(()=>{try{talk('drag')}catch(e){}},900)}
-  if(B.kind==='boss'&&!B.rage&&B.hp<B.max*.5){B.rage=1;B.atk=Math.round(B.atk*1.3);B.mag=Math.round(B.mag*1.3);fx.cut=`${B.m.n} 暴走`;fx.fsk='m_rage';blog(`${B.name} 進入暴走狀態！攻擊大幅提升`);setTimeout(()=>{try{talk('rage',1)}catch(e){}},900)}
+  if(B.turn>=20&&!(RUN&&RUN.tower)){const d=Math.round(B.max*Math.min(.15,.02*(B.turn-19)));B.hp=Math.max(0,B.hp-d);blog(`久戰之下，${B.name} 開始力竭，流失 ${d} HP`);if(B.hp<=0){render();winSoon(1350);return}}}
+  const fx=AC?(B.fx={by:'foe'}):{};if(B.turn===8&&!B.talkDrag){B.talkDrag=1;setTimeout(()=>{try{talk('drag')}catch(e){}},900)}
+  if(!AC){if(B.st.stun>0){B.st.stun--;if(!B.st.stun)blog(`${B.name} 醒過來了`)}}
+  else if(B.kind==='boss'&&!B.rage&&B.hp<B.max*.5){B.rage=1;B.atk=Math.round(B.atk*1.3);B.mag=Math.round(B.mag*1.3);fx.cut=`${B.m.n} 暴走`;fx.fsk='m_rage';blog(`${B.name} 進入暴走狀態！攻擊大幅提升`);setTimeout(()=>{try{talk('rage',1)}catch(e){}},900)}
   else if(B.st.stun>0){B.st.stun--;fx.stun=1;blog(`${B.name} 暈眩中，無法行動`)}
-  else if(B.kind==='boss'&&!B.chg&&!B.big&&B.turn>=3&&B.turn%4===3){B.chg=1;B.chgHp=B.hp;B.chgSh=B.fshield||0;B.chgNeed=brkNeed();fx.cut='蓄力';fx.fsk='m_rage';blog(`⚠ ${B.name} 開始蓄力，要放【毀滅一擊】了`);setTimeout(()=>{try{talk('charge',1)}catch(e){}},900)}
+  else if(B.kind==='boss'&&!B.chg&&!B.big&&chgDue()){B.chg=1;B.chgHp=B.hp;B.chgSh=B.fshield||0;B.chgNeed=brkNeed();fx.cut='蓄力';fx.fsk='m_rage';blog(`⚠ ${B.name} 開始蓄力，要放【毀滅一擊】了`);setTimeout(()=>{try{talk('charge',1)}catch(e){}},900)}
   else if(B.chg&&B.chgNeed&&brkDone()>=B.chgNeed){B.chg=0;B.brkN=(B.brkN||0)+1;fx.stun=1;fx.brk=1;fx.cut='打斷！';setTimeout(()=>{try{talk('brk',1)}catch(e){}},700);B.st.weak=Math.max(B.st.weak||0,2);const bc=brkCore();if(bc)B.st.stun=Math.max(B.st.stun||0,1);B.opening=1;try{SFX.thunder();buzz([40,30,90])}catch(e){}blog(`✦ 打斷成功！${B.name} 的【毀滅一擊】散掉了，陷入虛弱${bc?'、暈眩':''}，露出破綻`);setTimeout(()=>{try{talk('guard')}catch(e){}},600)}
   else{const big=B.chg?(B.chg=0,1):0,id=big?null:('next' in B?B.next:foePick());delete B.next;const dng=!big&&!!id&&isDng(SKM[id]),k=big?{n:'毀滅一擊',pow:2.6,mag:B.mag>B.atk?1:0}:id?SKM[id]:null,mb=!k&&mgB(),nm=k?`【${k.n}】`:mb?'魔力彈':'攻擊';
     if(k){fx.cut=k.n;fx.fsk=id}
@@ -3616,7 +3630,7 @@ function foeTurn(){if(!B)return;if(B.treasure&&B.turn>=3&&B.hp>0){B=null;RUN.vie
       if(k.hst&&Math.random()<(k.p||1))for(const h in k.hst){B.pst[h]=Math.max(1,k.hst[h]-(hasP('cl3')?1:0));ps.push(`你陷入${HST[h]}`)}
       blog(`${B.name} 使用${nm}，${ps.join('，')}`)}
     else if(!(B.rt&&(B.rt.pr>B.rt.t||B.rt.ev>B.rt.t))&&allyTgt()){allyHurt((k&&k.mag?B.mag:mb?B.mag*.6:B.atk)*(k?k.pow:1)*(k&&k.h||1)*(1+fbSum('atk')),nm,B.name)}
-    else if(B.rt&&rtReact(fx,nm)){}
+    else if(B.rt&&rtReact(fx,nm,null,k||(mb?{mag:1}:null),big)){}
     else{let tot=0,hit=0,cr=false;
       for(let i=0;i<(k&&k.h||1);i++){if(!big&&Math.random()*100<s.EVA+buffSum('eva')+(S.cls==='dual'&&!stn()&&B.cls.combo>=6?18:0))continue;hit++;
         const base=(k&&k.mag?B.mag:mb?B.mag*.6:B.atk)*(k?k.pow:1)*(1+fbSum('atk'))*(B.st.weak>0?.75:1)*(B.trait==='enrage'&&B.turn>=8?1.8:1)*grudgeM();
@@ -3630,26 +3644,26 @@ function foeTurn(){if(!B)return;if(B.treasure&&B.turn>=3&&B.hp>0){B=null;RUN.vie
         if(S.hp<=0&&B.endure){S.hp=1;B.endure=0;blog('鬥氣護體！以 1 HP 撐了下來')}if(S.hp<=0&&((stats().KW||{}).back||0)>=3&&!B.backSave){S.hp=1;B.backSave=1;blog('【絕境共鳴】咬牙撐住了致命一擊！')}
         if(s.THORN&&d>0&&B.hp>((s.KW.thorn||0)>=2?0:1)){const tk=s.KW.thorn||0,raw=Math.round(d*s.THORN/100*(tk>=3?1.5:1)*(tk>=3&&B.guard?2:1)),r=tk>=2?Math.max(1,raw):Math.min(B.hp-1,Math.max(1,raw));B.hp=Math.max(0,B.hp-r);dsrc('荊棘',r);blog(`【荊棘】反彈 ${r} 傷害`)}
         const dr=(k&&k.drain||0)+(B.aff.includes('leech')?.3:0);if(dr&&d>0){const h=Math.round(d*dr);B.hp=Math.min(B.max,B.hp+h);fx.fheal=h;blog(`${B.name} 吸取了 ${h} HP`)}
-        if(k&&k.hst&&Math.random()<(k.p||1))for(const h in k.hst){B.pst[h]=Math.max(1,k.hst[h]-(hasP('cl3')?1:0));blog(`你陷入${HST[h]}（${k.hst[h]} 回合）`)}
+        if(k&&k.hst&&Math.random()<(k.p||1))for(const h in k.hst){B.pst[h]=Math.max(1,k.hst[h]-(hasP('cl3')?1:0));blog(`你陷入${HST[h]}`)}
         if(B.aff.includes('venom')&&d>0){B.pst.poison=Math.max(B.pst.poison,2)}
         if(ctr&&S.hp>0){const r=hitFoe('ATK',stn()&&S.cls==='swordsman'?2.6:1.5);B.cls.brk=Math.min(rmax(5),B.cls.brk+(stn()&&S.cls==='swordsman'?2:1));blog(`招架反擊，造成 ${r.d} 傷害，破綻 ${B.cls.brk}`)}}}}
-  if(B.st.weak>0)B.st.weak--;
-  if(B.opn2){B.opening=0;B.opn2=0}
+  if(TK&&B.st.weak>0)B.st.weak--;
+  if(AC){if(B.opn2){B.opening=0;B.opn2=0}
   if(B.brkP){B.brkP=0;if(B.hp>0&&S.hp>0){B.opening=1;B.brkFx=1;blog(`✴【崩解霧核】${B.name} 的架勢崩解了！你的下一次行動傷害 +50%`)}}
-  if(!('next' in B)&&!B.chg)B.next=foePick();
+  if(!('next' in B)&&!B.chg)B.next=foePick();}
   if(!B.rt)addsAct(fx);
-  for(const [h,r,n] of [['poison',.04,'毒素發作'],['burn',.05,'灼燒'],['bleed',.035,'流血']])if(S.hp>0&&B.pst[h]>0){const d=Math.max(1,Math.round(s.HP*r));S.hp=Math.max(0,S.hp-d);B.pst[h]--;blog(`${n}，損失 ${d} HP`)}
+  if(TK){for(const [h,r,n] of [['poison',.04,'毒素發作'],['burn',.05,'灼燒'],['bleed',.035,'流血']])if(S.hp>0&&B.pst[h]>0){const d=Math.max(1,Math.round(s.HP*r));S.hp=Math.max(0,S.hp-d);B.pst[h]--;blog(`${n}，損失 ${d} HP`)}
   if(B.pst.weak>0)B.pst.weak--;
   if(S.hp>0&&B.pst.regen>0){const h=Math.round(s.HP*.08);S.hp=Math.min(s.HP,S.hp+h);B.pst.regen--;blog(`再生效果回復 ${h} HP`)}
   if(S.hp>0&&B.cls.faith>=100){B.cls.faith=0;if(S.cls==='cleric'&&stn()){B.srcNow='審判';const r=hitFoe('MAG',4.5*(1+s.ANSWER/100));SFX.holy(0);blog(`【審判】神降下裁決的聖光，造成 ${r.d} 傷害`)}else{const h=Math.round(s.HP*(.28+s.ANSWER/100));S.hp=Math.min(s.HP,S.hp+h);const r=hitFoe('MAG',2.4);SFX.holy(0);blog(`神回應了祈禱：回復 ${h} HP，聖光造成 ${r.d} 傷害`)}}
-  if(B.hp<=0){render();winSoon(1350);return}
-  if(S.hp>0&&s.REGEN){const h=Math.max(1,Math.round(s.HP*s.REGEN/100));S.hp=Math.min(s.HP,S.hp+h);blog(`裝備效果回復 ${h} HP`)}
+  }if(B.hp<=0){render();winSoon(1350);return}
+  if(TK){if(S.hp>0&&s.REGEN){const h=Math.max(1,Math.round(s.HP*s.REGEN/100));S.hp=Math.min(s.HP,S.hp+h);if(!B.rt)blog(`裝備效果回復 ${h} HP`)}
   if(S.hp>0&&s.MPREG){S.mp=Math.min(s.MP,S.mp+Math.max(1,Math.round(s.MP*s.MPREG/100)))}
   B.fb.forEach(b=>b.t--);B.fb=B.fb.filter(b=>b.t>0);
   B.buffs.forEach(b=>b.t--);B.buffs=B.buffs.filter(b=>b.t>0);B.turn++;
   if(RUN&&RUN.core==='flow'&&!RUN.tower&&S.hp>0&&B.hp>0){const mm=stats().MP,v=Math.min(mm-S.mp,Math.round(mm*(cUp()?.1:.06)));if(v>0){S.mp+=v;blog(`💧【${coreNm('flow')}】回復 ${v} MP`)}}
-  if(S.hp<=0){if(B.rt)B.rt.done=1;render();setTimeout(lose,1100);return}
-  if(B.rt){rtFoeDone(fx);render();return}
+  }if(S.hp<=0){if(B.rt)B.rt.done=1;render();setTimeout(lose,1100);return}
+  if(B.rt){if(AC)rtFoeDone(fx);render();return}
   const wait=fx.fsk?1300:0;
   if(B.pst.stun>0){B.pst.stun--;blog(`你${HST.stun}了，這回合無法行動`);B.busy=true;render();setTimeout(foeTurn,AS(wait+1100));return}
   B.busy=!!wait;render();setTimeout(()=>{if(!B)return;B.busy=false;if(B.auto)autoAct()},AS(wait+(B.auto?(FA?2000+wait:1000):0)))}
@@ -3742,29 +3756,35 @@ const RTI={
      ally:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l2 6 6 .5-4.7 3.9 1.5 6.1L12 16l-4.8 3.5 1.5-6.1L4 9.5 10 9z"/></svg>',
      sys:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="3.5"/></svg>'}};
 function rtInit(){if(!B)return;const bs=B.kind==='boss';
-  B.rt={t:bs?-1.4:-.7,pg:30+Math.random()*30,ag:Math.random()*40,q:null,ev:-9,pr:-9,gu:-9,pstun:-9,done:0,paused:0,li:Math.max(0,B.log.length-30),sig:'',ac:0,vh:B.hp,vh0:B.hp,vhT:0,hurt:0,atk:0,an:0,np:0,nf:0,warn:1,lw:null};
+  B.rt={t:bs?-1.4:-.7,pg:30+Math.random()*30,ag:Math.random()*40,q:null,ev:-9,pr:-9,gu:-9,pstun:-9,done:0,paused:0,li:Math.max(0,B.log.length-30),sig:'',ac:0,vh:B.hp,vh0:B.hp,vhT:0,hurt:0,atk:0,an:0,np:0,nf:0,warn:1,lw:null,acts:1,rc:0,ph0:S.hp,pv:S.hp,pvT:0,logAt:0};
   B.rtg=Math.random()*25;B.rtw=null;(B.adds||[]).forEach(f=>{f.rtg=15+Math.random()*35;f.rtw=null});B.busy=false;
   if(!RTK.raf){RTK.lt=performance.now();RTK.raf=requestAnimationFrame(rtLoop)}}
 function rtS(){const R=B.rt;if(!R.sc||Math.abs(R.t-R.scT)>.25){R.sc=stats();R.scT=R.t}return R.sc}
-function rtPT(){const a=rtS().A||{};let t=2.9/(1+Math.min(.3,(a.DEX||0)*.005));if(S.cls==='dual')t*=.85;return t}
-function rtFT(f,add){let t={swift:1.7,brute:2.2,tank:2.4,caster:2}[(f.m&&f.m.ty)||'']||2;if(f.kind==='boss')t+=.2;if(add)t*=1.35;return t}
+function rtPT(){const a=rtS().A||{};let t=3/(1+Math.min(.3,(a.DEX||0)*.005));if(S.cls==='dual')t*=.85;return t}
+/* 魔物型態：迅捷出手快、會追擊；蠻力慢但重；重甲最慢；施法者詠唱久、普攻也是魔法 */
+const RTY={swift:{ft:1.5,wu:.65,n:'迅捷'},brute:{ft:1.75,wu:1.15,n:'蠻力'},tank:{ft:2,wu:1,n:'重甲'},caster:{ft:1.6,wu:1.1,n:'施法'}};
+const rtTy=f=>RTY[(f.m&&f.m.ty)||'']||{ft:2,wu:.9,n:''};
+function rtFT(f,add){let t=rtTy(f).ft;if(add)t*=1.35;return t}
 function rtTitle(){try{if(RUN.trial)return '轉職試煉';if(RUN.tower)return `霧淵 第 ${RUN.floor} 層`;if(RUN.dg&&DG[RUN.dg.d])return DG[RUN.dg.d].n;return AREAS[RUN.area].n}catch(e){return '戰鬥'}}
 function rtSub(){if(!B)return '';if(B.kind==='boss')return '首領';if(B.kind==='elite')return '精英';try{if(RUN&&RUN.nodes&&!RUN.tower)return `${Math.min(RUN.nodes.length,(RUN.step||0)+1)} / ${RUN.nodes.length}`}catch(e){}return ''}
 /* ---- 敵人出招 ---- */
-function rtWind(){const R=B.rt;
-  if(B.st.stun>0||(B.chg&&B.chgNeed&&brkDone()>=B.chgNeed)){rtFoeGo();return}
-  let k='atk',n='攻擊',dur=.9,mg=false,dg=false;
+function rtWind(){const R=B.rt,ty=rtTy(B),T=(B.m&&B.m.ty)||'';
+  if(B.chg&&B.chgNeed&&brkDone()>=B.chgNeed){rtFoeGo();return}
+  let k='atk',n=T==='brute'?'重揮':T==='swift'?'快攻':'攻擊',dur=ty.wu,mg=false,dg=false,nd=false;
   if(B.kind==='boss'&&!B.rage&&B.hp<B.max*.5){k='rage';n='暴走';dur=.7}
-  else if(B.kind==='boss'&&!B.chg&&!B.big&&B.turn>=3&&B.turn%4===3){k='chg';n='蓄力';dur=.6}
-  else if(B.chg){k='big';n='毀滅一擊';dur=2.2;dg=true;mg=B.mag>B.atk}
+  else if(B.kind==='boss'&&!B.chg&&!B.big&&chgDue()){k='chg';n='蓄力';dur=.6}
+  else if(B.chg){k='big';n='毀滅一擊';dur=2.2;dg=true;nd=true;mg=B.mag>B.atk}
   else{if(!('next' in B))B.next=foePick();const x=B.next&&SKM[B.next];
-    if(x){n='【'+x.n+'】';if(!x.pow){k='sup';dur=.8}else if(isDng(x)){k='dng';dur=1.6;dg=true;mg=!!x.mag}else{k='sk';dur=1.2;mg=!!x.mag}}
+    if(x){n=x.n;if(!x.pow){k='sup';dur=.8}else if(isDng(x)){k='dng';dur=1.6;dg=true;mg=!!x.mag}else{k='sk';dur=ty.wu+.3;mg=!!x.mag}}
     else if(mgB()){n='魔力彈';mg=true}}
-  B.rtw={t:0,dur,k,n,mg,dg};B.rtg=100;
-  if(dg){try{sq(220,.12,.08,0,0,.5);sq(220,.12,.08,.16,0,.5)}catch(e){}rtWarn(k==='big'?'毀滅一擊':n.replace(/[【】]/g,''),dur)}}
-function rtFoeGo(){const R=B.rt,w=B.rtw;B.rtw=null;B.rtg=0;R.lw=w||{k:'stun'};if(w&&w.k!=='chg'&&w.k!=='sup'&&w.k!=='rage'){R.atk=performance.now()+420;R.an++}B.fx=null;$('#rtb .warnb')&&$('#rtb .warnb').remove();foeTurn()}
-function rtFoeDone(fx){const R=B.rt;B.guard=false;if(B.chg&&B.rtg<35)B.rtg=35;if(B.pst.stun>0){B.pst.stun--;R.pstun=R.t+2.2;blog(`你${HST.stun}了，動彈不得`)}}
-function rtAddGo(f){f.rtw=null;f.rtg=0;f.rta=performance.now()+420;const s=rtS(),fx=B.fx&&B.fx.by==='foe'?B.fx:(B.fx={by:'foe'});fx.af=f;
+  B.rtw={t:0,dur,k,n,mg,dg,nd};B.rtg=100;
+  if(dg){try{sq(220,.12,.08,0,0,.5);sq(220,.12,.08,.16,0,.5)}catch(e){}rtWarn(n,dur)}}
+function rtFoeGo(){const R=B.rt,w=B.rtw;B.rtw=null;B.rtg=0;R.lw=w||{k:'-'};R.ph0=S.hp;if(w&&w.k!=='chg'&&w.k!=='sup'&&w.k!=='rage'){R.atk=performance.now()+420;R.an++}B.fx=null;$('#rtb .warnb')&&$('#rtb .warnb').remove();
+  const nm=w&&w.k==='atk';B.rtPh='act';foeTurn();if(!B||!B.rt)return;R.acts++;
+  /* 迅捷型：普攻後有機會立刻追擊 */
+  if(nm&&B.m&&B.m.ty==='swift'&&B.hp>0&&!R.chase&&Math.random()<.4){R.chase=1;B.rtg=72}else R.chase=0}
+function rtFoeDone(fx){const R=B.rt;B.guard=false;if(B.chg&&B.rtg<35)B.rtg=35;if(B.pst.stun>0){R.pstun=R.t+2.4*B.pst.stun;B.pst.stun=0;R.q=null;blog(`你${HST.stun}了，動彈不得`)}}
+function rtAddGo(f){B.rt.ph0=S.hp;f.rtw=null;f.rtg=0;f.rta=performance.now()+420;const s=rtS(),fx=B.fx&&B.fx.by==='foe'?B.fx:(B.fx={by:'foe'});fx.af=f;
   const base=f.atk*(.9+Math.random()*.2);
   if(rtReact(fx,'攻擊',f))return;
   if(allyTgt()){allyHurt(base,'攻擊',f.name);return}
@@ -3773,21 +3793,23 @@ function rtAddGo(f){f.rtw=null;f.rtg=0;f.rta=performance.now()+420;const s=rtS()
   let ab=0;if(B.shield>0){ab=Math.min(B.shield,d);B.shield-=ab;d-=ab}
   S.hp=Math.max(0,S.hp-d);fx.d=(fx.d||0)+d;blog(`${f.name} 的攻擊造成 ${d} 傷害${ab?`（護盾吸收 ${ab}）`:''}`);
   if(S.hp<=0&&B.endure){S.hp=1;B.endure=0;blog('鬥氣護體！以 1 HP 撐了下來')}if(S.hp<=0&&((s.KW||{}).back||0)>=3&&!B.backSave){S.hp=1;B.backSave=1;blog('【絕境共鳴】咬牙撐住了致命一擊！')}}
-/* 格擋：擋下並反擊；閃避：整招躲掉 */
-function rtReact(fx,nm,f){const R=B.rt,who=f?f.name:B.name;
-  if(R.pr>R.t){R.pr=0;R.np++;fx.parry=1;fx.miss=1;const s=rtS(),mg=CLS[S.cls].basic==='MAG';let d;
+/* 格擋：擋下並反擊（魔法擋不住；擋下重招會讓對方踉蹌）。閃避：整招躲掉（毀滅一擊躲不掉） */
+function rtReact(fx,nm,f,k,big){const R=B.rt,who=f?f.name:B.name;
+  if(R.pr>R.t){R.pr=-9;if(k&&k.mag){fx.nop='擋不住魔法';blog(`魔法擋不住`)}else{
+    R.np++;fx.parry=1;fx.miss=1;const s=rtS(),mg=CLS[S.cls].basic==='MAG';let d;
     if(f){d=Math.max(1,Math.round((mg?s.MAG:s.ATK)*1.5*100/(100+(f.def||0))));f.hp=Math.max(0,f.hp-d);f.rth=performance.now()+450;if(f.hp<=0)blog(`${f.name} 倒下了`)}
     else{const _s=B.srcNow;B.srcNow='格擋反擊';d=hitFoe(mg?'MAG':'ATK',1.5,{sure:1}).d;B.srcNow=_s}
     B.opening=1;R.pg=Math.min(100,R.pg+50);fx.ctr=d;fx.ctrF=f||null;
-    blog(`【格擋】擋下 ${who} 的${nm}，反擊 ${d}`);try{SFX.crit(0)}catch(e){}return true}
-  if(R.ev>R.t){R.ev=0;R.nf++;fx.evade=1;fx.miss=1;R.pg=Math.min(100,R.pg+40);blog(`【閃避】躲開 ${who} 的${nm}`);try{SFX.miss(0)}catch(e){}return true}
+    const hv=!f&&(big||(k&&isDng(k)));if(hv&&B.hp>0){B.st.stun=Math.max(B.st.stun||0,1);fx.stag=1}
+    blog(`【格擋】擋下 ${who} 的${nm}，反擊 ${d}${hv?'，牠踉蹌了':''}`);try{SFX.crit(0)}catch(e){}return true}}
+  if(R.ev>R.t){R.ev=-9;if(big){fx.nop='躲不掉';blog('這一擊躲不掉')}else{R.nf++;fx.evade=1;fx.miss=1;R.pg=Math.min(100,R.pg+40);blog(`【閃避】躲開 ${who} 的${nm}`);try{SFX.miss(0)}catch(e){}return true}}
   return false}
 /* ---- 玩家出手 ---- */
 function rtDo(c){const R=B&&B.rt;if(!R||R.done)return;R.vh0=B.hp;R.q=null;
   if(c==='@parry'||c==='@evade'){if(c==='@parry')R.pr=R.t+1;else R.ev=R.t+1.6;R.pg=0;try{SFX.ui()}catch(e){}rtPop($('#rtb .bhc'),c==='@parry'?'格擋':'閃避','t');return}
   if(c==='@atk')pAct('atk');else if(c==='@guard')pAct('guard');else if(c==='@flee')pAct('flee');else if(String(c).startsWith('item:'))pAct('item',c.slice(5));else if(SK[c])pAct('skill',c)}
-function rtAfterP(type){const R=B.rt;R.pg=0;R.q=null;if(type==='guard')R.gu=R.t+6;if(B.opn2){B.opening=0;B.opn2=0}render();if(B&&B.rt&&B.hp<=0)winSoon(type==='skill'?1150:850)}
-function rtAuto(){const R=B.rt,w=B.rtw;R.vh0=B.hp;if(w&&w.dg&&!B.guard){const rem=w.dur-w.t;if(rem<.85&&rem>.15&&Math.random()<.45){rtDo('@parry');return}}autoAct()}
+function rtAfterP(type){const R=B.rt;R.pg=0;R.q=null;if(type==='guard')R.gu=R.t+6;if(B.opn2){B.opening=0;B.opn2=0}render();if(B&&B.rt&&B.hp<=0)winSoon(type==='skill'?2300:1100)}
+function rtAuto(){const R=B.rt,w=B.rtw;R.vh0=B.hp;if(w&&w.dg&&!B.guard){const rem=w.dur-w.t;if(rem<.85&&rem>.15&&Math.random()<.3){rtDo(w.mg?(w.nd?'@guard':'@evade'):'@parry');return}}autoAct()}
 function rtLose(){if(B&&B.rt)B.rt.done=1;render();setTimeout(lose,1100)}
 /* ---- 時間推進 ---- */
 function rtStep(dt){const R=B.rt;R.t+=dt;if(R.t<0)return;
@@ -3796,18 +3818,20 @@ function rtStep(dt){const R=B.rt;R.t+=dt;if(R.t<0)return;
   if(can&&R.pg<100)R.pg=Math.min(100,R.pg+dt*100/rtPT());
   if(can&&R.pg>=100){if(R.q){rtDo(R.q);if(!B||!B.rt||R.done)return}else if(B.auto){if(!R.ac)R.ac=R.t+.12;if(R.t>=R.ac){R.ac=0;rtAuto();if(!B||!B.rt||R.done)return}}}
   const fr=(!B.auto&&can&&R.pg>=100)?.5:1;
+  R.rc+=dt*fr;if(R.rc>=3){R.rc-=3;B.rtPh='tick';R.vh0=B.hp;foeTurn();if(!B||!B.rt||R.done)return}
   if(B.hp>0){
-    if(B.rtw){if(B.st.stun>0||(B.rtw.k==='big'&&B.chgNeed&&brkDone()>=B.chgNeed))rtFoeGo();else{B.rtw.t+=dt*fr;if(B.rtw.t>=B.rtw.dur)rtFoeGo()}}
+    if(B.st.stun>0){if(B.rtw&&B.rtw.k!=='big'){B.rtw=null;B.rtg=30;$('#rtb .warnb')&&$('#rtb .warnb').remove();const mc=rtMain();rtPop(mc&&mc.el,'打斷','p')}else if(B.rtw&&B.chgNeed&&brkDone()>=B.chgNeed)rtFoeGo()}
+    else if(B.rtw){if(B.rtw.k==='big'&&B.chgNeed&&brkDone()>=B.chgNeed)rtFoeGo();else{B.rtw.t+=dt*fr;if(B.rtw.t>=B.rtw.dur)rtFoeGo()}}
     else{B.rtg=(B.rtg||0)+dt*fr*100/rtFT(B);if(B.rtg>=100)rtWind()}
     if(!B||!B.rt||R.done)return}
   for(const f of B.adds||[]){if(f.hp<=0)continue;
     if(f.rtw){f.rtw.t+=dt*fr;if(f.rtw.t>=f.rtw.dur){rtAddGo(f);render();if(S.hp<=0){rtLose();return}}}
-    else{f.rtg=(f.rtg||0)+dt*fr*100/rtFT(f,1);if(f.rtg>=100){if(f.st.stun>0){f.st.stun--;f.rtg=20;blog(`${f.name} 暈眩中`)}else{f.rtw={t:0,dur:.8,n:'攻擊'};f.rtg=100}}}}
+    else{f.rtg=(f.rtg||0)+dt*fr*100/rtFT(f,1);if(f.rtg>=100){if(f.st.stun>0){f.st.stun--;f.rtg=20;blog(`${f.name} 暈眩中`)}else{f.rtw={t:0,dur:rtTy(f).wu,n:'攻擊'};f.rtg=100}}}}
   const A=B.ally;if(A&&A.hp>0&&B.hp>0){R.ag+=dt*fr*100/3.3;if(R.ag>=100){R.ag=0;B.allyTurn=-1;allyAct();render();if(B&&B.rt&&B.hp<=0&&!R.done)winSoon(900)}}}
 function rtLoop(ts){RTK.raf=requestAnimationFrame(rtLoop);RTK.now=ts;const dt=Math.min(.1,Math.max(0,(ts-RTK.lt)/1000));RTK.lt=ts;
   if(!B||!B.rt){cancelAnimationFrame(RTK.raf);RTK.raf=0;return}
   const R=B.rt,el=document.getElementById('rtb'),tip=$('#tip');
-  if(el&&!MODAL&&!STORY&&!(tip&&!tip.hidden)&&!R.paused&&!R.done){let sc=(S.rtSpd||1)*(window.RTX||1)*(ts<RTK.sl?.18:1);if(RTK.hs>0){RTK.hs-=dt*1000;sc=0}let g=dt*sc;while(g>0&&B&&B.rt&&!B.rt.done){const st=Math.min(.05,g);rtStep(st);g-=st}}
+  if(el&&!MODAL&&!STORY&&!(tip&&!tip.hidden)&&!R.paused&&!R.done){let sc=(S.rtSpd||1)*(window.RTX||1)*(ts<RTK.sl?.18:1);if(RTK.hs>0){RTK.hs-=dt*1000*(window.RTX||1);sc=0}let g=dt*sc;while(g>0&&B&&B.rt&&!B.rt.done){const st=Math.min(.05,g);rtStep(st);g-=st}}
   if(el&&B&&B.rt)rtFrame()}
 /* ---- 畫面 ---- */
 function vRT(){const a=AREAS[RUN.area]||AREAS[0],bg=bgKey(a);
@@ -3855,11 +3879,11 @@ function rtPchips(R){const o=[],C=B.cls;if(R.t<R.pstun)o.push('<b>暈眩</b>');i
   if(B.shield>0)o.push(`<span>護盾 ${B.shield}</span>`);if(B.counter)o.push('<span>招架</span>');if(B.endure)o.push('<span>鬥氣</span>');B.buffs.forEach(b=>b.id!=='bless'&&o.push(`<span>${esc(b.n)}</span>`));
   ['poison','burn','bleed','weak'].forEach(h=>B.pst[h]>0&&o.push(`<span class="bad">${HST[h]}</span>`));if(B.pst.regen>0)o.push('<span>再生</span>');return o.join('')}
 function rtFrame(){const R=B.rt,now=performance.now(),s=rtS(),slow=now-RTK.stT>220;if(slow)RTK.stT=now;
-  if(R.warn&&R.t>-1.2){R.warn=0;if(B.kind==='boss')rtStamp('WARNING','red',esc(B.m.n))}
+  if(R.warn&&R.t>-1.2){R.warn=0;if(B.kind==='boss')rtStamp(esc(B.m.n),'red','WARNING')}
   const can=R.t>=R.pstun,rdy=R.pg>=100&&can&&!R.done,fr=(!B.auto&&rdy)?.5:1;
-  const h=RTK.h;if(h){h.hp.style.width=Math.max(0,S.hp/s.HP*100)+'%';h.mp.style.width=Math.max(0,S.mp/s.MP*100)+'%';h.as.style.width=Math.max(0,Math.min(100,R.pg))+'%';h.pt.style.setProperty('--g',Math.max(0,Math.min(100,R.pg)));
-    const hv=`${Math.max(0,S.hp)}/${s.HP}`;if(h.hv.textContent!==hv)h.hv.textContent=hv;const mv=`MP ${S.mp}/${s.MP}`;if(h.mv.textContent!==mv)h.mv.textContent=mv;
-    const c=h.el.classList;c.toggle('ready',rdy);c.toggle('low',S.hp<s.HP*.3);c.toggle('tg',!!(B.rtw||(B.adds||[]).some(f=>f.hp>0&&f.rtw)));
+  const php=now<R.pvT?R.pv:S.hp;const h=RTK.h;if(h){h.hp.style.width=Math.max(0,php/s.HP*100)+'%';h.mp.style.width=Math.max(0,S.mp/s.MP*100)+'%';h.as.style.width=Math.max(0,Math.min(100,R.pg))+'%';h.pt.style.setProperty('--g',Math.max(0,Math.min(100,R.pg)));
+    const hv=`${Math.max(0,php)}/${s.HP}`;if(h.hv.textContent!==hv)h.hv.textContent=hv;const mv=`MP ${S.mp}/${s.MP}`;if(h.mv.textContent!==mv)h.mv.textContent=mv;
+    const c=h.el.classList;c.toggle('ready',rdy);c.toggle('low',php<s.HP*.3);c.toggle('tg',!!(B.rtw||(B.adds||[]).some(f=>f.hp>0&&f.rtw)));
     if(slow){const av=rtPT().toFixed(1)+'秒';if(h.asv.textContent!==av)h.asv.textContent=av;const st=rtPchips(R);if(h.stc._h!==st){h.stc.innerHTML=st;h.stc._h=st}const au=B.auto?'自動':'';if(h.au.textContent!==au)h.au.textContent=au;
       const xa=$('#xauto');if(xa){xa.classList.toggle('on',!!B.auto)}const xs=$('#xspd');if(xs)xs.textContent='×'+(S.rtSpd||1);const sb=$('#xsub');if(sb){const t=rtSub();if(sb.textContent!==t)sb.textContent=t}}}
   const A=B.ally,a=RTK.a;if(a&&A){a.hp.style.width=Math.max(0,A.hp/A.max*100)+'%';a.pt.style.setProperty('--g',A.hp>0?Math.min(100,R.ag):0);a.el.classList.toggle('down',A.hp<=0)}
@@ -3870,55 +3894,67 @@ function rtFrame(){const R=B.rt,now=performance.now(),s=rtS(),slow=now-RTK.stT>2
     let cn='';if(alive&&!stun&&R.t>=0){const rem=w?(w.dur-w.t)/fr:(100-g)/(100/rtFT(f,!c.m))/fr;cn=rem<9.95?rem.toFixed(1):''}if(c.cnt.textContent!==cn)c.cnt.textContent=cn;
     const cl=c.el.classList;cl.toggle('wind',!!w&&alive);cl.toggle('soon',!w&&alive&&g>75);cl.toggle('stun',!!stun&&alive);
     if(!alive&&!c.dead){c.dead=1;cl.add('dead');if(c.m){rtStamp(B.kind==='boss'?'首領擊破':'擊破','',B.kind==='boss'?esc(B.m.n):'');try{SFX.hit(0)}catch(e){}}}
-    const it=w&&alive?(w.mg?'<i>魔法</i>':'')+esc(w.n):'';if(c.it._h!==it){c.it.innerHTML=it;c.it._h=it}
+    const it=w&&alive?(w.mg?'<i>魔法</i>':'')+(w.nd?'<i class="nd">躲不掉</i>':'')+esc(w.n):'';if(c.it._h!==it){c.it.innerHTML=it;c.it._h=it}
     if(c.b2){const on=!!(B.chg&&B.chgNeed);c.b2.classList.toggle('on',on);if(on)c.b2.firstChild.style.width=Math.min(100,brkDone()/B.chgNeed*100)+'%'}
     if(slow){const st=rtFstat(f,c.m);if(c.sts._h!==st){c.sts.innerHTML=st;c.sts._h=st}}
     rtSwap(c)}
   const cm=$('#xcmds');if(cm){cm.classList.toggle('xdim',!rdy);for(const b of RTK.cb){const k=b.dataset.v;let na=R.done;
     if(k[0]!=='@'&&SK[k]){const c=mpCost(k),u=SK[k].ult&&B.ultUsed;na=na||S.mp<c||u;const t=SK[k].ult?(u?'已使用':'奧義'):'MP '+c;const e=b.querySelector('.cf');if(e.textContent!==t)e.textContent=t}
     b.classList.toggle('na',!!na);b.classList.toggle('qd',R.q===k)}}}
-function rtSync(){if(!B||!B.rt)return;rtCards();rtLog();rtFx()}
+function rtSync(){if(!B||!B.rt)return;rtCards();const dl=rtFx(),R=B.rt;if(dl>0){R.logAt=Math.max(R.logAt,performance.now()+dl);setTimeout(()=>{if(B&&B.rt)rtLog()},dl+20)}rtLog()}
 /* ---- 戰鬥紀錄 ---- */
 function rtLT(t){if(/【格擋】|招架/.test(t))return 'parry';if(/閃開|【閃避】|躲開/.test(t))return 'evade';if(/倒下了|衝了上來|擊破/.test(t))return 'kill';if(/^(露娜|蓋爾)/.test(t))return 'ally';
   const me=/^(你|妳)/.test(t);if(me){if(/爆擊/.test(t))return 'crit';if(/造成/.test(t))return 'atk';if(/回復/.test(t))return 'heal';return 'buff'}
   if(/^(毒素發作|灼燒|流血)，損失/.test(t)||/的.{0,12}造成 \d+ 傷害/.test(t)&&!/(受到|露娜)/.test(t))return 'foe';
   if(/^(裝備效果|再生效果|神回應)/.test(t))return 'heal';return 'sys'}
-function rtLog(){const el=$('#blogi');if(!el)return;const R=B.rt;let n=0;while(R.li<B.log.length){const t=String(B.log[R.li++]),ty=rtLT(t);let v='';const m=t.match(/(?:造成|反擊|回復|吸取|損失|反彈)\s*(\d+)/);if(m)v=(ty==='heal'?'+':ty==='foe'?'-':'')+m[1];
+function rtLog(){const el=$('#blogi');if(!el)return;const R=B.rt;if(performance.now()<R.logAt)return;let n=0;while(R.li<B.log.length){const t=String(B.log[R.li++]),ty=rtLT(t);let v='';const m=t.match(/(?:造成|反擊|回復|吸取|損失|反彈)\s*(\d+)/);if(m)v=(ty==='heal'?'+':ty==='foe'?'-':'')+m[1];
     const d=document.createElement('div');d.className='blg t-'+ty;d.innerHTML=`<span class="lgi">${RTI.l[ty]||RTI.l.sys}</span><span class="lt">${esc(t)}</span>${v?`<b class="lv">${v}</b>`:''}`;el.appendChild(d);n++}
   if(n){while(el.children.length>40)el.firstChild.remove();const b=$('#xlog');if(b)b.scrollTop=b.scrollHeight}}
 /* ---- 特效 ---- */
 function rtPop(el,txt,cls,dl,lab){if(!el)return;const go=()=>{const d=document.createElement('div');d.className='pop '+(cls||'');d.innerHTML=(lab?`<small>${lab}</small>`:'')+txt;const dx=Math.random()*50-25;d.style.left=(50+dx*.5)+'%';d.style.top=(cls==='c'?22:32)+Math.random()*14+'%';d.style.setProperty('--dx',dx*.6+'px');(el.querySelector('.eart')||el).appendChild(d);setTimeout(()=>d.remove(),1000)};dl?setTimeout(go,dl):go()}
-function rtStamp(t,cls,sub){const rb=$('#rtb');if(!rb)return;const d=document.createElement('div');d.className='stamp '+(cls||'');d.innerHTML=t+(sub?`<small>${sub}</small>`:'');rb.appendChild(d);setTimeout(()=>d.remove(),1300)}
+function rtStamp(t,cls,sub){const rb=$('#rtb');if(!rb)return;rb.querySelectorAll('.stamp').forEach(e=>e.remove());const d=document.createElement('div');d.className='stamp '+(cls||'');d.innerHTML=`<b>${t}</b>`+(sub?`<small>${sub}</small>`:'');rb.appendChild(d);setTimeout(()=>d.remove(),1200)}
 function rtFlash(c){const rb=$('#rtb');if(!rb)return;const d=document.createElement('div');d.className='rtfl';d.style.background=c;rb.appendChild(d);setTimeout(()=>d.remove(),420)}
 function rtCls(el,c){if(!el)return;el.classList.remove(c);void el.offsetWidth;el.classList.add(c)}
-function rtWarn(n,dur){const x=$('#xfield');if(!x)return;$('#rtb .warnb')&&$('#rtb .warnb').remove();const d=document.createElement('div');d.className='warnb';d.textContent=n;x.appendChild(d);setTimeout(()=>d.remove(),Math.min(2400,dur*1000/((S.rtSpd||1)*(window.RTX||1))))}
+function rtWarn(n,dur){const x=$('#xfield');if(!x)return;$('#rtb .warnb')&&$('#rtb .warnb').remove();const d=document.createElement('div');d.className='warnb';d.innerHTML=`<i>DANGER</i><b>${esc(n)}</b>`;x.appendChild(d);setTimeout(()=>d.remove(),Math.min(2400,dur*1000/((S.rtSpd||1)*(window.RTX||1))))}
 function rtPose(k){const ks=battleSkills(),i=ks.indexOf(k),n=(SK[k]&&SK[k].ult)||i%2?2:1,key=AK()+'_s'+n,x=$('#xfield');if(!x||!(ARTSET&&ARTSET.has(key)))return false;
-  const d=document.createElement('div');d.className='posein p'+n;d.style.setProperty('--c',(SKA[k]||[])[1]||'#ffd86b');d.innerHTML=`<i></i><img src="art/${key}.webp" alt=""><b>${esc(SK[k].n)}</b>`;x.appendChild(d);setTimeout(()=>d.remove(),650);return true}
-function rtFx(){const R=B.rt,now=performance.now(),fx=B.fx,s=rtS();B.fx=null;const mc=rtMain(),hero=$('#rtb .bhc');
-  if(fx&&fx.by==='me'){let dl=0;
-    if(fx.skill&&SK[fx.skill]){if(rtPose(fx.skill)){dl=430;RTK.sl=(RTK.now||now)+500}else{dl=120;const x=$('#xfield');if(x&&fx.cut){const b=document.createElement('div');b.className='skb';b.style.setProperty('--c',(SKA[fx.skill]||[])[1]||'#ecd08a');b.textContent=SK[fx.skill].n;x.appendChild(b);setTimeout(()=>b.remove(),800)}}}
+  const d=document.createElement('div');d.className='posein p'+n;d.style.setProperty('--c',(SKA[k]||[])[1]||'#ffd86b');d.innerHTML=`<i></i><img src="art/${key}.webp" alt=""><b>${esc(SK[k].n)}</b>`;x.appendChild(d);setTimeout(()=>d.remove(),600);return true}
+/* 出手順序：立繪／招式名 → 特效 → 命中（數字、震動、血條一起）→ 紀錄 */
+function rtFx(){const R=B.rt,now=performance.now(),fx=B.fx,s=rtS();B.fx=null;const mc=rtMain(),hero=$('#rtb .bhc'),ok=()=>B&&B.rt===R;let hold=0;
+  if(fx&&fx.by==='me'){let dl=0;const sk=fx.skill&&SK[fx.skill];
+    if(sk){const ps=rtPose(fx.skill);if(!ps)rtName(sk.n,(SKA[fx.skill]||[])[1]);const d0=ps?340:120;setTimeout(()=>{if(ok())try{PFX.me(fx)}catch(e){}},d0);dl=d0+(fx.d!=null?560:260)}
+    else if(fx.d!=null){try{PFX.me(fx)}catch(e){}dl=200}
+    else if(fx.glow){try{PFX.me(fx)}catch(e){}}
+    RTK.hs=Math.max(RTK.hs,dl);hold=dl;
     if(fx.d===0)rtPop(mc&&mc.el,'閃開','m',dl);
-    else if(fx.d>0){const hl=fx.hl&&fx.hl.length>1?fx.hl:null;if(hl){hl.forEach((d,i)=>{rtPop(mc&&mc.el,d,'',dl+i*110);setTimeout(()=>{rtCls(mc&&mc.el,'hit');R.hurt=performance.now()+400},dl+i*110)});rtPop(mc&&mc.el,`${hl.length} HIT`,'c',dl+hl.length*110,fx.cr?'爆擊':'')}
-      else{rtPop(mc&&mc.el,fx.d,fx.cr?'c':'',dl,fx.cr?'爆擊':'');setTimeout(()=>{rtCls(mc&&mc.el,fx.cr?'hitc':'hit');R.hurt=performance.now()+450;if(fx.cr)RTK.hs=Math.max(RTK.hs,70)},dl)}
-      R.vh=R.vh0;R.vhT=now+dl+(hl?hl.length*110:0)}
+    else if(fx.d>0){const hl=fx.hl&&fx.hl.length>1?fx.hl:null,iv=hl?Math.min(110,Math.round(720/hl.length)):0,dead=B.hp<=0;
+      if(hl){hl.forEach((d,i)=>{rtPop(mc&&mc.el,d,'',dl+i*iv);setTimeout(()=>{if(!ok())return;rtCls(mc&&mc.el,'hit');R.hurt=performance.now()+400},dl+i*iv)});rtPop(mc&&mc.el,`${hl.length} HIT　${fx.d}`,'c',dl+hl.length*iv,fx.cr?'爆擊':'');hold=dl+hl.length*iv}
+      else rtPop(mc&&mc.el,fx.d,fx.cr?'c':'',dl,fx.cr?'爆擊':'');
+      setTimeout(()=>{if(!ok())return;rtCls(mc&&mc.el,fx.cr?'hitc':'hit');R.hurt=performance.now()+450;if(fx.cr)RTK.hs=Math.max(RTK.hs,70);try{PFX.impact('foe',dead?1:fx.d/B.max*5,fx.cr,dead,PFX.heroFxn(fx))}catch(e){}},dl);
+      R.vh=R.vh0;R.vhT=now+hold}
     if(fx.heal)rtPop(hero,'+'+fx.heal,'h',dl);
-    (fx.tags||[]).forEach((t,i)=>rtPop(mc&&mc.el,esc(t),'t',dl+260+i*200))}
-  if(fx&&fx.by==='foe'){const c=fx.af?rtCardOf(fx.af):mc,dg=R.lw&&R.lw.dg&&!fx.af;
-    if(c&&!fx.stun&&(fx.d!=null||fx.miss||fx.parry||fx.evade))rtCls(c.el,'lunge');
-    if(fx.parry){rtPop(hero,'格擋','p');rtStamp('格擋','cy','反擊');RTK.sl=(RTK.now||now)+380;rtFlash('rgba(255,250,230,.8)');if(hero){const r=document.createElement('div');r.className='pburst';hero.appendChild(r);setTimeout(()=>r.remove(),600)}
-      const cc=fx.ctrF?rtCardOf(fx.ctrF):mc;if(cc){rtCls(cc.el,'parried');if(fx.ctr)rtPop(cc.el,fx.ctr,'c',140,'反擊')}if(!fx.ctrF)R.hurt=now+450}
-    else if(fx.evade){rtPop(hero,'閃避','m');rtCls(hero,'evd')}
-    else if(fx.miss&&!fx.d)rtPop(hero,'閃開','m');
-    if(fx.d>0){rtPop(hero,'-'+fx.d,'k');rtCls(hero,'shake');if(dg||fx.d>=s.HP*.2){rtCls($('#rtb'),'shake');const rb=$('#rtb');if(rb){const v=document.createElement('div');v.className='vig';rb.appendChild(v);setTimeout(()=>v.remove(),520)}RTK.hs=Math.max(RTK.hs,80)}
-      if(S.hp>0&&fx.d>=s.HP*.3&&(B.dmc||0)<2&&ARTSET&&ARTSET.has(AK()+'_dm')){B.dmc=(B.dmc||0)+1;const x=$('#xfield');if(x){const d=document.createElement('div');d.className='dmgin';d.innerHTML=`<i></i><img src="art/${AK()}_dm.webp" alt=""><b>重創</b>`;x.appendChild(d);RTK.sl=(RTK.now||now)+700;setTimeout(()=>d.remove(),1900)}}}
+    (fx.tags||[]).forEach((t,i)=>rtPop(mc&&mc.el,esc(t),'t',hold+220+i*200))}
+  if(fx&&fx.by==='foe'){const c=fx.af?rtCardOf(fx.af):mc,lw=R.lw||{},dg=lw.dg&&!fx.af,act=!fx.stun&&(fx.d!=null||fx.miss||fx.parry||fx.evade);let dl=0;
+    if(act){if(c)rtCls(c.el,'lunge');if(!fx.af)try{PFX.foe(fx)}catch(e){}dl=!fx.af&&(fx.fsk||lw.k==='big')?480:170;RTK.hs=Math.max(RTK.hs,dl)}
+    hold=dl;R.pv=R.ph0;R.pvT=now+dl;
+    setTimeout(()=>{if(!ok())return;const n2=performance.now();
+      if(fx.nop)rtPop(hero,fx.nop,'t');
+      if(fx.parry){rtPop(hero,'格擋','p');rtStamp('格擋','cy',fx.stag?'踉蹌':'反擊');RTK.sl=(RTK.now||n2)+380;rtFlash('rgba(255,250,230,.7)');if(hero){const r=document.createElement('div');r.className='pburst';hero.appendChild(r);setTimeout(()=>r.remove(),600)}
+        const cc=fx.ctrF?rtCardOf(fx.ctrF):mc;if(cc){rtCls(cc.el,'parried');if(fx.ctr)rtPop(cc.el,fx.ctr,'c',140,'反擊')}if(!fx.ctrF)R.hurt=n2+450}
+      else if(fx.evade){rtPop(hero,'閃避','m');rtCls(hero,'evd')}
+      else if(fx.miss&&!fx.d)rtPop(hero,'閃開','m');
+      if(fx.d>0){rtPop(hero,'-'+fx.d,'k');rtCls(hero,'shake');try{PFX.impact('me',fx.d/s.HP*4,fx.cr,S.hp<=0,PFX.foeFxn(fx))}catch(e){}
+        if(dg||fx.d>=s.HP*.2){rtCls($('#rtb'),'shake');const rb=$('#rtb');if(rb){const v=document.createElement('div');v.className='vig';rb.appendChild(v);setTimeout(()=>v.remove(),520)}RTK.hs=Math.max(RTK.hs,80)}
+        if(S.hp>0&&fx.d>=s.HP*.3&&(B.dmc||0)<2&&ARTSET&&ARTSET.has(AK()+'_dm')){B.dmc=(B.dmc||0)+1;const x=$('#xfield');if(x){const d=document.createElement('div');d.className='dmgin';d.innerHTML=`<i></i><img src="art/${AK()}_dm.webp" alt=""><b>重創</b>`;x.appendChild(d);RTK.sl=(RTK.now||n2)+700;setTimeout(()=>d.remove(),1900)}}}},dl);
     if(fx.fheal&&c)rtPop(c.el,'+'+fx.fheal,'h');
-    if(fx.stun&&!fx.brk&&c)rtPop(c.el,'暈眩','m');
-    if(fx.brk){rtStamp('打斷','cy');RTK.sl=(RTK.now||now)+300}
-    if(fx.cut&&!fx.brk&&/蓄力|暴走/.test(fx.cut))rtStamp(fx.cut,'red')}
-  if(B.pops&&B.pops.length){B.pops.slice(-4).forEach((p,i)=>rtPop(mc&&mc.el,p.d,'d',i*160,p.k));B.pops=[]}
-  if(B.allyD){rtPop(mc&&mc.el,B.allyD,'a',0,B.ally?B.ally.n:'');setTimeout(()=>{if(B&&B.rt){B.rt.hurt=performance.now()+400;rtCls(mc&&mc.el,'hit')}},0);B.allyD=0}
-  if(B.allyH){rtPop(hero,'+'+B.allyH,'h',120);B.allyH=0}
-  if(B.allyHit){const a=$('#rtb .xal');rtPop(a,'-'+B.allyHit,'k');rtCls(a,'shake');B.allyHit=0}}
+    if(fx.brk){rtStamp('打斷','cy','毀滅一擊散了');RTK.sl=(RTK.now||now)+300}
+    else if(fx.cut&&/蓄力/.test(fx.cut))rtStamp('蓄力','red','打出傷害可以打斷');
+    else if(fx.cut&&/暴走/.test(fx.cut))rtStamp('暴走','red',esc(B.m.n))}
+  if(B.pops&&B.pops.length){B.pops.slice(-4).forEach((p,i)=>rtPop(mc&&mc.el,p.d,'d',hold+i*160,p.k));B.pops=[]}
+  if(B.allyD){const d=B.allyD;B.allyD=0;rtPop(mc&&mc.el,d,'a',180,B.ally?B.ally.n:'');setTimeout(()=>{if(ok()){R.hurt=performance.now()+400;rtCls(mc&&mc.el,'hit')}},180)}
+  if(B.allyH){rtPop(hero,'+'+B.allyH,'h',180);B.allyH=0}
+  if(B.allyHit){const a=$('#rtb .xal');rtPop(a,'-'+B.allyHit,'k',170);rtCls(a,'shake');B.allyHit=0}
+  return hold}
+function rtName(n,c){const x=$('#xfield');if(!x)return;x.querySelectorAll('.skb').forEach(e=>e.remove());const b=document.createElement('div');b.className='skb';b.style.setProperty('--c',c||'#ecd08a');b.innerHTML=`<b>${esc(n)}</b>`;x.appendChild(b);setTimeout(()=>b.remove(),900)}
 function rtPauseV(){const p=$('#bpause');if(!p||!B||!B.rt)return;const R=B.rt;p.style.display=R.paused?'flex':'none';
   if(R.paused)p.innerHTML=`<div class="pw"><div class="pt2">暫停</div><button class="xb" data-a="rtAuto">自動戰鬥：${B.auto?'開':'關'}</button><button class="xb" data-a="rtSpd">戰鬥速度：×${S.rtSpd||1}</button><button class="xb go" data-a="rtPause">繼續</button></div>`}
 function rtItems(){const el=$('#xitems');if(!el)return;if(!el.hidden){el.hidden=true;return}const us=Object.keys(S.items).filter(k=>ITEMS[k]&&ITEMS[k].use&&S.items[k]>0);
@@ -3933,7 +3969,7 @@ const PFX=(()=>{let HS=0,cv,cx,P=[],Q=[],raf=0,W=0,Hh=0,t0=0,SR={x:0,y:0,w:360,h
   const rnd=(a,b)=>a+Math.random()*(b-a),pk=a=>Array.isArray(a)?a[Math.floor(Math.random()*a.length)]:a;
   function ensure(){const app=$('#app');if(!cv||!app.contains(cv)){cv=document.createElement('canvas');cv.id='pfx';app.appendChild(cv);cx=cv.getContext('2d')}
     const r=app.getBoundingClientRect(),d=Math.min(2,window.devicePixelRatio||1);if(W!==r.width||Hh!==r.height){W=r.width;Hh=r.height;cv.width=W*d;cv.height=Hh*d;cx.setTransform(d,0,0,d,0,0)}}
-  function stage(){const st=document.querySelector('.stage'),a=$('#app').getBoundingClientRect();if(st){const r=st.getBoundingClientRect();SR={x:r.left-a.left,y:r.top-a.top,w:r.width,h:r.height}}}
+  function stage(){const st=(document.querySelector('.stage')||document.querySelector('#xfield')),a=$('#app').getBoundingClientRect();if(st){const r=st.getBoundingClientRect();SR={x:r.left-a.left,y:r.top-a.top,w:r.width,h:r.height}}}
   const pt=(fx,fy)=>[SR.x+SR.w*fx,SR.y+SR.h*fy];
   /* 元素粒子發光：鮮豔亮色用疊加光暈，深色魔法用柔邊，土石灰色維持描邊 */
   const GK={};function glowK(c){if(typeof c!=='string'||c[0]!=='#')return 0;if(c in GK)return GK[c];let h=c.slice(1);if(h.length===3)h=h.replace(/./g,x=>x+x);if(h.length!==6)return GK[c]=0;
@@ -4005,8 +4041,8 @@ const PFX=(()=>{let HS=0,cv,cx,P=[],Q=[],raf=0,W=0,Hh=0,t0=0,SR={x:0,y:0,w:360,h
         b=BBX[k]=x1<0?null:[x0/w,y0/h,(x1+1)/w,(y1+1)/h]}
       if(!b)return null;const nw=img.naturalWidth,nh=img.naturalHeight,sc=Math.max(r.width/nw,r.height/nh),dw=nw*sc,dh=nh*sc,ox=r.left+(r.width-dw)/2,oy=r.top+(r.height-dh)/2;
       return[ox+b[0]*dw,oy+b[1]*dh,ox+b[2]*dw,oy+b[3]*dh]}catch(e){return null}}
-  function locate(){try{const st=document.querySelector('.stage');if(!st)return;const sr=st.getBoundingClientRect();if(sr.width<10)return;
-    for(const [sel,A,side] of [['.spr.foe .art',F,'foe'],['.spr.me .art',H,'me'],['.stage .ally .art',AL,'me']]){const el=document.querySelector(sel);if(!el)continue;const r=offRect(el,st,sr);if(r.width<4||r.height<4)continue;
+  function locate(){try{const st=(document.querySelector('.stage')||document.querySelector('#xfield'));if(!st)return;const sr=st.getBoundingClientRect();if(sr.width<10)return;
+    for(const [sel,A,side] of [['.spr.foe .art, #rtb .bec.big .eart .art',F,'foe'],['.spr.me .art, #rtb .bhc .hpt',H,'me'],['.stage .ally .art, #rtb .xal .apt',AL,'me']]){const el=document.querySelector(sel);if(!el)continue;const r=offRect(el,st,sr);if(r.width<4||r.height<4)continue;
       const bx=figBox(el.querySelector('img'),r);
       if(bx){A[0]=((bx[0]+bx[2])/2-sr.left)/sr.width;A[1]=(bx[1]+(bx[3]-bx[1])*(side==='foe'?.52:.45)-sr.top)/sr.height;A.g=(bx[3]-(bx[3]-bx[1])*.02-sr.top)/sr.height-A[1]}
       else{A[0]=(r.left+r.width/2-sr.left)/sr.width;A[1]=(r.top+r.height*(side==='foe'?.52:.45)-sr.top)/sr.height;A.g=(r.bottom-r.height*(side==='foe'?.06:.03)-sr.top)/sr.height-A[1]}A.R=r.width/sr.width}
@@ -4108,7 +4144,7 @@ const PFX=(()=>{let HS=0,cv,cx,P=[],Q=[],raf=0,W=0,Hh=0,t0=0,SR={x:0,y:0,w:360,h
   function swirl(f,col,o){o=o||{};cel(o.life||.8,(c,k)=>{const [x,y]=P2(f),R=(o.R||.12)*U()*(1.2-eo(k*1.5)*.6);c.globalAlpha=Math.sin(Math.PI*Math.min(1,k*1.2));ADD(c);c.translate(x,y);c.scale(1,.7);c.shadowColor=col;c.shadowBlur=10;
       for(let j=0;j<3;j++){c.beginPath();for(let i=0;i<=30;i++){const t=i/30,a=t*5+j*2.09+k*9,r=R*(1-t*.85);c.lineTo(Math.cos(a)*r,Math.sin(a)*r)}c.strokeStyle=j?col:'#ffffff';c.lineWidth=Math.max(1.5,U()*.01*(1-k*.5));c.lineCap='round';c.stroke()}c.fillStyle=rg(c,0,0,R*.6,[[0,col],[1,T0]]);c.fillRect(-R,-R,R*2,R*2)})}
   /* 角色動作：衝刺、跳起、下沉、淡出 */
-  function moveSpr(side,kf,ms){try{const sp=document.querySelector(side==='foe'?'.spr.foe .art img:not(.under)':'.spr.me .art img:not(.under)');if(sp)sp.animate(kf,{duration:ms,easing:'cubic-bezier(.3,.8,.3,1)',composite:'add'})}catch(e){}}
+  function moveSpr(side,kf,ms){try{const sp=document.querySelector(side==='foe'?'.spr.foe .art img:not(.under), #rtb .bec.big .eart .art img:not(.under)':'.spr.me .art img:not(.under), #rtb .bhc .hface img');if(sp)sp.animate(kf,{duration:ms,easing:'cubic-bezier(.3,.8,.3,1)',composite:'add'})}catch(e){}}
   const lunge=(side,d)=>{const dx=(side==='foe'?-1:1)*(d||28);moveSpr(side,[{transform:'translate(0,0)'},{transform:`translate(${-dx*.25}px,0)`,offset:.2},{transform:`translate(${dx}px,${side==='foe'?8:-6}px)`,offset:.45},{transform:'translate(0,0)'}],460)};
   const hop=side=>moveSpr(side,[{transform:'translateY(0)'},{transform:'translateY(-30px)',offset:.4},{transform:'translateY(0)'}],420);
   const sink=side=>moveSpr(side,[{transform:'translateY(0)',opacity:1},{transform:'translateY(40px)',opacity:0,offset:.45},{transform:'translateY(40px)',opacity:0,offset:.6},{transform:'translateY(0)',opacity:1}],1000);
@@ -4519,7 +4555,7 @@ const PFX=(()=>{let HS=0,cv,cx,P=[],Q=[],raf=0,W=0,Hh=0,t0=0,SR={x:0,y:0,w:360,h
       phys([T[0],T[1]],'chunk',Math.round(2+P*4),{spd:[.4,1],sz:[.004,.009],life:[.6,1],dir:-PI/2+dir*.5,spread:1.1});
       fog([T[0]-dir*.02,gy-.02],'rgba(225,210,180,.75)',{R:.05+P*.04,n:6,rise:.03,life:.7,a:.55})}}if(cr){flash(T,'#ffffff',.3,.3);shock(T,'#ffe27a',.3,.4);spark(T,'#ffe27a',.24,14,.3);scr('rgba(255,255,255,.22)',.12)}
     if(dead){phys(T,'chunk',8,{spd:[.5,1.2],sz:[.008,.016],life:[.9,1.3],dir:-PI/2+dir*.4,spread:1});phys(T,'smoke',7,{dir:-PI/2,spread:PI,spd:[.05,.25],sz:[.03,.05],life:[.9,1.4],a:.5})}if(dead)at(250,()=>{fog([T[0],gy-.04],'rgba(220,210,190,.8)',{R:.1,n:8,rise:.04});flash(T,'#ffffff',.3,.4)});
-    const st=document.querySelector('.stage'),sp=document.querySelector(side==='foe'?'.spr.foe .art img:not(.under)':'.spr.me .art img:not(.under)');
+    const st=(document.querySelector('.stage')||document.querySelector('#xfield')),sp=document.querySelector(side==='foe'?'.spr.foe .art img:not(.under), #rtb .bec.big .eart .art img:not(.under)':'.spr.me .art img:not(.under), #rtb .bhc .hface img');
     const hs=HS-performance.now(),A=3+str*9+(cr?4:0);
     setTimeout(()=>{try{if(st&&!SHAKEOFF)st.animate([{transform:'translate(0,0)'},{transform:`translate(${A*dir}px,${-A*.5}px)`},{transform:`translate(${-A*.6*dir}px,${A*.4}px)`},{transform:`translate(${A*.3*dir}px,0)`},{transform:'translate(0,0)'}],{duration:260+str*120,easing:'ease-out'});
       if(sp)sp.animate([{filter:side==='foe'?'brightness(3) saturate(0)':'brightness(1.8) sepia(1) saturate(6) hue-rotate(-50deg)'},{filter:'none'}],{duration:cr?240:170,easing:'ease-out'});if(sp&&!dead){const K=8+str*22+(cr?10:0),R0=2+str*5;sp.animate([{transform:'translateX(0) rotate(0) scale(1,1)'},{transform:`translateX(${dir*K}px) rotate(${dir*R0}deg) scale(1.06,.92)`,offset:.12},{transform:`translateX(${-dir*K*.32}px) rotate(${-dir*R0*.35}deg) scale(.97,1.04)`,offset:.36},{transform:`translateX(${dir*K*.12}px) rotate(${dir*R0*.12}deg) scale(1.01,.99)`,offset:.58},{transform:`translateX(${-dir*K*.04}px) rotate(0) scale(1,1)`,offset:.78},{transform:'translateX(0) rotate(0) scale(1,1)'}],{duration:620+str*220,easing:'ease-out'})}}catch(e){}},Math.max(0,hs));
@@ -4544,8 +4580,6 @@ const PFX=(()=>{let HS=0,cv,cx,P=[],Q=[],raf=0,W=0,Hh=0,t0=0,SR={x:0,y:0,w:360,h
       if(fx.miss)return wind([H[0]+.05,H[1]],'#ffffff',{dir:-1,n:3,life:.35});
       if(fx.d>0){claw(H,'#ff6a6a',{n:3,ang:-.9});later(90,()=>hitFx(H,'#ff9a8a',.7))}}};
 })();
-/* 即時戰鬥畫面沒有舊舞台，粒子特效略過 */
-['impact','marks','ally','me','foe'].forEach(k=>{const f=PFX[k];if(typeof f==='function')PFX[k]=function(){if(B&&B.rt)return;return f.apply(this,arguments)}});
 {const _imp=PFX.impact;PFX.impact=function(side,str,cr,dead){_imp.apply(this,arguments);try{if(side==='foe'&&cr&&!dead)setTimeout(()=>talk('crit'),350);else if(side==='foe'&&!dead&&B&&B.kind!==''&&B.kind&&B.hp<B.max*.25&&!B.talkNear){B.talkNear=1;setTimeout(()=>talk('near'),350)}if(side==='me'&&!dead&&lowHP())setTimeout(()=>talk('low'),450)}catch(e){}}}
 const S_CLS=()=>S.cls;
 
