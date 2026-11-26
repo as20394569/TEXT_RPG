@@ -90,6 +90,44 @@ h3{font-family:var(--display);font-size:16px;color:var(--hd)}
 .item .grow{flex:1;min-width:0}.item b{display:block}.item .sub{display:block}
 .empty{text-align:center;color:var(--sub);padding:18px 0}
 
+
+/* 角色頁：科技感介面（只作用在 .cyb 內） */
+.cyb{--cy:#4fe3ff;--cy2:rgba(79,227,255,.22);display:flex;flex-direction:column;gap:12px}
+.cyb .panel,.cy-hero{position:relative;border:1px solid var(--cy2);border-radius:2px;background:linear-gradient(160deg,rgba(79,227,255,.07),transparent 40%),#15161b;box-shadow:none;clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px))}
+.cyb .panel::before,.cy-hero::before{content:'';position:absolute;left:0;top:0;width:44px;height:2px;background:var(--cy);box-shadow:0 0 8px var(--cy)}
+.cyb .panel::after,.cy-hero::after{content:'';position:absolute;right:0;bottom:0;width:26px;height:2px;background:var(--gold)}
+.cyb .panel>h3{font-size:15px;letter-spacing:.14em;color:#eaf9ff;padding-left:10px;border-left:3px solid var(--cy)}
+.cyb .gsec{border:1px solid var(--cy2);border-radius:2px;background:rgba(79,227,255,.04)}
+.cyb .item{border-radius:2px}
+.cy-hero{padding:12px;display:grid;grid-template-columns:40% 1fr;gap:10px 12px;background:repeating-linear-gradient(0deg,rgba(79,227,255,.05) 0 1px,transparent 1px 22px),repeating-linear-gradient(90deg,rgba(79,227,255,.05) 0 1px,transparent 1px 22px),linear-gradient(160deg,#1a2230,#101116 60%)}
+.cy-pt{position:relative;border:1px solid var(--cy2);background:radial-gradient(ellipse at 50% 100%,rgba(79,227,255,.28),transparent 62%);overflow:hidden}
+.cy-pt{display:flex;align-items:flex-end}.cy-pt .art{border:0;background:none;border-radius:0;width:100%}.cyb .party .btn{display:flex;flex-direction:column;align-items:center;white-space:normal;border-radius:2px}
+.cy-pt::before,.cy-pt::after{content:'';position:absolute;width:14px;height:14px;border:2px solid var(--cy);z-index:2}
+.cy-pt::before{left:-1px;top:-1px;border-right:0;border-bottom:0}.cy-pt::after{right:-1px;bottom:-1px;border-left:0;border-top:0}
+.cy-pt em{position:absolute;left:0;right:0;top:0;height:34%;background:linear-gradient(rgba(79,227,255,0),rgba(79,227,255,.16) 85%,rgba(79,227,255,.75));animation:cyScan 3.6s linear infinite;pointer-events:none;mix-blend-mode:screen}
+@keyframes cyScan{0%{transform:translateY(-110%)}100%{transform:translateY(310%)}}
+.cy-id{display:flex;flex-direction:column;gap:4px;min-width:0}
+.cy-tag{font:700 9px/1 monospace;letter-spacing:.18em;color:var(--cy);opacity:.85}
+.cy-id h3{font-size:22px;color:#fff;letter-spacing:.06em;text-shadow:0 0 12px rgba(79,227,255,.55);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cy-cls{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--sub)}
+.cy-cls>b{color:#101116;background:var(--cy);padding:1px 8px;font-size:12px;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%)}
+.cy-cls span b{font:900 20px var(--display);color:var(--gold)}
+.cy-pw{display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid var(--cy2);border-bottom:1px solid var(--cy2);padding:3px 0}
+.cy-pw span{font-size:10px;letter-spacing:.14em;color:var(--sub)}.cy-pw b{font:900 24px var(--display);color:var(--gold);text-shadow:0 0 10px rgba(232,188,78,.45);font-variant-numeric:tabular-nums}
+.cy-radar{width:100%;max-height:140px}.cy-radar .g{fill:none;stroke:rgba(79,227,255,.22);stroke-width:.6}.cy-radar .v{fill:rgba(79,227,255,.22);stroke:var(--cy);stroke-width:1.4;filter:drop-shadow(0 0 3px var(--cy))}.cy-radar .d{fill:#fff}.cy-radar text{font-size:8px;fill:#9fdcf0;text-anchor:middle}
+.cy-bars{grid-column:1/-1;display:flex;flex-direction:column;gap:5px}
+.cy-g{display:grid;grid-template-columns:30px 1fr 92px;gap:8px;align-items:center;font:700 10px/1 monospace;color:var(--sub)}
+.cy-g i{height:8px;background:rgba(255,255,255,.07);transform:skewX(-24deg);overflow:hidden}.cy-g u{display:block;height:100%;background:var(--c);box-shadow:0 0 8px var(--c);background-image:repeating-linear-gradient(90deg,transparent 0 9px,rgba(0,0,0,.45) 9px 11px)}
+.cy-g.hp{--c:#ff5d6c}.cy-g.mp{--c:#4f9bff}.cy-g.exp{--c:#5fe08a}
+.cy-g b{text-align:right;color:#fff;font-size:12px;font-variant-numeric:tabular-nums}.cy-g small{color:var(--sub);font-weight:400}
+.cy-grid{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.cy-c{padding:5px 6px 6px;border:1px solid var(--cy2);border-left:2px solid var(--cy);background:rgba(79,227,255,.05);display:flex;flex-direction:column;gap:1px;min-width:0}
+.cy-c span{font-size:10px;color:var(--sub);white-space:nowrap}.cy-c b{font:900 17px var(--display);color:#fff;font-variant-numeric:tabular-nums}
+.cy-c.main{border-left-color:var(--gold);background:rgba(232,188,78,.09)}.cy-c.main b{color:var(--gold)}
+.cy-res{grid-column:1/-1;display:flex;gap:6px;font-size:11px;color:var(--sub)}.cy-res span{flex:1;text-align:center;border:1px solid var(--cy2);padding:2px 0}
+.cy-k{font:700 10px monospace;color:var(--cy);letter-spacing:.08em;margin-right:2px}
+.cy-ab{position:relative;height:6px;margin:2px 0 6px;background:rgba(255,255,255,.07);transform:skewX(-24deg)}.cy-ab u{display:block;height:100%;background:linear-gradient(90deg,#2a8fd0,var(--cy));box-shadow:0 0 6px var(--cy)}.cy-ab s{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--gold)}
+@media (prefers-reduced-motion:reduce){.cy-pt em{display:none}}
 /* 插畫預留位 */
 .art{position:relative;overflow:hidden;border-radius:8px;border:2px dashed var(--line);background:repeating-linear-gradient(45deg,#efe2bd 0 10px,#f7edd2 10px 20px);width:100%;color:#2c2742}
 .art.r169{aspect-ratio:16/9}.art.r34{aspect-ratio:3/4}.art.r11{aspect-ratio:1/1}
@@ -2268,16 +2306,22 @@ function vChar(){const s=stats(),sc=setCounts();
   const eq=dollHtml();
   const BS=battleSkills(),lim=mySkills().length>loadMax();const sk=(lim?`<p class="sub">戰鬥中最多帶 <b>${loadMax()}</b> 招（目前 ${BS.length}/${loadMax()}），點「帶入／取下」調整你的招式組合。</p>`:'')+mySkills().map(k=>{const lv=S.skl[k]||1,on=BS.includes(k);return `<div class="item ${lim&&!on?'off':''}"><span class="ico c2">${icon('skill_'+k,ic('skill'))}</span><span class="grow"><b>${SK[k].n}　Lv.${lv}/5${lim&&on?' <span class="tag red">出戰</span>':''}</b><span class="sub">MP ${mpCost(k)}・${SK[k].d}</span>${skxOn(k,s.KW).map(w=>`<span class="sub" style="color:var(--r4)">${RZ[w].ic}【${RZ[w].n}改寫】${SKX[w].d}</span>`).join('')}</span>${lim?`<button class="btn sm ${on?'':'pri'}" data-a="skLoad" data-v="${k}">${on?'取下':'帶入'}</button>`:''}<button class="btn sm" data-a="skUp" data-v="${k}" ${S.sp>0&&lv<5?'':'disabled'}>升級</button></div>`}).join('');
   const nxt=Object.keys(SK).filter(k=>(SK[k].c===S.cls||SK[k].c===S.adv)&&S.lv<SK[k].lv).map(k=>`<span class="chip">Lv.${SK[k].lv} ${SK[k].n}</span>`).join('');
-  return `<div class="panel"><div class="char-top">${art(HK(),clsName()+'立繪','r34')}
-   <div class="list"><h3>${esc(S.name)}</h3><div class="row"><span class="tag">${clsName()}</span><span class="sub">Lv.${S.lv}</span></div>
-   <div class="stat-g"><div><span>HP</span><b>${s.HP}</b></div><div><span>MP</span><b>${s.MP}</b></div>${CLS[S.cls].basic==='MAG'?`<div class="main"><span>魔法攻擊</span><b>${s.MAG}</b></div><div><span>物理攻擊</span><b>${s.ATK}</b></div>`:`<div class="main"><span>物理攻擊</span><b>${s.ATK}</b></div><div><span>魔法攻擊</span><b>${s.MAG}</b></div>`}<div><span>防禦</span><b>${s.DEF}</b></div><div><span>魔抗</span><b>${s.MRES}</b></div><div><span>爆擊</span><b>${s.CRIT}%</b></div><div><span>迴避</span><b>${s.EVA}%</b></div><div><span>爆傷</span><b>${s.CD}%</b></div><div><span>吸血</span><b>${s.LS}%</b></div><div><span>戰力</span><b>${power()}</b></div></div>${s.RF||s.RI||s.RT||s.RD?`<p class="sub" style="margin-top:4px">抗性：火 ${s.RF}%　冰 ${s.RI}%　雷 ${s.RT}%　暗 ${s.RD}%</p>`:''}
-   <p class="sub">下一級還需 ${Math.max(0,need(S.lv)-S.exp)} EXP</p></div></div></div>
+  const mg=CLS[S.cls].basic==='MAG',L=S.lv,rv=[['生命',s.HP/(L*55+260)],[mg?'魔攻':'物攻',(mg?s.MAG:s.ATK)/(L*7+40)],['防禦',s.DEF/(L*5+40)],['魔抗',s.MRES/(L*4+30)],['爆擊',s.CRIT/60],['迴避',s.EVA/40]].map(([n,v])=>[n,Math.max(.14,Math.min(1,v))]);
+  const pt=(i,r)=>{const a=-Math.PI/2+i*Math.PI/3;return [(60+Math.cos(a)*r).toFixed(1),(60+Math.sin(a)*r).toFixed(1)]},hexP=r=>rv.map((_,i)=>pt(i,r).join(',')).join(' ');
+  const radar=`<svg class="cy-radar" viewBox="-14 -6 148 132" aria-hidden="true">${[46,31,16].map(r=>`<polygon points="${hexP(r)}" class="g"/>`).join('')}${rv.map((_,i)=>`<line x1="60" y1="60" x2="${pt(i,46)[0]}" y2="${pt(i,46)[1]}" class="g"/>`).join('')}<polygon points="${rv.map(([n,v],i)=>pt(i,46*v).join(',')).join(' ')}" class="v"/>${rv.map(([n,v],i)=>`<circle cx="${pt(i,46*v)[0]}" cy="${pt(i,46*v)[1]}" r="2" class="d"/><text x="${pt(i,57)[0]}" y="${(+pt(i,57)[1]+3).toFixed(1)}">${n}</text>`).join('')}</svg>`;
+  const cell=(n,v,c)=>`<div class="cy-c ${c||''}"><span>${n}</span><b>${v}</b></div>`,gauge=(k,v,m)=>`<div class="cy-g ${k}"><span>${k.toUpperCase()}</span><i><u style="width:${Math.max(0,Math.min(100,v/m*100))}%"></u></i><b>${v}<small>/${m}</small></b></div>`;
+  return `<div class="cyb"><div class="cy-hero"><div class="cy-pt">${art(HK(),clsName()+'立繪','r34')}<em></em></div>
+   <div class="cy-id"><span class="cy-tag">ADVENTURER // ${String(S.pid||'').slice(0,4).toUpperCase()||'0001'}</span><h3>${esc(S.name)}</h3><div class="cy-cls"><b>${clsName()}</b><span>LV <b>${S.lv}</b></span></div>
+   <div class="cy-pw"><span>戰力 POWER</span><b>${power()}</b></div>${radar}</div>
+   <div class="cy-bars">${gauge('hp',S.hp,s.HP)}${gauge('mp',S.mp,s.MP)}${gauge('exp',S.exp,need(S.lv))}</div>
+   <div class="cy-grid">${mg?cell('魔法攻擊',s.MAG,'main')+cell('物理攻擊',s.ATK):cell('物理攻擊',s.ATK,'main')+cell('魔法攻擊',s.MAG)}${cell('防禦',s.DEF)}${cell('魔抗',s.MRES)}${cell('爆擊',s.CRIT+'%')}${cell('爆傷',s.CD+'%')}${cell('迴避',s.EVA+'%')}${cell('吸血',s.LS+'%')}</div>
+   ${s.RF||s.RI||s.RT||s.RD?`<div class="cy-res"><span>火 ${s.RF}%</span><span>冰 ${s.RI}%</span><span>雷 ${s.RT}%</span><span>暗 ${s.RD}%</span></div>`:''}</div>
   ${buildPanel()}
   <div class="panel"><h3>職業特色</h3><p class="sub">${CLS[S.cls].f}</p><div class="gsec"><b>目前打法：${STN[S.cls][stn()].n}</b><span class="sub">${STN[S.cls][stn()].d}</span><span class="sub" style="opacity:.7">某些共鳴會改變打法。</span></div>${Object.keys(PASS).filter(id=>PASS[id].c===S.cls||PASS[id].c===S.adv).map(id=>`<span class="subl row ${hasP(id)?'':'sub'}" style="gap:6px"><span class="ico c4" style="width:30px;height:30px">${icon('pass_'+id,ic('skill'))}</span><span class="grow">被動【${PASS[id].n}】Lv.${PASS[id].lv}：${PASS[id].d}${PASS[id].sx?PASS[id].sx.map((x,i)=>`<br><span style="${stn()===i?'color:var(--r4);font-weight:700':'opacity:.6'}">${stn()===i?'✔ ':''}${STN[S.cls][i].n}：${x.d}</span>`).join(''):''}</span></span>`).join('')}${S.adv?`<p class="sub">${ADV[S.adv].n}：${ADV[S.adv].d}</p>`:''}</div>
-  <div class="panel"><h3>屬性　<span class="tag ${S.pts?'red':'off'}">可用 ${S.pts} 點</span><button class="btn sm" style="float:right" data-a="respec">重置（${respecCost()} G）</button></h3>${Object.keys(ATTR).map(k=>`<div class="attr"><span>${ATTR[k]}<span class="sub">　${{STR:'物理攻擊',DEX:'迴避・爆擊・連擊',INT:'魔力・MP・技能省 MP',VIT:'HP・防禦・每回合回血',LUK:'爆擊・爆傷・掉寶・金幣'}[k]}</span></span><b>${S.attr[k]}${s.A[k]>S.attr[k]?`<small class="up">+${s.A[k]-S.attr[k]}</small>`:''}</b><button class="btn sm" data-a="addPt" data-v="${k}" ${S.pts?'':'disabled'}>＋</button></div><div class="chips" style="margin:-2px 0 6px">${MS[k].map((m,i)=>`<span class="tag ${s.A[k]>=MSAT[i]?'red':'off'}">${MSAT[i]}【${m.n}】${m.d}</span>`).join('')}</div>`).join('')}</div>
+  <div class="panel"><h3>屬性　<span class="tag ${S.pts?'red':'off'}">可用 ${S.pts} 點</span><button class="btn sm" style="float:right" data-a="respec">重置（${respecCost()} G）</button></h3>${Object.keys(ATTR).map(k=>`<div class="attr"><span><b class="cy-k">${k}</b> ${ATTR[k]}<span class="sub">　${{STR:'物理攻擊',DEX:'迴避・爆擊・連擊',INT:'魔力・MP・技能省 MP',VIT:'HP・防禦・每回合回血',LUK:'爆擊・爆傷・掉寶・金幣'}[k]}</span></span><b>${S.attr[k]}${s.A[k]>S.attr[k]?`<small class="up">+${s.A[k]-S.attr[k]}</small>`:''}</b><button class="btn sm" data-a="addPt" data-v="${k}" ${S.pts?'':'disabled'}>＋</button></div><div class="cy-ab"><u style="width:${Math.min(100,s.A[k]/75*100)}%"></u>${MSAT.map(v=>`<s style="left:${v/75*100}%"></s>`).join('')}</div><div class="chips" style="margin:0 0 8px">${MS[k].map((m,i)=>`<span class="tag ${s.A[k]>=MSAT[i]?'red':'off'}">${MSAT[i]}【${m.n}】${m.d}</span>`).join('')}</div>`).join('')}</div>
   ${Object.keys(ALLY).some(k=>ALLY[k].open())?`<div class="panel"><h3>同行夥伴</h3><div class="party">${[...Object.keys(ALLY).filter(k=>ALLY[k].open()),'none'].map(k=>`<button class="btn ${(S.party||'none')===k?'on':''}" data-a="setParty" data-v="${k}">${k==='none'?'<b>獨自冒險</b><span class="sub">不帶夥伴</span>':`${art(ALLY[k].img,ALLY[k].n,'r11','mini')}<b>${ALLY[k].n}</b><span class="sub">${ALLY[k].role}</span>`}</button>`).join('')}</div><p class="sub">${S.party&&S.party!=='none'?ALLY[S.party].d+(S.party==='luna'?'　羈絆越深，露娜越強。':''):'不帶夥伴時，所有戰鬥都靠自己。'}</p>${S.party==='luna'?`<div class="gsec"><b>露娜・燈術士　羈絆 ${Math.floor(S.bond||0)}</b><span class="sub">下一級進度 ${Math.round(((S.bond||0)%1)*100)}%・今日已累積 ${(S.daily&&S.daily.bond||0).toFixed(2)}／1.5（一起冒險、打首領、營火閒聊）</span>${Object.values(LUNASK).map(k=>`<span class="sub ${k.ok()?'son':''}">${k.ok()?'◆':'◇'} 【${k.n}】${k.d}${k.ok()?'':`（解鎖：${k.need}）`}</span>`).join('')}</div>`:''}</div>`:''}
   <div class="panel"><h3>裝備</h3>${eq}<p class="sub" style="text-align:center">點部位查看裝備詳細資料</p>${setHtml}</div>
-  <div class="panel"><h3>技能　<span class="tag ${S.sp?'red':'off'}">技能點 ${S.sp}</span></h3><div class="list">${sk}</div>${nxt?`<div class="chips">${nxt}</div>`:''}</div>`}
+  <div class="panel"><h3>技能　<span class="tag ${S.sp?'red':'off'}">技能點 ${S.sp}</span></h3><div class="list">${sk}</div>${nxt?`<div class="chips">${nxt}</div>`:''}</div></div>`}
 function buildPanel(){const c=kwCount(),ks=Object.keys(RZ).filter(k=>c[k]),nm=buildName(c);
   return `<div class="panel bld"><h3>我的流派　${nm?`<span class="tag red">${nm}</span>`:'<span class="tag off">尚未成形</span>'}</h3>
    ${ks.length?ks.sort((a,b)=>c[b]-c[a]).map(k=>{const n=c[k],x=RZ[k];return `<div class="bk"><div class="bkh"><b>${x.ic} ${x.n}</b><span class="pips">${[1,2,3].map(i=>`<i class="${i<=n?'on':''}"></i>`).join('')}</span></div>
@@ -2964,6 +3008,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'15.12',d:'2026-11-26',t:'角色頁改版',b:'角色頁換成新介面：能力雷達、戰力與數值面板、屬性量表。另外，自己按撤退時全自動會跟著關掉。'},
   {v:'15.11',d:'2026-11-26',t:'狀態列只在城鎮出現',b:'上方的角色狀態列只留在城鎮首頁，其他頁面收起來。'},
   {v:'15.10',d:'2026-11-26',t:'配色定為墨黑',b:'全遊戲改用墨黑配色，其他配色與切換選項收掉。'},
   {v:'15.9',d:'2026-11-26',t:'五種配色可以換',b:'米色底拿掉了。設定最上面的「配色」可選：夜藍（預設）、墨黑、深林、酒紫、霧灰。'},
@@ -4066,7 +4111,7 @@ const ACT={
     closeM();TAB='adv';RUN={area:Math.min(4,Math.max(0,S.main.ch)),trial:true,nm:false,step:0,nodes:['boss'],loot:{gold:0,exp:0,items:[]},view:{type:'start'}};startBattle('shadow','boss');render()},
   startDg(v){if(S.hp<=1){toast('HP 太低，先到旅店休息');return}const [d,k]=String(v).split(':').map(Number);startDg(d,k)},dgNext(){dgNext()},gift14(v){gift14(v)},dgDiff(v){DGDIFF=+v;render()},
   startNm(v){if(S.hp<=1){toast('HP 太低，先到旅店休息');return}startRun(+v,true)},
-  runNext(){runNext()},bossGo(){if(!RUN)return;RUN.gate=1;runNext()},gatePrep(v){doPrep(v)},bossBox(v){bossBox(v)},core(v){corePick(v)},kiln(v){kilnPick(v)},camp(v){campPick(v)},retreat(){if(!RUN)return;if(RUN.step<0){RUN=null;render()}else finish(false)},retreatAsk(){if(!RUN||B)return;if(confirm('要撤退回城嗎？\n已獲得的金幣、經驗與戰利品都會保留。'))ACT.retreat()},finish(){finish(true)},
+  runNext(){runNext()},bossGo(){if(!RUN)return;RUN.gate=1;runNext()},gatePrep(v){doPrep(v)},bossBox(v){bossBox(v)},core(v){corePick(v)},kiln(v){kilnPick(v)},camp(v){campPick(v)},retreat(){if(!RUN)return;if(FA&&!FA.selfRet)faStop('已撤退，全自動關閉');if(RUN.step<0){RUN=null;render()}else finish(false)},retreatAsk(){if(!RUN||B)return;if(confirm('要撤退回城嗎？\n已獲得的金幣、經驗與戰利品都會保留。'))ACT.retreat()},finish(){finish(true)},
   evPick(v){evPick(+v)},
   bAtk(){pAct('atk')},bGuard(){pAct('guard')},bFlee(){pAct('flee')},bSkill(v){pAct('skill',v)},bItem(v){pAct('item',v)},
   bMenu(v){if(B.busy)return;B.menu=v;render()},
@@ -4182,7 +4227,7 @@ function faTick(){faDraw();if(!FA||!S||FA.busy)return;if(FA.hold&&Date.now()-FA.
   if(MODAL){if(B&&MODAL.k==='foe')return;if(B&&MODAL.k!=='msg'){closeM();return}faClick('#modal .sheet-b [data-a="closeM"].pri')||faClick('#modal .x');return}
   if(B){if(!B.auto){B.auto=AUTO=true;render();setTimeout(autoAct,200)}return}
   if(RUN){if(TAB!=='adv'){TAB='adv';render();return}
-    if(RUN.view&&RUN.view.type==='gate'){const L=MOBS[AREAS[RUN.area].boss].lv+(RUN.nm?10:0)+(RUN.dg?[0,1,3][RUN.dg.diff||0]:0),st=stats();if(((!S.cleared[RUN.area]||(RUN.dg&&RUN.dg.diff))&&S.lv<L-1)||(S.hp<st.HP*.35&&!S.items.pot&&!S.items.pot2&&!S.items.pot3)){toast('全自動：首領太強，先撤退練功');faClick('#main [data-a="retreat"]')}else{if(!RUN.prep){if(S.hp<st.HP*.6)doPrep('camp');else if(S.gold>=prepCost(L)*3)doPrep('scout');else if((S.items.pot||0)>2)doPrep('trap')}faClick('#main [data-a="bossGo"]')}return}
+    if(RUN.view&&RUN.view.type==='gate'){const L=MOBS[AREAS[RUN.area].boss].lv+(RUN.nm?10:0)+(RUN.dg?[0,1,3][RUN.dg.diff||0]:0),st=stats();if(((!S.cleared[RUN.area]||(RUN.dg&&RUN.dg.diff))&&S.lv<L-1)||(S.hp<st.HP*.35&&!S.items.pot&&!S.items.pot2&&!S.items.pot3)){toast('全自動：首領太強，先撤退練功');FA.selfRet=1;faClick('#main [data-a="retreat"]');if(FA)FA.selfRet=0}else{if(!RUN.prep){if(S.hp<st.HP*.6)doPrep('camp');else if(S.gold>=prepCost(L)*3)doPrep('scout');else if((S.items.pot||0)>2)doPrep('trap')}faClick('#main [data-a="bossGo"]')}return}
     (RUN.view&&RUN.view.type==='camp'&&(faCamp(),1))||((RUN.view&&RUN.view.type==='kiln'&&!RUN.view.done)?(kilnPick(S.hp>=stats().HP*.65?'forge':'rest'),true):false)||faClick('#main [data-a="bossBox"]',1)||faClick('#main [data-a="core"][data-fit]:not([data-v="greed"]):not([data-v="temper"])',1)||faClick('#main [data-a="core"]:not([data-v="greed"]):not([data-v="temper"])',1)||(document.querySelector('#main [data-a="pickFork"]')&&(faSmartFork()||faDice('#main [data-a="pickFork"]','岔路')))||(document.querySelector('#main [data-a="evPick"]')&&faDice('#main [data-a="evPick"]','事件抉擇'))||faClick('#main [data-a="evFight"]')||faClick('#main [data-a="bless"]',1)||faDeep()||faClick('#main [data-a="runNext"]')||faClick('#main [data-a="towerNext"]')||faClick('#main [data-a="finish"]');return}
   /* 回城：休息後重新出發同一地區 */
   if(FA.tower){faStop('高塔挑戰結束');return}
