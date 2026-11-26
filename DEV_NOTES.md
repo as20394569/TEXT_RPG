@@ -383,3 +383,8 @@
 ## v15.8（2026-11-26）
 - 戰鬥中 `#app.inb`：隱藏 `#hud`，`.stage.v2` 高度改 clamp(300px,58vh,500px)。
 - 配色調暗：`--sky #6e8fb4`、`--paper #d9ceb4`、`--panel #ece3cd`、`--panel2 #d8c9a4`、`--line #86622c`、`--navy #1a2344`、`--navy2 #2b3a6e`、`--gold #e0b03e`；寫死的 `background:#fff` 改 `#f3ecda`。
+
+## v15.9（2026-11-26）配色主題
+- `html[data-th]`：night（預設）、ink、forest、wine、mist；`THEMES`／`thNow()`／`thApply()`／`ACT.setTh`，存 localStorage `ao_th`（不進存檔）。
+- 新變數：`--hd`（標題與按鈕字色，原本借用 --navy）、`--card`、`--btn1`、`--warn`、`--bad`、`--dim`、`--dk`、`--shade`。之後寫 CSS：深色底上的字用這些變數；自己帶淺色底的元件字色要寫死深色。
+- 測試：/tmp/sim/th.py（每個主題 12 個畫面）。
