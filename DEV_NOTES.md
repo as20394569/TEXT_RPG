@@ -388,3 +388,6 @@
 - `html[data-th]`：night（預設）、ink、forest、wine、mist；`THEMES`／`thNow()`／`thApply()`／`ACT.setTh`，存 localStorage `ao_th`（不進存檔）。
 - 新變數：`--hd`（標題與按鈕字色，原本借用 --navy）、`--card`、`--btn1`、`--warn`、`--bad`、`--dim`、`--dk`、`--shade`。之後寫 CSS：深色底上的字用這些變數；自己帶淺色底的元件字色要寫死深色。
 - 測試：/tmp/sim/th.py（每個主題 12 個畫面）。
+
+## v15.10（2026-11-26）
+- 使用者選定墨黑：只留 `html[data-th=ink]`，移除其餘四種與設定裡的切換；`thNow()` 固定回 'ink'。
