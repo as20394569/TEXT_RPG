@@ -439,10 +439,11 @@ body.pc #app{margin:0;flex:none;box-shadow:0 0 40px rgba(0,0,0,.45)}
 .stage.v2 .spr.foe.lunge-foe{animation:v2lg .42s}.stage.v2 .spr.foe.lunge2{animation:v2lg .42s .5s}
 @keyframes v2lg{45%{transform:translateY(16%) scale(1.22)}}
 @keyframes v2pop{30%{transform:scale(1.12) translateY(-6%)}}
-.posein{position:absolute;inset:0;z-index:30;pointer-events:none;overflow:hidden;opacity:0;animation:v2pin .62s ease-out forwards}
-.stage.pd .spr.foe.hitl .art{animation-delay:1.38s}.stage.pd .spr.foe.faintl{animation-delay:1.88s}.stage.pd.quakel,.stage.pd.punchl{animation-delay:1.38s}.stage.pd .dmg.late{animation-delay:1.43s}.stage.pd .spr.me.dash{animation-delay:.93s}
+.stage.bout{transition:opacity .26s ease-in,filter .26s;opacity:.15;filter:brightness(1.6)}.panel.resin{animation:resIn .34s ease-out}@keyframes resIn{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:none}}
+.posein{position:absolute;inset:0;z-index:30;pointer-events:none;overflow:hidden;opacity:0;animation:v2pin .54s ease-out forwards}
+.stage.pd .spr.foe.hitl .art{animation-delay:1.3s}.stage.pd .spr.foe.faintl{animation-delay:1.8s}.stage.pd.quakel,.stage.pd.punchl{animation-delay:1.3s}.stage.pd .dmg.late{animation-delay:1.35s}.stage.pd .spr.me.dash{animation-delay:.85s}
 .posein>i{position:absolute;left:-10%;right:-10%;top:14%;bottom:14%;background:linear-gradient(100deg,transparent 0,rgba(10,16,40,.86) 14% 86%,transparent);transform:skewY(-7deg);box-shadow:0 0 0 3px var(--c,#ffd86b) inset}
-.posein>img{position:absolute;left:6%;bottom:4%;height:92%;max-width:88%;object-fit:contain;filter:drop-shadow(0 6px 10px rgba(0,0,0,.6));animation:v2pim .62s cubic-bezier(.15,.8,.25,1) forwards}
+.posein>img{position:absolute;left:6%;bottom:4%;height:92%;max-width:88%;object-fit:contain;filter:drop-shadow(0 6px 10px rgba(0,0,0,.6));animation:v2pim .54s cubic-bezier(.15,.8,.25,1) forwards}
 .posein.p2>img,.posein.lu>img{left:auto;right:6%;animation-name:v2pim2}
 .posein>b{position:absolute;right:6%;bottom:17%;color:#fff;font-family:var(--display);font-weight:900;font-size:24px;letter-spacing:.12em;text-shadow:0 2px 0 #000,0 0 12px var(--c,#ffd86b)}
 .posein.p2>b,.posein.lu>b{right:auto;left:6%}
@@ -1930,7 +1931,7 @@ const LSK={whirl:['十字的劍痕……還留在空氣裡。','漂亮的收尾�
   bash:['盾牌撞上去的聲音好響！'],rage:['又拿血換傷害！等下我要罵{你|妳}。'],stab:['影子一閃就結束了……'],sanct:['庇護所裡，霧進不來。'],judge:['天秤傾斜了——牠完了。']};
 const LCL={swordsman:['好重的一擊！','{你|妳}的背影好可靠。'],mage:['魔法的光，比我的燈還亮。','好強的魔力波動！'],ranger:['好準！','風剛好停了，時機完美。'],cleric:['神聖的光……牠在發抖。','祈禱起作用了，牠的霧變淡了。'],
   knight:['{你|妳}站在那裡，就像一面牆。'],berserker:['{你|妳}又流血了啦！'],archmage:['這才是大魔導士。'],warlock:['黑色的魔力……還好是站在我們這邊。'],sniper:['一箭一隻，乾淨俐落。'],assassin:['我根本看不到{你|妳}的刀。'],bishop:['主教的光，連霧都會讓路。'],templar:['錘子加禱詞，好吵但好可靠。']};
-function lunaSkill(id){if(!B||!withLuna()||B.ally&&B.ally.hp<=0||(B.talkN||0)>=3||Math.random()>.3)return;const L=LSK[id]||LCL[S.adv]||LCL[S.cls];if(!L)return;B.talkN=(B.talkN||0)+1;setTimeout(()=>{if(B)bub('luna',pick(L))},1100)}
+function lunaSkill(id){if(!B||!withLuna()||B.ally&&B.ally.hp<=0||(B.talkN||0)>=3||Math.random()>.3)return;const L=LSK[id]||LCL[S.adv]||LCL[S.cls];if(!L)return;B.talkN=(B.talkN||0)+1;setTimeout(()=>{if(B)bub('luna',pick(L))},60)}
 /* 非戰鬥：出發、營火時依職業與性別說話 */
 const LOUT=[['出發前檢查一下：藥水、繩子、{你|妳}的劍。',cI('swordsman')],['今天也要靠{你|妳}的劍開路了。',cI('swordsman')],
   ['{你|妳}的法杖上沾了霧晶粉，借我刮一點下來研究？',cI('mage')],['法師跟燈術士一起走，晚上都不用生火了。',cI('mage')],
@@ -1941,8 +1942,12 @@ const LOUT=[['出發前檢查一下：藥水、繩子、{你|妳}的劍。',cI('
   ['藥水帶夠了嗎？不夠我這裡還有。',null],['路上小心，霧濃的地方跟緊我的燈。',null]];
 {const _sr=startRun;startRun=function(){const r=_sr.apply(this,arguments);try{if(withLuna()&&Math.random()<.4){const l=lunaOut();if(l)setTimeout(()=>toast('露娜：「'+l+'」'),600)}}catch(e){}return r}}
 function lunaOut(){if(!withLuna())return '';const l=pickC(LOUT);return l?you(tx(l)):''}
-function bub(who,text){try{const el=document.querySelector(who==='luna'?'.stage .ally':'.stage .spr.me'),app=$('#app');if(!el||!app||!text)return;const r=el.getBoundingClientRect(),a=app.getBoundingClientRect();
+function bubShow(who,text){try{const el=document.querySelector(who==='luna'?'.stage .ally':'.stage .spr.me'),app=$('#app');if(!el||!app||!text)return;const r=el.getBoundingClientRect(),a=app.getBoundingClientRect();
   const d=document.createElement('div');d.className='spb '+(who==='luna'?'bubL':'bubM');d.innerHTML=`<b>${who==='luna'?'露娜':esc(S.name)}</b>${esc(you(tx(text)))}`;d.style.left=Math.max(4,Math.min(a.width-200,r.left-a.left+r.width*(who==='luna'?.1:.35)))+'px';d.style.top=Math.max(4,r.top-a.top-8)+'px';app.appendChild(d);setTimeout(()=>d.classList.add('out'),2300);setTimeout(()=>d.remove(),2700)}catch(e){}}
+/* 對話泡泡排隊：等圖卡與命中演完才出現，一次一句 */
+let BUBQ=[],BUBW=0,BUBN=0;
+function bub(who,text){if(!B||!text)return;if(BUBQ.length>=2)BUBQ.shift();BUBQ.push([who,text]);if(!B.bubAt)B.bubAt=performance.now()+650;bubPump()}
+function bubPump(){if(BUBW||!BUBQ.length)return;if(!B){BUBQ=[];return}const now=performance.now(),w=Math.max(0,(B.bubAt||0)-now,BUBN-now);BUBW=1;setTimeout(()=>{BUBW=0;if(!B){BUBQ=[];return}if((B.bubAt||0)-performance.now()>40){bubPump();return}const x=BUBQ.shift();if(x){bubShow(x[0],x[1]);BUBN=performance.now()+1500}bubPump()},w)}
 function talk(ev,force){if(!B||!S)return;B.talkN=B.talkN||0;if(B.talkN>=3&&!force)return;const ch={start:.35,boss:1,crit:.3,low:1,guard:.8,win:.5,charge:1,rage:.9,brk:.9,dodge:.25,drag:.7,near:.5,fogbrk:1}[ev]||.3;if(!force&&Math.random()>ch)return;
   if(ev==='low'){if(B.talkLow)return;B.talkLow=1}
   const L=withLuna()&&(!BT.me[ev]||Math.random()<.7)&&!(B.ally&&B.ally.hp<=0);const line=pickC((L?BT.luna:BT.me)[ev]||[]);if(!line)return;B.talkN++;
@@ -2168,7 +2173,7 @@ function vRun(){if(RUN.tower)return vTower();const a=AREAS[RUN.area],v=RUN.view,
   let body='';
   if(v.type==='start')body=`<div class="panel">${art('area_'+a.id,a.n)}<p>${a.d}</p>${AFX[a.id]?`<div class="gsec"><b>地區特性：${AFX[a.id].n}</b><span class="sub">${AFX[a.id].d}</span></div>`:''}${RUN.dg?`<div class="gsec"><b>大副本「${dgOf().n}」第 ${RUN.dg.k+1}／${dgOf().segs.length} 段・${DGDN[RUN.dg.diff||0]}</b><span class="sub">${RUN.dg.depth?`已連續深入 ${RUN.dg.depth} 段：掉寶加成 +${Math.round((dgB()-1)*100)}%`:'打倒這段的首領後可以直接深入下一段'}</span></div>`:''}<p class="sub">本次路線共 ${RUN.nodes.length} 段，終點是${RUN.nodes[RUN.nodes.length-1]==='boss'?'首領 '+MOBS[a.boss].n:'精英魔物'}。</p><button class="btn pri big" data-a="runNext">踏入${a.n}</button><button class="btn" data-a="retreat">返回</button></div>`;
   else if(v.type==='gate')body=bossGate(a);
-  else if(v.type==='res')body=`<div class="panel">${v.img?`<div class="duo">${art(v.img,'勝利','r34')}${v.mimg?art(v.mimg,'','r11'):''}</div>`:''}<h3>${v.title}</h3>${v.drop||''}<p>${v.text}</p>${v.box?bossBoxHtml(v):''}${v.core?coreHtml(v):''}${v.box===1||(v.core&&!RUN.core)?'':last?(RUN.dg&&dgCanGo()?`<button class="btn pri big" data-a="dgNext">深入下一段：${AREAS[dgNextArea()].n}</button><p class="sub" style="text-align:center">不回城、不回血；下一段掉寶加成 +${Math.round(((RUN.dg.depth||0)+1)*15)}%</p><button class="btn" data-a="finish">帶著戰利品回城</button>`:`<button class="btn pri big" data-a="finish">完成冒險</button>${RUN.dg&&dgNextArea()>=0?'<p class="sub" style="text-align:center">這趟沒有打倒首領，無法繼續深入。</p>':''}`):`<button class="btn pri big" data-a="runNext">繼續前進</button><button class="btn" data-a="retreat">撤退回城（保留戰利品）</button>`}</div>`;
+  else if(v.type==='res')body=`<div class="panel resin">${v.img?`<div class="duo">${art(v.img,'勝利','r34')}${v.mimg?art(v.mimg,'','r11'):''}</div>`:''}<h3>${v.title}</h3>${v.drop||''}<p>${v.text}</p>${v.box?bossBoxHtml(v):''}${v.core?coreHtml(v):''}${v.box===1||(v.core&&!RUN.core)?'':last?(RUN.dg&&dgCanGo()?`<button class="btn pri big" data-a="dgNext">深入下一段：${AREAS[dgNextArea()].n}</button><p class="sub" style="text-align:center">不回城、不回血；下一段掉寶加成 +${Math.round(((RUN.dg.depth||0)+1)*15)}%</p><button class="btn" data-a="finish">帶著戰利品回城</button>`:`<button class="btn pri big" data-a="finish">完成冒險</button>${RUN.dg&&dgNextArea()>=0?'<p class="sub" style="text-align:center">這趟沒有打倒首領，無法繼續深入。</p>':''}`):`<button class="btn pri big" data-a="runNext">繼續前進</button><button class="btn" data-a="retreat">撤退回城（保留戰利品）</button>`}</div>`;
   else if(v.type==='fork')body=`<div class="panel"><h3>岔路</h3><p class="sub">前方的路分成兩條。要往哪邊走？</p>${forkTalk()}<div class="fork">${v.opts.map((o,i)=>(()=>{const tg=((RUN.ftags||[])[RUN.step+1]||[])[i],T=tg&&TAGS[tg];const bl=(RUN.blind||[])[RUN.step+1]===i;if(bl)return `<button class="btn" data-a="pickFork" data-v="${i}"><i>🌫</i><b>濃霧中的路</b><span>霧太濃了，看不清前面有什麼</span><span class="risk">完全未知</span></button>`;return `<button class="btn ${T?'tagged':''}" data-a="pickFork" data-v="${i}"><i>${NODE[o][0]}</i><b>${NODE[o][1]}</b><span>${NODE[o][2]}</span><span class="risk">${NRISK[o]||''}</span>${T?`<span class="ftag">${T[0]} ${T[1]}<small>${T[2]}</small></span>`:''}</button>`})()).join('')}</div><button class="btn" data-a="retreat">撤退回城（保留戰利品）</button></div>`;
   else if(v.type==='kiln')body=`<div class="panel">${art('event_kiln','霧窯')}<h3>營地旁的霧窯</h3><p>營地後面有一座長滿青苔的舊窯，窯口還留著不會熄的紫火，槌子靠在一旁。你懷裡的霧核微微發燙，像是認得這裡。</p>${v.done?`<p>${v.done}</p><button class="btn pri big" data-a="${last?'finish':'runNext'}">${last?'完成冒險':'繼續前進'}</button>`:`<div class="lbl">今晚只夠做一件事</div><div class="list"><button class="btn" style="text-align:left;white-space:normal;line-height:1.5" data-a="kiln" data-v="rest"><b>${campIc('rest',26)}在營火旁休息</b><br><span class="sub">回復 35% 的 HP 與 MP</span></button><button class="btn" style="text-align:left;white-space:normal;line-height:1.5" data-a="kiln" data-v="forge"><b>${campIc('core',26)}重鍛【${MCORE[RUN.core].n}】</b><br><span class="sub">不休息。霧核升為精鍛：${MCORE[RUN.core].d2||MCORE[RUN.core].d}</span></button><button class="btn" style="text-align:left;white-space:normal;line-height:1.5" data-a="kiln" data-v="hone"${honeMax()?' disabled':''}><b>${campIc('hone',26)}磨刃</b><br><span class="sub">${honeMax()?'武器已經磨到極限了':CAMPO.hone[2]}</span></button><button class="btn" style="text-align:left;white-space:normal;line-height:1.5" data-a="kiln" data-v="raid"${RUN.raid?' disabled':''}><b>${campIc('raid',26)}夜探</b><br><span class="sub">${RUN.raid?'前面的路已經探過了':CAMPO.raid[2]}</span></button></div>`}</div>`;
   else if(v.type==='camp')body=campHtml();
@@ -2197,16 +2202,16 @@ const RACEOF=(()=>{const m={};const put=(r,l)=>l.split(' ').forEach(k=>m[k]=r);
   put('dragon','icedragon');put('elemental','icesprite stormsprite windfairy');put('insect','orebeetle mosscrab worm bookworm');put('demon','demon gatewarden');return m})();
 const raceOf=id=>{if(RACEOF[id])return RACEOF[id];const v=typeof MVAR!=='undefined'&&MVAR[id];if(v&&RACEOF[v.base])return RACEOF[v.base];const m=MOBS[id];return m&&m.fly?'flyer':'beast'};
 /* 招式圖卡先亮相，退場後特效才開始、最後才命中：圖卡時間 PD 毫秒 */
-const PD=480;
+const PD=400;
 function vBattle(){const s=stats(),fx=B.fx||{},intro=B.intro,a=AREAS[RUN.area];B.fx=null;B.intro=false;const AL=B.ally,aD=B.allyD,aH=B.allyH,aHit=B.allyHit;B.allyD=B.allyH=B.allyHit=0;
   const fp=B.fhp,pp=B.php;B.fhp=B.hp/B.max*100;B.php=S.hp/s.HP*100;
   const C=B.cls,kl=B.hp>0&&!(B.adds||[]).some(f=>f.hp>0)&&(()=>{try{return myPd(null,s)>=B.hp?'普攻':battleSkills().some(k=>SK[k].dmg&&S.mp>=mpCost(k)&&myPd(k,s)>=B.hp)?'技能':''}catch(e){return ''}})(),st=[kl?`<span class="chip" style="color:#fff;background:#b8452a" title="這一擊大概就能收掉，不必再防守">🗡 ${kl}可斬殺</span>`:'',...B.aff.map(x=>`<span class="chip" style="color:#fff;background:#7a2a4a">${AFF[x].n}</span>`),...B.fb.map(b=>`<span class="chip">${b.n} ${b.t}</span>`),B.fshield>0?`<span class="chip">盾 ${B.fshield}</span>`:'',C.brk?`<span class="chip" style="color:var(--hp)">破綻 ${C.brk}</span>`:'',B.tough||B.cdr>.06?`<span class="chip" title="降低你的爆擊率與爆擊傷害">韌性 ${B.tough||0}・爆抗 ${Math.round((B.cdr||0)*100)}%</span>`:'',C.marks.length?`<span class="chip" style="color:var(--r3)">印記 ${C.marks.join('')}</span>`:'',...Object.keys(B.st).filter(k=>B.st[k]>0).map(k=>`<span class="chip">${FOE[k]} ${B.st[k]}</span>`)].join('');
   const me=[RUN&&RUN.core&&MCORE[RUN.core]&&!RUN.tower?`<span class="chip" style="color:var(--exp)" title="${coreDs(RUN.core)}">${coreIc(RUN.core,16)}${coreNm(RUN.core).replace('霧核','')}${coreM0()>1?' ▲':''}${RUN.core==='shatter'&&!RUN.trial?` ${B.brkP?(RUN.coreUp?4:5):B.crk||0}/${RUN.coreUp?4:5}`:''}</span>`:'',B.opening?'<span class="chip" style="color:#1a1206;background:var(--exp);font-weight:700">✦ 下一擊 +50%</span>':'',honeM()>1?`<span class="chip" style="color:var(--exp)">⚔ 磨刃 +${RUN.hone*12}%</span>`:'',C.focus?`<span class="chip" style="color:var(--exp)">專注 ${C.focus}</span>`:'',S.cls==='cleric'?`<span class="chip" style="color:var(--r4)">信仰 ${C.faith}</span>`:'',B.counter?'<span class="chip">招架反擊</span>':'',B.endure?'<span class="chip">鬥氣解放</span>':'',...B.buffs.map(b=>`<span class="chip">${b.n} ${b.t}</span>`),B.shield>0?`<span class="chip">護盾 ${B.shield}</span>`:'',...['poison','burn','bleed','weak','stun'].filter(h=>B.pst[h]>0).map(h=>`<span class="chip" style="color:var(--hp)">${HST[h]} ${B.pst[h]}</span>`),B.pst.regen>0?`<span class="chip">再生 ${B.pst.regen}</span>`:'',B.guard?'<span class="chip">防禦中</span>':''].join('');
   
-  if(fx.by)B.pfx=fx;const mine=fx.by==='me',theirs=fx.by==='foe',atk=mine&&fx.d!=null;const sk=fx.skill?SKA[fx.skill]:null,pd=B.pd=(sk&&mine&&ARTSET&&(ARTSET.has(AK()+'_s1')||ARTSET.has(AK()+'_s2')))?PD:0,fk=theirs&&fx.fsk?(SKM[fx.fsk]||{fx:'roar',c:'#ff4a4a'}):null;B.delayBar=!!(sk||fk);
+  if(fx.by)B.pfx=fx;const mine=fx.by==='me',theirs=fx.by==='foe',atk=mine&&fx.d!=null;const sk=fx.skill?SKA[fx.skill]:null,pd=B.pd=(sk&&mine&&ARTSET&&(ARTSET.has(AK()+'_s1')||ARTSET.has(AK()+'_s2')))?PD:0,fk=theirs&&fx.fsk?(SKM[fx.fsk]||{fx:'roar',c:'#ff4a4a'}):null;B.delayBar=!!(sk||fk);if(fx.by&&B.bubFx!==fx){B.bubFx=fx;B.bubAt=performance.now()+(mine?(sk?950+pd:250):(fk?950:320))+320}
   const foeC=['mv-'+raceOf(B.id),intro?'in-r':'',atk&&fx.d>0?(sk?'hitl':'hit'):fx.brk?'hit':'',theirs&&!fx.stun?(fk?(MELEE[fk.fx]?'charge lunge2':'charge'):'lunge-foe'):'',B.hp<=0?(sk?'faintl':'faint'):'',B.fog>0?'fog':'',B.mut&&(B.fog>0||!B.fogMax)?'mut':'',B.fogBrkT===B.turn&&B.fogMax?'fogout':'',B.nm?'nm':'',B.treasure?'gold':'',B.wander?'wander':'',...Object.keys(B.st||{}).filter(k=>B.st[k]>0).map(k=>'s-'+k),B.frozen&&B.st.stun>0?'s-freeze':'',B.chg?'chg':''].join(' ');
   const meC=[intro?'in-l':'',sk?(sk[0]==='slash'||sk[0]==='spin'?'cast dash':'cast'):atk?'lunge-me':'',mine&&fx.glow&&!sk?'glow':'',theirs&&fx.d>0?(fk?'hitl':'hit'):'',...Object.keys(B.pst||{}).filter(k=>B.pst[k]>0).map(k=>'s-'+k)].join(' ');
-  const foeFx0=(fx.fheal?`<span class="dmg heal ${fk?'late':''}">+${fx.fheal}</span>`:'')+(atk&&fx.d===0?'<span class="dmg miss">MISS</span>':'')+(atk&&fx.d>0?(fx.hl?fx.hl.map((d,i)=>`<span class="dmg hitn" style="animation-delay:${(.95+i*.13).toFixed(2)}s;margin-left:${((i%3)-1)*26}px;margin-top:${-(i%2)*14}px">${d}</span>`).join('')+`<span class="dmg tot ${fx.cr?'cr':''}" style="animation-delay:${(1.05+fx.hl.length*.13).toFixed(2)}s">${fx.hl.length} HIT　-${fx.d}${fx.cr?'!':''}</span>`:sk?`<span class="dmg late ${fx.cr?'cr':''} ${fx.d>=B.max*.2?'big':''}">-${fx.d}${fx.cr?'!':''}</span>`:`<span class="dmg ${fx.cr?'cr':''} ${fx.d>=B.max*.2?'big':''}">-${fx.d}${fx.cr?'!':''}</span>`):'')+(mine&&fx.tags&&fx.tags.length?`<span class="ftags">${fx.tags.map((t,i)=>`<i style="animation-delay:${(1.2+i*.25).toFixed(2)}s">${esc(t)}</i>`).join('')}</span>`:'')+(atk&&fx.d>0&&B.elHit?`<span class="dmg ${sk?'late':''} eltag ${B.elHit}">${B.elHit==='w'?'弱點！':B.elHit==='rend'?'裂甲！':'抵抗'}</span>`:'');
+  const foeFx0=(fx.fheal?`<span class="dmg heal ${fk?'late':''}">+${fx.fheal}</span>`:'')+(atk&&fx.d===0?'<span class="dmg miss">MISS</span>':'')+(atk&&fx.d>0?(fx.hl?fx.hl.map((d,i)=>`<span class="dmg hitn" style="animation-delay:${(.95+pd/1000+i*.13).toFixed(2)}s;margin-left:${((i%3)-1)*26}px;margin-top:${-(i%2)*14}px">${d}</span>`).join('')+`<span class="dmg tot ${fx.cr?'cr':''}" style="animation-delay:${(1.05+pd/1000+fx.hl.length*.13).toFixed(2)}s">${fx.hl.length} HIT　-${fx.d}${fx.cr?'!':''}</span>`:sk?`<span class="dmg late ${fx.cr?'cr':''} ${fx.d>=B.max*.2?'big':''}">-${fx.d}${fx.cr?'!':''}</span>`:`<span class="dmg ${fx.cr?'cr':''} ${fx.d>=B.max*.2?'big':''}">-${fx.d}${fx.cr?'!':''}</span>`):'')+(mine&&fx.tags&&fx.tags.length?`<span class="ftags">${fx.tags.map((t,i)=>`<i style="animation-delay:${((sk?1.2+pd/1000:.5)+i*.25).toFixed(2)}s">${esc(t)}</i>`).join('')}</span>`:'')+(atk&&fx.d>0&&B.elHit?`<span class="dmg ${sk?'late':''} eltag ${B.elHit}">${B.elHit==='w'?'弱點！':B.elHit==='rend'?'裂甲！':'抵抗'}</span>`:'');
   const foeFx=foeFx0+(()=>{const x=(B.pops||[]).slice(-4).map((p,i)=>`<span class="dmg pop p-${POPK[p.k]}" style="animation-delay:${(sk?1.1+pd/1000:.35)+i*.22}s;margin-left:${(i%2?1:-1)*(18+i*6)}px">-${p.d}<small>${p.k}</small></span>`).join('');B.pops=[];return x})();
   const meFx=(theirs?(fx.miss?'<span class="dmg miss">MISS</span>':fx.d>0?(fk?`<span class="dmg late ${fx.cr?'cr':''}">-${fx.d}</span>`:`<span class="dmg">-${fx.d}</span>`):fx.d===0?'<span class="dmg miss">擋下</span>':''):'')+(fx.heal?`<span class="dmg heal ${sk?'late':''}">+${fx.heal}</span>`:'');
   /* 動作依時間發生：先出手，命中瞬間才受傷／倒地，之後回到待機 */
@@ -2956,6 +2961,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'15.7',d:'2026-11-26',t:'戰鬥節奏調整',b:'①招式圖卡變快。②多段傷害數字、狀態標籤等圖卡演完才跳。③對話泡泡改成命中之後才出現，一次一句不重疊。④擊倒後等魔物倒下、畫面淡出，結算再滑進來。'},
   {v:'15.6',d:'2026-11-26',t:'露娜的話變了',b:'露娜在戰鬥中不再提醒怎麼打，只說她當下看到的、感覺到的。'},
   {v:'15.5',d:'2026-11-26',t:'狂戰士立繪調整',b:'狂戰士（男／女）一般站姿重畫：巨斧改扛在肩上，表情換成帶挑釁的笑。'},
   {v:'15.4',d:'2026-11-26',t:'全自動進得了大副本、掛機有保底',b:'①全自動：會一路深入大副本，回城後再進同一個副本與難度；換裝會顧著身上的流派。②自動戰鬥：首領蓄力時先打斷或防禦，不再先補血；纏霧時會挑多段招式。③背景掛機：每 3 小時保底一件稀有以上，雜裝變少。④「收割」共鳴：敵人半血以下打更痛。祭司「祈禱」小幅加強。'},
@@ -3262,7 +3268,7 @@ function pAct(type,arg){if(!B||B.busy)return;const s=stats();
   else if(type==='guard'){B.guard=true;S.mp=Math.min(s.MP,S.mp+Math.max(2,Math.round(s.MP*.08)));if((s.KW.guard||0)>=3){const h=Math.round(s.HP*.08);S.hp=Math.min(s.HP,S.hp+h);B.gdUp=1;blog(`【守護共鳴】穩住架式，回復 ${h} HP，下次攻擊 +30%`)}B.fx={by:'me',glow:1};SFX.buff();blog('你擺出防禦架式，並回復少許 MP')}
   else if(type==='flee'){if(Math.random()<.6+S.attr.DEX*.005){B=null;RUN.view={type:'res',title:'成功逃離',text:'你甩開了魔物，繼續趕路。'};render();return}blog('逃跑失敗！')}
   B.menu='main';B.busy=true;render();
-  if(B.hp<=0){setTimeout(win,type==='skill'?1900:1200);return}
+  if(B.hp<=0){winSoon(type==='skill'?2150+(B.pd||0):1350);return}
   setTimeout(foeTurn,AS(type==='skill'?1750+(B&&B.pd||PD):850))}
 /* 魔法型首領（MAG 遠高於 ATK）的普通攻擊改成魔力彈：吃 MAG×0.6、看魔抗 */
 const mgB=()=>!!(B&&B.kind==='boss'&&B.id!=='shadow'&&B.mag>B.atk*1.5);
@@ -3277,14 +3283,14 @@ function foeTurn(){if(!B)return;if(B.treasure&&B.turn>=3&&B.hp>0){B=null;RUN.vie
   if(B.stunHit&&!(B.st.stun>0)&&B.hp>0){B.stunHit=0;B.srcNow='震擊共鳴';const r=hitFoe(CLS[S.cls].basic,1.2);blog(`【震擊共鳴】暈眩結束的瞬間追加重擊 ${r.d}`)}
   {const kw=s.KW||{};if((kw.shield||0)>=3&&B.turn>0&&B.turn%4===0&&s.SHIELD){const sh=Math.round(s.HP*s.SHIELD/200);B.shield=Math.max(B.shield||0,sh);blog(`【先機共鳴】重新張開護盾 ${sh}`)}}
   addsDot();
-  if(B.hp<=0){render();setTimeout(win,1200);return}
-  allyAct();if(B.hp<=0){render();setTimeout(win,1200);return}
+  if(B.hp<=0){render();winSoon(1350);return}
+  allyAct();if(B.hp<=0){render();winSoon(1350);return}
   if((B.trait==='cleanse'||B.trait==='grove')&&B.hp>0&&(B.st.burn>0||B.st.poison>0||B.st.bleed>0)){B.st.burn=0;B.st.poison=0;B.st.bleed=0;const h=Math.round(B.max*.04);B.hp=Math.min(B.max,B.hp+h);blog(`${B.name} 的【${TRX(B.trait).n}】清除了持續傷害，並回復 ${h} HP`)}
   if((B.trait==='summon'||B.trait==='grove')&&B.hp>0&&B.turn%3===0&&(B.adds||[]).filter(f=>f.hp>0).length<2&&RUN){try{const f=mkFoe(pick(AREAS[RUN.area].mobs.slice(0,2)),'');f.hp=f.max=Math.round(f.max*.6);B.adds=(B.adds||[]).filter(x=>x.hp>0);B.adds.push(f);blog(`${B.name} 叫來了 ${f.name}！`)}catch(e){}}
   if(B.trait==='undying'&&B.hp>0){if(B.st.burn>0||B.st.poison>0)blog(`${B.name} 的【不死】被灼燒／中毒壓制，無法再生`);else{const h=Math.round(B.max*.05);B.hp=Math.min(B.max,B.hp+h);blog(`${B.name} 的【不死】再生 ${h} HP`)}}
   if(B.spk){blog(`【尖刺】這回合你被反彈了 ${B.spk} 傷害`);B.spk=0}
   if(B.aff.includes('regen')&&B.turn<20){const h=Math.round(B.max*.06);B.hp=Math.min(B.max,B.hp+h);blog(`${B.name} 再生了 ${h} HP`)}
-  if(B.turn>=20){const d=Math.round(B.max*Math.min(.15,.02*(B.turn-19)));B.hp=Math.max(0,B.hp-d);blog(`久戰之下，${B.name} 開始力竭，流失 ${d} HP`);if(B.hp<=0){render();setTimeout(win,1200);return}}
+  if(B.turn>=20){const d=Math.round(B.max*Math.min(.15,.02*(B.turn-19)));B.hp=Math.max(0,B.hp-d);blog(`久戰之下，${B.name} 開始力竭，流失 ${d} HP`);if(B.hp<=0){render();winSoon(1350);return}}
   const fx=B.fx={by:'foe'};if(B.turn===8&&!B.talkDrag){B.talkDrag=1;setTimeout(()=>{try{talk('drag')}catch(e){}},900)}
   if(B.kind==='boss'&&!B.rage&&B.hp<B.max*.5){B.rage=1;B.atk=Math.round(B.atk*1.3);B.mag=Math.round(B.mag*1.3);fx.cut=`${B.m.n} 暴走`;fx.fsk='m_rage';blog(`${B.name} 進入暴走狀態！攻擊大幅提升`);setTimeout(()=>{try{talk('rage',1)}catch(e){}},900)}
   else if(B.st.stun>0){B.st.stun--;fx.stun=1;blog(`${B.name} 暈眩中，無法行動`)}
@@ -3325,7 +3331,7 @@ function foeTurn(){if(!B)return;if(B.treasure&&B.turn>=3&&B.hp>0){B=null;RUN.vie
   if(B.pst.weak>0)B.pst.weak--;
   if(S.hp>0&&B.pst.regen>0){const h=Math.round(s.HP*.08);S.hp=Math.min(s.HP,S.hp+h);B.pst.regen--;blog(`再生效果回復 ${h} HP`)}
   if(S.hp>0&&B.cls.faith>=100){B.cls.faith=0;if(S.cls==='cleric'&&stn()){B.srcNow='審判';const r=hitFoe('MAG',4.5*(1+s.ANSWER/100));SFX.holy(0);blog(`【審判】神降下裁決的聖光，造成 ${r.d} 傷害`)}else{const h=Math.round(s.HP*(.28+s.ANSWER/100));S.hp=Math.min(s.HP,S.hp+h);const r=hitFoe('MAG',2.4);SFX.holy(0);blog(`神回應了祈禱：回復 ${h} HP，聖光造成 ${r.d} 傷害`)}}
-  if(B.hp<=0){render();setTimeout(win,1200);return}
+  if(B.hp<=0){render();winSoon(1350);return}
   if(S.hp>0&&s.REGEN){const h=Math.max(1,Math.round(s.HP*s.REGEN/100));S.hp=Math.min(s.HP,S.hp+h);blog(`裝備效果回復 ${h} HP`)}
   if(S.hp>0&&s.MPREG){S.mp=Math.min(s.MP,S.mp+Math.max(1,Math.round(s.MP*s.MPREG/100)))}
   B.fb.forEach(b=>b.t--);B.fb=B.fb.filter(b=>b.t>0);
@@ -3390,6 +3396,7 @@ function spoil(){const m=B.m,L=B.L,bs=B.kind==='boss',el=B.kind==='elite',T=B.to
   got.push(...liveDrop(bs));
   track('kill',B.id);S.st.kills++;if(S.dex)S.dex.m[B.id]=(S.dex.m[B.id]||0)+1;if(bs&&B.nm)S.st.nmboss=(S.st.nmboss||0)+1;
   if(bs&&!fld&&!RUN.trial&&!RUN.tower){S.cleared[RUN.area]=1;track('boss',B.id);sys(`${S.name} 討伐了首領【${m.n}】！`)}}
+function winSoon(ms){setTimeout(()=>{try{if(B&&B.hp<=0&&!(B.adds||[]).some(f=>f.hp>0)){const st=document.querySelector('.stage');if(st)st.classList.add('bout')}}catch(e){}},Math.max(0,ms-260));setTimeout(win,ms)}
 function win(){if(!B||B.hp>0)return;try{const ds=B.ds||{},tot=Object.values(ds).reduce((a,b)=>a+b,0);if(tot>0&&(B.kind==='boss'||B.kind==='elite'||Object.keys(ds).length>=3)){const top=Object.entries(ds).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([k,v])=>`${k} ${Math.round(v/tot*100)}%`).join('・');B.log.push(`📊 戰報（${B.turn} 回合）：${top}`);B.rep=top}}catch(e){}try{spoil()}catch(e){try{localStorage.setItem('ao_err','spoil '+e);const T=B.tot||(B.tot={exp:0,gold:0,got:[],names:[]});if(!T.names.includes(B.name))T.names.push(B.name)}catch(_){}}if(B.kind==='boss')bondGain(.5,'並肩打倒首領');try{talk('win')}catch(e){}{const s=stats();if(s.REAP&&S.hp>0){const rk=s.KW.reap||0,h=Math.round(s.HP*s.REAP/100*(rk>=2?2:1)),m=Math.round(s.MP*s.REAP/100*(rk>=2?2:1));if(rk>=3)S.reapFree=1;S.hp=Math.min(s.HP,S.hp+h);S.mp=Math.min(s.MP,S.mp+m);B.rp=`【收割】回復 ${h} HP、${m} MP`;B.log.push(B.rp)}}
   const nx=(B.adds||[]).findIndex(f=>f.hp>0);
   if(nx>=0){const dn=B.name;swapFoe(nx);B.adds=B.adds.filter(f=>f.hp>0);B.log.push(`${dn} 倒下了！${B.name} 衝了上來`);B.fx=null;B.busy=true;B.intro=true;render();setTimeout(foeTurn,900);return}
