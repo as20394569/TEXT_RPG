@@ -640,20 +640,20 @@ function toast(t){const T=$('#toast');while(T.children.length>=3)T.firstChild.re
 /* ============ 資料 ============ */
 const ATTR={STR:'力量',DEX:'敏捷',INT:'智力',VIT:'體質',LUK:'幸運'};
 const CLS={
-  swordsman:{n:'劍士',d:'站在最前面的人。血與防禦是四職之首，越打越順手。',f:'破綻：攻擊在敵人身上堆破綻，再一口氣清算。',base:{STR:8,DEX:5,INT:3,VIT:8,LUK:4},grow:{STR:1,VIT:1},atk:'STR',basic:'ATK',adv:['knight','berserker']},
-  mage:{n:'法師',d:'火力最高，身體最脆。靠順序取勝的人。',f:'印記：技能留下印記，再一次引爆。',base:{STR:2,DEX:4,INT:10,VIT:5,LUK:5},grow:{INT:2},atk:'STR',basic:'MAG',adv:['archmage','warlock']},
-  ranger:{n:'遊俠',d:'不硬碰硬，等對方露出空檔。',f:'專注：攻擊與閃避累積專注，再一箭打出去。',base:{STR:4,DEX:10,INT:3,VIT:9,LUK:6},grow:{DEX:1,LUK:1},atk:'DEX',basic:'ATK',adv:['sniper','assassin']},
-  cleric:{n:'神官',d:'打得慢，但很難倒下。',f:'信仰：治療與祈禱累積信仰，滿了神會回應。',base:{STR:4,DEX:4,INT:8,VIT:8,LUK:4},grow:{INT:1,VIT:1},atk:'STR',basic:'MAG',adv:['bishop','templar']}
+  swordsman:{n:'劍士',d:'血多防高的前排，四個職業裡最耐打。',f:'攻擊會讓敵人累積「破綻」，再用清算招式一次打出去。',base:{STR:8,DEX:5,INT:3,VIT:8,LUK:4},grow:{STR:1,VIT:1},atk:'STR',basic:'ATK',adv:['knight','berserker']},
+  mage:{n:'法師',d:'魔法傷害最高，但血少、不耐打。',f:'技能會在敵人身上留下印記，再用引爆招式一起炸開。',base:{STR:2,DEX:4,INT:10,VIT:5,LUK:5},grow:{INT:2},atk:'STR',basic:'MAG',adv:['archmage','warlock']},
+  ranger:{n:'遊俠',d:'閃避和爆擊都高，出手快。',f:'攻擊和閃避會累積「專注」，專注越高，下一招越痛。',base:{STR:4,DEX:10,INT:3,VIT:9,LUK:6},grow:{DEX:1,LUK:1},atk:'DEX',basic:'ATK',adv:['sniper','assassin']},
+  cleric:{n:'神官',d:'能補血又耐打，傷害比較低。',f:'補血和攻擊會累積「信仰」，集滿後自動發動一次。',base:{STR:4,DEX:4,INT:8,VIT:8,LUK:4},grow:{INT:1,VIT:1},atk:'STR',basic:'MAG',adv:['bishop','templar']}
 };
 const ADV={
-  knight:{n:'騎士',d:'用身體擋住一切。體質 +5、力量 +3。',bonus:{VIT:5,STR:3}},
-  berserker:{n:'狂戰士',d:'拿血換傷害。力量 +8。',bonus:{STR:8}},
-  archmage:{n:'大魔導士',d:'把印記玩到極致。智力 +8。',bonus:{INT:8}},
-  warlock:{n:'咒術師',d:'靠吸取活下去。智力 +5、體質 +3。',bonus:{INT:5,VIT:3}},
-  sniper:{n:'神射手',d:'專注越高越可怕。敏捷 +8、體質 +4。',bonus:{VIT:4,DEX:8}},
-  assassin:{n:'刺客',d:'只出一刀。敏捷 +5、幸運 +5、體質 +4。',bonus:{VIT:4,DEX:5,LUK:5}},
-  bishop:{n:'主教',d:'讓神更快回應。智力 +6、體質 +2。',bonus:{INT:6,VIT:2}},
-  templar:{n:'聖殿騎士',d:'把信仰變成鐵鎚。力量 +6、體質 +4。',bonus:{STR:6,VIT:4}}
+  knight:{n:'騎士',d:'主打防禦的前排。體質 +5、力量 +3。',bonus:{VIT:5,STR:3}},
+  berserker:{n:'狂戰士',d:'扣自己的血換高傷害。力量 +8。',bonus:{STR:8}},
+  archmage:{n:'大魔導士',d:'印記引爆的傷害更高。智力 +8。',bonus:{INT:8}},
+  warlock:{n:'咒術師',d:'邊打邊吸血的法師。智力 +5、體質 +3。',bonus:{INT:5,VIT:3}},
+  sniper:{n:'神射手',d:'專注的加成更高。敏捷 +8、體質 +4。',bonus:{VIT:4,DEX:8}},
+  assassin:{n:'刺客',d:'爆擊高，擅長一擊解決。敏捷 +5、幸運 +5、體質 +4。',bonus:{VIT:4,DEX:5,LUK:5}},
+  bishop:{n:'主教',d:'信仰累積得更快。智力 +6、體質 +2。',bonus:{INT:6,VIT:2}},
+  templar:{n:'聖殿騎士',d:'拿鎚子近戰的神官。力量 +6、體質 +4。',bonus:{STR:6,VIT:4}}
 };
 const SK={
   slash:{n:'裂甲擊',c:'swordsman',lv:1,mp:4,dmg:{s:'ATK',p:1.55,rend:1},brk:2,d:'踏前一步重砍，敵人破綻 +2。劈開護甲：無視物理抗性。'},
@@ -734,10 +734,10 @@ const PASS={
   tp:{n:'信念之鎚',c:'templar',lv:20,sx:[{st:{guard:10,defp:10},d:'受擊 10% 機率傷害減半、防禦 +10%'},{st:{atkp:8,magp:8},d:'物攻、魔攻再 +8%'}],st:{atkp:10,magp:10},d:'物攻、魔攻 +10%。'}};
 /* 職業流派：每個職業兩種打法，戰鬥外可隨時切換，改變職業資源的用途 */
 const STN={
-  swordsman:[{n:'破陣',d:'破綻越多打越痛，清算一次爆發。'},{n:'鐵壁',d:'破綻改成減傷，招架反擊更痛。'}],
-  mage:[{n:'引爆',d:'留下印記，再一次引爆。'},{n:'延燒',d:'印記不引爆，讓灼燒中毒燒得更兇。'}],
-  ranger:[{n:'狙擊',d:'專注加攻擊，屏息一箭打出。'},{n:'連射',d:'專注改成連擊率，箭越射越多。'}],
-  cleric:[{n:'祈禱',d:'信仰越高越不怕痛，滿了神會治療你。'},{n:'審判',d:'信仰滿了，神改為降下重擊。'}]};
+  swordsman:[{n:'破陣',d:'破綻越多傷害越高。'},{n:'鐵壁',d:'破綻改成減少受到的傷害，反擊變強。'}],
+  mage:[{n:'引爆',d:'先上印記，再一次引爆。'},{n:'延燒',d:'印記不會消失，灼燒和中毒的傷害提高。'}],
+  ranger:[{n:'狙擊',d:'專注提高攻擊力。'},{n:'連射',d:'專注改成提高連擊率。'}],
+  cleric:[{n:'祈禱',d:'信仰越高受傷越少，集滿時回復 HP。'},{n:'審判',d:'信仰集滿時改成打出一次重擊。'}]};
 /* 戰法已併入流派：不再手動切換，身上湊出指定共鳴（2 件）時打法自動改變 */
 const STNK={swordsman:['guard','thorn'],mage:['burn'],ranger:['double','gale'],cleric:['stun','back']};
 const stn=()=>{try{if(!S||!S.eq)return 0;const c=kwCount();return (STNK[S.cls]||[]).some(k=>(c[k]||0)>=2)?1:0}catch(e){return 0}};
@@ -1574,8 +1574,8 @@ const LUNASK={
   oath:{n:'星光爆裂',d:'奧義・每場一次。首領戰或敵人半血後發動，巨大傷害並治療你 15%。',ok:()=>(S.bond||0)>=6,say:'這盞燈，絕不熄滅！',need:'羈絆 6'}};
 /* 同行夥伴 */
 const ALLY={
-  luna:{n:'露娜',img:'npc_luna',d:'研究黑霧的少女。職業【燈術士】：用火球術攻擊，替你治療、展開結界、驅散霧氣。',role:'燈術士',open:()=>S.main.ch>=1},
-  gale:{n:'蓋爾',img:'npc_gale',d:'前王國騎士團的王牌。重擊敵人，並時常替你擋下攻擊。',role:'坦克・物理',open:()=>!!S.flags.galeBack}};
+  luna:{n:'露娜',img:'npc_luna',d:'研究黑霧的燈術士。會放火球、幫你補血、開護盾、驅散霧。',role:'燈術士',open:()=>S.main.ch>=1},
+  gale:{n:'蓋爾',img:'npc_gale',d:'以前是王國騎士。攻擊力高，會幫你擋傷害。',role:'坦克・物理',open:()=>!!S.flags.galeBack}};
 
 /* 占星師：每日星象，整天有效的小祝福 */
 const FORT={exp:{n:'智者之星',d:'戰鬥經驗 +15%',say:'學到的東西會比平常多。'},gold:{n:'商人之星',d:'金幣 +25%',say:'錢包會變重的。'},drop:{n:'獵人之星',d:'稀有裝備掉落率提高',say:'好東西在等你。'},crit:{n:'戰士之星',d:'爆擊率 +8%',say:'你的刀會找到縫隙。'},chain:{n:'元素之星',d:'屬性連鎖傷害再 +20%',say:'火與冰今天特別躁動。'}};
@@ -2316,18 +2316,18 @@ function vChar(){const s=stats(),sc=setCounts();
   const T=[['main','總覽'],['build','流派'],['attr','屬性'+(S.pts?'●':'')],['gear','裝備'],['ally','夥伴'],['skill','技能'+(S.sp?'●':'')]].filter(t=>t[0]!=='ally'||Object.keys(ALLY).some(k=>ALLY[k].open()));if(!T.some(t=>t[0]===CTAB))CTAB='main';
   const tabs=`<div class="cy-tabs">${T.map(([k,n])=>`<button class="${CTAB===k?'on':''}" data-a="ctab" data-v="${k}">${n}</button>`).join('')}</div>`;
   const sec=CTAB==='main'?`<div class="cy-hero"><div class="cy-pt">${art(HK(),clsName()+'立繪','r34')}<em></em></div>
-   <div class="cy-id"><span class="cy-tag">ADVENTURER // ${String(S.pid||'').slice(0,4).toUpperCase()||'0001'}</span><h3>${esc(S.name)}</h3><div class="cy-cls"><b>${clsName()}</b><span>LV <b>${S.lv}</b></span></div>
-   <div class="cy-pw"><span>戰力 POWER</span><b>${power()}</b></div>${radar}</div>
+   <div class="cy-id"><h3>${esc(S.name)}</h3><div class="cy-cls"><b>${clsName()}</b><span>LV <b>${S.lv}</b></span></div>
+   <div class="cy-pw"><span>戰力</span><b>${power()}</b></div>${radar}</div>
    <div class="cy-bars">${gauge('hp',S.hp,s.HP)}${gauge('mp',S.mp,s.MP)}${gauge('exp',S.exp,need(S.lv))}</div>
    <div class="cy-grid">${mg?cell('魔法攻擊',s.MAG,'main')+cell('物理攻擊',s.ATK):cell('物理攻擊',s.ATK,'main')+cell('魔法攻擊',s.MAG)}${cell('防禦',s.DEF)}${cell('魔抗',s.MRES)}${cell('爆擊',s.CRIT+'%')}${cell('爆傷',s.CD+'%')}${cell('迴避',s.EVA+'%')}${cell('吸血',s.LS+'%')}</div>
-   ${s.RF||s.RI||s.RT||s.RD?`<div class="cy-res"><span>火 ${s.RF}%</span><span>冰 ${s.RI}%</span><span>雷 ${s.RT}%</span><span>暗 ${s.RD}%</span></div>`:''}</div>`:CTAB==='build'?`${buildPanel()}<div class="panel"><h3>職業特色</h3><p class="sub">${CLS[S.cls].f}</p><div class="gsec"><b>目前打法：${STN[S.cls][stn()].n}</b><span class="sub">${STN[S.cls][stn()].d}</span><span class="sub" style="opacity:.7">某些共鳴會改變打法。</span></div>${Object.keys(PASS).filter(id=>PASS[id].c===S.cls||PASS[id].c===S.adv).map(id=>`<span class="subl row ${hasP(id)?'':'sub'}" style="gap:6px"><span class="ico c4" style="width:30px;height:30px">${icon('pass_'+id,ic('skill'))}</span><span class="grow">被動【${PASS[id].n}】Lv.${PASS[id].lv}：${PASS[id].d}${PASS[id].sx?PASS[id].sx.map((x,i)=>`<br><span style="${stn()===i?'color:var(--r4);font-weight:700':'opacity:.6'}">${stn()===i?'✔ ':''}${STN[S.cls][i].n}：${x.d}</span>`).join(''):''}</span></span>`).join('')}${S.adv?`<p class="sub">${ADV[S.adv].n}：${ADV[S.adv].d}</p>`:''}</div>`:CTAB==='attr'?`<div class="panel"><h3>屬性　<span class="tag ${S.pts?'red':'off'}">可用 ${S.pts} 點</span><button class="btn sm" style="float:right" data-a="respec">重置（${respecCost()} G）</button></h3>${Object.keys(ATTR).map(k=>`<div class="attr"><span><b class="cy-k">${k}</b> ${ATTR[k]}<span class="sub">　${{STR:'物理攻擊',DEX:'迴避・爆擊・連擊',INT:'魔力・MP・技能省 MP',VIT:'HP・防禦・每回合回血',LUK:'爆擊・爆傷・掉寶・金幣'}[k]}</span></span><b>${S.attr[k]}${s.A[k]>S.attr[k]?`<small class="up">+${s.A[k]-S.attr[k]}</small>`:''}</b><button class="btn sm" data-a="addPt" data-v="${k}" ${S.pts?'':'disabled'}>＋</button></div><div class="cy-ab"><u style="width:${Math.min(100,s.A[k]/75*100)}%"></u></div>`).join('')}</div>`:CTAB==='gear'?`<div class="panel"><h3>裝備</h3>${eq}<p class="sub" style="text-align:center">點部位查看裝備詳細資料</p>${setHtml}</div>`:CTAB==='ally'?`${Object.keys(ALLY).some(k=>ALLY[k].open())?`<div class="panel"><h3>同行夥伴</h3><div class="party">${[...Object.keys(ALLY).filter(k=>ALLY[k].open()),'none'].map(k=>`<button class="btn ${(S.party||'none')===k?'on':''}" data-a="setParty" data-v="${k}">${k==='none'?'<b>獨自冒險</b><span class="sub">不帶夥伴</span>':`${art(ALLY[k].img,ALLY[k].n,'r11','mini')}<b>${ALLY[k].n}</b><span class="sub">${ALLY[k].role}</span>`}</button>`).join('')}</div><p class="sub">${S.party&&S.party!=='none'?ALLY[S.party].d+(S.party==='luna'?'　羈絆越深，露娜越強。':''):'不帶夥伴時，所有戰鬥都靠自己。'}</p>${S.party==='luna'?`<div class="gsec"><b>露娜・燈術士　羈絆 ${Math.floor(S.bond||0)}</b><span class="sub">下一級進度 ${Math.round(((S.bond||0)%1)*100)}%・今日已累積 ${(S.daily&&S.daily.bond||0).toFixed(2)}／1.5（一起冒險、打首領、營火閒聊）</span>${Object.values(LUNASK).map(k=>`<span class="sub ${k.ok()?'son':''}">${k.ok()?'◆':'◇'} 【${k.n}】${k.d}${k.ok()?'':`（解鎖：${k.need}）`}</span>`).join('')}</div>`:''}</div>`:''}`:`<div class="panel"><h3>技能　<span class="tag ${S.sp?'red':'off'}">技能點 ${S.sp}</span></h3><div class="list">${sk}</div>${nxt?`<div class="chips">${nxt}</div>`:''}</div>`;
+   ${s.RF||s.RI||s.RT||s.RD?`<div class="cy-res"><span>火 ${s.RF}%</span><span>冰 ${s.RI}%</span><span>雷 ${s.RT}%</span><span>暗 ${s.RD}%</span></div>`:''}</div>`:CTAB==='build'?`${buildPanel()}<div class="panel"><h3>職業特色</h3><p class="sub">${CLS[S.cls].f}</p><div class="gsec"><b>目前打法：${STN[S.cls][stn()].n}</b><span class="sub">${STN[S.cls][stn()].d}</span><span class="sub" style="opacity:.7">裝備的共鳴會影響打法。</span></div>${Object.keys(PASS).filter(id=>PASS[id].c===S.cls||PASS[id].c===S.adv).map(id=>`<span class="subl row ${hasP(id)?'':'sub'}" style="gap:6px"><span class="ico c4" style="width:30px;height:30px">${icon('pass_'+id,ic('skill'))}</span><span class="grow">被動【${PASS[id].n}】Lv.${PASS[id].lv}：${PASS[id].d}${PASS[id].sx?PASS[id].sx.map((x,i)=>`<br><span style="${stn()===i?'color:var(--r4);font-weight:700':'opacity:.6'}">${stn()===i?'✔ ':''}${STN[S.cls][i].n}：${x.d}</span>`).join(''):''}</span></span>`).join('')}${S.adv?`<p class="sub">${ADV[S.adv].n}：${ADV[S.adv].d}</p>`:''}</div>`:CTAB==='attr'?`<div class="panel"><h3>屬性　<span class="tag ${S.pts?'red':'off'}">可用 ${S.pts} 點</span><button class="btn sm" style="float:right" data-a="respec">重置（${respecCost()} G）</button></h3>${Object.keys(ATTR).map(k=>`<div class="attr"><span><b class="cy-k">${k}</b> ${ATTR[k]}<span class="sub">　${{STR:'物理攻擊',DEX:'迴避・爆擊・連擊',INT:'魔力・MP・技能省 MP',VIT:'HP・防禦・每回合回血',LUK:'爆擊・爆傷・掉寶・金幣'}[k]}</span></span><b>${S.attr[k]}${s.A[k]>S.attr[k]?`<small class="up">+${s.A[k]-S.attr[k]}</small>`:''}</b><button class="btn sm" data-a="addPt" data-v="${k}" ${S.pts?'':'disabled'}>＋</button></div><div class="cy-ab"><u style="width:${Math.min(100,s.A[k]/75*100)}%"></u></div>`).join('')}</div>`:CTAB==='gear'?`<div class="panel"><h3>裝備</h3>${eq}<p class="sub" style="text-align:center">點部位查看裝備詳細資料</p>${setHtml}</div>`:CTAB==='ally'?`${Object.keys(ALLY).some(k=>ALLY[k].open())?`<div class="panel"><h3>同行夥伴</h3><div class="party">${[...Object.keys(ALLY).filter(k=>ALLY[k].open()),'none'].map(k=>`<button class="btn ${(S.party||'none')===k?'on':''}" data-a="setParty" data-v="${k}">${k==='none'?'<b>獨自冒險</b><span class="sub">不帶夥伴</span>':`${art(ALLY[k].img,ALLY[k].n,'r11','mini')}<b>${ALLY[k].n}</b><span class="sub">${ALLY[k].role}</span>`}</button>`).join('')}</div><p class="sub">${S.party&&S.party!=='none'?ALLY[S.party].d+(S.party==='luna'?'　羈絆越高，露娜越強。':''):'沒有夥伴同行。'}</p>${S.party==='luna'?`<div class="gsec"><b>露娜・燈術士　羈絆 ${Math.floor(S.bond||0)}</b><span class="sub">下一級進度 ${Math.round(((S.bond||0)%1)*100)}%・今日已累積 ${(S.daily&&S.daily.bond||0).toFixed(2)}／1.5（一起冒險、打首領、營火閒聊）</span>${Object.values(LUNASK).map(k=>`<span class="sub ${k.ok()?'son':''}">${k.ok()?'◆':'◇'} 【${k.n}】${k.d}${k.ok()?'':`（解鎖：${k.need}）`}</span>`).join('')}</div>`:''}</div>`:''}`:`<div class="panel"><h3>技能　<span class="tag ${S.sp?'red':'off'}">技能點 ${S.sp}</span></h3><div class="list">${sk}</div>${nxt?`<div class="chips">${nxt}</div>`:''}</div>`;
   return `<div class="cyb">${tabs}${sec}</div>`}
 function buildPanel(){const c=kwCount(),ks=Object.keys(RZ).filter(k=>c[k]),nm=buildName(c);
   return `<div class="panel bld"><h3>我的流派　${nm?`<span class="tag red">${nm}</span>`:'<span class="tag off">尚未成形</span>'}</h3>
    ${ks.length?ks.sort((a,b)=>c[b]-c[a]).map(k=>{const n=c[k],x=RZ[k];return `<div class="bk"><div class="bkh"><b>${x.ic} ${x.n}</b><span class="pips">${[1,2,3].map(i=>`<i class="${i<=n?'on':''}"></i>`).join('')}</span></div>
      <span class="sub ${n>=2?'son':''}">2 件：${x.i}</span><span class="sub ${n>=3?'son':''}">3 件：${x.ii}</span></div>`}).join('')
-   :'<p class="sub">同種稀有詞綴湊 2、3 件會產生共鳴。</p>'}
-   <p class="sub">稀有以上的裝備才有詞綴。</p></div>`}
+   :'<p class="sub">同一種詞綴穿 2 件、3 件會有共鳴效果。</p>'}
+   <p class="sub">稀有以上的裝備才會有詞綴。</p></div>`}
 function vBag(){
   const tabs=`<div class="tabs">${[['gear','裝備'],['use','道具'],['mat','素材']].map(([k,n])=>`<button class="${BAGTAB===k?'on':''}" data-a="bagTab" data-v="${k}">${n}</button>`).join('')}</div>`;
   let body='';
@@ -3008,6 +3008,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'15.14',d:'2026-11-26',t:'文字修改',b:'職業、進階職、打法、夥伴的說明改成比較直白的寫法。'},
   {v:'15.13',d:'2026-11-26',t:'角色頁分頁、屬性專精取消',b:'角色頁分成總覽、流派、屬性、裝備、夥伴、技能，每頁一個畫面看完；技能點一下才展開說明。屬性點到 30／60 的固定加成拿掉了。'},
   {v:'15.12',d:'2026-11-26',t:'角色頁改版',b:'角色頁換成新介面：能力雷達、戰力與數值面板、屬性量表。另外，自己按撤退時全自動會跟著關掉。'},
   {v:'15.11',d:'2026-11-26',t:'狀態列只在城鎮出現',b:'上方的角色狀態列只留在城鎮首頁，其他頁面收起來。'},
