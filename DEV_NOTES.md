@@ -426,3 +426,5 @@
 - `start_rank.ps1` 監看 Python 與 cloudflared；`update_rank.ps1` **每 15 分鐘從 GitHub main 抓 `tools/rank_server.py`**，編譯通過才換、啟動失敗自動還原，紀錄在 `update.log`。所以改伺服器＝推 repo，不用手動重啟。
 - 臨時通道網址寫在 `rank_url.txt`，重開會變。
 - 每日備份：`backup_loop()` 把 accounts/、rank_data、feedback、xfer 打包到 `backups/YYYYMMDD.zip`，留 14 份。
+
+- 排行重複（2026-11-26）：原因是玩家 ID 存在存檔裡，開新角色或換裝置就換 ID，伺服器只合併「同名同職業」。修正：伺服器同名且舊紀錄超過 1 天沒上線就併掉、45 天沒上線清除；前端同名只顯示最新一筆；ID 另存 `localStorage ao_pid`，同一台裝置開新角色沿用。同名的兩個真人若都在一天內上線，伺服器兩筆都留，但前端只顯示較新的（已知限制，要靠帳號才能真正區分）。

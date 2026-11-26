@@ -336,8 +336,11 @@ class H(BaseHTTPRequestHandler):
             if isinstance(st, list) and len(st) <= 8:
                 row['st'] = [max(0, min(9999999, int(v))) for v in st]
             with LOCK:
-                for k in [k for k, r in DB.items() if k != pid and r.get('name') == row['name'] and r.get('cls') == row['cls']]:
-                    DB.pop(k, None)  # 同名同職業的舊紀錄（重整產生的分身）合併
+                ms = int(now * 1000)
+                for k in [k for k, r in DB.items() if k != pid and (
+                        (r.get('name') == row['name'] and (r.get('cls') == row['cls'] or ms - r.get('ts', 0) > 86400000))
+                        or ms - r.get('ts', 0) > 45 * 86400000)]:
+                    DB.pop(k, None)  # 同名同職業、或同名但超過一天沒上線的舊紀錄視為分身合併；45 天沒上線的清掉
                 DB[pid] = row
                 save()
                 rank = sorted(DB.values(), key=lambda r: -r['power']).index(row) + 1
