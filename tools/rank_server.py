@@ -348,6 +348,37 @@ class H(BaseHTTPRequestHandler):
     def log_message(self, *a):
         pass
 
+def backup_loop():
+    """每天把帳號、排行、回報打包一份到 backups/，只留最近 14 份。失敗不影響伺服器。"""
+    import zipfile
+    bdir = os.path.join(HERE, 'backups')
+    while True:
+        try:
+            os.makedirs(bdir, exist_ok=True)
+            name = os.path.join(bdir, time.strftime('%Y%m%d') + '.zip')
+            if not os.path.exists(name):
+                tmp = name + '.tmp'
+                with LOCK:
+                    with zipfile.ZipFile(tmp, 'w', zipfile.ZIP_DEFLATED) as z:
+                        for fn in ('rank_data.json', 'feedback_data.json', 'xfer_data.json'):
+                            fp = os.path.join(HERE, fn)
+                            if os.path.isfile(fp):
+                                z.write(fp, fn)
+                        adir = os.path.join(HERE, 'accounts')
+                        if os.path.isdir(adir):
+                            for fn in os.listdir(adir):
+                                fp = os.path.join(adir, fn)
+                                if os.path.isfile(fp):
+                                    z.write(fp, 'accounts/' + fn)
+                os.replace(tmp, name)
+                old = sorted(f for f in os.listdir(bdir) if re.fullmatch(r'\d{8}\.zip', f))
+                for f in old[:-14]:
+                    os.remove(os.path.join(bdir, f))
+        except Exception:
+            pass
+        time.sleep(3600)
+
 if __name__ == '__main__':
     print(f'rank server on 127.0.0.1:{PORT}', flush=True)
+    threading.Thread(target=backup_loop, daemon=True).start()
     ThreadingHTTPServer(('127.0.0.1', PORT), H).serve_forever()

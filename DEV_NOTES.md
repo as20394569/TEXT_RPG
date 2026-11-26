@@ -420,3 +420,9 @@
 - 霧淵內灼燒／中毒每跳上限 = max(ATK,MAG)×1.5×層數（原本吃魔物最大 HP 的百分比，高層太強）。
 - `area_tower.webp` 重畫成霧淵（網頁 ChatGPT）。第一章結尾加入「霧會叫名字」。
 - 伺服器：`tools/rank_server.py` 白名單已含 ab／abw，尚未重啟。
+
+## 排行伺服器（2026-11-26 確認）
+- 位置：使用者電腦 `C:\Users\Administrator\Documents\ChatGPT\cluade畫圖\azure-oath\rank_server`（已接給 Claude，可列目錄、取檔、寫檔；不能下指令）。
+- `start_rank.ps1` 監看 Python 與 cloudflared；`update_rank.ps1` **每 15 分鐘從 GitHub main 抓 `tools/rank_server.py`**，編譯通過才換、啟動失敗自動還原，紀錄在 `update.log`。所以改伺服器＝推 repo，不用手動重啟。
+- 臨時通道網址寫在 `rank_url.txt`，重開會變。
+- 每日備份：`backup_loop()` 把 accounts/、rank_data、feedback、xfer 打包到 `backups/YYYYMMDD.zip`，留 14 份。
