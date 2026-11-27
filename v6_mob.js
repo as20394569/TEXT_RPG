@@ -216,7 +216,7 @@ function phaseChk6(fx){const f=B;if(!f.ph6||!f.ph6.length||f.hp<=0)return;
 const st6Src=f=>({atk:f.atk,mag:f.mag,lv:f.L});
 function inflict6(id,f,o){o=o||{};if(!id)return;if(typeof stAdd==='function'){try{stAdd('p',id,Object.assign({src:st6Src(f)},o));blog(`你陷入${(V6.STAT.find(x=>x.id===id)||{n:id}).n}`);return}catch(e){}}
   const M={POISON:['poison',3],BURN:['burn',2],BLEED:['bleed',3],WEAK:['weak',2],STUN:['stun',1]}[id];if(M&&B.pst){B.pst[M[0]]=Math.max(B.pst[M[0]]||0,M[1]);blog(`你陷入${HST[M[0]]||M[0]}`)}}
-function selfSt6(f,id,v){if(typeof stAdd==='function'){try{stAdd(f,id,{v});return}catch(e){}}
+function mobSelfSt6(f,id,v){if(typeof stAdd==='function'){try{stAdd(f,id,{v});return}catch(e){}}
   const M={HARDEN:{def:.25},WARD:{mres:.25},GUARD:{def:.25},RAGE:{atk:.2},FOCUS:{crit:10},HASTE:{},THORN:{},SHIELD:{}}[id]||{};if(id==='SHIELD')f.fshield=(f.fshield||0)+Math.round(f.max*.08);else f.fb.push(Object.assign({id:'v6'+id,n:(V6.STAT.find(x=>x.id===id)||{n:id}).n,t:2},M))}
 /* 直接攻擊一次：回傳 {d,miss,cr,blk} */
 function foeHit6(f,k,s,o){o=o||{};const mag=k?(k.either?f.mag>=f.atk&&f.role6==='MAGE':!!k.mag):(f.role6==='MAGE'||f.role6==='WARD'),pw=k?k.pow:1,h=k&&k.h||1;
@@ -244,6 +244,8 @@ function applyHit6(f,r,fx,k,nm,o){o=o||{};const s=stats();let d=r.d;
   try{SFX.hurt(k&&!B.rt?.85:0);buzz(k?120:50)}catch(e){}
   blog(`${f.name} 的${nm}造成 ${d} 傷害${r.cr?'（爆擊）':''}${ab?`（護盾吸收 ${ab}）`:''}${r.blk?'（格擋率）':''}`);
   if(S.hp<=0&&B.endure){S.hp=1;B.endure=0;blog('鬥氣護體！以 1 HP 撐了下來')}
+  if(S.hp<=0&&typeof gearFatal6==='function'&&gearFatal6()){S.hp=1;blog('【不屈】撐住了致命一擊')}
+  if(S.hp>0&&typeof gearLowHp6==='function'&&S.hp<stats().HP*.3){const a=gearLowHp6();if(a>0&&typeof stAdd==='function'){try{stAdd('p','SHIELD',{amt:a,dur:6});blog(`套裝護盾展開（${a}）`)}catch(e){}}}
   if(s.THORN&&d>0&&f.hp>1){const t=Math.min(f.hp-1,Math.max(1,Math.round(d*s.THORN/100)));f.hp-=t;blog(`反傷 ${t}`)}
   const ps=f.pass6||[],dr=(k&&k.drain||0)+(ps.includes('P18')?.05:0)+(f.role6==='DRAIN'?.08:0)+((f.aff||[]).includes('leech')?.3:0);
   if(dr&&d>0){const h=Math.round(d*dr);f.hp=Math.min(f.max,f.hp+h);if(h>0){fx.fheal=(fx.fheal||0)+h;blog(`${f.name} 吸取了 ${h} HP`)}}
@@ -258,7 +260,7 @@ function foeAttack6(f,id,fx,o){o=o||{};const s=stats(),k=id?SKM[id]:null,nm=k?`�
   if(k){fx.cut=k.n;fx.fsk=id;dexSkill6(id)}
   if(k&&!k.pow){const ps=[];
     if(k.heal){const h=Math.round(f.max*Math.min(k.heal,f.kind==='boss'?.03:1)*(has6(f,'BURN')||(f.st&&f.st.burn>0)?.5:1));f.hp=Math.min(f.max,f.hp+h);fx.fheal=h;ps.push(`回復 ${h} HP`)}
-    if(k.selfSt){selfSt6(f,k.selfSt,k.sv);ps.push((V6.STAT.find(x=>x.id===k.selfSt)||{n:k.selfSt}).n)}
+    if(k.selfSt){mobSelfSt6(f,k.selfSt,k.sv);ps.push((V6.STAT.find(x=>x.id===k.selfSt)||{n:k.selfSt}).n)}
     if(k.cleanse){const ks=Object.keys(f.st||{}).filter(x=>f.st[x]>0);if(ks.length)f.st[ks[0]]=0;try{if(typeof stClear==='function')stClear(f,false,1)}catch(e){}ps.push('清除負面')}
     if(k.atbSelf&&B.rt)B.rtg=Math.min(99,(B.rtg||0)+k.atbSelf);
     if(k.inf)inflict6(k.inf,f,{v:k.iv});
@@ -293,7 +295,7 @@ function foeTurn(){if(!B)return;
   if(B.rt){if(AC)rtFoeDone(fx);render();return}
   B.busy=false;render()}
 function tick6(s){const usedTick=typeof stTick==='function';
-  if(usedTick){try{stTick('p');stTick(B);for(const f of B.adds||[])if(f.hp>0)stTick(f)}catch(e){}}
+  if(usedTick){if(!B.rt)try{stTick('p');stTick(B);for(const f of B.adds||[])if(f.hp>0)stTick(f)}catch(e){}}
   else{for(const k of ['poison','burn'])if(B.st[k]>0){const d=Math.max(1,Math.round(B.max*(k==='poison'?.05:.04)*(B.kind==='boss'?.5:1)));B.hp=Math.max(0,B.hp-d);try{dsrc(k==='burn'?'灼燒':'中毒',d)}catch(e){}B.st[k]--;blog(`${B.name} 受到${FOE[k]}傷害 ${d}`)}
     try{addsDot()}catch(e){}
     for(const [h,r,n] of [['poison',.04,'毒素發作'],['burn',.05,'灼燒'],['bleed',.035,'流血']])if(S.hp>0&&B.pst[h]>0){const d=Math.max(1,Math.round(s.HP*r));S.hp=Math.max(0,S.hp-d);B.pst[h]--;blog(`${n}，損失 ${d} HP`)}
