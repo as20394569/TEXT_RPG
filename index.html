@@ -796,6 +796,11 @@ body.noanim *{transition:none!important}
 #rtb #bpause .xb{height:40px}
 #rtb #bpause .xb.go{background:linear-gradient(90deg,#d9ae4c,#ecd08a);color:#1a1206;border:0}
 #rtb .posein{z-index:15}
+/* 技能人物圖卡：只露上半身，壓在戰場上緣，不擋中間的特效 */
+#xfield .posein>i{top:1%;bottom:auto;height:37%;transform:skewY(-4deg)}
+#xfield .posein>img{top:1%;bottom:auto;left:4%;height:37%;width:58%;max-width:none;object-fit:cover;object-position:50% 24%;-webkit-mask-image:linear-gradient(90deg,transparent,#000 14% 86%,transparent);mask-image:linear-gradient(90deg,transparent,#000 14% 86%,transparent)}
+#xfield .posein.p2>img,#xfield .posein.lu>img{left:auto;right:4%}
+#xfield .posein>b{top:24%;bottom:auto;font-size:22px}
 @media (hover:none){#rtb .bcm .kn{display:none}}
 @media (max-height:720px){#rtb #xlog{height:84px}#rtb .bcm{height:48px}}
 </style>
@@ -3093,6 +3098,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'20.6',d:'2026-11-28',t:'技能圖卡',b:'放技能時的人物圖卡改成只露上半身，壓在戰場上緣一條，不再蓋住整個戰場，怪物和刀光從頭到尾都看得到。'},
   {v:'20.5',d:'2026-11-28',t:'雙劍士重做',b:'雙劍士每次攻擊都是兩道刃：藍刃先、黑刃後，角度交錯、一長一短，各技能再用數量、交叉方式和收尾分出差別。交錯斬是兩對X字刃；雙月斬是兩道長刃上下交會；閃斬是一對極細的快刃；重雙斬最後一對最長並帶衝擊。雙劍士的旋風斬改名「影步亂斬」：殘影穿過所有敵人，每人身上留一對交叉刃，回身再補一刀。'},
   {v:'20.4',d:'2026-11-28',t:'刀光修正',b:'所有斬擊改成兩頭尖的扁菱形，中間的白芯也是菱形。雙劍士藍刃、黑刃一刀一換，黑刃加藍邊更清楚；刀光長短明顯交錯。移除雙劍士的弧形刀光，旋風斬改成連續旋轉的菱形刀光，雙月斬改成藍黑兩道長刃交叉。'},
   {v:'20.3',d:'2026-11-28',t:'雙劍士調整',b:'雙劍士刀光改成藍、黑雙色，尺寸變小、速度更快，每一刀的長短、粗細、角度和形狀都不同（藍刃、黑刃、細刃、短弧），收尾改成三道極快的細刃；閃斬改成殘影一閃、三道輕快細刃掠過。'},
