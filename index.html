@@ -810,6 +810,7 @@ body.noanim *{transition:none!important}
   <div id="story" hidden></div>
   <div id="toast"></div>
 </div>
+<script src="v6data.js"></script>
 <script>
 /* ============ 工具 ============ */
 const $=s=>document.querySelector(s);
@@ -4784,16 +4785,20 @@ const THEMES=[['ink','墨黑']];
 function thNow(){return 'ink'}
 function thApply(){document.documentElement.dataset.th=thNow()}
 ACT.setTh=v=>{try{localStorage.setItem('ao_th',v)}catch(e){}thApply();if(MODAL)drawModal()};thApply();
-/* ============ 啟動 ============ */
-load();if(S){migrate();checkDaily();learn(true);runLoad()}
+/* ============ 啟動（等 v6 模組都載入後才開始） ============ */
+function boot6(){load();if(S){migrate();checkDaily();learn(true);runLoad()}render();chatTick();setInterval(chatTick,4000);setTimeout(bcastCheckSeen,1200)}
+addEventListener('DOMContentLoaded',boot6);
 /* 戰鬥卡住保險：指令鎖住超過 10 秒就自動解開（敵人已倒下則直接結算） */
 addEventListener('error',e=>{try{localStorage.setItem('ao_err',new Date().toISOString()+' '+(e.message||'')+' @'+(e.lineno||0)+':'+(e.colno||0))}catch(_){}});
 setInterval(()=>{try{if(!B||!B.busy||MODAL||STORY||document.hidden){if(B)B.wd=0;return}const k=B.turn+'|'+B.hp+'|'+B.id+'|'+S.hp;if(B.wdK!==k){B.wdK=k;B.wd=Date.now();return}if(!B.wd)B.wd=Date.now();if(Date.now()-B.wd<10000)return;B.wd=0;
   if(B.hp<=0){try{win()}catch(e){try{localStorage.setItem('ao_err','win '+e)}catch(_){}}if(B&&B.hp<=0){B=null;if(RUN)RUN.view={type:'res',title:'戰鬥勝利',text:'魔物倒下了。你整理好裝備，繼續前進。'};save();render()}}
   else if(S.hp<=0){try{lose()}catch(e){B=null;RUN=null;TAB='town';save();render()}}
   else{B.busy=false;render()}}catch(e){}},2000);
-render();chatTick();setInterval(chatTick,4000);setTimeout(bcastCheckSeen,1200);
 </script>
+<!-- 大改版 V6.3 模組：裝備經濟／技能狀態天賦／怪物地區內容 -->
+<script src="v6_gear.js"></script>
+<script src="v6_skill.js"></script>
+<script src="v6_mob.js"></script>
 <script>if('serviceWorker' in navigator&&/github\.io$/.test(location.hostname))navigator.serviceWorker.register('sw.js').catch(()=>{})</script>
 </body>
 </html>
