@@ -2388,11 +2388,11 @@ let IDLESEL=0,IDLERES=null;
 setInterval(()=>{if(!S||!S.idle)return;const t=$('#idleT'),g=$('#idleG');if(!t)return;const c=idleCalc();t.textContent=hms(c.ms);g.innerHTML=idleLine(c)},1000);
 function idleSettle(){const c=idleCalc();if(!c)return;const lv0=S.lv,gs=[];S.idle=null;gainExp(c.exp);S.gold+=c.gold;if(c.stone)addItem('stone',c.stone);if(c.pot)addItem('pot',c.pot);
   for(let i=0;i<c.gear;i++){const g=rollGear(AREAS.indexOf(c.a),0);gs.push(g)}for(let i=0;i<c.rare;i++)gs.push(rollGear(AREAS.indexOf(c.a),2));DROPS=[];IDLERES={c,lv0,lv1:S.lv,gs};save();openM('idleRes')}
-function vAreas(){return `<h2>選擇冒險地點</h2>`+vGift()+vIdle()+vDg()+AREAS.map((a,i)=>{const open=S.main.ch>=i,bossOn=bossReady(i);
+function vAreas(){return `<h2>選擇冒險地點</h2>`+vGift()+vIdle()+vDg()+AREAS.map((a,i)=>{const open=typeof areaOpen6==='function'?areaOpen6(i):S.main.ch>=i,bossOn=bossReady(i);
   return `<div class="panel area ${open?'':'lock'}">${art('area_'+a.id,a.n)}
   <div class="row"><h3 class="grow">${a.n}</h3><span class="tag">Lv ${a.lv}</span>${S.cleared[i]?'<span class="tag ok">已通關</span>':''}</div>
   <p class="sub">${a.d}</p><div class="chips">${a.mobs.map(m=>`<span class="chip">${MOBS[m].n}</span>`).join('')}<span class="chip" style="color:var(--hp)">首領 ${MOBS[a.boss].n}${bossOn?'':'（未現身）'}</span></div>${open&&bossOn&&!S.cleared[i]&&S.lv<MOBS[a.boss].lv?`<p class="sub" style="color:var(--hp)">⚠ ${MOBS[a.boss].n} 已在深處等著（Lv ${MOBS[a.boss].lv}）。現在 Lv ${S.lv}，這趟終點會直接碰上它——不夠強就先在岔路多打幾場、換好裝備。</p>`:''}
-  ${open?`<div class="row"><button class="btn pri grow" data-a="startRun" data-v="${i}">出發冒險</button>${S.cleared[i]?`<button class="btn grow" data-a="startNm" data-v="${i}" style="background:linear-gradient(#5a2a4a,#2a1430);color:#ffb3d0;border-color:#a04a7a">惡夢 Lv${AREAS[i].base+10}+</button>`:''}</div>${S.cleared[i]?'<p class="sub">惡夢模式：怪物 +10 級並帶詞綴，掉寶更好。</p>':''}`:`<button class="btn" disabled>完成${CH[i-1].t.slice(0,3)}後開放</button>`}</div>`}).join('')+vTowerCard()}
+  ${open?`<div class="row"><button class="btn pri grow" data-a="startRun" data-v="${i}">出發冒險</button>${S.cleared[i]?`<button class="btn grow" data-a="startNm" data-v="${i}" style="background:linear-gradient(#5a2a4a,#2a1430);color:#ffb3d0;border-color:#a04a7a">惡夢 Lv${AREAS[i].base+10}+</button>`:''}</div>${S.cleared[i]?'<p class="sub">惡夢模式：怪物 +10 級並帶詞綴，掉寶更好。</p>':''}`:`<button class="btn" disabled>${S.cleared[i-1]?`Lv.${a.base} 開放`:`擊敗 ${MOBS[AREAS[i-1].boss].n} 後開放`}</button>`}</div>`}).join('')+vTowerCard()}
 function vTowerCard(){if(!towerOpen())return `<div class="panel area lock"><div class="row"><h3 class="grow">霧淵</h3></div><button class="btn" disabled>完成第三章後開放</button></div>`;const W=abWeek(),A=abSt();return `<div class="panel area" style="border-color:var(--r3)">${art('area_tower','霧淵')}<div class="row"><h3 class="grow">霧淵</h3><span class="tag red">每週更換</span></div><p class="sub">本週　${ABB[W.b].n}・${TRX(W.a).n}　｜　最深 第 ${A.best} 層　｜　剩 ${abDays()} 天</p><button class="btn pri" data-a="startTower">走進霧淵</button></div>`}
 /* 首領前哨的戰前準備：三選一，各有代價 */
 const PREP={scout:{n:'🔭 偵察動向',d:'摸清首領的習慣，開戰時首領 HP -12%'},trap:{n:'🪤 布置陷阱',d:'用一瓶治療藥水當誘餌，首領開場中毒 12 秒、攻擊下降 6 秒'},camp:{n:'🔥 營火調息',d:'免費回復 30% HP／MP，但火光驚動首領：攻擊 +12%'}};
@@ -2599,7 +2599,7 @@ function vBag(){
   return `<h2>背包</h2>${BAGTAB==='gear'?`<div class="panel">${dollHtml()}</div>`:''}${tabs}<div class="panel"><div class="list">${body}</div></div>`}
 const sellPrice=k=>ITEMS[k].sell||Math.round(ITEMS[k].price*.4);
 function vQuest(){
-  const tabs=`<div class="tabs">${[['main','主線'],['story','人物故事'],['side','支線委託'],['daily','每日']].map(([k,n])=>`<button class="${QTAB===k?'on':''}" data-a="qTab" data-v="${k}">${n}${k==='story'&&nstDot()?' <span class="tag new">!</span>':''}</button>`).join('')}</div>`;
+  const tabs=`<div class="tabs">${[['main','主線'],['board','討伐委託'],['story','人物故事'],['side','支線委託'],['daily','每日']].map(([k,n])=>`<button class="${QTAB===k?'on':''}" data-a="qTab" data-v="${k}">${n}${k==='story'&&nstDot()?' <span class="tag new">!</span>':''}</button>`).join('')}</div>`;
   let body='';
   if(QTAB==='main'){const m=S.main;
     if(m.ch>=CH.length)body=P2?`${art(SKEY(CH.length,'outro'),'最新章節插畫')}<h3>第二部「霧之彼岸」進行中</h3><p>王都封鎖了氣象院。艾琳是誰？二十年前的遠征隊，真的死了嗎？</p><p class="sub">下一章製作中。在那之前：挑戰灰石街道的首領、無盡之塔與惡夢難度，把裝備打磨到極致。</p>`:`${art(SKEY(5,'outro'),'結局插畫')}<h3>第一部「北方大道」完</h3><p>北方大道重新通行了，但黑霧還在。王國瞞了二十年的事，將在第二部揭曉。</p><p class="sub">在那之前：完成人物故事、挑戰無盡之塔、收集圖鑑與成就，把裝備打磨到極致。</p>`;
@@ -2609,6 +2609,7 @@ function vQuest(){
       ${!m.acc&&!chLvOk()?`<button class="btn big" disabled>需要 Lv.${CHLV[m.ch]}（目前 Lv.${S.lv}）</button><p class="sub">先在已開放的地區磨練，或做支線與人物故事。</p>`:!m.acc?`<button class="btn pri big" data-a="mainAccept">接受主線</button>`:mainReady()?`<button class="btn pri big" data-a="mainDone">回報任務</button>`:`<button class="btn big" data-a="tab" data-v="adv">前往冒險</button>`}`}
     const past=CH.slice(0,m.ch).map((c,i)=>`<div class="row"><span class="grow sub">${c.t}</span><button class="btn sm" data-a="replay" data-v="${i}">回顧劇情</button></div>`).join('');
     if(past)body+=`<h3>已完成章節</h3>${past}`}
+  else if(QTAB==='board'){body=typeof vBoard6==='function'?vBoard6():''}
   else if(QTAB==='story'){body=nstList()||'<p class="empty">推進主線後，鎮上的人會開始跟你分享他們的故事。</p>';body='<p class="sub">晨星鎮的每個人，都有一段還沒說完的故事。</p>'+body}
   else if(QTAB==='side'){const av=SQ.filter(q=>q.ch<=S.main.ch);
     body=av.filter(q=>!(S.side[q.id]||{}).done).map(q=>{const s=S.side[q.id],p=Math.min(q.c,sqProg(q));
@@ -3594,15 +3595,15 @@ function pAct(type,arg){if(!B||B.busy)return;const s=stats();
   else if(type==='item'){const it=ITEMS[arg];if(!S.items[arg])return;addItem(arg,-1);
     const h0=S.hp;if(it.use.hp)S.hp=Math.min(s.HP,S.hp+it.use.hp);if(it.use.mp)S.mp=Math.min(s.MP,S.mp+it.use.mp);B.fx={by:'me',glow:1,heal:S.hp-h0||0};SFX.heal();blog(`你使用了${it.n}，${it.d}`)}
   else if(type==='guard'){B.guard=true;S.mp=Math.min(s.MP,S.mp+Math.max(2,Math.round(s.MP*.08)));if((s.KW.guard||0)>=3){const h=Math.round(s.HP*.08);S.hp=Math.min(s.HP,S.hp+h);B.gdUp=1;blog(`【守護共鳴】穩住架式，回復 ${h} HP，下次攻擊 +30%`)}B.fx={by:'me',glow:1};SFX.buff();blog('你擺出防禦架式，並回復少許 MP')}
-  else if(type==='flee'){if(Math.random()<.6+S.attr.DEX*.005){B=null;RUN.view={type:'res',title:'成功逃離',text:'你甩開了魔物，繼續趕路。'};render();return}blog('逃跑失敗！')}
+  else if(type==='flee'){if(Math.random()<(typeof fleeChance6==='function'?fleeChance6():.6+S.attr.DEX*.005)){B=null;RUN.view={type:'res',title:'成功逃離',text:'你甩開了魔物，繼續趕路。'};render();return}blog('逃跑失敗！')}
   if(B.rt){rtAfterP(type);return}
   B.menu='main';B.busy=true;render();
   if(B.hp<=0){winSoon(type==='skill'?2150+(B.pd||0):1350);return}
   setTimeout(foeTurn,AS(type==='skill'?1750+(B&&B.pd||PD):850))}
 /* 魔法型首領（MAG 遠高於 ATK）的普通攻擊改成魔力彈：吃 MAG×0.6、看魔抗 */
-const chgDue=()=>B.rt?B.rt.acts>=3&&B.rt.acts%4===3:B.turn>=3&&B.turn%4===3;
+/* chgDue 移到 v6_mob.js */
 const mgB=()=>!!(B&&B.kind==='boss'&&B.id!=='shadow'&&B.mag>B.atk*1.5);
-const isDng=k=>!!k&&!!k.pow&&((k.pow||0)>=1.6||(k.h||1)>=3);
+/* isDng 移到 v6_mob.js */
 const ELI={fire:'🔥火',ice:'❄冰',thunder:'⚡雷',dark:'🌑暗',holy:'✨聖',poison:'☠毒',phys:'⚔物理'};
 function intentHtml(){if(!B||B.hp<=0)return '';if(B.chg){const nd=B.chgNeed||0,dn=Math.min(nd,brkDone()),rem=nd-dn;let can=0;try{const s0=stats();can=rem>0&&[null,...battleSkills().filter(k=>SK[k].dmg&&S.mp>=mpCost(k)&&!(SK[k].ult&&B.ultUsed))].some(k=>myPd(k,s0)>=rem)}catch(e){}return `<div class="intent dng">⚠ 下回合：毀滅一擊${nd?`<span class="brk"><i style="width:${Math.round(dn/nd*100)}%"></i></span><small class="brkt">${rem>0?`💥 再打 ${rem} 可打斷${can?' <b>✔ 打得到</b>':''}`:'💥 已打斷！牠放不出來了'}</small>`:'　'}<small class="brkt">🛡 防禦減傷 75%</small></div>`}if(B.kind==='boss'&&!B.big&&B.turn>=3&&B.turn%4===3&&!(B.st.stun>0))return `<div class="intent dng">⚠ 下回合：開始蓄力</div>`;if(B.st.stun>0&&!(B.kind==='boss'&&!B.rage&&B.hp<B.max*.5))return `<div class="intent buff">💫 暈眩中：下回合無法行動</div>`;if(!('next' in B))return '';const k=B.next&&SKM[B.next];
   if(!k)return mgB()?`<div class="intent">✦ 下回合：魔力彈　<small>魔法・看魔抗</small></div>`:`<div class="intent">⚔ 下回合：普通攻擊</div>`;if(!k.pow){if(k.heal){const pc=Math.round(k.heal*Math.pow(.6,B.hN||0)*(B.st.burn>0?.5:1)*100);return `<div class="intent buff">✚ 下回合：【${k.n}】　<small>回復約 ${pc}%${B.st.burn>0?'（灼燒壓制中）':'・灼燒可減半'}</small></div>`}return `<div class="intent buff">✚ 下回合：【${k.n}】</div>`}const me=MOBEL(k),st=stats(),rv=me?mobRes(k,st):0,et=me?`<small class="elt el-${me}">${ELI[me]}${rv?`・抗 ${rv}%`:'・無抗性'}</small>`:'';return isDng(k)?`<div class="intent dng">⚠ 下回合：【${k.n}】${et}　<small>防禦減傷 75%＋破綻</small></div>`:`<div class="intent sk">✦ 下回合：【${k.n}】${et}</div>`}
