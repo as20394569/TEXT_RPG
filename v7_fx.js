@@ -659,10 +659,16 @@ function toxic(f,p){p=p||1;pe(f,{n:Math.round(14*p),spr:PI,v0:.02,v1:.08,ay:-.03
   physL(f,'drop',Math.round(5+p*4),{spd:[.3,.8],sz:[.004,.008],life:[.5,.9],col:'#8be04a'});
   cel(1,(c,k)=>{const [x,y]=P2(f),u=U();for(let i=0;i<6;i++){const t=(k*1.4+i/6)%1,bx=x+Math.sin(i*2.7)*u*.07,by=y+u*.06-t*u*.12,r=u*.008*(.6+Math.sin(i)*.4)*(t<.85?1:1+(t-.85)*8);c.globalAlpha=(t<.85?.8:1-(t-.85)/.15)*(1-k*.5);c.strokeStyle='#c8ff8a';c.lineWidth=1;c.fillStyle='rgba(120,220,60,.35)';c.beginPath();c.arc(bx,by,r,0,7);c.fill();c.stroke()}})}
 /* ---------- 暗：濃黑煙＋紫色邊光 ---------- */
-function shadow(f,p){p=p||1;pe(f,{n:Math.round(14*p),spr:PI,v0:.03,v1:.1,ay:-.06,drag:1.6,l0:.8,l1:1.3,s0:.02,s1:.065*p,al:.55,im:DRK,jx:.03,jy:.03,wob:.15});pe(f,{n:Math.round(8*p),spr:PI,v0:.05,v1:.15,ay:-.1,drag:2,l0:.5,l1:.9,s0:.012,s1:.03,al:.5,add:1,im:spr(170,100,255)});swirl(f,'#a060ff',{R:.1*p,life:.8});
-  cel(.8,(c,k)=>{const [x,y]=P2(f),u=U(),gy=y+GY(f)*SR().h;c.globalCompositeOperation='source-over';c.lineCap='round';for(let i=0;i<5;i++){const bx=x+(i-2)*u*.035,h=u*.16*p*eo(k*2.5)*(.7+.3*Math.sin(i*3));c.globalAlpha=(k<.6?1:1-(k-.6)/.4)*.8;c.strokeStyle='rgba(20,0,35,.95)';c.lineWidth=u*.012*(1-k*.4);c.beginPath();c.moveTo(bx,gy);
-      c.bezierCurveTo(bx+Math.sin(k*8+i)*u*.03,gy-h*.4,bx-Math.sin(k*6+i)*u*.04,gy-h*.8,bx+Math.sin(k*10+i)*u*.02,gy-h);c.stroke();ADD(c);c.strokeStyle='rgba(170,110,255,.6)';c.lineWidth*=.3;c.stroke();c.globalCompositeOperation='source-over'}})}
+function shadow(f,p){p=p||1;pe(f,{n:Math.round(14*p),spr:PI,v0:.03,v1:.1,ay:-.06,drag:1.6,l0:.8,l1:1.3,s0:.02,s1:.065*p,al:.5,im:DRK,jx:.03,jy:.03,wob:.15});pe(f,{n:Math.round(10*p),spr:PI,v0:.05,v1:.15,ay:-.1,drag:2,l0:.5,l1:.9,s0:.012,s1:.03,al:.55,add:1,im:spr(170,100,255)});swirl(f,'#a060ff',{R:.1*p,life:.8});
+  /* 向內收縮的暗環＋紫色碎光（取代原本地上竄出的黑影） */
+  cel(.6,(c,k)=>{const [x,y]=P2(f),u=U(),r=u*.12*p*(1-eo(k*1.6)*.8);ADD(c);c.globalAlpha=1-k;c.strokeStyle='#b88aff';c.lineWidth=Math.max(1.5,u*.006*(1-k));c.beginPath();c.ellipse(x,y,r,r*.8,0,0,7);c.stroke()});bits(f,{n:Math.round(8*p),col:'#c9a0ff',spd:[.3,.9],life:[.3,.6]})}
 
+/* 腐蝕：地上一灘冒泡的酸液，嘶嘶冒出紫綠色酸霧 */
+function acidPool(f,p){p=p||1;cel(1.2,(c,k)=>{const [x,y]=P2(f),gy=y+GY(f)*SR().h,u=U(),R=u*.13*p*eo(Math.min(1,k*3)),fd=k<.7?1:1-(k-.7)/.3;c.globalAlpha=fd*.9;c.translate(x,gy);c.scale(1,.28);c.fillStyle=rg(c,0,0,R,[[0,'rgba(150,60,200,.95)'],[.7,'rgba(90,150,40,.7)'],[1,T0]]);c.beginPath();c.arc(0,0,R,0,7);c.fill();
+  ADD(c);for(let i=0;i<6;i++){const t=(k*2+i/6)%1,bx=Math.cos(i*2.4)*R*.6,by=Math.sin(i*2.4)*R*.5,r=u*.012*Math.sin(PI*t);c.globalAlpha=fd*Math.sin(PI*t);c.strokeStyle='#d8a0ff';c.lineWidth=2;c.beginPath();c.arc(bx,by,r,0,7);c.stroke()}});
+  pe([f[0],f[1]+GY(f)],{n:Math.round(10*p),a:-PI/2,spr:.5,v0:.04,v1:.1,ay:-.08,drag:1.4,l0:.7,l1:1.2,s0:.015,s1:.06,al:.45,im:[spr(150,70,200),spr(110,170,60)],jx:.05,wob:.15});later(100,()=>SN.hiss(0,.5))}
+function corrodeDrip(f){physL(f,'drop',8,{spd:[.2,.6],sz:[.004,.008],life:[.6,1],col:'#9a4ad0'});acidPool(f,.8)}
+function acid(f){physL(f,'drop',14,{spd:[.5,1.2],sz:[.004,.008],life:[.5,.9],col:'#b05ae0'});acidPool(f,1)}
 /* ================= 接到現有流程 ================= */
 const RC={};const getR=k=>k in RC?RC[k]:(RC[k]=(SF[k]?{v:()=>{castPose('me');SF[k].v()},s:()=>SF[k].s(0),el:'holy'}:null)||designed(k)||recipe(k));
 /* 依配方的屬性選擇命中碎屑 */
