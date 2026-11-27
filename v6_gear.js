@@ -141,6 +141,8 @@ function setFoldAll(){}
 const gIco=id=>{const t=tplOf(id);if(!t)return ic('weapon');const k=t.k,ti=Math.min(5,Math.floor((t.lv-1)/17));
   const m={SWORD:'w_swordsman',GREATSWORD:'w_knight',AXE:'w_berserker',DAGGER:'w_assassin',BOW:'w_ranger',STAFF:'w_mage',WAND:'w_warlock',BOOK:'w_warlock',HOLY:'w_cleric',MACE:'w_templar',SHIELD:'w_knight',NECK:'n',RING:'r'};
   let base=m[k];if(!base){const sl=k[0]==='H'?'h':k[0]==='B'?'a':'f';base=sl+(k.endsWith('HEAVY')?'':'b')}
+  const nm={GREATSWORD:'greatsword',AXE:'axe',DAGGER:'dagger',WAND:'wand',BOOK:'book',MACE:'mace',SHIELD:'shield',H_CLOTH:'hc',B_CLOTH:'bc',F_CLOTH:'fc'}[k];
+  if(nm&&typeof ARTSET!=='undefined'&&ARTSET&&ARTSET.has('icon_'+nm+'_'+ti))return icon('icon_'+nm+'_'+ti,SLOTCH[slotsOfType(k)[0]]);
   let key='icon_'+base+'_'+ti;if(!(key in ATL)){for(let i=ti;i>=0;i--)if(('icon_'+base+'_'+i) in ATL){key='icon_'+base+'_'+i;break}if(!(key in ATL))for(let i=4;i<=5;i++)if(('icon_'+base+'_'+i) in ATL){key='icon_'+base+'_'+i;break}}
   return icon(key,SLOTCH[slotsOfType(k)[0]])};
 function dropUp(g){const sl=equipSlots(g).find(s=>canEquip(g,s));if(!sl)return 0;const cur=gearBy(S.eq[sl]);if(!cur)return 100;const a=gearPower(g),c=gearPower(cur);return a>c?Math.max(1,Math.round((a-c)/Math.max(1,c)*100)):0}
