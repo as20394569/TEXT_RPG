@@ -1,0 +1,156 @@
+{
+ "P0-1 被動不重複計算": {
+  "ok": false,
+  "info": {
+   "skP": {
+    "atkp": 5,
+    "hpp": 5
+   },
+   "gt": {
+    "atkp": 10,
+    "hpp": 10
+   }
+  }
+ },
+ "P0-2 副目標狀態會到期、持續傷害會跳": {
+  "ok": false,
+  "info": {
+   "ac": 0,
+   "acts": 0,
+   "weak": true,
+   "poison": true,
+   "stun": true,
+   "hpLost": 0
+  }
+ },
+ "P1-1 韌性只算一次": {
+  "ok": false,
+  "info": {
+   "dur": 5
+  }
+ },
+ "P1-2 怪物護盾以行動數判斷": {
+  "ok": false,
+  "info": {
+   "t": 14,
+   "absorbed": false
+  }
+ },
+ "P1-3 換目標不會弄丟蓄力": {
+  "ok": false,
+  "info": {
+   "after": null
+  }
+ },
+ "P2-1 怪物淨化只清負面": {
+  "ok": false,
+  "info": {
+   "shield": false,
+   "weak": false
+  }
+ },
+ "P2-2 換位時被動旗標跟著怪物": {
+  "ok": false,
+  "info": {
+   "newMainUsed": 1
+  }
+ },
+ "ERR 無頁面錯誤(1)": {
+  "ok": true,
+  "info": []
+ },
+ "P0-3 首領不在主位仍依 AI 放技能": {
+  "ok": true,
+  "info": {
+   "slots": [
+    "",
+    "boss"
+   ],
+   "bossMain": false,
+   "bossActs": 2,
+   "mcd": 0,
+   "log": [
+    "雪兔 的【疾風突進】造成 28 傷害"
+   ]
+  }
+ },
+ "P0-3b 首領不在主位仍會召喚": {
+  "ok": false,
+  "info": {
+   "sum": 1
+  }
+ },
+ "ERR 無頁面錯誤(2)": {
+  "ok": true,
+  "info": []
+ },
+ "P1-4 戰敗停止全自動": {
+  "ok": false,
+  "info": {
+   "code": {
+    "hasStop": false
+   },
+   "after": {
+    "fa": {
+     "area": 1,
+     "nm": false,
+     "tower": false
+    }
+   }
+  }
+ },
+ "P1-6 全自動配點照職業主屬性": {
+  "ok": false,
+  "info": {
+   "templar": {
+    "main": "力",
+    "diff": {
+     "VIT": 3,
+     "INT": 6
+    }
+   },
+   "assassin": {
+    "main": "力",
+    "diff": {
+     "VIT": 3,
+     "DEX": 6
+    }
+   },
+   "archmage": {
+    "main": "智",
+    "diff": {
+     "VIT": 3,
+     "INT": 6
+    }
+   }
+  }
+ },
+ "P2-4 天賦對到正確技能": {
+  "ok": false,
+  "info": {
+   "t0723": "J07S15",
+   "t0921": "J09S15",
+   "blockRedUsed": false
+  }
+ },
+ "P2-3 格擋減傷天賦有作用": {
+  "ok": false,
+  "info": {
+   "t0723": "J07S15",
+   "t0921": "J09S15",
+   "blockRedUsed": false
+  }
+ },
+ "P2-11 伺服器等級上限 100": {
+  "ok": false,
+  "info": {}
+ },
+ "P1-7 上榜需要帳號 token": {
+  "ok": false,
+  "info": {}
+ },
+ "P2-12 前端沒有 GM 密語": {
+  "ok": false,
+  "info": {}
+ }
+}
