@@ -18,9 +18,9 @@ const M7={};/* id → {rk,off} */
     a.mobs=[...by('普通'),...(KEEP7[i]||[]).filter(id=>MOBS[id])].filter((x,j,A)=>A.indexOf(x)===j);a.el7=by('精英');a.ra7=by('稀有');a.mid7=by('中段強敵');
     if(i>=7){const b=by('區域首領')[0];if(b)a.boss=b}
     a.mobs.forEach(m=>{if(MOBS[m]&&MOBS[m].v6new)MOBS[m].lv=ZN6[i].lo})})})();
-/* 怪物等級：表上等級當下限，跟著玩家等級浮動，不超出地圖範圍 */
+/* 怪物等級：跟著玩家等級浮動（強敵、精英 +1），不超出地圖範圍 */
 {const _fl=foeLv6;foeLv6=function(id,rk){const x=M7[id];if(RUN&&RUN.dg&&!RUN.tower&&!RUN.trial){const z=ZN6[zoneOf6()]||ZN6[0];return clamp6(S.lv+(rk==='E'?1:0)-Math.floor(Math.random()*3),z.lo,z.hi)}if(!x||!RUN||RUN.tower||RUN.trial)return _fl.apply(this,arguments);const z=ZN6[zoneOf6()]||ZN6[0];
-  const base=z.lo+x.off;return clamp6(Math.max(base,S.lv+(rk==='E'?1:0)+Math.floor(Math.random()*4)-2),z.lo,z.hi)}}
+  return clamp6(S.lv+(rk==='E'||rk==='B'?1:0)+Math.floor(Math.random()*3)-2,z.lo,z.hi)}}
 
 /* ---------- 群體遭遇 ---------- */
 const GRPM7=n=>V6.GRPM[Math.max(1,Math.min(4,n))-1];
@@ -95,9 +95,9 @@ dgEnter=function(){const o=RUN,D=dgOf(),nk=o.dg.k+1,na=D.segs[nk];track('run');
   RUN={dg:{diff:o.dg.diff||0}};startRun(na,o.nm);if(!RUN)return;RUN.loot=o.loot;RUN.dg={d:o.dg.d,k:nk,depth:(o.dg.depth||0)+1,diff:o.dg.diff||0};save();render();toast(`第 ${nk+1} 區：${AREAS[na].n}`)};
 dgNext=function(){if(!RUN||!RUN.dg||B||!dgCanGo())return;dgEnter()};
 /* 第二區 HP×1.10、攻擊×1.05；第三區 HP×1.20、攻擊×1.10（先套階級與群體，再套副本） */
-/* 平衡（企劃表註明數值非實測定稿）：八格連戰會帶著損耗打到中段與首領，首領級 HP ×0.55、攻擊 ×0.8，精英 HP ×0.75 */
+/* 平衡（企劃表註明數值非實測定稿）：八格連戰會帶著損耗打到中段與首領，首領級 HP ×0.55、攻擊 ×0.8，精英 HP ×0.75；Lv10 以下再放輕 */
 const BAL7={B:{hp:.55,atk:.8},E:{hp:.75,atk:1}};
-{const _mk=mkFoe;mkFoe=function(id,kind){const f=_mk.apply(this,arguments);const b=BAL7[f.rank6];if(b&&!(RUN&&(RUN.tower||RUN.trial))){f.hp=f.max=Math.round(f.max*b.hp);f.atk=Math.round(f.atk*b.atk);f.mag=Math.round(f.mag*b.atk)}if(RUN&&RUN.dg){const k=RUN.dg.k||0,h=[1,1.1,1.2][k]||1,a=[1,1.05,1.1][k]||1;f.hp=f.max=Math.round(f.max*h);f.atk=Math.round(f.atk*a);f.mag=Math.round(f.mag*a)}return f}}
+{const _mk=mkFoe;mkFoe=function(id,kind){const f=_mk.apply(this,arguments);const b=BAL7[f.rank6];if(b&&!(RUN&&(RUN.tower||RUN.trial))){const lk=Math.min(1,.55+(f.L||1)/22);f.hp=f.max=Math.round(f.max*b.hp*lk);f.atk=Math.round(f.atk*b.atk*(.5+lk/2));f.mag=Math.round(f.mag*b.atk*(.5+lk/2))}if(RUN&&RUN.dg){const k=RUN.dg.k||0,h=[1,1.1,1.2][k]||1,a=[1,1.05,1.1][k]||1;f.hp=f.max=Math.round(f.max*h);f.atk=Math.round(f.atk*a);f.mag=Math.round(f.mag*a)}return f}}
 /* 通關寶箱：最後首領額外裝備判定 1 次、首領印記 2、金幣基準 ×10 */
 function dgChest7(){const z=zoneOf6(),L=ZN6[z].hi,got=[];gearDrop6(L,'B',got,{force:1,zone:z});give6(zmat6(z,5),2,got);const g=MLV6(L)[12]*10;S.gold+=g;RUN.loot.gold+=g;RUN.loot.items.push(...got);
   RUN.view.text=(RUN.view.text||'')+`<br>副本寶箱：${g} G${got.length?'、'+got.join('、'):''}。`}
