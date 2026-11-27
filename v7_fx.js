@@ -713,32 +713,46 @@ function darkBlade(f,ang,L,W,o){o=o||{};const life=o.life||.3,d0=o.d0||.09,hold=
   ADD(c);c.globalAlpha=.35*th;sh(tail-len*.03,head+len*.02,w*1.9);c.fillStyle=blue;c.fill();
   c.globalCompositeOperation='source-over';c.globalAlpha=th;sh(tail,head,w*1.15);c.fillStyle='#03050d';c.fill();c.strokeStyle=blue;c.lineWidth=1.6;c.lineJoin='miter';c.stroke();
   ADD(c);c.globalAlpha=.8*th;sh(tail+len*.15,head-len*.05,Math.max(1,w*.22));c.fillStyle='#8fc4ff';c.fill()})}
-/* 一刀：藍刃／黑刃交替，長短粗細明顯不同，全部是兩頭尖的扁菱形 */
-const DLEN=[.34,.15,.27,.12,.31,.19,.24,.14];
-function flick(p,a,i,o){o=o||{};const j=(i+(o.sh||0)),L=DLEN[j%DLEN.length]*rnd2(.9,1.1),W=L*rnd2(.2,.26),bias=rnd2(.38,.62);
-  if(j%2)darkBlade(p,a,L,W,{bias,life:.28});
-  else dia(p,a,L,W,j%4===2?'#7fb8ff':DC1,{life:.26,hold:.32,bias});
-  later(25,()=>{tick(p,j%2?'#5aa0ff':'#9fc8ff');if(o.ef)edgeFx(p,a,o.ef,DC1);hitShake(F,5)})}
-/* 連擊：節奏越來越快、角度與位置每刀都不同 */
+/* 雙劍基本單位：一次攻擊＝兩道刃（藍刃先、黑刃後），角度交錯不平行，一長一短 */
+const DLEN=[.32,.2,.28,.17,.3,.22];
+function pair(p,a,o){o=o||{};const L=o.L||DLEN[(o.j||0)%DLEN.length]*rnd2(.92,1.08),L2=L*(o.r2||rnd2(.6,.8)),sp=o.sp??rnd2(.5,.9),d=o.d??.012,lf=o.life||.26,
+  nx=-Math.sin(a),ny=Math.cos(a),p1=[p[0]+nx*d,p[1]+ny*d],p2=[p[0]-nx*d,p[1]-ny*d],sw=(o.j||0)%2;
+  const A=()=>dia(sw?p2:p1,a-sp/2,sw?L2:L,(sw?L2:L)*.21,o.c||DC1,{life:lf,hold:.32,bias:rnd2(.4,.6)}),
+        B=()=>darkBlade(sw?p1:p2,a+sp/2,sw?L:L2,(sw?L:L2)*.24,{life:lf+.02,bias:rnd2(.4,.6)});
+  A();later(o.gap??35,B);later(25,()=>{tick(p,'#9fc8ff');if(o.ef)edgeFx(p,a,o.ef,DC1);hitShake(F,o.sk||5)})}
+/* 連擊：每一下都是一對刃，節奏越來越快、角度位置每次不同 */
 function combo(f,n,o){o=o||{};const i0=o.i0||80,i1=o.i1||35,T=[];let t=0;for(let i=0;i<n;i++){T.push(t);t+=i0+(i1-i0)*(i/Math.max(1,n-1))}let pa=rnd2(-PI,PI);
-  T.forEach((tt,i)=>later(tt,()=>{pa+=rnd2(.9,2.2)*(Math.random()<.5?1:-1);const a=o.ang?o.ang(i):pa,p=[f[0]+rnd2(-.035,.035),f[1]+rnd2(-.04,.035)];flick(p,a,i,o);if(i%4===3)spk(p,'#cfe4ff',.05,5,.15)}));return t}
-/* 收尾：三道極快的細刃＋藍色星屑，小而俐落 */
-function finisher(f,o){o=o||{};const base=rnd2(-PI,PI);[[.36,0],[.16,1],[.28,0]].forEach(([L,dk],i)=>later(i*30,()=>{const p=[f[0]+rnd2(-.015,.015),f[1]+rnd2(-.015,.015)],a=base+i*1.05;if(dk)darkBlade(p,a,L,L*.24,{life:.3,d0:.07});else dia(p,a,L,L*.2,i===2?'#7fb8ff':DC1,{life:.3,d0:.07})}));
+  T.forEach((tt,i)=>later(tt,()=>{pa+=rnd2(.9,2.1)*(Math.random()<.5?1:-1);const p=[f[0]+rnd2(-.03,.03),f[1]+rnd2(-.035,.03)];pair(p,o.ang?o.ang(i):pa,{j:i+(o.sh||0),ef:o.ef,gap:Math.max(18,o.gap??(tt>0?30:35))});if(i%3===2)spk(p,'#cfe4ff',.05,5,.15)}));return t}
+/* 收尾：一對較長的交叉刃＋藍色星屑 */
+function finisher(f,o){o=o||{};const a=rnd2(-PI,PI);pair(f,a,{L:o.L||.36,r2:.85,sp:1.25,d:0,life:.32,sk:9,gap:40});
   later(100,()=>{flash(f,'#cfe4ff',.12,.2);spk(f,'#ffffff',.08,9,.22);stardust(f,12,{im:[spr(90,160,255),spr(200,225,255)],v1:.25});hitShake(F,9)})}
 function comboSnd(n,i0,i1,t0,fin){let t=t0||.1;for(let i=0;i<n;i++){SN.cut(t,2300+(i%4)*150);t+=(i0+(i1-i0)*(i/Math.max(1,n-1)))/1000}if(fin){for(let j=0;j<3;j++)SN.cut(t+j*.03,2800+j*200);SN.star(t+.1)}}
 /* 閃斬：殘影一閃、三道又細又快的刀光從不同方向掠過 */
-function quickStep(f){wind(H,'#dceeff',{dir:1,n:5,life:.35});[[-.35,.2],[.9,-.1],[-1.4,.05]].forEach(([a,dx],i)=>later(60+i*45,()=>{(i===1?darkBlade:(pp,aa,LL,WW,oo)=>dia(pp,aa,LL,WW,DC1,oo))([f[0]+dx*.1,f[1]+rnd2(-.02,.02)],a,[.3,.14,.22][i],[.3,.14,.22][i]*.16,{life:.2,d0:.06,hold:.25});later(20,()=>{tick([f[0]+dx*.1,f[1]],'#bfe0ff');hitShake(F,4)})}));later(220,()=>{wind(f,'#e8f4ff',{dir:1,n:4,life:.3});stardust(f,8,{im:[spr(200,225,255)],v1:.2})})}
+function quickStep(f){wind(H,'#dceeff',{dir:1,n:5,life:.35});later(70,()=>pair(f,-.25,{L:.3,r2:.55,sp:.35,d:.02,life:.2,gap:22}));later(150,()=>{wind(f,'#e8f4ff',{dir:1,n:4,life:.3});stardust(f,8,{im:[spr(200,225,255)],v1:.2})})}
 const DUAL={
-  J13S1:{v:()=>{lunge('me',30);const t=combo(F,4,{i0:90,i1:65});later(t,()=>finisher(F))},s:()=>comboSnd(4,90,65,.1,1)},
-  J13S2:{v:()=>{lunge('me',30);dia(F,-.5,.36,.075,DC1,{life:.34});later(70,()=>darkBlade(F,.55,.33,.08,{life:.34}));later(200,()=>{const t=combo(F,3,{i0:60,i1:45,sh:2});later(t,()=>finisher(F))})},s:()=>{SN.swish(.1,1,1);SN.cut(.17,2500);comboSnd(3,60,45,.3,1)}},
-  J13S3:{v:()=>{lunge('me',30);wind(F,'#e0f0ff',{dir:1,n:5,life:.7});const t=combo(F,9,{i0:70,i1:28});later(t,()=>finisher(F))},s:()=>{SN.wind(.05);comboSnd(9,70,28,.1,1)}},
-  J13S7:{aoe:1,v:k=>{lunge('me',30);aoePts(k).forEach((p,i)=>later(i*60,()=>{const a0=rnd2(-PI,PI);for(let j=0;j<6;j++)later(j*38,()=>flick([p[0]+rnd2(-.02,.02),p[1]+rnd2(-.02,.02)],a0+j*.95,j,{sh:i}));later(250,()=>spk(p,'#cfe4ff',.06,6,.18))}))},s:()=>{SN.wind(.05);comboSnd(6,38,38,.1,0)}},
-  J13S8:{aoe:1,v:k=>{lunge('me',30);const pts=aoePts(k);pts.forEach((p,i)=>later(i*45,()=>{const t=combo(p,3,{i0:55,i1:40,sh:i*2});later(t,()=>spk(p,'#cfe4ff',.06,6,.18))}))},s:()=>comboSnd(4,55,40,.1,0)},
-  J13S9:{v:()=>{lunge('me',30);const t=combo(F,5,{i0:75,i1:45,ef:'blood'});later(t,()=>{finisher(F);edgeFx(F,0,'blood')})},s:()=>{comboSnd(5,75,45,.1,1);SN.splat(.3);SN.splat(.45)}},
-  J13S10:{v:()=>quickStep(F),s:()=>{SN.wind(0);for(let i=0;i<3;i++)SN.cut(.06+i*.045,2800+i*200);SN.star(.25)}},
-  J13S11:{v:()=>{lunge('me',30);armorCut(F,-.6,'#3a8cff',1);later(60,()=>combo(F,3,{i0:45,i1:35,sh:1}));later(240,()=>{dia(F,-.6,.26,.04,DC1,{life:.3});later(30,()=>darkBlade(F,.6,.26,.04,{life:.3}));later(60,()=>{edgeFx(F,0,'armor','#9fc8ff');hitShake(F,9)})})},s:()=>{SN.guard(.05);comboSnd(3,45,35,.1,0);SN.cut(.34,2400);SN.ring(.38,800,.1,.5);SN.shatter(.4)}},
-  J13S12:{v:()=>{lunge('me',30);const t=combo(F,7,{i0:65,i1:30,sh:3});later(t,()=>finisher(F))},s:()=>comboSnd(7,65,30,.1,1)},
-  J13S13:{v:()=>{lunge('me',30);const t=combo(F,11,{i0:68,i1:24,sh:4});later(t,()=>{finisher(F);later(90,()=>finisher(F))})},s:()=>{comboSnd(11,68,24,.1,1);SN.cut(.85,3000)}}};
+  /* 交錯斬：兩對 X 字交叉刃 */
+  J13S1:{v:()=>{lunge('me',30);pair(F,-.4,{L:.3,sp:1.3,d:0,j:0});later(150,()=>pair(F,.9,{L:.26,sp:1.2,d:0,j:1}));later(300,()=>finisher(F,{L:.3}))},s:()=>{SN.cut(.1,2400);SN.cut(.14,2200);SN.cut(.25,2600);SN.cut(.29,2400);comboSnd(0,0,0,.4,1)}},
+  /* 雙月斬：兩道長刃上下各劃一弧位，像兩彎月牙交會 */
+  J13S2:{v:()=>{lunge('me',30);dia([F[0],F[1]-.03],-.25,.38,.07,DC1,{life:.36,bias:.35});later(60,()=>darkBlade([F[0],F[1]+.03],.25,.38,.08,{life:.36,bias:.65}));later(110,()=>{flash(F,'#cfe4ff',.1,.18);hitShake(F,8)});later(260,()=>{const t=combo(F,2,{i0:70,i1:60,sh:2});later(t,()=>finisher(F))})},s:()=>{SN.swish(.1,1,1);SN.cut(.13,2500);SN.cut(.19,2200);comboSnd(2,70,60,.36,1)}},
+  /* 疾風連刃：風壓中六對刃越砍越快 */
+  J13S3:{v:()=>{lunge('me',30);wind(F,'#e0f0ff',{dir:1,n:5,life:.7});const t=combo(F,6,{i0:80,i1:35});later(t,()=>finisher(F))},s:()=>{SN.wind(.05);comboSnd(6,80,35,.1,1)}},
+  /* 影步亂斬：殘影穿過全部敵人，每個身上留一對交叉刃，回身再補一對 */
+  J13S7:{aoe:1,v:k=>{const pts=aoePts(k);wind(H,'#dceeff',{dir:1,n:5,life:.35});pts.forEach((p,i)=>later(60+i*55,()=>{wind(p,'#e8f4ff',{dir:1,n:3,life:.25});pair(p,-.3+rnd2(-.3,.3),{L:.28,sp:1.2,d:0,j:i,life:.28})}));
+    const back=60+pts.length*55+80;pts.slice().reverse().forEach((p,i)=>later(back+i*45,()=>{pair(p,1.1+rnd2(-.3,.3),{L:.22,sp:.8,j:i+1,life:.24});later(40,()=>spk(p,'#cfe4ff',.05,6,.16))}))},
+    s:()=>{SN.wind(.05);for(let i=0;i<4;i++){SN.cut(.12+i*.055,2300+i*120);SN.cut(.15+i*.055,2100+i*120)}for(let i=0;i<4;i++)SN.cut(.45+i*.045,2600)}},
+  /* 雙刃斬：兩名敵人各吃一對 V 字刃 */
+  J13S8:{aoe:1,v:k=>{lunge('me',30);aoePts(k).forEach((p,i)=>later(i*70,()=>{pair(p,PI/2+(i?.15:-.15),{L:.28,sp:.7,d:.015,j:i});later(160,()=>pair(p,-.5,{L:.2,sp:.9,j:i+1}))}))},s:()=>{comboSnd(4,70,60,.1,0)}},
+  /* 裂傷斬：三對刃＋濺血 */
+  J13S9:{v:()=>{lunge('me',30);const t=combo(F,3,{i0:85,i1:60,ef:'blood'});later(t,()=>{finisher(F);edgeFx(F,0,'blood')})},s:()=>{comboSnd(3,85,60,.1,1);SN.splat(.25);SN.splat(.4)}},
+  /* 閃斬：殘影一閃，一對極細極快的刃 */
+  J13S10:{v:()=>quickStep(F),s:()=>{SN.wind(0);SN.cut(.08,2900);SN.cut(.1,2700);SN.star(.2)}},
+  /* 破甲斬：盾甲裂開，一對大 X 刃砍穿 */
+  J13S11:{v:()=>{lunge('me',30);armorCut(F,-.6,'#3a8cff',1);later(120,()=>pair(F,0,{L:.34,r2:.9,sp:1.2,d:0,life:.32,sk:9}));later(200,()=>edgeFx(F,0,'armor','#9fc8ff'))},s:()=>{SN.guard(.05);SN.cut(.13,2400);SN.cut(.17,2200);SN.ring(.2,800,.1,.5);SN.shatter(.22)}},
+  /* 連擊斬：四對刃 */
+  J13S12:{v:()=>{lunge('me',30);const t=combo(F,4,{i0:75,i1:45,sh:3});later(t,()=>finisher(F))},s:()=>comboSnd(4,75,45,.1,1)},
+  /* 重雙斬：六對刃，最後一對最長並帶衝擊 */
+  J13S13:{v:()=>{lunge('me',30);const t=combo(F,6,{i0:75,i1:32,sh:4});later(t,()=>{pair(F,rnd2(-PI,PI),{L:.4,r2:.9,sp:1.3,d:0,life:.36,sk:12,gap:30});later(80,()=>{flash(F,'#cfe4ff',.15,.22);shock(F,'#5aa0ff',.12,.28);stardust(F,14,{im:[spr(90,160,255),spr(200,225,255)],v1:.3})})})},s:()=>{comboSnd(6,75,32,.1,0);SN.cut(.62,2200);SN.cut(.65,2000);SN.heavy(.66)}}};
+
 /* ================= 接到現有流程 ================= */
 const RC={};const getR=k=>k in RC?RC[k]:(RC[k]=(DUAL[k]?{v:()=>DUAL[k].v(k),s:()=>DUAL[k].s(),el:'slash'}:null)||(SF[k]?{v:()=>{castPose('me');SF[k].v()},s:()=>SF[k].s(0),el:'holy'}:null)||designed(k)||recipe(k));
 /* 依配方的屬性選擇命中碎屑 */
