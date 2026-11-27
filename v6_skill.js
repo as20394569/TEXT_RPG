@@ -27,7 +27,7 @@ const WTAG={'單手劍':'SLASH','雙手劍':'SLASH','巨斧':'SLASH','戰錘':'B
 const jobEq6=j=>(V6.JOBEQ||[]).find(r=>JOBK[r.job]===j)||{};
 for(const k in SK)delete SK[k];for(const k in PASS)delete PASS[k];
 (V6.SKILL||[]).forEach(r=>{const c=JOBK[r.job];if(!c)return;const act=r.kind==='主動',dm=r.dt==='物'||r.dt==='魔',hl=r.dt==='治療';
-  const lv=CLS[c]?r.lv:Math.max(r.lv,TRIAL.lv);
+  const lv=CLS[c]&&!CLS[c].hide?Math.round(1+(r.lv-1)*(TRIAL.lv-1)/84):(r.lv<=18?TRIAL.lv:Math.round(TRIAL.lv+(r.lv-18)*(LVMAX-TRIAL.lv)/67));
   SK[r.id]={id:r.id,n:r.n,c,lv,act,mp:r.mp||0,cd:r.cd||0,pow:(r.pow||0)/100,s:r.dt==='魔'?'MAG':'ATK',dt:r.dt,fx:r.fx==='無'?'':r.fx,
     dmg:dm?{s:r.dt==='魔'?'MAG':'ATK',p:(r.pow||0)/100,h:r.id==='J13S2'?2:1}:null,heal:hl?1:0,
     d:(dm?`${r.dt==='物'?'物理':'魔法'} ${r.pow}%`:hl?'治療':'')+(r.fx&&r.fx!=='無'?(dm||hl?'，':'')+r.fx:'')};

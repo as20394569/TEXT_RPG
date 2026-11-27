@@ -2217,7 +2217,7 @@ function vTitle(){const c=CLS[NEWCLS];return `<div class="title">${art('title_bg
   <p>${c.d}</p><p class="sub">${c.f}</p><div class="chips">${Object.keys(ATTR).map(k=>`<span class="chip">${ATTR[k]} ${c.base[k]}</span>`).join('')}</div>
   <p class="sub">男女主角的部分劇情對話不同。</p><button class="btn pri big" data-a="start">開始冒險</button></div></div>`}
 function vTown(){
-  const F=[['guild','npc_ria','莉雅','冒險者公會','主線與委託'],['smith','npc_bald','巴爾德','鐵匠鋪','強化・分解'],['shop','npc_miko','蜜可','道具商店','藥水與裝備'],['inn','npc_martha','瑪莎','旅店',`休息回復（${S.lv*4} G）`],['altar','npc_oracle','占星師','星象台','每日占卜・掉落情報'],['temple','npc_edwin','艾德溫','轉職神殿','Lv.20 轉職試煉']];
+  const F=[['guild','npc_ria','莉雅','冒險者公會','主線與委託'],['smith','npc_bald','巴爾德','鐵匠鋪','強化・分解'],['shop','npc_miko','蜜可','道具商店','藥水與裝備'],['inn','npc_martha','瑪莎','旅店',`休息回復（${S.lv*4} G）`],['altar','npc_oracle','占星師','星象台','每日占卜・掉落情報'],['temple','npc_edwin','艾德溫','轉職神殿','Lv.30 轉職試煉']];
   return `<div class="banner">${art('town_bg','晨星鎮全景')}<div class="cap">晨星鎮<small>頻道 1</small></div></div>
   <button class="newsbar" data-a="openM" data-v="news"><span class="nb-tag">公告</span><span class="grow nb-t"><b>v${NEWS[0].v}　${NEWS[0].t}</b><small>${NEWS[0].d}・點我看全部更新</small></span>${newsDot()?'<span class="tag new">NEW</span>':''}<span class="nb-arr">›</span></button>
   <div class="row qrow"><button class="btn grow" data-a="openM" data-v="dex">冒險圖鑑</button><button class="btn grow" data-a="openM" data-v="ach">成就</button><button class="btn grow" data-a="openM" data-v="rank">排行榜</button><button class="btn grow" data-a="openM" data-v="fb">意見回報</button></div>
@@ -3080,13 +3080,13 @@ const TIPS={
   char:['角色','升級拿到的屬性點和技能點在這裡分配。裝備點下去可以看詳情、更換。'],
   smith:['鐵匠鋪','強化提升主屬性，+10 以後失敗會掉級。用不到的裝備可以分解成星塵，拿去洗練詞條或合成。'],
   bag:['背包','裝備依部位分類。紫色史詩、金色傳說有鑲嵌孔，可以放寶石。'],
-  adv20:['轉職','Lv.20 可以到轉職神殿接受試煉，打贏自己的影子就能轉職，學會新技能。'],
+  adv20:['轉職','Lv.30、打倒第 3 區首領後，可以到轉職神殿挑戰自己的影子，贏了就能轉職。'],
   tower:['霧淵','每週規則不同。能走多深就走多深。'],
   ally:['夥伴','露娜會跟你一起戰鬥。她會攻擊，也會在你危險時治療。可以在角色頁更換或取消夥伴。']};
 function tipCheck(){const el0=$('#tip');if(!S||STORY||(MODAL&&MODAL.k!=='smith')){if(el0)el0.hidden=true;return}if(!S.tut)S.tut={};let k=null;
   if(MODAL)k='smith';else if(B)k=S.tut.battle?(B.ally&&!S.tut.ally?'ally':null):'battle';
   else if(RUN&&RUN.view)k=RUN.view.type==='fork'?'fork':RUN.view.type==='event'?'event':RUN.tower?'tower':null;
-  else k={town:'town',quest:'quest',adv:S.lv>=20&&!S.adv&&CLS[S.cls].adv.length?'adv20':'adv',char:'char',bag:'bag'}[TAB];
+  else k={town:'town',quest:'quest',adv:S.lv>=TRIAL.lv&&!S.adv&&CLS[S.cls].adv.length?'adv20':'adv',char:'char',bag:'bag'}[TAB];
   if(k&&S.tut[k])k=null;const el=$('#tip');if(!el)return;
   if(!k){el.hidden=true;return}
   el.hidden=false;el.innerHTML=`<b>${TIPS[k][0]}</b><p>${TIPS[k][1]}</p><button class="btn sm pri" data-a="tipOk" data-v="${k}">知道了</button>`}
@@ -3098,6 +3098,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'20.8',d:'2026-11-28',t:'技能等級',b:'基礎職業的技能改在 Lv.1～30 學完，轉職前就能用到全部招式；轉職當下學會 6 招，其餘一路分布到 Lv.100。轉職說明改成正確的 Lv.30。'},
   {v:'20.7',d:'2026-11-28',t:'角色頁',b:'總覽的角色立繪放大。套裝和職業被動併進屬性頁，說明縮短，被動依等級排序。'},
   {v:'20.6',d:'2026-11-28',t:'技能圖卡',b:'放技能時的人物圖卡改成只露上半身，壓在戰場上緣一條，不再蓋住整個戰場，怪物和刀光從頭到尾都看得到。'},
   {v:'20.5',d:'2026-11-28',t:'雙劍士重做',b:'雙劍士每次攻擊都是兩道刃：藍刃先、黑刃後，角度交錯、一長一短，各技能再用數量、交叉方式和收尾分出差別。交錯斬是兩對X字刃；雙月斬是兩道長刃上下交會；閃斬是一對極細的快刃；重雙斬最後一對最長並帶衝擊。雙劍士的旋風斬改名「影步亂斬」：殘影穿過所有敵人，每人身上留一對交叉刃，回身再補一刀。'},
