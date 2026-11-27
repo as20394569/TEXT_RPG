@@ -4,65 +4,85 @@
 const K=PFX.kit,{cel,P2,U,F,H,later,multi,flash,shock,spark,phys,debris,streak,comet,ray,column,rune,charge,flames,crystals,fog,auraUp,bubble,wind,swirl,twinkle,lunge,castPose,tint,run,locate,rg,ADD,eo,rnd2,GY,reduce,T0}=K;
 const PI=Math.PI,SR=()=>K.SR(),clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 
-/* ================= 音效（獨立匯流排，不經過 8-bit 低通，保留金屬與破空的高頻） ================= */
-let G7=null,NB=null;
-function A(){if(typeof MUTE!=='undefined'&&MUTE)return null;const a=typeof ctx==='function'?ctx():null;if(!a)return null;
-  if(!G7){const cp=a.createDynamicsCompressor();cp.threshold.value=-18;cp.ratio.value=4;cp.connect(a.destination);G7=a.createGain();G7.gain.value=.32;G7.connect(cp);
-    const n=a.sampleRate*1.5|0,b=a.createBuffer(1,n,a.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=Math.random()*2-1;NB=b}return a}
+/* ================= 音效：多層次（低頻撞擊＋本體＋高頻細節＋空間殘響），經過飽和與壓縮讓聲音厚實 ================= */
+let G7=null,NB=null,RVB=null;
+function A(){if(typeof MUTE!=='undefined'&&MUTE)return null;const a=typeof ctx==='function'?ctx():null;if(!a)return null;if(G7&&G7.context!==a)G7=null;
+  if(!G7){const cp=a.createDynamicsCompressor();cp.threshold.value=-20;cp.knee.value=12;cp.ratio.value=5;cp.attack.value=.003;cp.release.value=.18;cp.connect(a.destination);
+    /* 柔性飽和：增加厚度 */
+    const sat=a.createWaveShaper(),cv=new Float32Array(1024);for(let i=0;i<1024;i++){const x=i/511.5-1;cv[i]=Math.tanh(x*1.8)/Math.tanh(1.8)}sat.curve=cv;sat.oversample='2x';
+    const mg=a.createGain();mg.gain.value=.5;sat.connect(mg);mg.connect(cp);
+    /* 殘響：程式產生的雙聲道衰減噪音 */
+    const len=a.sampleRate*1.8|0,ir=a.createBuffer(2,len,a.sampleRate);for(let ch=0;ch<2;ch++){const d=ir.getChannelData(ch);for(let i=0;i<len;i++){const t=i/len;d[i]=(Math.random()*2-1)*Math.pow(1-t,2.6)*(i<a.sampleRate*.012?.3:1)}}
+    const cvn=a.createConvolver();cvn.buffer=ir;const wet=a.createGain();wet.gain.value=.26;const rlp=a.createBiquadFilter();rlp.type='lowpass';rlp.frequency.value=5000;cvn.connect(rlp);rlp.connect(wet);wet.connect(cp);RVB=cvn;
+    G7=a.createGain();G7.gain.value=.9;G7.connect(sat);G7.connect(cvn);
+    const n=a.sampleRate*2|0,b=a.createBuffer(1,n,a.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=Math.random()*2-1;NB=b}return a}
 const now=(a,t)=>a.currentTime+(t||0);
 function env(a,g,t,at,v,dec){g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+at);g.gain.exponentialRampToValueAtTime(.0008,t+at+dec)}
-/* 濾波噪音：f0→f1 掃頻 */
+function out(a,node,pan){if(pan){const p=a.createStereoPanner();p.pan.value=Math.max(-1,Math.min(1,pan));node.connect(p);p.connect(G7)}else node.connect(G7)}
+/* 濾波噪音：f0→f1 掃頻，可左右移動 */
 function noise(t0,dur,o){const a=A();if(!a)return;o=o||{};const t=now(a,t0),s=a.createBufferSource(),f=a.createBiquadFilter(),g=a.createGain();s.buffer=NB;s.loop=true;f.type=o.type||'bandpass';f.Q.value=o.q||1.2;
-  f.frequency.setValueAtTime(o.f0||1200,t);f.frequency.exponentialRampToValueAtTime(Math.max(30,o.f1||o.f0||1200),t+dur);env(a,g,t,o.at||.01,o.v||.5,dur);s.connect(f);f.connect(g);g.connect(G7);s.start(t,Math.random());s.stop(t+dur+.1)}
+  f.frequency.setValueAtTime(o.f0||1200,t);f.frequency.exponentialRampToValueAtTime(Math.max(30,o.f1||o.f0||1200),t+dur);env(a,g,t,o.at||.008,o.v||.5,dur);s.connect(f);f.connect(g);
+  if(o.pan0!=null){const p=a.createStereoPanner();p.pan.setValueAtTime(o.pan0,t);p.pan.linearRampToValueAtTime(o.pan1??-o.pan0,t+dur);g.connect(p);p.connect(G7)}else out(a,g,o.pan);s.start(t,Math.random());s.stop(t+dur+.1)}
 /* 振盪音 */
 function tone(t0,dur,o){const a=A();if(!a)return;o=o||{};const t=now(a,t0),s=a.createOscillator(),g=a.createGain();s.type=o.w||'sine';s.frequency.setValueAtTime(o.f0||440,t);if(o.f1)s.frequency.exponentialRampToValueAtTime(o.f1,t+dur);if(o.det)s.detune.value=o.det;
-  env(a,g,t,o.at||.005,o.v||.2,dur);let n=s;if(o.lp){const f=a.createBiquadFilter();f.type='lowpass';f.frequency.value=o.lp;s.connect(f);n=f}n.connect(g);g.connect(G7);s.start(t);s.stop(t+dur+.1)}
+  env(a,g,t,o.at||.004,o.v||.2,dur);let n=s;if(o.lp){const f=a.createBiquadFilter();f.type='lowpass';f.frequency.value=o.lp;s.connect(f);n=f}n.connect(g);out(a,g,o.pan);s.start(t);s.stop(t+dur+.1)}
+/* 合成元件 */
+const LY={
+  /* 低頻：從高往低掉的正弦，撞擊的胸口感 */
+  sub(t,f0=110,f1=38,d=.35,v=.6){tone(t,d,{f0,f1,v})},
+  /* 本體：低通噪音 */
+  body(t,d=.2,v=.4,f=900){noise(t,d,{type:'lowpass',f0:f,f1:f*.25,q:.7,v})},
+  /* 金屬：帶通高頻噪音＋不和諧泛音，短而亮，不是「叮」 */
+  shing(t,v=.25,f=5200,d=.28,pan){noise(t,d,{f0:f,f1:f*1.25,q:7,v,pan});noise(t,d*.6,{type:'highpass',f0:7000,v:v*.5,pan});[1,1.47,2.09].forEach((m,i)=>tone(t,d*(1.2-i*.3),{f0:f*.55*m,v:v*.07,pan}))},
+  /* 破風：雙層帶通掃頻、左右移動 */
+  whoosh(t,d=.18,v=.45,hi=1){noise(t,d,{f0:hi?700:350,f1:hi?4800:2200,q:1.4,v,pan0:-.5,pan1:.5});noise(t,d*.9,{f0:hi?1500:800,f1:hi?7000:3500,q:3,v:v*.4,pan0:-.3,pan1:.6})},
+  /* 碎礫 */
+  grit(t,d=.25,v=.3){for(let i=0;i<6;i++)noise(t+Math.random()*d*.6,.05,{type:'bandpass',f0:1500+Math.random()*2500,q:2,v:v*(.5+Math.random()*.5),pan:Math.random()*1.2-.6})},
+  /* 合唱墊：多個微失諧的鋸齒波經過低通，慢起 */
+  pad(t,fs,d=1,v=.06,lp=2200){fs.forEach((f,i)=>[-8,8].forEach(dt=>tone(t,d,{f0:f,w:'sawtooth',det:dt,v,lp,at:d*.35,pan:(i%2?.3:-.3)})))}};
 const SN={
-  /* 揮刃破風：短促帶通噪音由低掃到高 */
-  swish(t=0,p=1,hi){noise(t,.13*p,{f0:hi?900:500,f1:hi?5200:3200,q:1.6,v:.42})},
-  /* 金屬刃鳴：非整數泛音，快速衰減 */
-  ring(t=0,f=1800,v=.09,d=.35){[1,2.76,5.4].forEach((m,i)=>tone(t,d*(1-i*.25),{f0:f*m,v:v/(i+1)}))},
-  /* 命中：低頻撞擊＋砂礫 */
-  thud(t=0,v=.5){tone(t,.18,{f0:150,f1:45,v:v*.7});noise(t,.09,{type:'lowpass',f0:1400,f1:300,v:v*.6})},
-  cut(t=0,col){SN.swish(t,1,1);SN.ring(t+.03,col||2100,.07,.25);noise(t+.05,.06,{type:'highpass',f0:3000,v:.25})},
-  heavy(t=0){SN.swish(t,1.6);SN.thud(t+.08,.7);noise(t+.1,.35,{type:'lowpass',f0:600,f1:120,v:.35})},
-  blunt(t=0){SN.thud(t,.8);SN.ring(t+.01,620,.06,.5);noise(t,.2,{type:'lowpass',f0:900,f1:200,v:.4})},
-  /* 弓弦＋破空哨音 */
-  bow(t=0){tone(t,.09,{f0:220,f1:110,w:'triangle',v:.18});noise(t,.05,{f0:2500,q:4,v:.25})},
-  zip(t=0,d=.2){noise(t,d,{f0:5000,f1:1400,q:5,v:.3});tone(t,d,{f0:2600,f1:900,v:.05})},
-  thunk(t=0){noise(t,.05,{type:'highpass',f0:2000,v:.3});tone(t,.1,{f0:300,f1:120,w:'triangle',v:.2})},
-  /* 火：低頻轟燃 */
-  ignite(t=0){noise(t,.25,{f0:300,f1:1600,q:.8,v:.35,at:.04})},
-  roar(t=0,d=.7,v=.45){noise(t,d,{type:'lowpass',f0:1800,f1:250,q:.7,v,at:.06});noise(t,d*.8,{type:'highpass',f0:3500,v:v*.25,at:.05})},
-  boom(t=0,v=.7){tone(t,.45,{f0:90,f1:30,v:v*.8});noise(t,.6,{type:'lowpass',f0:2200,f1:120,v})},
-  /* 冰：高頻碎裂與結晶聲 */
-  frost(t=0){noise(t,.4,{type:'highpass',f0:4500,f1:2500,v:.18,at:.05});for(let i=0;i<5;i++)tone(t+i*.05+Math.random()*.03,.12,{f0:2400+Math.random()*2600,v:.05})},
-  shatter(t=0){noise(t,.25,{type:'highpass',f0:3000,f1:6000,v:.35});for(let i=0;i<8;i++)tone(t+Math.random()*.15,.15,{f0:2000+Math.random()*4000,v:.05})},
-  /* 雷：撕裂＋悶雷 */
-  zap(t=0){noise(t,.08,{type:'highpass',f0:2500,v:.6});tone(t,.25,{f0:70,w:'sawtooth',v:.12,lp:900});noise(t+.06,.9,{type:'lowpass',f0:500,f1:60,v:.5,at:.03})},
-  crackle(t=0,d=.3){for(let i=0;i<6;i++)noise(t+Math.random()*d,.02,{type:'highpass',f0:3000,v:.3})},
-  /* 聖：鐘聲和弦 */
-  chime(t=0,base=880){[1,1.25,1.5,2].forEach((m,i)=>tone(t+i*.05,.9,{f0:base*m,v:.06}))},
-  bell(t=0,f=1320){tone(t,1.1,{f0:f,v:.08});tone(t,.8,{f0:f*2.4,v:.03})},
-  /* 暗：低沉嗡鳴與反向湧起 */
-  drone(t=0,d=.7){tone(t,d,{f0:82,w:'sawtooth',v:.12,lp:500,at:.2});tone(t,d,{f0:87,w:'sawtooth',v:.1,lp:500,at:.2});noise(t,d,{type:'lowpass',f0:200,f1:900,v:.25,at:d*.7})},
-  whisper(t=0){noise(t,.5,{f0:700,f1:2400,q:6,v:.2,at:.2})},
-  /* 毒：冒泡 */
-  bubble(t=0,n=5){for(let i=0;i<n;i++)tone(t+i*.06+Math.random()*.03,.07,{f0:300+Math.random()*300,f1:900+Math.random()*500,v:.07})},
-  hiss(t=0,d=.5){noise(t,d,{type:'highpass',f0:5000,f1:3500,v:.18,at:.05})},
-  /* 吸收／治療 */
-  heal(t=0){[523,659,784,1047].forEach((f,i)=>tone(t+i*.07,.5,{f0:f,v:.06}));noise(t,.6,{type:'highpass',f0:6000,v:.05,at:.2})},
-  mana(t=0){[392,494,587,784].forEach((f,i)=>tone(t+i*.06,.45,{f0:f,w:'triangle',v:.06}))},
-  /* 護盾：嗡鳴罩起 */
-  shield(t=0){tone(t,.5,{f0:220,f1:440,w:'triangle',v:.1});SN.ring(t+.15,1400,.05,.6)},
-  guard(t=0){SN.ring(t,900,.08,.5);tone(t,.3,{f0:180,v:.1})},
-  /* 增益／減益 */
-  up(t=0){tone(t,.25,{f0:330,f1:880,w:'triangle',v:.08});tone(t+.12,.25,{f0:494,f1:1320,w:'triangle',v:.06})},
-  down(t=0){tone(t,.35,{f0:600,f1:160,w:'triangle',v:.09})},
-  star(t=0){for(let i=0;i<4;i++)tone(t+i*.05,.3,{f0:1800+i*300,v:.04})},
-  charge(t=0,d=.5){tone(t,d,{f0:200,f1:900,w:'sawtooth',v:.06,lp:1800,at:d*.8});noise(t,d,{f0:400,f1:3000,q:3,v:.15,at:d*.8})},
-  wind(t=0){noise(t,.4,{f0:600,f1:1800,q:2,v:.25,at:.1})},
-  splat(t=0){noise(t,.08,{type:'lowpass',f0:900,v:.3});tone(t,.08,{f0:200,f1:90,v:.1})}};
+  swish(t=0,p=1,hi){LY.whoosh(t,.16*p,.5,hi)},
+  ring(t=0,f=1800,v=.09,d=.35){LY.shing(t,v*2.2,Math.max(2500,f*2.4),d)},
+  thud(t=0,v=.5){LY.sub(t,130,40,.3,v);LY.body(t,.14,v*.7,1100)},
+  /* 斬擊：破風＋刃鳴＋一點點肉感 */
+  cut(t=0,col){LY.whoosh(t,.13,.7,1);LY.shing(t+.03,.32,col?Math.max(3500,col*2.2):5000,.26,Math.random()*.6-.3);LY.body(t+.035,.09,.4,2000);LY.sub(t+.035,160,70,.12,.3)},
+  heavy(t=0){LY.whoosh(t,.22,.55,0);LY.sub(t+.08,150,42,.4,.75);LY.body(t+.08,.2,.55,900);LY.grit(t+.1,.3,.25)},
+  blunt(t=0){LY.sub(t,120,36,.45,.85);LY.body(t,.22,.6,700);noise(t,.06,{type:'highpass',f0:2500,v:.25});LY.grit(t+.02,.25,.2);LY.shing(t,.08,2800,.3)},
+  /* 弓：弦聲＋木頭＋破空 */
+  bow(t=0){tone(t,.12,{f0:180,f1:95,w:'triangle',v:.28});tone(t,.08,{f0:420,f1:200,w:'triangle',v:.1});noise(t,.05,{f0:2200,q:4,v:.25})},
+  zip(t=0,d=.2){noise(t,d,{f0:6500,f1:1800,q:6,v:.32,pan0:-.4,pan1:.4});noise(t,d*.8,{f0:2500,f1:900,q:2,v:.18,pan0:-.4,pan1:.4})},
+  thunk(t=0){LY.sub(t,180,70,.12,.4);noise(t,.05,{type:'highpass',f0:2500,v:.3});LY.body(t,.08,.3,1500)},
+  /* 火：點燃的吸氣＋轟燃（低頻＋爆裂聲） */
+  ignite(t=0){noise(t,.3,{f0:250,f1:2200,q:.8,v:.4,at:.08});LY.sub(t+.05,70,120,.25,.25)},
+  roar(t=0,d=.7,v=.45){noise(t,d,{type:'lowpass',f0:1600,f1:220,q:.6,v,at:.06});LY.sub(t,60,45,d,v*.5);for(let i=0;i<Math.round(d*14);i++)noise(t+Math.random()*d,.025,{type:'highpass',f0:3000+Math.random()*2000,v:v*.35,pan:Math.random()*1.2-.6})},
+  boom(t=0,v=.7){LY.sub(t,95,28,.7,v);noise(t,.9,{type:'lowpass',f0:2400,f1:90,q:.5,v});LY.grit(t+.05,.5,v*.4);noise(t,.05,{type:'highpass',f0:3000,v:v*.4})},
+  /* 冰：結晶生長＋玻璃碎裂（不和諧短音）＋冷風 */
+  frost(t=0){noise(t,.45,{type:'highpass',f0:5000,f1:2600,v:.16,at:.06});noise(t,.5,{f0:900,f1:2500,q:2,v:.12,at:.1});for(let i=0;i<6;i++){const f=2600+Math.random()*3400;tone(t+i*.045+Math.random()*.02,.09,{f0:f,v:.035,pan:Math.random()-.5});tone(t+i*.045,.07,{f0:f*1.37,v:.02})}},
+  shatter(t=0){noise(t,.3,{type:'highpass',f0:3500,f1:7000,v:.4});LY.sub(t,140,60,.15,.3);for(let i=0;i<10;i++){const f=2000+Math.random()*5000;tone(t+Math.random()*.18,.12,{f0:f,v:.04,pan:Math.random()*1.4-.7})}},
+  /* 雷：撕裂聲＋電流嗡＋長悶雷 */
+  zap(t=0){noise(t,.09,{type:'highpass',f0:2200,v:.7});tone(t,.3,{f0:60,w:'sawtooth',v:.16,lp:1200});tone(t,.3,{f0:90,w:'square',v:.06,lp:900});LY.sub(t+.02,80,30,1.2,.6);noise(t+.05,1.4,{type:'lowpass',f0:600,f1:50,q:.5,v:.55,at:.05})},
+  crackle(t=0,d=.3){for(let i=0;i<8;i++)noise(t+Math.random()*d,.02,{type:'highpass',f0:2500+Math.random()*2500,v:.32,pan:Math.random()*1.2-.6})},
+  /* 聖：鐘＋合唱墊 */
+  chime(t=0,base=880){LY.pad(t,[base/2,base*.75/2*1.335,base*.75],1.1,.045,2600);[1,1.25,1.5].forEach((m,i)=>tone(t+i*.06,1,{f0:base*m,v:.05,pan:(i-1)*.4}))},
+  bell(t=0,f=1320){tone(t,1.3,{f0:f,v:.08});tone(t,1,{f0:f*2.76,v:.025});tone(t,1.6,{f0:f/2,v:.05});noise(t,.03,{type:'highpass',f0:5000,v:.15})},
+  /* 暗：失真的低沉嗡鳴＋反向湧起＋耳語 */
+  drone(t=0,d=.7){[55,58.3,82.4].forEach((f,i)=>tone(t,d,{f0:f,w:'sawtooth',v:.12,lp:600,at:d*.4,pan:(i-1)*.4}));noise(t,d,{type:'lowpass',f0:200,f1:1200,v:.28,at:d*.75});LY.sub(t+d*.7,90,35,.4,.4)},
+  whisper(t=0){noise(t,.6,{f0:700,f1:2600,q:7,v:.22,at:.25,pan0:-.6,pan1:.6});noise(t+.1,.5,{f0:1200,f1:500,q:9,v:.14,at:.2,pan0:.5,pan1:-.5})},
+  /* 毒：濕潤的冒泡 */
+  bubble(t=0,n=5){for(let i=0;i<n;i++){const t1=t+i*.06+Math.random()*.04;tone(t1,.08,{f0:250+Math.random()*250,f1:800+Math.random()*500,v:.09,pan:Math.random()-.5});noise(t1,.04,{type:'lowpass',f0:600,v:.12})}noise(t,n*.07,{type:'lowpass',f0:400,v:.15,at:.05})},
+  hiss(t=0,d=.5){noise(t,d,{type:'highpass',f0:5500,f1:3500,v:.2,at:.05});noise(t,d,{f0:2500,q:3,v:.1,at:.1})},
+  /* 回復：溫暖的和弦上行＋閃爍 */
+  heal(t=0){LY.pad(t,[262,330,392],1,.06,1800);[523,659,784,1047].forEach((f,i)=>tone(t+i*.08,.6,{f0:f,v:.07,pan:(i-1.5)*.25}));noise(t+.2,.7,{type:'highpass',f0:7000,v:.06,at:.2})},
+  mana(t=0){LY.pad(t,[196,247,294],.8,.035,1500);[392,494,587,784].forEach((f,i)=>tone(t+i*.06,.5,{f0:f,w:'triangle',v:.05}))},
+  /* 護盾：低頻嗡＋能量罩起 */
+  shield(t=0){tone(t,.6,{f0:110,f1:220,w:'sawtooth',v:.1,lp:800,at:.1});LY.shing(t+.15,.12,3200,.5);LY.sub(t,80,60,.4,.3)},
+  guard(t=0){LY.shing(t,.22,3000,.45);LY.sub(t,140,60,.25,.45);LY.body(t,.1,.3,1200)},
+  up(t=0){tone(t,.3,{f0:330,f1:880,w:'triangle',v:.09});tone(t+.12,.3,{f0:494,f1:1320,w:'triangle',v:.07});noise(t,.35,{f0:800,f1:4000,q:2,v:.1,at:.1})},
+  down(t=0){tone(t,.4,{f0:600,f1:140,w:'sawtooth',v:.08,lp:1500});LY.sub(t+.1,90,40,.3,.25)},
+  star(t=0){for(let i=0;i<4;i++)tone(t+i*.05,.35,{f0:1800+i*300,v:.035,pan:(i-1.5)*.3});noise(t,.3,{type:'highpass',f0:6000,v:.08})},
+  charge(t=0,d=.5){tone(t,d,{f0:110,f1:700,w:'sawtooth',v:.08,lp:1600,at:d*.85});noise(t,d,{f0:300,f1:3500,q:3,v:.2,at:d*.85});LY.sub(t,50,90,d,.25)},
+  wind(t=0){noise(t,.5,{f0:500,f1:1800,q:2,v:.3,at:.15,pan0:-.7,pan1:.7});noise(t,.45,{type:'lowpass',f0:500,v:.15,at:.1})},
+  splat(t=0){noise(t,.1,{type:'lowpass',f0:900,v:.35});tone(t,.1,{f0:180,f1:70,v:.15});noise(t+.02,.08,{f0:2500,q:3,v:.12})}};
 window.SN7=SN;
 
 /* ================= 位置 ================= */
@@ -712,5 +732,5 @@ function drawSt(c,id,col,x,y,gy,R,t,u){col=vivid(col);const pu=.6+.4*Math.sin(t*
   else{ADD(c);c.globalAlpha=.2*pu;c.fillStyle=rg(c,x,gy,R,[[0,col],[1,T0]]);c.fillRect(x-R,gy-R,R*2,R*2)}}
 /* 戰鬥開始或狀態變化時啟動持續層 */
 setInterval(()=>{try{if(B&&B.rt&&!SLON){const any=stList('p').length||stList(B).length||(B.adds||[]).some(a=>stList(a).length);if(any)stRun()}}catch(e){}},500);
-window.FX7V={recipe:getR,STV,SN,dart,blade,fireball,bolt,HP0,tick,aoePts,pierceHit,spk,bits,fogL,smash,iceNova,arcSweep,fireBurst,motes,rays,crystals,twinkle,flames,shock};
+window.FX7V={recipe:getR,STV,SN,dart,blade,fireball,bolt,HP0,tick,aoePts,pierceHit,spk,bits,fogL,smash,iceNova,arcSweep,SN,fireBurst,motes,rays,crystals,twinkle,flames,shock};
 })();
