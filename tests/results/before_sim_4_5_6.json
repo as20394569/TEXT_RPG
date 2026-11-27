@@ -1,0 +1,95 @@
+[
+ {
+  "job": "knight",
+  "explore": {
+   "lv": 45,
+   "area": 4,
+   "win": 4,
+   "n": 4,
+   "fails": [],
+   "dmg_per_act": 108.4,
+   "mp_per_act": 5.54,
+   "acts": 250
+  },
+  "errs": [],
+  "dungeon": {
+   "lv": 30,
+   "d": "深林礦脈",
+   "win": 2,
+   "n": 2,
+   "fails": []
+  }
+ },
+ {
+  "job": "berserker",
+  "explore": {
+   "lv": 45,
+   "area": 4,
+   "win": 4,
+   "n": 4,
+   "fails": [],
+   "dmg_per_act": 234.8,
+   "mp_per_act": 9.98,
+   "acts": 121
+  },
+  "errs": [],
+  "dungeon": {
+   "lv": 30,
+   "d": "深林礦脈",
+   "win": 0,
+   "n": 2,
+   "fails": [
+    [
+     [
+      1
+     ],
+     4,
+     "中段強敵・火蜥王"
+    ],
+    [
+     [
+      1
+     ],
+     7,
+     "鑽岩巨蟲"
+    ]
+   ]
+  }
+ },
+ {
+  "job": "dual",
+  "explore": {
+   "lv": 45,
+   "area": 4,
+   "win": 4,
+   "n": 4,
+   "fails": [],
+   "dmg_per_act": 176.3,
+   "mp_per_act": 8.75,
+   "acts": 150
+  },
+  "errs": [],
+  "dungeon": {
+   "lv": 30,
+   "d": "深林礦脈",
+   "win": 0,
+   "n": 2,
+   "fails": [
+    [
+     [
+      1
+     ],
+     4,
+     "中段強敵・火蜥王"
+    ],
+    [
+     [
+      1
+     ],
+     4,
+     "中段強敵・岩石王"
+    ]
+   ]
+  }
+ }
+]

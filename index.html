@@ -1748,8 +1748,14 @@ const KEY='azure_oath_save_v2',KEY_OLD='azure_oath_save_v1',SAVEV=3; /* 大改�
 let S=null,TAB='town',RUN=null,B=null,MODAL=null,STORY=null;
 let NEWCLS='swordsman',NEWSEX='m',BAGF='all',NEWNAME='',BAGTAB='gear',QTAB='main',AUTO=false,CHATQ=[];
 /* 冒險途中重新整理不丟進度：把本趟路線存起來；戰鬥中斷則回到該節點重打 */
-function runSnap(){if(FXLAB)return;try{if(!S||!RUN||RUN.step<0||RUN.tower||RUN.trial){localStorage.removeItem(KEY+'_run');return}const o=JSON.parse(JSON.stringify(RUN,(k,v)=>typeof v==='function'?undefined:v));if(B){if(o.nodes[o.step]==='chest')o.nodes[o.step]='ambush';o.step--;o.view={type:'res',title:'戰鬥中斷',text:'你回過神來——魔物還擋在前面。'}}else if(!o.view||o.view.type!=='fork'&&o.view.type!=='gate'&&o.view.type!=='res'&&o.view.type!=='camp'&&o.view.type!=='kiln'&&o.view.type!=='shrine')o.view={type:'res',title:'繼續冒險',text:'你整理好行囊，繼續沿著路走。'};else if(o.view.type==='res')delete o.view.drop;localStorage.setItem(KEY+'_run',JSON.stringify({n:S.name,r:o}))}catch(e){}}
-function runLoad(){try{const j=localStorage.getItem(KEY+'_run');if(!j||!S)return;const o=JSON.parse(j);if(!o||o.n!==S.name||!o.r||!AREAS[o.r.area]||!Array.isArray(o.r.nodes)){localStorage.removeItem(KEY+'_run');return}RUN=o.r;B=null;TAB='adv';setTimeout(()=>toast('已回到冒險途中'),600)}catch(e){try{localStorage.removeItem(KEY+'_run')}catch(_){}}}
+function runSnap(){if(FXLAB)return;try{if(!S||!RUN||RUN.step<0||RUN.tower||RUN.trial){localStorage.removeItem(KEY+'_run');return}const o=JSON.parse(JSON.stringify(RUN,(k,v)=>typeof v==='function'?undefined:v));let bs=null;if(B&&B.rt){try{bs=JSON.parse(JSON.stringify(B,(k,v)=>typeof v==='function'||k==='fx'||k==='pops'||k==='pfx'||(v&&typeof Node!=='undefined'&&v instanceof Node)?undefined:v))}catch(e){bs=null}}
+  if(bs){o.battle=bs}else if(B){if(o.nodes[o.step]==='chest')o.nodes[o.step]='ambush';o.step--;o.view={type:'res',title:'戰鬥中斷',text:'你回過神來——魔物還擋在前面。'}}else if(!o.view||o.view.type!=='fork'&&o.view.type!=='gate'&&o.view.type!=='res'&&o.view.type!=='camp'&&o.view.type!=='kiln'&&o.view.type!=='shrine')o.view={type:'res',title:'繼續冒險',text:'你整理好行囊，繼續沿著路走。'};else if(o.view.type==='res')delete o.view.drop;localStorage.setItem(KEY+'_run',JSON.stringify({n:S.name,r:o}))}catch(e){}}
+function runLoad(){try{const j=localStorage.getItem(KEY+'_run');if(!j||!S)return;const o=JSON.parse(j);if(!o||o.n!==S.name||!o.r||!AREAS[o.r.area]||!Array.isArray(o.r.nodes)){localStorage.removeItem(KEY+'_run');return}const bt=o.r.battle;delete o.r.battle;RUN=o.r;B=null;TAB='adv';
+  /* v20.9：重新整理後回到戰鬥原本的狀態（不另外懲罰斷線） */
+  if(bt&&bt.rt){try{B=bt;B.fx=null;B.pops=[];B.busy=false;B.rt.paused=0;B.rt.q=null;const fix=f=>{if(f&&MOBS[f.id])f.m=MOBS[f.id]};fix(B);(B.adds||[]).forEach(fix);
+    const end=B.hp<=0&&!(B.adds||[]).some(f=>f.hp>0);B.rt.done=end?1:0;
+    setTimeout(()=>{try{if(!B)return;if(S.hp<=0){lose();return}if(end){win();return}if(!RTK.raf){RTK.lt=performance.now();RTK.raf=requestAnimationFrame(rtLoop)}render();toast('已回到戰鬥中')}catch(e){}},500)}catch(e){B=null;RUN.step=Math.max(-1,RUN.step-1);RUN.view={type:'res',title:'戰鬥中斷',text:'你回過神來——魔物還擋在前面。'}}}
+  else setTimeout(()=>toast('已回到冒險途中'),600)}catch(e){try{localStorage.removeItem(KEY+'_run')}catch(_){}}}
 var FXLAB=false;/* 特效工作室：不存檔 */
 let BAKT=0;function save(){if(FXLAB)return;runSnap();try{if(S&&S.ach)checkAch()}catch(e){}try{const j=JSON.stringify(S);localStorage.setItem(KEY,j);try{accDirty()}catch(e){}if(Date.now()-BAKT>300000){BAKT=Date.now();localStorage.setItem(KEY+'_bak',j)}}catch(e){}}
 function load(){try{const s=localStorage.getItem(KEY);if(s)S=JSON.parse(s)}catch(e){S=null}if(S&&(S.v||0)<SAVEV)S=null;if(!S||!S.cls){try{const b=localStorage.getItem(KEY+'_bak');if(b){S=JSON.parse(b);setTimeout(()=>toast('主存檔損壞，已從備份還原'),800)}}catch(e){}}}
@@ -2017,10 +2023,10 @@ async function fbSend(){const ta=$('#fbText'),cat=$('#fbCat');const text=(ta&&ta
   const u=await rankUrl();if(!u){toast('伺服器暫時連不上，稍後再試');return}if(!S.pid){S.pid=Math.random().toString(36).slice(2,10);save()}
   try{const r=await fetch(u+'/api/fb',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:S.pid,name:S.name,cls:clsName(),lv:S.lv,cat:cat?cat.value:'other',text})});const j=await r.json();
     if(j.ok){toast('已送出，謝謝你的意見！');ta.value='';FBL=null;await fbLoad();drawModal()}else toast(j.error==='too fast'?'送太快了，1 分鐘後再試':'送出失敗，請再試一次')}catch(e){toast('送出失敗，請檢查網路')}}
-async function rankSync(force){if(!S||!S.cls||GM)return;if(!force&&Date.now()-RANKT<5*60e3)return;RANKT=Date.now();const u=await rankUrl();if(!u){RANKERR=1;return}
+async function rankSync(force){if(!S||!S.cls||GM||FXLAB)return;if(!force&&Date.now()-RANKT<5*60e3)return;RANKT=Date.now();const u=await rankUrl();if(!u){RANKERR=1;return}
   if(!S.pid){S.pid=Math.random().toString(36).slice(2,10);save()}
   try{const ctl=new AbortController();setTimeout(()=>ctl.abort(),6000);
-    await fetch(u+'/api/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:S.pid,name:S.name,cls:clsName(),lv:S.lv,power:power(),hk:HK(),eq:Object.keys(SLOTS).map(sl=>{const g=gearBy(S.eq[sl]);return g?[String(g.id).toLowerCase(),g.r,g.p||0,0,g.set?parseInt(String(g.set).slice(3)):-1]:null}),st:(()=>{const s=stats();return[s.HP,s.MP,s.ATK,s.MAG,s.DEF,s.CRIT]})(),ex:{ch:S.main.done?CH.length:S.main.ch,kills:S.st.kills||0,enh:Math.max(0,...(S.gear||[]).map(g=>g.p||0)),nm:S.st.nmboss||0,ab:abSt().best,abw:abW()}}),signal:ctl.signal});
+    if(ACC&&ACC.tk)await fetch(u+'/api/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({acc:ACC.n,token:ACC.tk,id:S.pid,name:S.name,cls:clsName(),lv:S.lv,power:power(),hk:HK(),eq:Object.keys(SLOTS).map(sl=>{const g=gearBy(S.eq[sl]);return g?[String(g.id).toLowerCase(),g.r,g.p||0,0,g.set?parseInt(String(g.set).slice(3)):-1]:null}),st:(()=>{const s=stats();return[s.HP,s.MP,s.ATK,s.MAG,s.DEF,s.CRIT]})(),ex:{ch:S.main.done?CH.length:S.main.ch,kills:S.st.kills||0,enh:Math.max(0,...(S.gear||[]).map(g=>g.p||0)),nm:S.st.nmboss||0,ab:abSt().best,abw:abW()}}),signal:ctl.signal});
     const r=await fetch(u+'/api/top?n=300',{signal:ctl.signal});RANKTOP=await r.json();RANKERR=0;if(MODAL&&MODAL.k==='rank')drawModal()}catch(e){RANKERR=1;RANKURL=null}}
 setInterval(()=>rankSync(),60e3);setTimeout(()=>rankSync(true),8000);
 function myCode(){if(!S.pid){S.pid=Math.random().toString(36).slice(2,10);save()}const j=JSON.stringify({i:S.pid,n:S.name,c:clsName(),l:S.lv,p:power(),t:Date.now()});return 'AO1-'+btoa(unescape(encodeURIComponent(j)))}
@@ -2119,10 +2125,13 @@ function forkTalk(){const L=withLuna();const t=pick(L?FORKL.luna:FORKL.me);retur
 /* ============ 頻道 ============ */
 /* 停服維修：maint.json 的 on 為 true 時封鎖遊戲 */
 let MAINT=false;
-/* 管理者通行：網址帶 #gm-azure7319 開一次，之後這台裝置停服也能進（不上排行榜） */
-const GM=(()=>{try{if(location.hash==='#gm-azure7319'){localStorage.setItem('ao_gm','1');history.replaceState(null,'',location.pathname)}if(location.hash==='#gm-off')localStorage.removeItem('ao_gm');return localStorage.getItem('ao_gm')==='1'}catch(e){return false}})();
-FXLAB=GM&&/[?&]fxlab=1/.test(location.search);
-async function maintCheck(){try{const r=await fetch('maint.json?'+Date.now(),{cache:'no-store'});const j=await r.json();const on=!!(j&&j.on)&&!GM;if(on!==MAINT){MAINT=on;maintDraw(j)}}catch(e){}}
+/* 管理員：金鑰不寫在程式裡。用「#gm=伺服器 fb_token.txt 的內容」開一次，金鑰存在這台裝置；每次開遊戲都向伺服器驗證，通過才是管理員 */
+let GM=false;
+(()=>{try{const m=location.hash.match(/^#gm=(.+)$/);if(m){localStorage.setItem('ao_gmk',decodeURIComponent(m[1]));history.replaceState(null,'',location.pathname+location.search)}if(location.hash==='#gm-off')localStorage.removeItem('ao_gmk');localStorage.removeItem('ao_gm')}catch(e){}})();
+async function gmCheck(){try{const k=localStorage.getItem('ao_gmk');if(!k)return;const u=await rankUrl();if(!u)return;const r=await fetch(u+'/api/gm',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:k})});let j={};try{j=await r.json()}catch(e){}GM=!!(j&&j.gm);if(r.status===403)localStorage.removeItem('ao_gmk');if(GM&&MAINT){MAINT=false;maintDraw(null)}if(GM)toast('管理員模式')}catch(e){}}
+setTimeout(gmCheck,300);
+FXLAB=/[?&]fxlab=1/.test(location.search);/* 特效工作室：不存檔，不需要管理員 */
+async function maintCheck(){try{const r=await fetch('maint.json?'+Date.now(),{cache:'no-store'});const j=await r.json();const on=!!(j&&j.on)&&!GM&&!FXLAB;if(on!==MAINT){MAINT=on;maintDraw(j)}}catch(e){}}
 function maintDraw(j){let el=document.getElementById('maint');if(!MAINT){if(el)el.remove();return}try{if(S)save();if(FA)faStop()}catch(e){}if(!el){el=document.createElement('div');el.id='maint';document.body.appendChild(el)}
   el.innerHTML=`<div class="mt-box"><div class="mt-ic">🔧</div><h2>停服維修中</h2><p>${esc((j&&j.msg)||'蒼藍誓約 Online 正在進行維修，開服時間另行公告。')}</p><p class="sub">你的存檔已安全保存，維修期間不會有任何變動。</p><button class="btn" onclick="location.reload()">重新整理</button></div>`}
 setInterval(maintCheck,60e3);maintCheck();
@@ -2540,7 +2549,7 @@ const MV={
     const medal=i=>i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1;
     return{t:'排行榜',b:`<div class="tabs rk">${Object.entries(TABS).map(([k,v])=>`<button class="${k===tab?'on':''}" data-a="rkTab" data-v="${k}">${v[0]}</button>`).join('')}</div>
       <div class="panel" style="gap:6px"><div class="fchips">${[['all','全部'],...CLSV().map(k=>[k,CLS[k].n+'系'])].map(([k,n])=>`<button class="${k===cf?'on':''}" data-a="rkCls" data-v="${k}">${n}</button>`).join('')}</div>
-      <div class="rkme">你的名次：<b>${myi>=0?myi+1:'-'}</b> / ${L.length}　${T[0]} <b>${T[2](P[0])}</b></div>
+      <div class="rkme">你的名次：<b>${myi>=0?myi+1:'-'}</b> / ${L.length}　${T[0]} <b>${T[2](P[0])}</b>${ACC?'':'<br><span class="sub">登入雲端帳號後才會上傳排名</span>'}</div>
       <div class="list">${L.slice(0,100).map((x,i)=>`<div class="item rkrow${i<3?' top':''}" data-a="pview" data-v="${x.me?'me':x.id}" style="cursor:pointer${x.me?';border:2px solid var(--navy);background:var(--panel2)':''}"><span class="rkn">${medal(i)}</span><span class="rkav">${x.hk?art(x.hk.replace('class_','portrait_'),x.n,'r11','mini'):''}</span><span class="grow"><b>${esc(x.n)}</b>${x.me?' <span class="tag">我</span>':''}<span class="sub">${esc(x.c||'')}・Lv.${x.l}${x.ex&&x.ex.ch?`・第 ${Math.min(x.ex.ch+1,CH.length)} 章`:''}${x.t?`・${ago(x.t)}`:''}</span></span><b class="rkv">${T[2](x)}</b></div>`).join('')}</div>
       <p class="sub">${online?`🟢 線上排行榜・共 ${P.length} 位玩家，顯示前 100 名。點玩家可查看裝備，你的資料每分鐘自動上傳。`:'⚪ 排行榜伺服器暫時連不上，稍後再試。'}</p></div>`}},
   gear(u){const g=gearBy(u);if(!g)return{t:'裝備',b:'<p class="empty">這件裝備已不存在</p>'};const b=GEAR[g.id],on=S.eq[b.slot]===u,cur=gearBy(S.eq[b.slot]);
@@ -3098,6 +3107,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'20.9',d:'2026-11-28',t:'錯誤修正',b:'修正被動與戰鬥增減益算兩次的問題。多隻怪時，每隻怪都會照自己的方式出招，身上的狀態也會正常到期。換目標不會再讓首領只會普攻，也不會弄丟蓄力。戰敗會立刻停下全自動。重新整理會回到戰鬥原本的狀態。持續傷害會被護盾擋下。一鍵換裝會考慮套裝與神話。排行榜改成登入雲端帳號才會上傳。'},
   {v:'20.8',d:'2026-11-28',t:'技能等級',b:'基礎職業的技能改在 Lv.1～30 學完，轉職前就能用到全部招式；轉職當下學會 6 招，其餘一路分布到 Lv.100。轉職說明改成正確的 Lv.30。'},
   {v:'20.7',d:'2026-11-28',t:'角色頁',b:'總覽的角色立繪放大。套裝和職業被動併進屬性頁，說明縮短，被動依等級排序。'},
   {v:'20.6',d:'2026-11-28',t:'技能圖卡',b:'放技能時的人物圖卡改成只露上半身，壓在戰場上緣一條，不再蓋住整個戰場，怪物和刀光從頭到尾都看得到。'},
@@ -3378,7 +3388,7 @@ const elMul=(id,el)=>{const e=MEL[id];if(!e||!el)return 1;return e[0]===el?1.5:e
 const basicEl=()=>({swordsman:'phys',dual:'phys',ranger:'phys',mage:'arcane',cleric:'holy'}[S.cls]||'phys');
 /* 首領護甲：每回合傷害上限；半血時進入狂怒（護盾＋攻擊上升） */
 const capB=d=>{if(!B||B.kind!=='boss')return d;const lim=B.max,r=Math.max(1,Math.min(d,lim-(B.tk||0)));B.tk=(B.tk||0)+r;return r};
-function bossPhase(){if(B&&B.kind==='boss'&&!B.ph2&&B.hp>0&&B.hp<=B.max*.5){B.ph2=1;{const a=Math.round(B.max*.12);B.fshield=(B.fshield||0)+a;if(B.chg)B.chgSh=(B.chgSh||0)+a}blog(`${B.name} 被逼入絕境，張開了護盾！`)}}
+function bossPhase(f){f=f||B;if(B&&f&&f.kind==='boss'&&!f.ph2&&f.hp>0&&f.hp<=f.max*.5){f.ph2=1;{const a=Math.round(f.max*.12);f.fshield=(f.fshield||0)+a;if(f.chg)f.chgSh=(f.chgSh||0)+a}blog(`${f.name} 被逼入絕境，張開了護盾！`)}}
 /* 霧蝕：被霧侵蝕的魔物（蝕化怪、第二章起的首領）身上纏著霧。霧散之前傷害 -25%、技能的暈眩與虛弱無效；
    攻擊、爆擊與露娜的測霧燈都能驅霧，霧散時牠會僵住 3 秒、6 秒內多受 20% 傷害。首領的霧會再纏上來一次。 */
 const FOGN=(mut,bs)=>mut?3:(bs&&RUN&&!RUN.tower&&!RUN.trial&&RUN.area>=1)?5:0;
@@ -3585,7 +3595,7 @@ function rtStep(dt){const R=B.rt;R.t+=dt;if(R.t<0)return;
     if(!B||!B.rt||R.done)return}
   for(const f of B.adds||[]){if(f.hp<=0)continue;
     if(f.rtw){f.rtw.t+=dt*fr;if(f.rtw.t>=f.rtw.dur){rtAddGo(f);render();if(S.hp<=0){rtLose();return}}}
-    else{f.rtg=(f.rtg||0)+dt*fr*100/rtFT(f,1);if(f.rtg>=100){if(f.st.stun>0){f.st.stun--;f.rtg=20;blog(`${f.name} 暈眩中`)}else{f.rtw={t:0,dur:rtTy(f).wu,n:'攻擊'};f.rtg=100}}}}
+    else{f.rtg=(f.rtg||0)+dt*fr*100/rtFT(f,1);if(f.rtg>=100){if(f.st.stun>0||has6(f,'STUN')){rtAddGo(f);if(!B||!B.rt)return;f.rtg=20;render();if(S.hp<=0){rtLose();return}}else{const nx=('next' in f)?f.next:foePick(f);f.next=nx;f.rtw={t:0,dur:rtTy(f).wu,n:nx&&SKM[nx]?SKM[nx].n:'攻擊'};f.rtg=100}}}}
   const A=B.ally;if(A&&A.hp>0&&B.hp>0){R.ag+=dt*fr*100/3.3;if(R.ag>=100){R.ag=0;B.allyTurn=-1;allyAct();render();if(B&&B.rt&&B.hp<=0&&!R.done)winSoon(900)}}}
 function rtLoop(ts){RTK.raf=requestAnimationFrame(rtLoop);RTK.now=ts;const dt=Math.min(.1,Math.max(0,(ts-RTK.lt)/1000));RTK.lt=ts;
   if(!B||!B.rt){cancelAnimationFrame(RTK.raf);RTK.raf=0;return}
@@ -4497,7 +4507,7 @@ function faTown(){const msgs=[];try{checkDaily();
   if(!S.daily.sign){ACT.sign();msgs.push('簽到')}
   for(const d of DAILY)if(!S.daily.got[d.k]&&(S.daily[d.k]||0)>=d.c){ACT.dailyGet(d.k);msgs.push('領每日')}
   if(typeof fortune==='function'&&!fortune()&&S.main.ch>=1){ACT.fortune()}
-  if(S.pts>0){const main=CLS[S.cls].basic==='MAG'?'INT':CLS[S.cls].atk;let n=0;while(S.pts>0&&n<999){const k=(n++%3===2)?'VIT':main;if(S.attr[k]>=ATTRMAX){const o=Object.keys(ATTR).find(x=>S.attr[x]<ATTRMAX);if(!o)break;S.pts--;S.attr[o]++;continue}S.pts--;S.attr[k]++}msgs.push('配點')}
+  if(S.pts>0){const main={'力':'STR','敏':'DEX','智':'INT'}[jobEq().main_attr]||'STR';let n=0;while(S.pts>0&&n<999){const k=(n++%3===2)?'VIT':main;if(S.attr[k]>=ATTRMAX){const o=Object.keys(ATTR).find(x=>S.attr[x]<ATTRMAX);if(!o)break;S.pts--;S.attr[o]++;continue}S.pts--;S.attr[k]++}msgs.push('配點')}
   if(S.sp>0){const ks=mySkills().filter(k=>(S.skl[k]||1)<5&&SK[k].dmg).sort((a,b)=>(S.skl[a]||1)-(S.skl[b]||1));const all=ks.length?ks:mySkills().filter(k=>(S.skl[k]||1)<5);let i=0;while(S.sp>0&&all.length){const k=all[i++%all.length];if((S.skl[k]||1)<5){S.sp--;S.skl[k]=(S.skl[k]||1)+1}else if(all.every(x=>(S.skl[x]||1)>=5))break}msgs.push('升技能')}
   {const ch=autoEquip6();if(ch)msgs.push(`換上 ${ch} 件裝備`)}
   const tier=TLV.reduce((a,v,i)=>v<=S.lv?i:a,0),hp=tier>=2?'pot2':'pot',mp=tier>=2?'eth2':'eth',keep=S.lv*4*3;let bought=0;
@@ -4521,6 +4531,10 @@ function thNow(){return 'ink'}
 function thApply(){document.documentElement.dataset.th=thNow()}
 ACT.setTh=v=>{try{localStorage.setItem('ao_th',v)}catch(e){}thApply();if(MODAL)drawModal()};thApply();
 /* ============ 啟動（等 v6 模組都載入後才開始） ============ */
+/* 戰鬥中定時存檔，重新整理或關閉頁面也先存一次 */
+setInterval(()=>{try{if(S&&B&&B.rt&&!FXLAB)save()}catch(e){}},4000);
+window.addEventListener('pagehide',()=>{try{if(S&&!FXLAB)save()}catch(e){}});
+document.addEventListener('visibilitychange',()=>{try{if(document.hidden&&S&&B&&!FXLAB)save()}catch(e){}});
 function boot6(){load();if(S){migrate();checkDaily();learn(true);runLoad()}render();chatTick();setInterval(chatTick,4000);setTimeout(bcastCheckSeen,1200)}
 addEventListener('DOMContentLoaded',boot6);
 /* 戰鬥卡住保險：指令鎖住超過 10 秒就自動解開（敵人已倒下則直接結算） */

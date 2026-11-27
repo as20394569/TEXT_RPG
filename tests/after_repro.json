@@ -1,0 +1,215 @@
+{
+ "P0-1 被動不重複計算": {
+  "ok": true,
+  "info": {
+   "skP": {
+    "atkp": 5,
+    "hpp": 5
+   },
+   "gt": {
+    "atkp": 5,
+    "hpp": 5
+   }
+  }
+ },
+ "P0-2 副目標狀態會到期、持續傷害會跳": {
+  "ok": true,
+  "info": {
+   "ac": 4,
+   "acts": 4,
+   "weak": false,
+   "poison": false,
+   "stun": false,
+   "hpLost": 92
+  }
+ },
+ "P1-1 韌性只算一次": {
+  "ok": true,
+  "info": {
+   "dur": 7
+  }
+ },
+ "P1-2 怪物護盾以行動數判斷": {
+  "ok": true,
+  "info": {
+   "t": 12,
+   "absorbed": true
+  }
+ },
+ "P1-3 換目標不會弄丟蓄力": {
+  "ok": true,
+  "info": {
+   "after": "J01S13"
+  }
+ },
+ "P2-1 怪物淨化只清負面": {
+  "ok": true,
+  "info": {
+   "shield": true,
+   "weak": false
+  }
+ },
+ "P2-2 換位時被動旗標跟著怪物": {
+  "ok": true,
+  "info": {
+   "newMainUsed": 0
+  }
+ },
+ "ERR 無頁面錯誤(1)": {
+  "ok": true,
+  "info": []
+ },
+ "P0-3 首領不在主位仍依 AI 放技能": {
+  "ok": true,
+  "info": {
+   "slots": [
+    "",
+    "boss"
+   ],
+   "bossMain": false,
+   "bossActs": 2,
+   "mcd": 1,
+   "log": [
+    "凜冬霜龍 的【震波】造成 73 傷害"
+   ]
+  }
+ },
+ "P0-3b 首領不在主位仍會召喚": {
+  "ok": true,
+  "info": {
+   "sum": 2
+  }
+ },
+ "ERR 無頁面錯誤(2)": {
+  "ok": true,
+  "info": []
+ },
+ "規則 重新整理回到戰鬥": {
+  "ok": true,
+  "info": {
+   "before": {
+    "foes": [
+     [
+      "岩蛇",
+      299
+     ]
+    ],
+    "php": 469,
+    "step": 1,
+    "ac": 0
+   },
+   "after": {
+    "foes": [
+     [
+      "岩蛇",
+      182
+     ]
+    ],
+    "php": 435,
+    "step": 1,
+    "ac": 1,
+    "rt": true
+   }
+  }
+ },
+ "ERR 無頁面錯誤(3)": {
+  "ok": true,
+  "info": []
+ },
+ "規則 持續傷害被護盾吸收": {
+  "ok": true,
+  "info": {
+   "hpLost": 0,
+   "shLost": 37
+  }
+ },
+ "規則 自動換裝考慮套裝與職業": {
+  "ok": true,
+  "info": {
+   "n": 7,
+   "allUsable": true,
+   "setCount": 4,
+   "score": 533,
+   "greedy": 389,
+   "mainAttr": "力"
+  }
+ },
+ "規則 大副本每區探索獎勵＋最後寶箱": {
+  "ok": true,
+  "info": {
+   "z1": true,
+   "z1chest": false,
+   "z2": true,
+   "z2chest": true
+  }
+ },
+ "ERR 無頁面錯誤(4)": {
+  "ok": true,
+  "info": []
+ },
+ "P1-4 戰敗停止全自動": {
+  "ok": true,
+  "info": {
+   "code": {
+    "hasStop": true
+   },
+   "after": {
+    "fa": null
+   }
+  }
+ },
+ "P1-6 全自動配點照職業主屬性": {
+  "ok": true,
+  "info": {
+   "templar": {
+    "main": "力",
+    "diff": {
+     "STR": 6,
+     "VIT": 3
+    }
+   },
+   "assassin": {
+    "main": "力",
+    "diff": {
+     "STR": 6,
+     "VIT": 3
+    }
+   },
+   "archmage": {
+    "main": "智",
+    "diff": {
+     "VIT": 3,
+     "INT": 6
+    }
+   }
+  }
+ },
+ "P2-4 天賦對到正確技能": {
+  "ok": true,
+  "info": {
+   "t0723": "J07S3",
+   "t0921": "J09S3",
+   "blockRedUsed": true
+  }
+ },
+ "P2-3 格擋減傷天賦有作用": {
+  "ok": true,
+  "info": {
+   "t0723": "J07S3",
+   "t0921": "J09S3",
+   "blockRedUsed": true
+  }
+ },
+ "P2-11 伺服器等級上限 100": {
+  "ok": true,
+  "info": {}
+ },
+ "P1-7 上榜需要帳號 token": {
+  "ok": true,
+  "info": {}
+ },
+ "P2-12 前端沒有 GM 密語": {
+  "ok": true,
+  "info": {}
+ }
+}

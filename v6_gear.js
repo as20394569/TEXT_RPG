@@ -131,8 +131,14 @@ function stats(){const e=gearTotals(),a={},v=k=>e[k]||0,cp=(k,m)=>1+Math.min(m||
     /* 舊戰鬥程式還會讀的欄位：新系統沒有，固定 0 */
     RF:TR.FIRE,RI:TR.ICE,RT:TR.THUNDER,RD:TR.DARK,BURN:0,STUN:0,GUARD:0,SHIELD:0,BACK:0,THORN:0,GALE:0,REAP:0,MPREG:0,RESMAX:0,BRKCD:0,DETAMP:0,FOCUSATK:0,ANSWER:0,FAITHG:0,KW:{},A:a};
   return R}
-function gearPower(g){const o=gearAll(g),mg=CLS[S.cls].basic==='MAG',W={atk:mg?.6:3,mag:mg?3:.6,def:2,mres:1.5,hp:.25,mp:.2,STR:mg?1:6,DEX:dexMain()?6:3,INT:mg?6:1,VIT:4,LUK:3,atkp:mg?2:12,magp:mg?12:2,crit:6,cd:2,double:6,eva:5,spd:10,pen:6,mpen:6,skill:8,boss:5,elite:4,ls:8,block:5,hpp:5,defp:4,mresp:3,pred:6,mred:6};
-  let v=0;for(const k in o)v+=o[k]*(W[k]||2);if(g.my)v+=60;return Math.round(v)}
+function wScore6(o){const mg=jobEq().main_attr==='智',W={atk:mg?.6:3,mag:mg?3:.6,def:2,mres:1.5,hp:.25,mp:.2,STR:mg?1:6,DEX:dexMain()?6:3,INT:mg?6:1,VIT:4,LUK:3,atkp:mg?2:12,magp:mg?12:2,crit:6,cd:2,double:6,eva:5,spd:10,pen:6,mpen:6,skill:8,boss:5,elite:4,ls:8,block:5,hpp:5,defp:4,mresp:3,pred:6,mred:6};
+  let v=0;for(const k in o)v+=o[k]*(W[k]||2);return v}
+function gearPower(g){let v=wScore6(gearAll(g));if(g.my)v+=60;return Math.round(v)}
+/* 整套評分（自動換裝用）：單件數值＋套裝 2／3 件屬性＋4 件效果＋神話（最多 2 種生效） */
+const SET4V=80,MYTHV=60;
+function eqScore6(eq){let sc=0;const cnt={},my=[];for(const sl of SL6){const g=eq[sl];if(!g)continue;sc+=wScore6(gearAll(g,sl==='off'&&WPN.has(g.k)));if(g.set&&SETSL.has(sl))cnt[g.set]=(cnt[g.set]||0)+1;if(g.my&&!my.includes(g.my))my.push(g.my)}
+  for(const id in cnt){const X=SETX[id];if(!X)continue;const c=cnt[id];if(c>=2)sc+=wScore6(setStat(X.s2));if(c>=3)sc+=wScore6(setStat(X.s3));if(c>=4)sc+=SET4V}
+  return sc+Math.min(2,my.length)*MYTHV}
 function power(){const s=stats();return Math.round(s.HP/4+s.MP/4+s.ATK*3+s.MAG*3+s.DEF*2.5+s.MRES*1.5+s.CRIT*4+(s.CD-150)*1.5+s.EVA*3+s.SPD*8+s.PEN*4+s.MPEN*4+s.DOUBLE*4+s.BLOCK*3+s.SKILL*5+s.LS*5)}
 function kwCount(){return {}}
 function buildName(){return ''}

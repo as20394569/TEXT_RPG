@@ -195,7 +195,7 @@ function foePick(f){f=f||B;if(!B||!f||!f.sk6)return null;const t=f.ac||0,fh=f.hp
 function foeDebuff6(f){if(f.st&&Object.values(f.st).some(v=>v>0))return true;return ['POISON','BURN','BLEED','WEAK','ARMOR','RESIST','SLOW','FROST','SHOCK','CURSE','HEX','VULN','FEAR','MARK','SCORCH','EXPOSE'].some(x=>has6(f,x))}
 
 /* ============ 首領階段（70%、35% 各一次） ============ */
-function phaseChk6(fx){const f=B;if(!f.ph6||!f.ph6.length||f.hp<=0)return;
+function phaseChk6(fx,f){f=f||B;if(!f)return;if(!f.ph6||!f.ph6.length||f.hp<=0)return;
   for(const pid of f.ph6){const P=PHASE6[pid];if(!P||f.phx6[pid]||f.hp/f.max*100>P.at)continue;f.phx6[pid]=1;const fx2=P.fx;let m;
     if(/^攻擊\+10%/.test(fx2)){f.atk=Math.round(f.atk*1.1);f.mag=Math.round(f.mag*1.1)}
     else if(/^速度\+10%/.test(fx2))f.ft6=Math.max(2,f.ft6/1.1);
@@ -205,10 +205,10 @@ function phaseChk6(fx){const f=B;if(!f.ph6||!f.ph6.length||f.hp<=0)return;
     else if(/^魔抗穿透/.test(fx2))f.pen6.m+=5;
     else if((m=fx2.match(/^回HP(\d+)%/))){const h=Math.round(f.max*m[1]/100);f.hp=Math.min(f.max,f.hp+h);if(fx)fx.fheal=h}
     else if((m=fx2.match(/^護盾(\d+)%HP/)))f.fshield=(f.fshield||0)+Math.round(f.max*m[1]/100);
-    else if(/^清除全部負面/.test(fx2)){f.st={};try{if(typeof stClear==='function')stClear(f,true)}catch(e){}}
+    else if(/^清除全部負面/.test(fx2)){try{stClearBad(f,99)}catch(e){}}
     else if((m=fx2.match(/^下次命中附加([A-Z]+)/)))f.nextInf6=m[1];
-    else if(/預告強招M09/.test(fx2))B.next='v6M09';
-    else if(/^自身行動條\+20/.test(fx2))B.rtg=Math.min(99,(B.rtg||0)+20);
+    else if(/預告強招M09/.test(fx2))f.next='v6M09';
+    else if(/^自身行動條\+20/.test(fx2))f.rtg=Math.min(99,(f.rtg||0)+20);
     else if(/^自身防禦-15%、攻擊\+15%/.test(fx2)){f.def=Math.round(f.def*.85);f.atk=Math.round(f.atk*1.15);f.mag=Math.round(f.mag*1.15)}
     else if(/^爆擊\+10/.test(fx2))f.crit+=10;
     else if(/^解鎖/.test(fx2)){const last=V6.MSK.filter(t=>t.cat==='首領').slice(-1)[0];if(last&&!f.sk6.includes('v6'+last.id))f.sk6.push('v6'+last.id)}
@@ -235,7 +235,7 @@ function foeHit6(f,k,s,o){o=o||{};const mag=k?(k.either?f.mag>=f.atk&&f.role6===
   if(Math.random()*100<(f.crit||5)+(has6(f,'FOCUS')?10:0)+fbSum('crit')){d*=(f.cd6||150)/100;cr=true}
   let vul=(has6('p','VULN')?10:0)+(mag&&has6('p','SHOCK')?10:0);vul=Math.min(25,vul);d*=1+vul/100;
   const red=Math.min(40,(mag?(s.MRED||0):(s.PRED||0))+(has6('p','GUARD')?20:0));d*=1-red/100;
-  let blk=false;if(!mag&&Math.random()*100<Math.min(35,s.BLOCK||0)){d*=.65;blk=true}
+  let blk=false;if(!mag&&Math.random()*100<Math.min(35,s.BLOCK||0)){d*=Math.max(.3,.65-(typeof effSum==='function'?effSum('blockRed'):0)/100);blk=true}/* 格擋減傷天賦（T0523、T1234） */
   if(ps.includes('P29')&&(B.shield>0||has6('p','SHIELD')))d*=1.15;
   return{d,cr,blk,mag}}
 function applyHit6(f,r,fx,k,nm,o){o=o||{};const s=stats();let d=r.d;
@@ -263,12 +263,12 @@ function foeAttack6(f,id,fx,o){o=o||{};const s=stats(),k=id?SKM[id]:null,nm=k?`�
   if(k&&!k.pow){const ps=[];
     if(k.heal){const h=Math.round(f.max*Math.min(k.heal,f.kind==='boss'?.03:1)*(has6(f,'BURN')||(f.st&&f.st.burn>0)?.5:1));f.hp=Math.min(f.max,f.hp+h);fx.fheal=h;ps.push(`回復 ${h} HP`)}
     if(k.selfSt){mobSelfSt6(f,k.selfSt,k.sv);ps.push((V6.STAT.find(x=>x.id===k.selfSt)||{n:k.selfSt}).n)}
-    if(k.cleanse){const ks=Object.keys(f.st||{}).filter(x=>f.st[x]>0);if(ks.length)f.st[ks[0]]=0;try{if(typeof stClear==='function')stClear(f,false,1)}catch(e){}ps.push('清除負面')}
-    if(k.atbSelf&&B.rt)B.rtg=Math.min(99,(B.rtg||0)+k.atbSelf);
+    if(k.cleanse){try{stClearBad(f,1)}catch(e){}ps.push('清除負面')}
+    if(k.atbSelf&&B.rt)f.rtg=Math.min(99,(f.rtg||0)+k.atbSelf);
     if(k.inf)inflict6(k.inf,f,{v:k.iv});
     if(!k.v6){if(k.self){f.fb.push(Object.assign({id,n:k.n},k.self));ps.push(k.d)}if(k.shield){f.fshield=Math.round(f.max*k.shield);ps.push(`護盾 ${f.fshield}`)}}
     blog(`${f.name} 使用${nm}${ps.length?'，'+ps.join('，'):''}`);return}
-  if(k&&k.atbSelf&&B.rt)B.rtg=Math.min(99,(B.rtg||0)+k.atbSelf);
+  if(k&&k.atbSelf&&B.rt)f.rtg=Math.min(99,(f.rtg||0)+k.atbSelf);
   if(!o.add&&!(B.rt&&(B.rt.pr>B.rt.t||B.rt.ev>B.rt.t))&&allyTgt()){const r=foeHit6(f,k,s,{sure:1});allyHurt(r.d,nm,f.name);return}
   if(B.rt&&rtReact(fx,nm,o.add?f:null,k||(f.role6==='MAGE'?{mag:1}:null),o.big)){return}
   const r=foeHit6(f,k,s);
@@ -305,16 +305,7 @@ function tick6(s){const usedTick=typeof stTick==='function';
     for(const [h,r,n] of [['poison',.04,'毒素發作'],['burn',.05,'灼燒'],['bleed',.035,'流血']])if(S.hp>0&&B.pst[h]>0){const d=Math.max(1,Math.round(s.HP*r));S.hp=Math.max(0,S.hp-d);B.pst[h]--;blog(`${n}，損失 ${d} HP`)}
     if(B.pst.weak>0)B.pst.weak--;if(B.st.weak>0)B.st.weak--;}
   
-  const f=B,ps=f.pass6||[];
-  if(f.hp>0){
-    if((ps.includes('P17')||f.role6==='REGEN')&&!(has6(f,'BURN')||f.st.burn>0)){const h=Math.max(1,Math.round(f.max*(ps.includes('P17')?.005:0)+f.max*(f.role6==='REGEN'?.01:0)));f.hp=Math.min(f.max,f.hp+h)}
-    if(ps.includes('P22')&&!f.p22&&f.hp/f.max<.25){f.p22=1;f.fshield=(f.fshield||0)+Math.round(f.max*.08);blog(`${f.name}【護命】張開護盾`)}
-    if(ps.includes('P23')&&!f.p23&&f.hp/f.max<.2){f.p23=1;const h=Math.round(f.max*.05);f.hp=Math.min(f.max,f.hp+h);blog(`${f.name}【復甦】回復 ${h} HP`)}
-    if(ps.includes('P24')&&f.hp/f.max<.3&&!f.p24){f.p24=1;f.ft6=Math.max(2,f.ft6/1.1)}
-    if(ps.includes('P25')){f.mresB6=f.mresB6||f.mres;f.mres=f.hp/f.max>.8?Math.round(f.mresB6*1.1):f.mresB6}
-    if(ps.includes('P33')&&(f.ac||0)%6===5){const ks=Object.keys(f.st||{}).filter(x=>f.st[x]>0);if(ks.length){f.st[ks[0]]=0;blog(`${f.name}【淨化】清掉了一個負面狀態`)}try{if(typeof stClear==='function')stClear(f,false,1)}catch(e){}}
-    if(f.role6==='GUARD'&&(f.acts6||0)>0&&(f.acts6%3===0)&&f.gdA6!==f.acts6){f.gdA6=f.acts6;f.fshield=(f.fshield||0)+Math.round(f.max*.05)}
-    phaseChk6(null)}
+  tickFoe7(B);
   /* 保留的魔物機制（大副本霧紋等） */
   if((B.trait==='cleanse'||B.trait==='grove')&&B.hp>0&&(B.st.burn>0||B.st.poison>0||B.st.bleed>0)){B.st.burn=0;B.st.poison=0;B.st.bleed=0;const h=Math.round(B.max*.04);B.hp=Math.min(B.max,B.hp+h);blog(`${B.name} 的【${TRX(B.trait).n}】清除了持續傷害，回復 ${h} HP`)}
   if((B.trait==='summon'||B.trait==='grove')&&B.hp>0&&B.turn%3===0&&(B.adds||[]).filter(x=>x.hp>0).length<2&&RUN){try{const a=mkFoe(pick(AREAS[RUN.area].mobs.slice(0,2)),'');a.hp=a.max=Math.round(a.max*.6);B.adds=(B.adds||[]).filter(x=>x.hp>0);B.adds.push(a);blog(`${B.name} 叫來了 ${a.name}！`)}catch(e){}}
@@ -330,10 +321,28 @@ function tick6(s){const usedTick=typeof stTick==='function';
   if(B.buffs){B.buffs.forEach(b=>b.t--);B.buffs=B.buffs.filter(b=>b.t>0)}
   B.turn++;
   if(B.elHit==='w')dexWeak6()}
+/* 每隻怪自己的被動結算（主目標、副目標共用；在牠自己行動前） */
+function tickFoe7(f){if(!f)return;const ps=f.pass6||[];
+  if(f.hp>0){
+    if((ps.includes('P17')||f.role6==='REGEN')&&!(has6(f,'BURN')||f.st.burn>0)){const h=Math.max(1,Math.round(f.max*(ps.includes('P17')?.005:0)+f.max*(f.role6==='REGEN'?.01:0)));f.hp=Math.min(f.max,f.hp+h)}
+    if(ps.includes('P22')&&!f.p22&&f.hp/f.max<.25){f.p22=1;f.fshield=(f.fshield||0)+Math.round(f.max*.08);blog(`${f.name}【護命】張開護盾`)}
+    if(ps.includes('P23')&&!f.p23&&f.hp/f.max<.2){f.p23=1;const h=Math.round(f.max*.05);f.hp=Math.min(f.max,f.hp+h);blog(`${f.name}【復甦】回復 ${h} HP`)}
+    if(ps.includes('P24')&&f.hp/f.max<.3&&!f.p24){f.p24=1;f.ft6=Math.max(2,f.ft6/1.1)}
+    if(ps.includes('P25')){f.mresB6=f.mresB6||f.mres;f.mres=f.hp/f.max>.8?Math.round(f.mresB6*1.1):f.mresB6}
+    if(ps.includes('P33')&&(f.ac||0)%6===5){let n=0;try{n=stClearBad(f,1)}catch(e){}if(n)blog(`${f.name}【淨化】清掉了一個負面狀態`)}
+    if(f.role6==='GUARD'&&(f.acts6||0)>0&&(f.acts6%3===0)&&f.gdA6!==f.acts6){f.gdA6=f.acts6;f.fshield=(f.fshield||0)+Math.round(f.max*.05)}
+    phaseChk6(null,f)}}
 /* 小怪的即時出手 */
 function rtAddGo(f){B.rt.ph0=S.hp;f.rtw=null;f.rtg=0;f.rta=performance.now()+420;const fx=B.fx&&B.fx.by==='foe'?B.fx:(B.fx={by:'foe'});fx.af=f;
-  if(f.st&&f.st.stun>0||has6(f,'STUN')){if(f.st.stun>0)f.st.stun--;return}
-  foeAttack6(f,null,fx,{add:1});f.acts6=(f.acts6||0)+1}
+  /* v20.9：副目標和主目標用同一套行動前後結算（狀態跳傷、被動、階段、行動數），也照自己的 AI 放技能（CODE_AUDIT P0-2、P0-3） */
+  B.actor=f;try{stTick(f);tickFoe7(f)}catch(e){}
+  if(!B)return;
+  if(f.hp<=0){B.actor=null;blog(`${f.name} 倒下了`);if(B.hp<=0&&!(B.adds||[]).some(x=>x.hp>0))winSoon(900);return}
+  if(f.st&&f.st.stun>0||has6(f,'STUN')){if(f.st&&f.st.stun>0)f.st.stun--;blog(`${f.name} 暈眩中`)}
+  else{const id='next' in f?f.next:foePick(f);delete f.next;const k=id?SKM[id]:null;foeAttack6(f,id,fx,{add:1,big:!!(k&&isDng(k))});f.acts6=(f.acts6||0)+1}
+  if(!B)return;f.ac=(f.ac||0)+1;B.actor=null;if(f.st&&!has6(f,'STUN'))f.st.stun=0;
+  try{if(typeof summon7==='function')summon7(f)}catch(e){}
+  if(f.hp>0&&!('next' in f))f.next=foePick(f)}
 /* 行動秒：表上低～高 × 定位 × 階級；速度狀態合計減速上限 30%（首領減半） */
 function rtFT(f,add){let t=f.ft6||((typeof rtTy==='function'?rtTy(f).ft:2));let sp=0;
   if(has6(f,'HASTE'))sp+=15;let sl=(has6(f,'SLOW')?20:0)+(has6(f,'FROST')?15:0)+(has6(f,'ROOT')?10:0)+(has6(f,'FEAR')?10:0);sl=Math.min(30,sl);if(f.kind==='boss')sl/=2;
@@ -379,7 +388,7 @@ function spoil(){const m=B.m,L=B.L,bs=B.kind==='boss',rk=B.rank6||(bs?'B':B.kind
 const _gainExp6=gainExp;
 gainExp=function(n){if(S&&S.lv>=LVMAX&&n>0){S.endx=(S.endx||0)+n;const nd=need(LVMAX-1);let k=0;while(S.endx>=nd){S.endx-=nd;k++}if(k){addItem('mark6',k);toast(`終局印記 +${k}`)}return}return _gainExp6(n)};
 /* 戰敗：回據點、扣 5% 金幣（上限＝同級普通怪金幣×10），HP／MP 全滿 */
-function lose(){try{SFX.lose()}catch(e){}const lid=B?B.id:null,L=B?B.L:S.lv;const lost=Math.min(Math.round(S.gold*.05),MLV6(L)[12]*10),s=stats();S.gold=Math.max(0,S.gold-lost);S.hp=s.HP;S.mp=s.MP;B=null;RUN=null;TAB='town';save();render();
+function lose(){try{SFX.lose()}catch(e){}try{if(typeof FA!=='undefined'&&FA)faStop('戰敗，全自動停止')}catch(e){}const lid=B?B.id:null,L=B?B.L:S.lv;const lost=Math.min(Math.round(S.gold*.05),MLV6(L)[12]*10),s=stats();S.gold=Math.max(0,S.gold-lost);S.hp=s.HP;S.mp=s.MP;B=null;RUN=null;TAB='town';save();render();
   openM('msg',{t:'戰敗',b:`<div class="panel"><div class="duo">${art(ARTSET&&ARTSET.has(AK()+'_dm')?AK()+'_dm':HK()+'_lose','戰敗','r34')}${lid&&lid!=='shadow'?art('mob_'+lid+'_win','','r11'):''}</div><p>${you('你')}倒下了。巡邏隊把你送回晨星鎮，途中遺失了 ${lost} G。</p></div><button class="btn pri big" data-a="closeM">確定</button>`})}
 /* 逃跑：普通 80%、精英 50%、首領 0%（耗掉一次行動） */
 function fleeChance6(){if(!B)return 0;return B.kind==='boss'?0:B.kind==='elite'?.5:.8}

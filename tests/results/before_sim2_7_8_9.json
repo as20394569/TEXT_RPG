@@ -1,0 +1,91 @@
+[
+ {
+  "job": "archmage",
+  "explore": {
+   "lv": 45,
+   "area": 4,
+   "win": 1,
+   "n": 4,
+   "fails": [
+    [
+     4,
+     "中段強敵・骷髏王"
+    ],
+    [
+     7,
+     "強敵・亡靈將軍"
+    ],
+    [
+     4,
+     "中段強敵・亡靈將軍"
+    ]
+   ],
+   "dmg_per_act": 133.9,
+   "mp_per_act": 8.84,
+   "acts": 107
+  },
+  "errs": [],
+  "dungeon": {
+   "lv": 30,
+   "d": "深林礦脈",
+   "win": 2,
+   "n": 2,
+   "fails": []
+  }
+ },
+ {
+  "job": "warlock",
+  "explore": {
+   "lv": 45,
+   "area": 4,
+   "win": 4,
+   "n": 4,
+   "fails": [],
+   "dmg_per_act": 186.8,
+   "mp_per_act": 8.97,
+   "acts": 114
+  },
+  "errs": [],
+  "dungeon": {
+   "lv": 30,
+   "d": "深林礦脈",
+   "win": 1,
+   "n": 2,
+   "fails": [
+    [
+     [
+      1
+     ],
+     7,
+     "鑽岩巨蟲+召喚・火蠍"
+    ]
+   ]
+  }
+ },
+ {
+  "job": "sniper",
+  "explore": {
+   "lv": 45,
+   "area": 4,
+   "win": 3,
+   "n": 4,
+   "fails": [
+    [
+     4,
+     "中段強敵・亡靈將軍"
+    ]
+   ],
+   "dmg_per_act": 226.9,
+   "mp_per_act": 8.78,
+   "acts": 112
+  },
+  "errs": [],
+  "dungeon": {
+   "lv": 30,
+   "d": "深林礦脈",
+   "win": 2,
+   "n": 2,
+   "fails": []
+  }
+ }
+]

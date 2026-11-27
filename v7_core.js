@@ -7,9 +7,14 @@
 */
 /* ---------- 共用 ---------- */
 const V7=true;
-try{FK.push('ac','next','spoiled','summon7','xmul','gmul','dmul','grp7','chg7')}catch(e){}
+try{FK.push('ac','next','spoiled','summon7','xmul','gmul','dmul','grp7')}catch(e){}
+/* v20.9：換目標時，怪物身上的所有資料都跟著牠走（CODE_AUDIT P0-3、P1-3、P2-2）。
+   副目標物件只放怪物資料，所以「副目標有的欄位＋FK＋下列戰鬥中才出現的旗標」就是完整的怪物資料；玩家狀態（chg7、p6、psx…）永遠留在 B */
+const FKX7=['lv','dr6Used','mresB6','p22','p23','p24','p34','gdA6','nextInf6','sm70','sm35','ph2','chg','chgSh','chgHp','chgNeed','brkN','brkP','brkFx','mid7','sumGone7','lastP6','fhit6','rage','sx','ac','acts6','mcd','phx6','pen6','st','fb','fshield','rtg','rtw','rta','rth'];
+const FKNO7=new Set(['chg7','rt','log','adds','p6','psx','pcd6','fx','tot','auto','busy','menu','icd','acP','pops','ds','actor','preAc','preRes','ally']);
+swapFoe=function(i){const a=B.adds[i];if(!a)return;const keys=new Set([...FK,...FKX7,...Object.keys(a)]);const cur={};for(const k of keys){if(FKNO7.has(k))continue;cur[k]=B[k];if(k in a)B[k]=a[k];else delete B[k]}for(const k in cur)if(cur[k]===undefined)delete cur[k];B.adds[i]=cur;B.fhp=null};
 const aliveFoes7=()=>B?[B,...(B.adds||[])].filter(f=>f&&f.hp>0):[];
-const nAlive7=()=>aliveFoes7().filter(f=>!f.summon7||true).length;
+const nAlive7=()=>aliveFoes7().length;/* 召喚物也算敵人數（不給獎勵） */
 
 /* ---------- 技能資料補欄位：目標、標籤、範圍、表上效果 ---------- */
 const FX7={};/* 新技能（S7～S16 與沒有寫死的）效果，由表上文字解析 */
@@ -137,9 +142,9 @@ function pPost7(){if(!B)return;const P=B.p6||{};P.lb=P.nb||0;P.le=P.ne||0;P.lh=P
 {const _rd=rtDo;rtDo=function(c){if(B&&B.rt&&c==='@parry'){const pre=pPre7();if(pre==='dead')return;if(pre==='skip'){B.rt.pg=0;pPost7();render();return}const r=_rd.apply(this,arguments);pPost7();return r}return _rd.apply(this,arguments)}}
 
 /* ---------- 蓄力技：這次付 MP、預告，下一次自己行動強制放出（暈眩不取消） ---------- */
-function relCharge7(k){const x=SK[k],s=rtS6();if(!x||!B)return false;B.actor='p';const fx=B.fx={by:'me',cut:x.n,skill:k,el:dmgTag6(k).toLowerCase(),hits:1};B.srcNow=x.n;
-  const r=hitFoe(x.s,x.pow,{skill:1,tag:dmgTag6(k),amp:skAmp7(k,B)+(skmLv6(k)-1)+effSum('skdmg',k),pen:skPen7(k),cr:skCrit7(B)});fx.d=r.d;fx.cr=r.cr;
-  blog(`你釋放【${x.n}】，${r.miss?`${B.name} 閃開了`:`造成 ${r.d} 傷害${r.cr?'（爆擊！）':''}`}`);try{playSkillSfx(k,x)}catch(e){}if(B.hp<=0)winSoon(2300);return true}
+function relCharge7(k){const x=SK[k];if(!x||!B)return false;B.actor='p';
+  /* v20.9：蓄力放出走一般技能的完整流程（增傷、連擊、吸血、觸發、回魔），只是不再扣 MP、不重算冷卻（CODE_AUDIT P1-5） */
+  B.chgRel=k;try{useSkill6(k,rtS6())}finally{if(B)B.chgRel=null}if(B&&B.hp<=0)winSoon(2300);return true}
 
 /* ---------- 新技能的增傷／穿透／爆擊（useSkill6 會呼叫） ---------- */
 function lastOk7(w){const P=B&&B.p6||{};return w==='hurt'?!!P.lh:w==='block'?!!P.lb:w==='evade'?!!P.le:w==='combo'?!!P.lc:false}
@@ -185,7 +190,7 @@ function onCombo7(){const P=B.p6,s=rtS6();P.nc=1;if(!P.cmb){for(const e of effK(
 /* ---------- 範圍技：主目標之外的目標（每個目標各自命中、爆擊、狀態） ---------- */
 function aoeTargets7(k){const x=SK[k];if(!x||!(x.tg==='雙體'||x.tg==='全體'))return [];const L=(B.adds||[]).filter(f=>f.hp>0).sort((a,b)=>a.hp-b.hp);return x.tg==='雙體'?L.slice(0,1):L.slice(0,3)}
 function aoeHit7(k,s,amp,pen,cr,cdB,ps){let tot=0;const x=SK[k];
-  for(const f of aoeTargets7(k)){const r=hitFoe(x.s,x.pow,{skill:1,tag:dmgTag6(k),amp:amp+skAmp7(k,f)-skAmp7(k,B),pen,cr:cr+skCrit7(f)-skCrit7(B),cd:cdB,tgt:f});tot+=r.d;
+  const tB=tgtAmp6(k,B);for(const f of aoeTargets7(k)){const r=hitFoe(x.s,x.pow,{skill:1,tag:dmgTag6(k),amp:amp+skAmp7(k,f)-skAmp7(k,B)+tgtAmp6(k,f)-tB,pen,cr:cr+skCrit7(f)-skCrit7(B),cd:cdB,tgt:f});tot+=r.d;
     if(r.miss)ps.push(`${f.name} 閃開了`);else{f.rth=performance.now()+450;(B.pops=B.pops||[]).push({d:r.d,k:r.cr?'爆擊':'',f});fx7Apply(k,s,r.d,ps,true,f);
       /* 範圍技對副目標也附加原本的狀態（破甲、灼燒…） */
       try{skFx6sub7(k,s,f,ps)}catch(e){}

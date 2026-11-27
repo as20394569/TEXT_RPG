@@ -75,6 +75,8 @@ function stAdd(t,id,o){o=o||{};if(!B)return false;id=STALIAS[id]||id;const D=STX
   if(id==='STUN'){if(me){B.rt&&(B.rt.q=null)}else{t.st=t.st||{};t.st.stun=1}stAdd(t,'IMMUNE',{dur:dur+2})}
   return true}
 function stClear(t,id){const bx=stBox(t);if(id)delete bx[id];else for(const k in bx)delete bx[k]}
+/* 只清負面狀態（怪物淨化用），最多 n 個 */
+function stClearBad(t,n){const bx=stBox(t),now=acOf(t);let c=0;for(const id of Object.keys(bx)){if(c>=(n||99))break;if(bx[id].e>now&&STX[id]&&STX[id].bad){delete bx[id];c++}}if(t&&t!=='p'&&t.st)for(const k in t.st)if(t.st[k]>0&&c<(n||99)){t.st[k]=0;c++}return c}
 function stList(t){const bx=stBox(t),now=acOf(t);return Object.keys(bx).filter(k=>bx[k].e>now)}
 function stVal(t,key){const bx=stBox(t),now=acOf(t);let v=0;for(const id in bx){const x=bx[id];if(x.e<=now)continue;const D=STX[id];if(!D||!D.m||D.m[key]==null)continue;
   let d=D.m[key];if(x.v!=null&&Object.keys(D.m).length===1)d=Math.sign(d||1)*Math.abs(x.v);v+=d}return v}
@@ -84,11 +86,11 @@ const rtS6=()=>{try{return B&&B.rt&&typeof rtS==='function'?rtS():stats()}catch(
 function stTick(t){if(!B)return;const bx=stBox(t),now=acOf(t),me=t==='p';
   for(const id in bx){const x=bx[id],D=STX[id];if(!D||x.e<=now){if(x.e<=now){delete bx[id];if(id==='STUN'&&!me&&t.st)t.st.stun=0}continue}
     if(D.dot&&x.src){let base=(x.src[D.dot]||0)*(x.r||.2)*(1+(x.amp||0));
-      if(me){const s=rtS6();const df=D.dot==='mag'?s.MRES:s.DEF;let d=Math.max(1,Math.round(base*100/(100+df)*pInMul6(D.dot==='mag')));S.hp=Math.max(0,S.hp-d);B.log.push(you(`${STX[id].n}，損失 ${d} HP`));B.fx=B.fx||{by:'foe'};}
+      if(me){const s=rtS6();const df=D.dot==='mag'?s.MRES:s.DEF;let d=Math.max(1,Math.round(base*100/(100+df)*pInMul6(D.dot==='mag')));const d0=d;d=pShieldAbsorb6(d);S.hp=Math.max(0,S.hp-d);B.log.push(you(`${STX[id].n}，損失 ${d} HP${d0>d?`（護盾吸收 ${d0-d}）`:''}`));B.fx=B.fx||{by:'foe'};}
       else{const df=D.dot==='mag'?(t.mres??t.def):t.def;let d=Math.max(1,Math.round(base*100/(100+(df||0)*(1+stCap(t,D.dot==='mag'?'mres':'def')/100))));d=foeTake6(t,d,STX[id].n);B.log.push(`${t.name} 受到${STX[id].n}傷害 ${d}`);(B.pops=B.pops||[]).push({d,k:STX[id].n,f:t})}}
     if(D.hot){if(me){const s=rtS6();const h=Math.round(s.HP*D.hot/100*healInM6());S.hp=Math.min(s.HP,S.hp+h)}else{t.hp=Math.min(t.max,t.hp+Math.round(t.max*D.hot/100*(t.kind==='boss'?.5:1)))}}
     if(D.mpdrain&&me){const s=rtS6();S.mp=Math.max(0,S.mp-Math.round(s.MP*D.mpdrain/100))}}}
-function foeTake6(f,d,src){const bx=stBox(f),sh=bx.SHIELD;if(sh&&sh.e>bt6()&&sh.amt>0){const ab=Math.min(sh.amt,d);sh.amt-=ab;d-=ab}if(f.fshield>0){const ab=Math.min(f.fshield,d);f.fshield-=ab;d-=ab}f.hp=Math.max(0,f.hp-d);if(f===B){try{dsrc(src||'攻擊',d)}catch(e){}try{bossPhase()}catch(e){}}return d}
+function foeTake6(f,d,src){const bx=stBox(f),sh=bx.SHIELD;if(sh&&sh.e>acOf(f)&&sh.amt>0){const ab=Math.min(sh.amt,d);sh.amt-=ab;d-=ab}if(f.fshield>0){const ab=Math.min(f.fshield,d);f.fshield-=ab;d-=ab}f.hp=Math.max(0,f.hp-d);try{dsrc(src||'攻擊',d)}catch(e){}try{bossPhase(f)}catch(e){}return d}
 const healInM6=()=>(1+Math.min(30,(rtS6().HEALIN||0))/100)*(1+stCap('p','healIn')/100);
 function stStep6(){}
 
@@ -117,9 +119,9 @@ const PSV={J01S4:[{k:'stat',key:'atkp',v:5}],J01S5:[{k:'stat',key:'hpp',v:5}],J0
   J12S4:[{k:'stat',key:'block',v:10}],J12S5:[{k:'stat',key:'hpp',v:8}],J12S6:[{k:'next',ev:'block',sk:'J12S2',v:25}],
   J13S4:[{k:'stat',key:'atkp',v:4}],J13S5:[{k:'stat',key:'double',v:3}],J13S6:[{k:'next',ev:'combo',v:10}]};
 /* 技能名 → ID（同職業，允許簡稱：牽制、盾壁、守勢、星火、護盾） */
-function skBy6(j,tok){if(!tok)return null;tok=tok.replace(/^[「【]|[」】]$/g,'');const L=jobSk6(j,null);
+function skBy6(j,tok){if(!tok)return null;tok=tok.replace(/^[「【]|[」】]$/g,'');const L=jobSk6(j,null).slice().sort((a,b)=>(b.act-a.act)||(+a.id.split('S')[1])-(+b.id.split('S')[1]));
   let x=L.find(k=>k.n===tok)||L.find(k=>tok.startsWith(k.n))||L.find(k=>k.n.startsWith(tok));
-  if(!x&&tok==='護盾')x=L.find(k=>/護盾/.test(k.fx));if(!x&&tok==='守勢')x=L.find(k=>k.n.startsWith('守勢'));return x?x.id:null}
+  if(!x&&tok==='護盾')x=L.find(k=>k.act&&/護盾|SHIELD/.test(k.fx))||L.find(k=>/護盾/.test(k.fx));if(!x&&tok==='守勢')x=L.find(k=>k.n.startsWith('守勢'));return x?x.id:null}
 const STN6={破甲:'ARMOR',灼燒:'BURN',減速:SLOWK,中毒:'POISON',聖印:'SEAL',審判印:'JUDGE',腐蝕:'CORRODE',獵印:'MARK',已灼燒:'BURN',已中毒:'POISON',已腐蝕:'CORRODE'};
 const stOf6=w=>STN6[w]?[].concat(STN6[w]):null;
 const STATK={'物防穿透':'pen','爆傷':'cd','連擊率':'double','格擋':'block','最大HP':'hpp','最大MP':'mpp','魔抗':'mresp','行動速度':'spd','受治療':'healin','受到治療':'healin'};
@@ -210,7 +212,7 @@ function skPassive6(){const o={};if(!S)return o;const add=(k,v)=>{o[k]=(o[k]||0)
     if(stHas('p','SHIELD'))for(const e of effK('shmres'))add('mresp',e.v);
     const s0=S.hp,mx=B.mx6||1;for(const e of effK('lowhp'))if(e.type==='crit'&&s0<mx*e.th/100)add('crit',e.v)}
   return o}
-if(typeof stats==='function'&&!/skPassive6/.test(stats.toString())&&typeof gearTotals==='function'){const _gt=gearTotals;gearTotals=function(){const e=_gt.apply(this,arguments);try{const p=skPassive6();for(const k in p)e[k]=(e[k]||0)+p[k]}catch(x){}return e}}
+/* v20.9：gearTotals（v6_gear.js）本身已加入 skPassive6，這裡原本又包一層導致被動、熟練、戰鬥狀態算兩次（CODE_AUDIT P0-1），已移除 */
 
 /* ---------- 熟練 ---------- */
 const MSTH=[0,30,100,250,500],WPTH=[0,20,60,150,300];
@@ -267,11 +269,11 @@ function pAct(type,arg){if(!B||B.busy)return false;const s=rtS6();B.p6=B.p6||{nx
   else if(type==='flee'){if(Math.random()<(typeof fleeChance6==='function'?fleeChance6():B.kind==='elite'?.5:.8)){B=null;RUN.view={type:'res',title:'成功逃離',text:'你甩開了魔物，繼續趕路。'};render();return true}blog('逃跑失敗')}
   if(B.rt){rtAfterP(type);const R=B.rt;if(R.pgB){R.pg=Math.min(100,R.pg+R.pgB);R.pgB=0}return true}
   B.menu='main';B.busy=true;render();if(B.hp<=0){winSoon(1350);return true}setTimeout(foeTurn,AS(850));return true}
-function useSkill6(k,s){const x=SK[k],P=B.p6,now=acOf('p'),c=mpCost6(k),j=job6(),ps=[];try{lunaSkill(k)}catch(e){}
-  if(typeof FX7!=='undefined'&&FX7[k]&&FX7[k].charge&&B.rt){S.mp-=c;P.mpUse+=c;if(x.cd)B.pcd6[k]=now+cdOf6(k)+1;B.chg7=k;B.fx={by:'me',cut:x.n+'・蓄力',skill:k,glow:1};try{SFX.buff()}catch(e){}blog(`你開始蓄力【${x.n}】`);return}
-  S.mp-=c;P.mpUse+=c;if(x.cd){B.pcd6[k]=now+cdOf6(k)+1;for(const e of effK('skcdn'))if(e.sk===k){P.cast=P.cast||{};P.cast[k]=(P.cast[k]||0)+1;if(P.cast[k]%e.th===0)B.pcd6[k]-=1}}
+function useSkill6(k,s){const rel=B.chgRel===k,x=SK[k],P=B.p6,now=acOf('p'),c=rel?0:mpCost6(k),j=job6(),ps=[];try{lunaSkill(k)}catch(e){}
+  if(typeof FX7!=='undefined'&&FX7[k]&&FX7[k].charge&&B.rt&&!rel){S.mp-=c;P.mpUse+=c;if(x.cd)B.pcd6[k]=now+cdOf6(k)+1;B.chg7=k;B.fx={by:'me',cut:x.n+'・蓄力',skill:k,glow:1};try{SFX.buff()}catch(e){}blog(`你開始蓄力【${x.n}】`);return}
+  S.mp-=c;P.mpUse+=c;if(x.cd&&!rel){B.pcd6[k]=now+cdOf6(k)+1;for(const e of effK('skcdn'))if(e.sk===k){P.cast=P.cast||{};P.cast[k]=(P.cast[k]||0)+1;if(P.cast[k]%e.th===0)B.pcd6[k]-=1}}
   {const L=Math.abs((B.L||B.lv||S.lv)-S.lv);if(L<=10){S.skm=S.skm||{};S.skm[k]=(S.skm[k]||0)+1}}
-  const fx=B.fx={by:'me',cut:x.n,skill:k,el:dmgTag6(k).toLowerCase(),hits:x.dmg?x.dmg.h:1};B.srcNow=x.n;
+  const fx=B.fx={by:'me',cut:x.n,skill:k,el:dmgTag6(k).toLowerCase(),hits:x.dmg?x.dmg.h:1};B.srcNow=x.n;if(rel)blog(`你釋放蓄力的【${x.n}】`);
   try{playSkillSfx(k,x)}catch(e){}
   /* 三連不同技能 */
   P.seq.push(k);P.seq=P.seq.slice(-3);
@@ -310,6 +312,8 @@ function useSkill6(k,s){const x=SK[k],P=B.p6,now=acOf('p'),c=mpCost6(k),j=job6()
   fx.d=x.dmg?tot:undefined;if(x.dmg)fx.d=tot;
   fx.tags=(fx.tags||[]).concat(ps.filter(t=>/陷入|護盾|減傷|格擋率|迴避|連擊率/.test(t)).map(t=>t.replace(/^敵人陷入/,''))).slice(0,3);
   blog(`你施展【${x.n}】${ps.length?'，'+ps.join('，'):''}`)}
+/* 依目標狀態而變的增傷（條件增傷、斬殺、腐蝕追加）：範圍技對每個目標各自重算 */
+function tgtAmp6(k,f){const s=rtS6();let a=0;for(const e of effK('cond'))if((!e.sk||e.sk===k)&&e.st&&e.st.some(t=>stHas(f,t)))a+=e.v;for(const e of effK('exec'))if(f.hp<f.max*e.th/100)a+=e.v;if(k==='J08S3'&&stHas(f,'CORRODE'))a+=25;return a}
 const selfSt6=k=>({J01S3:'GUARD',J05S3:'BLOCKUP',J07S3:'SHIELD',J12S3:'SHIELD',J10S3:'EVAUP',J13S3:'COMBOUP',J06S2:'TAKEUP'})[k];
 function heal6(k,pct,magR,s,ps){let amp=effSum('skheal',k)+(skmLv6(k)-1);for(const e of effK('lowhealp'))if(e.sk===k&&S.hp<s.HP*e.th/100)amp+=e.v;
   let h=(s.HP*pct+s.MAG*magR)*(1+Math.min(30,s.HEALP||0)/100)*(1+amp/100)*healInM6();for(const e of effK('lowheal'))if(e.sk===k&&S.hp<s.HP*e.th/100)h+=s.HP*e.pct/100;
@@ -346,7 +350,7 @@ function skFx6(k,s,d,ps,hit){const T=B,dot=x=>1+(effSum('skdot',k)+(rtS6().DOT||
 
 /* 格擋（玩家按的格擋成功，或 A 線的格擋率被動觸發都呼叫）、閃避、受傷 */
 function onBlock6(){if(!B)return;B.p6=B.p6||{nx:[],once:{},tcd:0,seq:[],third:{},mpUse:0};trig6('block');
-  for(const e of effK('counter')){const cd=e.cd;if(B.p6.cntT!=null&&B.p6.cntT+cd+1>acOf('p'))continue;B.p6.cntT=acOf('p');const r=hitFoe('ATK',(e.v+effSum('counterAmp'))/100,{sure:1,tag:dmgTag6(battleSkills()[0])});B.log.push(`【反制】反擊 ${r.d}`);(B.pops=B.pops||[]).push({d:r.d,k:'反制'});trig6('hit',{sk:'counter'})}}
+  for(const e of effK('counter')){const cd=e.cd;if(B.p6.cntT!=null&&B.p6.cntT+cd+1>acOf('p'))continue;B.p6.cntT=acOf('p');{const P=B.p6;for(const t of effK('skcdn'))if(t.sk===e.from){P.cast=P.cast||{};P.cast[e.from]=(P.cast[e.from]||0)+1;if(P.cast[e.from]%t.th===0)P.cntT-=1}}const r=hitFoe('ATK',(e.v+effSum('counterAmp'))/100,{sure:1,tag:dmgTag6(battleSkills()[0])});B.log.push(`【反制】反擊 ${r.d}`);(B.pops=B.pops||[]).push({d:r.d,k:'反制'});trig6('hit',{sk:'counter'})}}
 function onEvade6(){if(!B)return;B.p6=B.p6||{nx:[],once:{},tcd:0,seq:[],third:{},mpUse:0};trig6('evade')}
 function onHurt6(d,sh0){if(!B||!B.p6)return;const s=rtS6(),P=B.p6;
   if(sh0&&!stHas('p','SHIELD'))trig6('shbreak');

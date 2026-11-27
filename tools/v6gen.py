@@ -1,6 +1,6 @@
-# 把 .docs/v6/v73.json（使用者的 V7.3 企劃表；V6.3 舊檔 v63.json 保留）轉成 v6data.js，遊戲直接讀
+# 把 .docs/v6/v75.json（使用者的 V7.5 企劃表；V7.3 舊檔 v73.json 保留；V6.3 舊檔 v63.json 保留）轉成 v6data.js，遊戲直接讀
 import json,re,os
-D=json.load(open(os.path.join(os.path.dirname(__file__),'..','.docs','v6','v73.json'),encoding='utf8'))
+D=json.load(open(os.path.join(os.path.dirname(__file__),'..','.docs','v6','v75.json'),encoding='utf8'))
 def rows(n,skip=1):return [r for r in D[n][skip:] if r and r[0] is not None]
 def num(v):
     if v is None:return 0

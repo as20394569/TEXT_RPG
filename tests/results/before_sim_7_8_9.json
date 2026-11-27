@@ -1,0 +1,85 @@
+[
+ {
+  "job": "archmage",
+  "explore": {
+   "lv": 45,
+   "area": 4,
+   "win": 4,
+   "n": 4,
+   "fails": [],
+   "dmg_per_act": 220.5,
+   "mp_per_act": 9.7,
+   "acts": 141
+  },
+  "errs": [],
+  "dungeon": {
+   "lv": 30,
+   "d": "深林礦脈",
+   "win": 2,
+   "n": 2,
+   "fails": []
+  }
+ },
+ {
+  "job": "warlock",
+  "explore": {
+   "lv": 45,
+   "area": 4,
+   "win": 3,
+   "n": 4,
+   "fails": [
+    [
+     4,
+     "中段強敵・骷髏王"
+    ]
+   ],
+   "dmg_per_act": 142.1,
+   "mp_per_act": 8.51,
+   "acts": 139
+  },
+  "errs": [],
+  "dungeon": {
+   "lv": 30,
+   "d": "深林礦脈",
+   "win": 0,
+   "n": 2,
+   "fails": [
+    [
+     [
+      1
+     ],
+     7,
+     "鑽岩巨蟲"
+    ],
+    [
+     [
+      1
+     ],
+     7,
+     "鑽岩巨蟲+召喚・火蠍"
+    ]
+   ]
+  }
+ },
+ {
+  "job": "sniper",
+  "explore": {
+   "lv": 45,
+   "area": 4,
+   "win": 4,
+   "n": 4,
+   "fails": [],
+   "dmg_per_act": 234.1,
+   "mp_per_act": 9.22,
+   "acts": 131
+  },
+  "errs": [],
+  "dungeon": {
+   "lv": 30,
+   "d": "深林礦脈",
+   "win": 2,
+   "n": 2,
+   "fails": []
+  }
+ }
+]

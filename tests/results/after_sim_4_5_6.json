@@ -1,0 +1,90 @@
+[
+ {
+  "job": "knight",
+  "explore": {
+   "lv": 45,
+   "area": 4,
+   "win": 3,
+   "n": 4,
+   "fails": [
+    [
+     4,
+     "中段強敵・亡靈將軍"
+    ]
+   ],
+   "dmg_per_act": 105.6,
+   "mp_per_act": 4.89,
+   "acts": 291
+  },
+  "errs": [],
+  "dungeon": {
+   "lv": 30,
+   "d": "深林礦脈",
+   "win": 0,
+   "n": 2,
+   "fails": [
+    [
+     [
+      1
+     ],
+     7,
+     "鑽岩巨蟲"
+    ],
+    [
+     [
+      1
+     ],
+     7,
+     "鑽岩巨蟲+召喚・火蜥蜴"
+    ]
+   ]
+  }
+ },
+ {
+  "job": "berserker",
+  "explore": {
+   "lv": 45,
+   "area": 4,
+   "win": 3,
+   "n": 4,
+   "fails": [
+    [
+     7,
+     "強敵・骷髏王"
+    ]
+   ],
+   "dmg_per_act": 216.8,
+   "mp_per_act": 9.34,
+   "acts": 137
+  },
+  "errs": [],
+  "dungeon": {
+   "lv": 30,
+   "d": "深林礦脈",
+   "win": 2,
+   "n": 2,
+   "fails": []
+  }
+ },
+ {
+  "job": "dual",
+  "explore": {
+   "lv": 45,
+   "area": 4,
+   "win": 4,
+   "n": 4,
+   "fails": [],
+   "dmg_per_act": 170.2,
+   "mp_per_act": 7.98,
+   "acts": 143
+  },
+  "errs": [],
+  "dungeon": {
+   "lv": 30,
+   "d": "深林礦脈",
+   "win": 2,
+   "n": 2,
+   "fails": []
+  }
+ }
+]

@@ -46,8 +46,12 @@ function startMid7(strong){const a=AREAS[RUN.area],L=a.mid7&&a.mid7.length?a.mid
 function startRare7(){const a=AREAS[RUN.area];RUN.rare6=1;startBattle(pick(a.ra7&&a.ra7.length?a.ra7:a.mobs),'elite',0);if(B)grpDone7(false,`✪ 稀有的 ${B.m.n}！`)}
 
 /* ---------- 首領召喚：HP 70%、35% 各叫一隻，最多 2 隻、場上最多 4 敵；不給獎勵，首領倒下就消失 ---------- */
-{const _ft=foeTurn;foeTurn=function(){const r=_ft.apply(this,arguments);try{if(B&&B.rt&&B.kind==='boss'&&!B.mid7&&B.hp>0&&RUN&&!RUN.trial&&!RUN.tower){
-  for(const t of [.7,.35])if(B.hp<B.max*t&&!B['sm'+t*100]){B['sm'+t*100]=1;const al=aliveFoes7().length,sm=(B.adds||[]).filter(f=>f.summon7).length;if(al<4&&sm<2){const f=addFoe7(pick(AREAS[RUN.area].mobs),'',{hp:.35,atk:.25,spd:.8});f.summon7=1;f.name='召喚・'+f.m.n;f.rtg=0;B.rt.sig='';blog(`${B.name} 叫來了 ${f.m.n}！`)}}}}catch(e){}return r}}
+/* 召喚判定掛在「首領自己行動後」，不管牠在主位還是副位 */
+function summon7(f){if(!B||!B.rt||!f||f.kind!=='boss'||f.mid7||f.hp<=0||!RUN||RUN.trial||RUN.tower)return;
+  for(const t of [.7,.35])if(f.hp<f.max*t&&!f['sm'+Math.round(t*100)]){f['sm'+Math.round(t*100)]=1;const al=aliveFoes7().length,sm=[B,...(B.adds||[])].filter(x=>x.summon7&&x.hp>0).length;if(al<4&&sm<2){const a=addFoe7(pick(AREAS[RUN.area].mobs),'',{hp:.35,atk:.25,spd:.8});a.summon7=1;a.name='召喚・'+a.m.n;a.rtg=0;B.rt.sig='';blog(`${f.name} 叫來了 ${a.m.n}！`)}}}
+/* 首領倒下（不論在哪一格）時召喚物一起消失 */
+{const _tk=foeTake6;foeTake6=function(f,d,src){const r=_tk.apply(this,arguments);try{if(B&&f&&f.kind==='boss'&&!f.mid7&&f.hp<=0&&!f.sumGone7){f.sumGone7=1;for(const x of [B,...(B.adds||[])])if(x!==f&&x.summon7&&x.hp>0){x.hp=0;blog(`${x.name} 消失了`)}}}catch(e){}return r}}
+{const _ft=foeTurn;foeTurn=function(){const me=B;const r=_ft.apply(this,arguments);try{if(B&&me===B)summon7(B)}catch(e){}return r}}
 
 /* ---------- 獎勵：死掉的副目標也結算；召喚物不給；掉落倍率 ---------- */
 {const _sp=spoil;spoil=function(){if(!B||B.spoiled||B.summon7)return;B.spoiled=1;const g=B.gmul;if(B.gmul7)B.gmul=(B.gmul||1)*B.gmul7;try{return _sp.apply(this,arguments)}finally{B.gmul=g}}}

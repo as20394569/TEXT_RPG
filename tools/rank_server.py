@@ -1,6 +1,7 @@
 """蒼藍誓約 Online 排行榜伺服器（只用 Python 標準函式庫）
 GET  /api/top?n=50   -> 依戰力排序的玩家列表（最多 300）
-POST /api/submit     -> {"id","name","cls","lv","power"} 新增或更新自己的紀錄
+POST /api/submit     -> {"acc","token","cls","power",...} 用雲端帳號上榜；名字與等級以雲端存檔為準（v20.9 起不收匿名紀錄）
+POST /api/gm         -> {"key"} 管理員驗證（金鑰＝fb_token.txt），回傳 {"gm":true}
 POST /api/acc/register|login|load|save|logout -> 雲端帳號（帳號＋密碼，多裝置共用存檔）
 POST /api/xfer        -> {"id","name","lv","data"} 上傳存檔換 6 碼轉移碼（24 小時）
 POST /api/xfer/get    -> {"code","take"} 用轉移碼取回存檔（take=1 取用後刪除）
@@ -17,7 +18,8 @@ DATA = os.path.join(HERE, 'rank_data.json')
 PORT = int(os.environ.get('RANK_PORT', '8787'))
 ORIGINS = {'https://as20394569.github.io', 'http://localhost:8765', 'http://127.0.0.1:8765'}
 LOCK = threading.Lock()
-LAST = {}  # 每個 id 的上次提交時間（防洗）
+LAST = {}  # 每個帳號的上次提交時間（防洗）
+GM_TRY = {}
 FB_DATA = os.path.join(HERE, 'feedback_data.json')
 FB_LAST = {}
 FB_CATS = {'bug', 'idea', 'balance', 'art', 'other'}
@@ -125,6 +127,23 @@ def acc_hash(pw, salt):
     return hashlib.pbkdf2_hmac('sha256', pw.encode('utf-8'), bytes.fromhex(salt), 120000).hex()
 def acc_ok_name(n):
     return isinstance(n, str) and re.fullmatch(r'[A-Za-z0-9_\u4e00-\u9fff]{3,16}', n) is not None
+def acc_auth(name, token):
+    """驗證帳號與 token，回傳帳號資料或 None"""
+    if not acc_ok_name(name) or not isinstance(token, str):
+        return None
+    a = acc_read(name)
+    if not a or token not in (a.get('toks') or []):
+        return None
+    return a
+def save_meta(code):
+    """從雲端存檔取出角色名與等級（AO1.<base64>.<hash>）"""
+    try:
+        import base64
+        b = code.split('.')[1]
+        o = json.loads(base64.b64decode(b + '=' * (-len(b) % 4)).decode('utf-8'))
+        return str(o.get('name') or '')[:16], max(1, min(100, int(o.get('lv') or 1)))
+    except Exception:
+        return None, None
 def acc_ok_data(d):
     return isinstance(d, str) and d.startswith('AO1.') and len(d) <= 780000
 XF_CH = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
@@ -293,7 +312,7 @@ class H(BaseHTTPRequestHandler):
                     code = ''.join(secrets.choice(XF_CH) for _ in range(6))
                     while code in XF:
                         code = ''.join(secrets.choice(XF_CH) for _ in range(6))
-                    XF[code] = {'id': pid, 'd': data, 'exp': now + 86400, 'n': clean(d.get('name'), 16), 'lv': max(1, min(99, int(d.get('lv', 1))))}
+                    XF[code] = {'id': pid, 'd': data, 'exp': now + 86400, 'n': clean(d.get('name'), 16), 'lv': max(1, min(100, int(d.get('lv', 1))))}
                     xf_save()
                 return self.reply(200, {'code': code, 'exp': int((now + 86400) * 1000)})
             except Exception:
@@ -334,7 +353,7 @@ class H(BaseHTTPRequestHandler):
                 FB_LAST[pid] = now
                 cat = str(d.get('cat', 'other'))
                 row = {'pid': pid, 'name': clean(d.get('name'), 16) or '冒險者', 'cls': clean(d.get('cls'), 10),
-                       'lv': max(1, min(99, int(d.get('lv', 1)))), 'cat': cat if cat in FB_CATS else 'other',
+                       'lv': max(1, min(100, int(d.get('lv', 1)))), 'cat': cat if cat in FB_CATS else 'other',
                        'text': text, 'ts': int(now * 1000)}
                 with LOCK:
                     FB.append(row)
@@ -366,7 +385,7 @@ class H(BaseHTTPRequestHandler):
                         if k not in r['d']:
                             m.pop(k, None)
                     r['ch'] = max(int(r.get('ch', 0)), max(0, min(99, int(d.get('ch', 0)))))
-                    r['lv'] = max(1, min(999, int(d.get('lv', 1))))
+                    r['lv'] = max(1, min(100, int(d.get('lv', 1))))
                     r['ab'] = max(int(r.get('ab', 0)), max(0, min(9999, int(d.get('ab', 0)))))
                     r['v'] = clean(d.get('view'), 24)
                     ST_DIRTY[0] += 1
@@ -386,6 +405,19 @@ class H(BaseHTTPRequestHandler):
                     st_save()
                     rep = st_report()
                 return self.reply(200, rep)
+            except Exception:
+                return self.reply(400, {'error': 'bad request'})
+        if path == '/api/gm':
+            try:
+                d = self.body(512)
+                ip = self.ip(); now = time.time()
+                hist = [t for t in GM_TRY.get(ip, []) if now - t < 600]
+                if len(hist) >= 10:
+                    return self.reply(429, {'error': 'too many tries'})
+                hist.append(now); GM_TRY[ip] = hist
+                tok = fb_token()
+                ok = bool(tok) and hmac.compare_digest(str(d.get('key', '')), tok)
+                return self.reply(200 if ok else 403, {'gm': ok})
             except Exception:
                 return self.reply(400, {'error': 'bad request'})
         if path == '/api/fb/reply':
@@ -410,15 +442,23 @@ class H(BaseHTTPRequestHandler):
             if ln <= 0 or ln > 4096:
                 return self.reply(400, {'error': 'bad size'})
             d = json.loads(self.rfile.read(ln).decode('utf-8'))
-            pid = str(d.get('id', ''))
-            if not re.fullmatch(r'[a-z0-9]{4,16}', pid):
-                return self.reply(400, {'error': 'bad id'})
+            acc = d.get('acc')
+            with LOCK:
+                a = acc_auth(acc, d.get('token'))
+            if not a:
+                return self.reply(403, {'error': 'login required'})
+            nm, lv = save_meta(a.get('data', ''))
+            if not nm:
+                return self.reply(400, {'error': 'bad save'})
+            pid = 'a' + hashlib.sha256(acc.lower().encode('utf-8')).hexdigest()[:12]
             now = time.time()
             if now - LAST.get(pid, 0) < 20:
                 return self.reply(429, {'error': 'too fast'})
             LAST[pid] = now
-            row = {'id': pid, 'name': clean(d.get('name'), 16) or '冒險者', 'cls': clean(d.get('cls'), 10),
-                   'lv': max(1, min(99, int(d.get('lv', 1)))), 'power': max(0, min(999999, int(d.get('power', 0)))),
+            for k in [k for k, t in LAST.items() if now - t > 3600]:
+                LAST.pop(k, None)
+            row = {'id': pid, 'acc': 1, 'name': clean(nm, 16) or '冒險者', 'cls': clean(d.get('cls'), 10),
+                   'lv': lv, 'power': max(0, min(999999, int(d.get('power', 0)))),
                    'ts': int(now * 1000)}
             hk = str(d.get('hk', ''))
             if re.fullmatch(r'class_[a-z]{3,12}_[mf]', hk):
@@ -440,10 +480,8 @@ class H(BaseHTTPRequestHandler):
                 row['st'] = [max(0, min(9999999, int(v))) for v in st]
             with LOCK:
                 ms = int(now * 1000)
-                for k in [k for k, r in DB.items() if k != pid and (
-                        (r.get('name') == row['name'] and (r.get('cls') == row['cls'] or ms - r.get('ts', 0) > 86400000))
-                        or ms - r.get('ts', 0) > 45 * 86400000)]:
-                    DB.pop(k, None)  # 同名同職業、或同名但超過一天沒上線的舊紀錄視為分身合併；45 天沒上線的清掉
+                for k in [k for k, r in DB.items() if k != pid and ms - r.get('ts', 0) > 45 * 86400000]:
+                    DB.pop(k, None)  # 45 天沒上線的清掉；不再用名字合併（避免冒名刪除他人紀錄）
                 DB[pid] = row
                 save()
                 rank = sorted(DB.values(), key=lambda r: -r['power']).index(row) + 1
