@@ -319,10 +319,10 @@ function dia(f,ang,L,W,col,o){o=o||{};const life=o.life||.42,d0=o.d0||.11,hold=o
     c.translate(x0+(o.dx||0)*u,y0+(o.dy||0)*u);c.rotate(ang);
     const shape=(t0,t1,ww)=>{const m=t0+(t1-t0)*bias;c.beginPath();c.moveTo(t0,0);c.lineTo(m,-ww/2);c.lineTo(t1,0);c.lineTo(m,ww/2);c.closePath()};
     /* 外層色光：同形狀放寬、半透明，讓顏色在深色卡和白色怪身上都顯眼 */
-    ADD(c);c.globalAlpha=.45*th;shape(tail-len*.04,head+len*.02,w*3.2);c.fillStyle=col;c.shadowColor=col;c.shadowBlur=Math.max(8,w*4);c.fill();c.shadowBlur=0;
+    ADD(c);c.globalAlpha=.4*th;shape(tail-len*.03,head+len*.02,w*2.1);c.fillStyle=col;c.fill();
     c.globalCompositeOperation='source-over';c.globalAlpha=.5*th;shape(tail,head,w*1.35);c.strokeStyle='rgba(6,8,20,.9)';c.lineWidth=1;c.stroke();
     ADD(c);c.globalAlpha=th;shape(tail,head,w*1.35);c.fillStyle=col;c.fill();
-    c.beginPath();c.moveTo(tail+len*.03,0);c.lineTo(head,0);c.strokeStyle='#ffffff';c.lineWidth=Math.max(1,w*.45);c.lineCap='round';c.stroke();
+    shape(tail+len*.06,head-len*.01,Math.max(1,w*.42));c.fillStyle='#ffffff';c.fill();
     if(k<d0*1.6&&o.tip!==false){c.globalAlpha=1-k/(d0*1.6);const r=Math.max(6,w*3);c.fillStyle=rg(c,head,0,r,[[0,'#ffffff'],[.35,col],[1,T0]]);c.fillRect(head-r,-r,r*2,r*2)}})}
 /* 刃光排列方式：同一種外形，靠排列、數量、角度、顏色、節奏分出差別 */
 function slashP(f,P){const c1=P.c,c2=P.c2||'#ffffff',L=P.L||.36,W=P.W||.045,ang=P.a??-.55,gp=P.gap||70,lf=P.life;let tot=0;const D=(ff,a,l,w,cl,o)=>dia(ff,a,l,w,cl,Object.assign({life:lf},o||{}));
@@ -707,32 +707,32 @@ Object.assign(MG,{
 const DC1='#2f7dff',DC2='#0b1226';
 function hitShake(f,amt){try{const el=f===F?document.querySelector('#rtb .bec.big .eart .art img:not(.under)'):null;if(el&&!SHAKEOFF)el.animate([{transform:'translate(0,0)'},{transform:`translate(${(Math.random()-.5)*amt}px,${(Math.random()-.5)*amt*.6}px)`},{transform:'translate(0,0)'}],{duration:70,composite:'add'})}catch(e){}}
 /* 黑刃：深色刀身＋藍色邊光＋淡藍細芯（在深色卡上也看得到） */
-function darkBlade(f,ang,L,W,o){o=o||{};const life=o.life||.3,d0=.1,hold=.35,bias=o.bias??.5,blue=vivid('#3a8cff');cel(life,(c,k)=>{const [x0,y0]=P2(f),u=U(),Lp=L*u*1.1,Wp=W*u*.3,gr=eo(k/d0),out=k<hold?0:(k-hold)/(1-hold),th=1-out;if(th<=.01)return;
-  const head=-Lp/2+Lp*gr,tail=-Lp/2+Lp*Math.min(.9,eo(out)*.9),len=head-tail;if(len<1)return;const w=Math.max(1.6,Wp*Math.pow(th,.6)*Math.min(1,len/Lp*1.5))*1.4,m=tail+len*bias;
-  c.translate(x0+(o.dx||0)*u,y0+(o.dy||0)*u);c.rotate(ang);const sh=(ww)=>{c.beginPath();c.moveTo(tail,0);c.lineTo(m,-ww/2);c.lineTo(head,0);c.lineTo(m,ww/2);c.closePath()};
-  ADD(c);c.globalAlpha=.5*th;sh(w*3);c.fillStyle=blue;c.fill();
-  c.globalCompositeOperation='source-over';c.globalAlpha=.95*th;sh(w);c.fillStyle='#070b1a';c.fill();c.strokeStyle=blue;c.lineWidth=1.2;c.stroke();
-  ADD(c);c.globalAlpha=th;c.beginPath();c.moveTo(tail+len*.1,0);c.lineTo(head,0);c.strokeStyle='#bfe0ff';c.lineWidth=1;c.stroke()})}
-/* 一刀：隨機挑形狀（藍刃／黑刃、長短、粗細、偏心、短弧），避免每刀長得一樣 */
-function flick(p,a,i,o){o=o||{};const kind=(i+(o.sh||0))%5,L=rnd2(.17,.27),W=rnd2(.028,.042),bias=rnd2(.3,.7);
-  if(kind===1||kind===3)darkBlade(p,a,L,W,{bias,life:.26});
-  else if(kind===4)arcSweep(p,DC1,{rx:rnd2(.05,.07),ry:rnd2(.025,.04),w:.008,turns:.3,span:1.6,life:.28,a0:a,dir:Math.random()<.5?1:-1});
-  else dia(p,a,kind===2?L*.7:L,kind===2?W*.6:W,DC1,{life:.24,hold:.3,bias});
-  later(25,()=>{tick(p,i%2?'#9fc8ff':'#5aa0ff');if(o.ef)edgeFx(p,a,o.ef,DC1);hitShake(F,5)})}
+function darkBlade(f,ang,L,W,o){o=o||{};const life=o.life||.3,d0=o.d0||.09,hold=o.hold||.35,bias=o.bias??.5,blue=vivid('#3a8cff');cel(life,(c,k)=>{const [x0,y0]=P2(f),u=U(),Lp=L*u*1.1,Wp=W*u*.3,gr=eo(k/d0),out=k<hold?0:(k-hold)/(1-hold),th=1-out;if(th<=.01)return;
+  const head=-Lp/2+Lp*gr,tail=-Lp/2+Lp*Math.min(.9,eo(out)*.9),len=head-tail;if(len<1)return;const w=Math.max(2,Wp*Math.pow(th,.6)*Math.min(1,len/Lp*1.5)),m=tail+len*bias;
+  c.translate(x0+(o.dx||0)*u,y0+(o.dy||0)*u);c.rotate(ang);const sh=(t0,t1,ww)=>{const mm=t0+(t1-t0)*bias;c.beginPath();c.moveTo(t0,0);c.lineTo(mm,-ww/2);c.lineTo(t1,0);c.lineTo(mm,ww/2);c.closePath()};
+  ADD(c);c.globalAlpha=.35*th;sh(tail-len*.03,head+len*.02,w*1.9);c.fillStyle=blue;c.fill();
+  c.globalCompositeOperation='source-over';c.globalAlpha=th;sh(tail,head,w*1.15);c.fillStyle='#03050d';c.fill();c.strokeStyle=blue;c.lineWidth=1.6;c.lineJoin='miter';c.stroke();
+  ADD(c);c.globalAlpha=.8*th;sh(tail+len*.15,head-len*.05,Math.max(1,w*.22));c.fillStyle='#8fc4ff';c.fill()})}
+/* 一刀：藍刃／黑刃交替，長短粗細明顯不同，全部是兩頭尖的扁菱形 */
+const DLEN=[.34,.15,.27,.12,.31,.19,.24,.14];
+function flick(p,a,i,o){o=o||{};const j=(i+(o.sh||0)),L=DLEN[j%DLEN.length]*rnd2(.9,1.1),W=L*rnd2(.2,.26),bias=rnd2(.38,.62);
+  if(j%2)darkBlade(p,a,L,W,{bias,life:.28});
+  else dia(p,a,L,W,j%4===2?'#7fb8ff':DC1,{life:.26,hold:.32,bias});
+  later(25,()=>{tick(p,j%2?'#5aa0ff':'#9fc8ff');if(o.ef)edgeFx(p,a,o.ef,DC1);hitShake(F,5)})}
 /* 連擊：節奏越來越快、角度與位置每刀都不同 */
 function combo(f,n,o){o=o||{};const i0=o.i0||80,i1=o.i1||35,T=[];let t=0;for(let i=0;i<n;i++){T.push(t);t+=i0+(i1-i0)*(i/Math.max(1,n-1))}let pa=rnd2(-PI,PI);
   T.forEach((tt,i)=>later(tt,()=>{pa+=rnd2(.9,2.2)*(Math.random()<.5?1:-1);const a=o.ang?o.ang(i):pa,p=[f[0]+rnd2(-.035,.035),f[1]+rnd2(-.04,.035)];flick(p,a,i,o);if(i%4===3)spk(p,'#cfe4ff',.05,5,.15)}));return t}
 /* 收尾：三道極快的細刃＋藍色星屑，小而俐落 */
-function finisher(f,o){o=o||{};const base=rnd2(-PI,PI);for(let i=0;i<3;i++)later(i*28,()=>dia([f[0]+rnd2(-.015,.015),f[1]+rnd2(-.015,.015)],base+i*1.05,.26,.03,i===1?'#9fd0ff':DC1,{life:.28,d0:.07}));
-  later(90,()=>{flash(f,'#cfe4ff',.14,.22);spk(f,'#ffffff',.08,9,.22);stardust(f,12,{im:[spr(90,160,255),spr(200,225,255)],v1:.25});hitShake(F,9)})}
+function finisher(f,o){o=o||{};const base=rnd2(-PI,PI);[[.36,0],[.16,1],[.28,0]].forEach(([L,dk],i)=>later(i*30,()=>{const p=[f[0]+rnd2(-.015,.015),f[1]+rnd2(-.015,.015)],a=base+i*1.05;if(dk)darkBlade(p,a,L,L*.24,{life:.3,d0:.07});else dia(p,a,L,L*.2,i===2?'#7fb8ff':DC1,{life:.3,d0:.07})}));
+  later(100,()=>{flash(f,'#cfe4ff',.12,.2);spk(f,'#ffffff',.08,9,.22);stardust(f,12,{im:[spr(90,160,255),spr(200,225,255)],v1:.25});hitShake(F,9)})}
 function comboSnd(n,i0,i1,t0,fin){let t=t0||.1;for(let i=0;i<n;i++){SN.cut(t,2300+(i%4)*150);t+=(i0+(i1-i0)*(i/Math.max(1,n-1)))/1000}if(fin){for(let j=0;j<3;j++)SN.cut(t+j*.03,2800+j*200);SN.star(t+.1)}}
 /* 閃斬：殘影一閃、三道又細又快的刀光從不同方向掠過 */
-function quickStep(f){wind(H,'#dceeff',{dir:1,n:5,life:.35});[[-.35,.2],[.9,-.1],[-1.4,.05]].forEach(([a,dx],i)=>later(60+i*45,()=>{dia([f[0]+dx*.1,f[1]+rnd2(-.02,.02)],a,.24,.018,i===1?'#bfe0ff':DC1,{life:.18,d0:.06,hold:.25});later(20,()=>{tick([f[0]+dx*.1,f[1]],'#bfe0ff');hitShake(F,4)})}));later(220,()=>{wind(f,'#e8f4ff',{dir:1,n:4,life:.3});stardust(f,8,{im:[spr(200,225,255)],v1:.2})})}
+function quickStep(f){wind(H,'#dceeff',{dir:1,n:5,life:.35});[[-.35,.2],[.9,-.1],[-1.4,.05]].forEach(([a,dx],i)=>later(60+i*45,()=>{(i===1?darkBlade:(pp,aa,LL,WW,oo)=>dia(pp,aa,LL,WW,DC1,oo))([f[0]+dx*.1,f[1]+rnd2(-.02,.02)],a,[.3,.14,.22][i],[.3,.14,.22][i]*.16,{life:.2,d0:.06,hold:.25});later(20,()=>{tick([f[0]+dx*.1,f[1]],'#bfe0ff');hitShake(F,4)})}));later(220,()=>{wind(f,'#e8f4ff',{dir:1,n:4,life:.3});stardust(f,8,{im:[spr(200,225,255)],v1:.2})})}
 const DUAL={
   J13S1:{v:()=>{lunge('me',30);const t=combo(F,4,{i0:90,i1:65});later(t,()=>finisher(F))},s:()=>comboSnd(4,90,65,.1,1)},
-  J13S2:{v:()=>{lunge('me',30);arcSweep(F,DC1,{rx:.08,ry:.04,w:.01,turns:.45,span:2.2,life:.34});later(110,()=>darkBlade(F,.5,.24,.035,{life:.3}));later(220,()=>{const t=combo(F,3,{i0:60,i1:45,sh:2});later(t,()=>finisher(F))})},s:()=>{SN.swish(.1,1,1);SN.cut(.2,2500);comboSnd(3,60,45,.33,1)}},
+  J13S2:{v:()=>{lunge('me',30);dia(F,-.5,.36,.075,DC1,{life:.34});later(70,()=>darkBlade(F,.55,.33,.08,{life:.34}));later(200,()=>{const t=combo(F,3,{i0:60,i1:45,sh:2});later(t,()=>finisher(F))})},s:()=>{SN.swish(.1,1,1);SN.cut(.17,2500);comboSnd(3,60,45,.3,1)}},
   J13S3:{v:()=>{lunge('me',30);wind(F,'#e0f0ff',{dir:1,n:5,life:.7});const t=combo(F,9,{i0:70,i1:28});later(t,()=>finisher(F))},s:()=>{SN.wind(.05);comboSnd(9,70,28,.1,1)}},
-  J13S7:{aoe:1,v:k=>{lunge('me',30);aoePts(k).forEach((p,i)=>later(i*50,()=>{swirlBlade(p,DC1,{dir:1,R:.065});later(260,()=>combo(p,3,{i0:45,i1:32,sh:i}))}))},s:()=>{for(let i=0;i<3;i++)SN.swish(.1+i*.07,.6,1);comboSnd(3,45,32,.38,0)}},
+  J13S7:{aoe:1,v:k=>{lunge('me',30);aoePts(k).forEach((p,i)=>later(i*60,()=>{const a0=rnd2(-PI,PI);for(let j=0;j<6;j++)later(j*38,()=>flick([p[0]+rnd2(-.02,.02),p[1]+rnd2(-.02,.02)],a0+j*.95,j,{sh:i}));later(250,()=>spk(p,'#cfe4ff',.06,6,.18))}))},s:()=>{SN.wind(.05);comboSnd(6,38,38,.1,0)}},
   J13S8:{aoe:1,v:k=>{lunge('me',30);const pts=aoePts(k);pts.forEach((p,i)=>later(i*45,()=>{const t=combo(p,3,{i0:55,i1:40,sh:i*2});later(t,()=>spk(p,'#cfe4ff',.06,6,.18))}))},s:()=>comboSnd(4,55,40,.1,0)},
   J13S9:{v:()=>{lunge('me',30);const t=combo(F,5,{i0:75,i1:45,ef:'blood'});later(t,()=>{finisher(F);edgeFx(F,0,'blood')})},s:()=>{comboSnd(5,75,45,.1,1);SN.splat(.3);SN.splat(.45)}},
   J13S10:{v:()=>quickStep(F),s:()=>{SN.wind(0);for(let i=0;i<3;i++)SN.cut(.06+i*.045,2800+i*200);SN.star(.25)}},
