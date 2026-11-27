@@ -194,10 +194,10 @@ function dollHtml(){const sl=k=>{const g=gearBy(S.eq[k]);return g?`<button class
   const sc=setCount6(),my=mythOn6();
   const sets=Object.keys(sc).map(id=>`<span class="chip">${SETX[id].n} ${sc[id]}/4</span>`).join('')+my.map(id=>`<span class="chip c5">${MYX[id].n}</span>`).join('');
   return `<div class="doll doll7"><div class="dcol">${sl('head')}${sl('body')}${sl('feet')}</div><div class="dmid">${art(hasArt(HK()+'_stand')?HK()+'_stand':HK(),clsName()+'立繪','r34')}</div><div class="dcol">${sl('main')}${sl('off')}${sl('neck')}${sl('ring')}</div></div>${sets?`<div class="setbar">${sets}</div>`:''}`}
-function buildPanel(){const sc=setCount6(),my=mythOn6();
-  return `<div class="panel bld"><h3>套裝與神話</h3>${Object.keys(sc).map(id=>{const s=SETX[id],n=sc[id];return `<div class="bk"><div class="bkh"><b>${s.n}</b><span class="pips">${[1,2,3,4].map(i=>`<i class="${i<=n?'on':''}"></i>`).join('')}</span></div><span class="sub ${n>=2?'son':''}">2 件：${s.s2}</span><span class="sub ${n>=3?'son':''}">3 件：${s.s3}</span><span class="sub ${n>=4?'son':''}">4 件：${s.s4}</span></div>`}).join('')}
-   ${my.map(id=>`<div class="gsec"><b class="c5">${MYX[id].n}</b><span class="sub">${MYX[id].when}：${MYX[id].fx}（${MYX[id].lim}）</span></div>`).join('')}
-   ${!Object.keys(sc).length&&!my.length?'<p class="sub">首領掉落的頭、身、腳、項鍊、戒指可能帶套裝標記。神話裝備帶專屬效果，最多同時生效 2 種。</p>':''}</div>`}
+function buildPanel(){const sc=setCount6(),my=mythOn6(),ks=Object.keys(sc);
+  return `<div class="panel bld"><h3>套裝</h3>${ks.map(id=>{const s=SETX[id],n=sc[id];return `<div class="bk"><div class="bkh"><b>${s.n}</b><span class="pips">${[1,2,3,4].map(i=>`<i class="${i<=n?'on':''}"></i>`).join('')}</span></div>${[[2,s.s2],[3,s.s3],[4,s.s4]].map(([c,t])=>`<span class="sub ${n>=c?'son':''}">${c}件　${t}</span>`).join('')}</div>`}).join('')}
+   ${my.map(id=>`<div class="gsec"><b class="c5">${MYX[id].n}</b><span class="sub">${MYX[id].fx}</span></div>`).join('')}
+   ${!ks.length&&!my.length?'<p class="sub">首領裝可能帶套裝；神話效果最多 2 種。</p>':''}</div>`}
 const BAGSL={all:null,main:['main'],off:['off'],head:['head'],body:['body'],feet:['feet'],neck:['neck'],ring:['ring']};
 function vBag(){
   const tabs=`<div class="tabs">${[['gear','裝備'],['use','道具'],['mat','素材']].map(([k,n])=>`<button class="${BAGTAB===k?'on':''}" data-a="bagTab" data-v="${k}">${n}</button>`).join('')}</div>`;

@@ -436,7 +436,7 @@ function talTab6(){const T=TALS(),br=[...new Set(T.map(t=>t.br))],free=talFree6(
 function talCan6(t){if(!S||talFree6()<1)return false;const n=(S.tal||{})[t.id]||0;if(n>=t.max||S.lv<t.lv)return false;if(t.pre&&t.pre!=='無'&&!((S.tal||{})[t.pre]>0))return false;
   if(/5$/.test(t.id)){const inBr=TALS().filter(x=>x.br===t.br&&x.id!==t.id).reduce((a,x)=>a+((S.tal||{})[x.id]||0),0);if(inBr<6)return false}return true}
 const talResetCost6=()=>S&&S.talR?S.lv*100:0;
-function jobPanel6(){const j=job6(),P=jobSk6(j,false);return `<div class="panel"><h3>${JOBN[j]||''}</h3><p class="sub">${esc((S.adv?ADV[S.adv].d:CLS[S.cls].f)||'')}</p>${P.map(k=>`<span class="subl ${skOk6(k.id)?'':'sub'}">被動【${esc(k.n)}】Lv.${k.lv}：${esc(k.fx)}</span>`).join('')}</div>`}
+function jobPanel6(){const j=job6(),P=jobSk6(j,false);return `<div class="panel"><h3>${JOBN[j]||''}・被動</h3><p class="sub">${esc((S.adv?ADV[S.adv].d:CLS[S.cls].f)||'')}</p>${P.slice().sort((a,b)=>a.lv-b.lv).map(k=>`<span class="subl ${skOk6(k.id)?'':'sub'}"><b>${esc(k.n)}</b> Lv.${k.lv}　${esc(k.fx)}</span>`).join('')}</div>`}
 Object.assign(ACT,{
   talSel(v){TALSEL=TALSEL===v?null:v;render()},
   talUp(v){const t=TALS().find(x=>x.id===v);if(!t||!talCan6(t))return;S.tal=S.tal||{};S.tal[v]=(S.tal[v]||0)+1;EFC=null;try{SFX.buff()}catch(e){}save();render()},
