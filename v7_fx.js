@@ -289,15 +289,22 @@ function corrodeDrip(f){phys(f,'drop',8,{spd:[.2,.6],sz:[.004,.008],life:[.6,1],
 function sigil(f,col,life){cel(life||1,(c,k)=>{const [x,y]=P2(f),u=U(),cy=y-u*.13,s=u*.035*eo(k*4);ADD(c);c.globalAlpha=k<.7?1:1-(k-.7)/.3;c.strokeStyle=col;c.shadowColor=col;c.shadowBlur=10;c.lineWidth=Math.max(1.5,u*.004);c.translate(x,cy);c.rotate(k*1.2);c.beginPath();c.arc(0,0,s,0,7);c.stroke();c.beginPath();c.moveTo(0,-s*.7);c.lineTo(0,s*.7);c.moveTo(-s*.7,0);c.lineTo(s*.7,0);c.stroke()})}
 
 /* ================= 菱形刃光：壓扁的菱形，兩端尖、中間寬，筆直俐落 ================= */
-function dia(f,ang,L,W,col,o){o=o||{};const life=o.life||.42,d0=o.d0||.11,hold=o.hold||.38;
-  cel(life,(c,k)=>{const [x0,y0]=P2(f),u=U(),Lp=L*u,Wp=W*u,gr=eo(k/d0),out=k<hold?0:(k-hold)/(1-hold),th=1-out;if(th<=.01)return;
-    const head=-Lp/2+Lp*gr,tail=-Lp/2+Lp*Math.min(.92,eo(out)*.92),len=head-tail;if(len<1)return;const mid=tail+len*(o.bias??.5),w=Wp*Math.pow(th,.7)*Math.min(1,len/Lp*1.6);
+/* 顏色加強：在圖卡上看得清楚（提高飽和、亮度落在中段） */
+const VIV={};function vivid(c){if(typeof c!=='string'||c[0]!=='#'||c.length!==7)return c;if(VIV[c])return VIV[c];let r=parseInt(c.slice(1,3),16)/255,g=parseInt(c.slice(3,5),16)/255,b=parseInt(c.slice(5,7),16)/255;const mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,d=mx-mn;if(d<.04)return VIV[c]=c;
+  let h=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;h=(h*60+360)%360;const S=Math.min(1,(d/(1-Math.abs(2*l-1)))*1.5+.25),L=Math.max(.5,Math.min(.6,l));const C=(1-Math.abs(2*L-1))*S,X=C*(1-Math.abs((h/60)%2-1)),m=L-C/2;
+  const [rr,gg,bb]=h<60?[C,X,0]:h<120?[X,C,0]:h<180?[0,C,X]:h<240?[0,X,C]:h<300?[X,0,C]:[C,0,X];const hx=v=>Math.round((v+m)*255).toString(16).padStart(2,'0');return VIV[c]='#'+hx(rr)+hx(gg)+hx(bb)}
+/* 刀光：壓得很扁的菱形，前後兩端收成尖點；白色細芯＋鮮明的色光 */
+function dia(f,ang,L,W,col,o){o=o||{};const life=o.life||.42,d0=o.d0||.11,hold=o.hold||.4;col=vivid(col);
+  cel(life,(c,k)=>{const [x0,y0]=P2(f),u=U(),Lp=L*u*1.1,Wp=W*u*.3,gr=eo(k/d0),out=k<hold?0:(k-hold)/(1-hold),th=1-out;if(th<=.01)return;
+    const head=-Lp/2+Lp*gr,tail=-Lp/2+Lp*Math.min(.9,eo(out)*.9),len=head-tail;if(len<1)return;const bias=o.bias??.5,w=Math.max(1.6,Wp*Math.pow(th,.6)*Math.min(1,len/Lp*1.5));
     c.translate(x0+(o.dx||0)*u,y0+(o.dy||0)*u);c.rotate(ang);
-    const shape=(t0,t1,ww)=>{const m=t0+(t1-t0)*(o.bias??.5);c.beginPath();c.moveTo(t0,0);c.lineTo(m,-ww/2);c.lineTo(t1,0);c.lineTo(m,ww/2);c.closePath()};
-    c.globalCompositeOperation='source-over';c.globalAlpha=.55*th;shape(tail,head,w);c.strokeStyle='rgba(8,10,22,.95)';c.lineWidth=Math.max(1.5,u*.0035);c.lineJoin='miter';c.stroke();
-    ADD(c);c.globalAlpha=th;c.shadowColor=col;c.shadowBlur=w*.9;shape(tail,head,w);c.fillStyle=col;c.fill();c.shadowBlur=0;
-    shape(tail+len*.08,head-len*.02,w*.36);c.fillStyle='#ffffff';c.fill();
-    if(k<d0*1.6&&o.tip!==false){c.globalAlpha=1-k/(d0*1.6);c.fillStyle=rg(c,head,0,w*1.6,[[0,'#ffffff'],[.4,col],[1,T0]]);c.fillRect(head-w*1.6,-w*1.6,w*3.2,w*3.2)}})}
+    const shape=(t0,t1,ww)=>{const m=t0+(t1-t0)*bias;c.beginPath();c.moveTo(t0,0);c.lineTo(m,-ww/2);c.lineTo(t1,0);c.lineTo(m,ww/2);c.closePath()};
+    /* 外層色光：同形狀放寬、半透明，讓顏色在深色卡和白色怪身上都顯眼 */
+    ADD(c);c.globalAlpha=.45*th;shape(tail-len*.04,head+len*.02,w*3.2);c.fillStyle=col;c.shadowColor=col;c.shadowBlur=Math.max(8,w*4);c.fill();c.shadowBlur=0;
+    c.globalCompositeOperation='source-over';c.globalAlpha=.5*th;shape(tail,head,w*1.35);c.strokeStyle='rgba(6,8,20,.9)';c.lineWidth=1;c.stroke();
+    ADD(c);c.globalAlpha=th;shape(tail,head,w*1.35);c.fillStyle=col;c.fill();
+    c.beginPath();c.moveTo(tail+len*.03,0);c.lineTo(head,0);c.strokeStyle='#ffffff';c.lineWidth=Math.max(1,w*.45);c.lineCap='round';c.stroke();
+    if(k<d0*1.6&&o.tip!==false){c.globalAlpha=1-k/(d0*1.6);const r=Math.max(6,w*3);c.fillStyle=rg(c,head,0,r,[[0,'#ffffff'],[.35,col],[1,T0]]);c.fillRect(head-r,-r,r*2,r*2)}})}
 /* 刃光排列方式：同一種外形，靠排列、數量、角度、顏色、節奏分出差別 */
 function slashP(f,P){const c1=P.c,c2=P.c2||'#ffffff',L=P.L||.36,W=P.W||.045,ang=P.a??-.55,gp=P.gap||70,lf=P.life;let tot=0;const D=(ff,a,l,w,cl,o)=>dia(ff,a,l,w,cl,Object.assign({life:lf},o||{}));
   switch(P.p){
@@ -604,7 +611,7 @@ function stRun(){if(SLON||reduce())return;SLON=1;SLT=performance.now();run();cel
   for(const [tt,f] of TG){let L=[];try{L=stList(tt)}catch(e){}if(!L.length)continue;const [x,y]=P2(f),gy=y+(f.g!=null?f.g:GY(f))*SR().h,R=(f.R||.25)*SR().w*.45;
     for(const id of L){const v=STV[id];if(!v||v.quiet)continue;any=1;c.save();drawSt(c,id,v.c,x,y,gy,R,t,u);c.restore()}}
   if(!any){SLON=0;p.age=1e9}},{});}
-function drawSt(c,id,col,x,y,gy,R,t,u){const pu=.6+.4*Math.sin(t*4);
+function drawSt(c,id,col,x,y,gy,R,t,u){col=vivid(col);const pu=.6+.4*Math.sin(t*4);
   if(id==='BURN'){ADD(c);for(let i=0;i<5;i++){const ph=(t*1.6+i/5)%1,bx=x+Math.sin(i*2.3+t)*R*.5,by=gy-ph*R*1.1,s=u*.012*(1-ph);c.globalAlpha=(1-ph)*.85;c.fillStyle=rg(c,bx,by,s*2.2,[[0,'#fff4b0'],[.35,'#ff8a2a'],[1,T0]]);c.fillRect(bx-s*2.2,by-s*2.2,s*4.4,s*4.4)}}
   else if(id==='POISON'){for(let i=0;i<4;i++){const ph=(t*.8+i/4)%1,bx=x+Math.sin(i*2.9)*R*.5,by=y+R*.2-ph*R*.8,r=u*.006*(ph<.85?1:1+(ph-.85)*6);c.globalAlpha=(ph<.85?.75:1-(ph-.85)/.15);c.strokeStyle='#c8ff8a';c.fillStyle='rgba(120,220,60,.35)';c.lineWidth=1;c.beginPath();c.arc(bx,by,r,0,7);c.fill();c.stroke()}}
   else if(id==='CORRODE'){c.save();ADD(c);c.globalAlpha=.25*pu;c.fillStyle=rg(c,x,y,R*.8,[[0,'#5a1a8a'],[1,T0]]);c.fillRect(x-R,y-R,R*2,R*2);c.restore();for(let i=0;i<3;i++){const ph=(t*.7+i/3)%1,bx=x+(i-1)*R*.4,by=y-R*.2+ph*R*1.2;c.globalAlpha=(1-ph)*.9;c.fillStyle='#8a3ac8';c.beginPath();c.ellipse(bx,by,u*.004,u*.007,0,0,7);c.fill()}}
