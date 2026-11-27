@@ -2009,7 +2009,7 @@ async function fbSend(){const ta=$('#fbText'),cat=$('#fbCat');const text=(ta&&ta
   const u=await rankUrl();if(!u){toast('伺服器暫時連不上，稍後再試');return}if(!S.pid){S.pid=Math.random().toString(36).slice(2,10);save()}
   try{const r=await fetch(u+'/api/fb',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:S.pid,name:S.name,cls:clsName(),lv:S.lv,cat:cat?cat.value:'other',text})});const j=await r.json();
     if(j.ok){toast('已送出，謝謝你的意見！');ta.value='';FBL=null;await fbLoad();drawModal()}else toast(j.error==='too fast'?'送太快了，1 分鐘後再試':'送出失敗，請再試一次')}catch(e){toast('送出失敗，請檢查網路')}}
-async function rankSync(force){if(!S||!S.cls)return;if(!force&&Date.now()-RANKT<5*60e3)return;RANKT=Date.now();const u=await rankUrl();if(!u){RANKERR=1;return}
+async function rankSync(force){if(!S||!S.cls||GM)return;if(!force&&Date.now()-RANKT<5*60e3)return;RANKT=Date.now();const u=await rankUrl();if(!u){RANKERR=1;return}
   if(!S.pid){S.pid=Math.random().toString(36).slice(2,10);save()}
   try{const ctl=new AbortController();setTimeout(()=>ctl.abort(),6000);
     await fetch(u+'/api/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:S.pid,name:S.name,cls:clsName(),lv:S.lv,power:power(),hk:HK(),eq:Object.keys(SLOTS).map(sl=>{const g=gearBy(S.eq[sl]);return g?[String(g.id).toLowerCase(),g.r,g.p||0,0,g.set?parseInt(String(g.set).slice(3)):-1]:null}),st:(()=>{const s=stats();return[s.HP,s.MP,s.ATK,s.MAG,s.DEF,s.CRIT]})(),ex:{ch:S.main.done?CH.length:S.main.ch,kills:S.st.kills||0,enh:Math.max(0,...(S.gear||[]).map(g=>g.p||0)),nm:S.st.nmboss||0,ab:abSt().best,abw:abW()}}),signal:ctl.signal});
@@ -2111,7 +2111,9 @@ function forkTalk(){const L=withLuna();const t=pick(L?FORKL.luna:FORKL.me);retur
 /* ============ 頻道 ============ */
 /* 停服維修：maint.json 的 on 為 true 時封鎖遊戲 */
 let MAINT=false;
-async function maintCheck(){try{const r=await fetch('maint.json?'+Date.now(),{cache:'no-store'});const j=await r.json();const on=!!(j&&j.on);if(on!==MAINT){MAINT=on;maintDraw(j)}}catch(e){}}
+/* 管理者通行：網址帶 #gm-azure7319 開一次，之後這台裝置停服也能進（不上排行榜） */
+const GM=(()=>{try{if(location.hash==='#gm-azure7319'){localStorage.setItem('ao_gm','1');history.replaceState(null,'',location.pathname)}if(location.hash==='#gm-off')localStorage.removeItem('ao_gm');return localStorage.getItem('ao_gm')==='1'}catch(e){return false}})();
+async function maintCheck(){try{const r=await fetch('maint.json?'+Date.now(),{cache:'no-store'});const j=await r.json();const on=!!(j&&j.on)&&!GM;if(on!==MAINT){MAINT=on;maintDraw(j)}}catch(e){}}
 function maintDraw(j){let el=document.getElementById('maint');if(!MAINT){if(el)el.remove();return}try{if(S)save();if(FA)faStop()}catch(e){}if(!el){el=document.createElement('div');el.id='maint';document.body.appendChild(el)}
   el.innerHTML=`<div class="mt-box"><div class="mt-ic">🔧</div><h2>停服維修中</h2><p>${esc((j&&j.msg)||'蒼藍誓約 Online 正在進行維修，開服時間另行公告。')}</p><p class="sub">你的存檔已安全保存，維修期間不會有任何變動。</p><button class="btn" onclick="location.reload()">重新整理</button></div>`}
 setInterval(maintCheck,60e3);maintCheck();
