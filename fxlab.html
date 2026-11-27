@@ -24,9 +24,9 @@ button.on{background:var(--gd);color:#1a1408;border-color:var(--gd);font-weight:
 @media (min-width:820px){#app{flex-direction:row}#gw{flex:0 0 420px}#pn{border-top:0;border-left:1px solid var(--ln)}}
 </style></head><body>
 <div id="app">
-  <div id="gw"><iframe id="g" src="index.html?fxlab=1"></iframe><div id="msg">載入中…</div></div>
+  <div id="gw"><iframe id="g"></iframe><div id="msg">載入中…</div></div>
   <div id="pn">
-    <div class="bar"><b>特效工作室</b>
+    <div class="bar"><b>特效工作室 <small id="ver" style="color:var(--sub);font-weight:400"></small></b>
       <select id="cls"></select>
       <select id="area"></select>
       <span class="seg" id="nf"><button data-n="1">1隻</button><button data-n="2">2</button><button data-n="3">3</button><button data-n="4" class="on">4</button></span>
@@ -35,7 +35,7 @@ button.on{background:var(--gd);color:#1a1408;border-color:var(--gd);font-weight:
       <span class="seg" id="spd"><button data-s="1" class="on">×1</button><button data-s="0.5">×0.5</button><button data-s="0.25">×0.25</button><button data-s="0.1">×0.1</button></span>
       <button id="loop">循環</button><button id="snd" class="on">音效</button><button id="frz" class="on">敵人不動</button><button id="again">重播</button>
     </div>
-    <div class="tabs"><button data-t="sk" class="on">技能</button><button data-t="st">狀態</button><button data-t="all">全部職業</button></div>
+    <div class="tabs"><button data-t="sk" class="on">技能</button><button data-t="st">狀態</button><button data-t="sn">音效</button><button data-t="nw">更新</button><button data-t="all">職業</button></div>
     <div id="list"></div>
   </div>
 </div>
@@ -56,7 +56,9 @@ const HOOK=`window.LAB={
  sts(){const V=FX7V.STV;return Object.keys(V).filter(k=>!V[k].quiet).map(k=>({id:k,n:(STX[k]&&STX[k].n)||k,c:V[k].c,good:!!V[k].good}))},
  st(id,who){const t=who==='me'?'p':B;stClear(t,id);stAdd(t,id,{src:{atk:80,mag:80},dur:6,amt:300})},
  tick(){stTick(B);stTick('p')},
- clear(){stClear(B);stClear('p');(B.adds||[]).forEach(a=>stClear(a))}};true`;
+ clear(){stClear(B);stClear('p');(B.adds||[]).forEach(a=>stClear(a))},
+ ver(){return NEWS[0].v},news(){return NEWS.slice(0,6).map(n=>({v:n.v,t:n.t,b:n.b}))},
+ snd(n){const S=FX7V.SN;if(S[n])S[n](0)}};true`;
 function ok(){try{return !!(G.contentWindow.LAB)}catch(e){return false}}
 function setup(){if(!L)return;if(!L.gm()){$('#msg').hidden=false;$('#msg').innerHTML='這台裝置還沒開管理員權限。<br>先用管理員連結開一次遊戲，再回來這頁。';return}
   try{const [base,adv]=CL[ci];L.setup(base,adv,+$('#area').value,nf);$('#msg').hidden=true;ready=true}catch(e){$('#msg').hidden=false;$('#msg').textContent='開場失敗：'+e}}
@@ -72,6 +74,8 @@ function draw(){const Lt=$('#list');Lt.innerHTML='';if(!L)return;
     $('#tk').onclick=()=>act(()=>L.tick());$('#tc').onclick=()=>{try{L.clear()}catch(e){}};const all=L.sts();
     for(const [title,good] of [['減益',false],['增益',true]]){const h=document.createElement('div');h.className='hd';h.textContent=title;Lt.appendChild(h);
       all.filter(x=>x.good===good).forEach(x=>{const b=document.createElement('button');b.innerHTML=`<span style="color:${x.c}">●</span> ${x.n}<small>${x.id}</small>`;b.onclick=()=>{cur(b);const who=tgtOn.who;act(()=>L.st(x.id,who))};Lt.appendChild(b)})}}
+  else if(tab==='sn'){const SNL=[["swish", "揮刃破風"], ["cut", "斬擊"], ["heavy", "重斬"], ["blunt", "鈍擊"], ["thud", "撞擊"], ["ring", "刃鳴"], ["bow", "拉弓"], ["zip", "破空"], ["thunk", "命中"], ["ignite", "點燃"], ["roar", "火焰轟燃"], ["boom", "爆炸"], ["frost", "結霜"], ["shatter", "碎冰"], ["zap", "落雷"], ["crackle", "電流"], ["chime", "聖光"], ["bell", "鐘聲"], ["drone", "暗之低鳴"], ["whisper", "耳語"], ["bubble", "冒泡"], ["hiss", "腐蝕"], ["heal", "治療"], ["mana", "回魔"], ["shield", "護盾"], ["guard", "守勢"], ["up", "增益"], ["down", "減益"], ["star", "星光"], ["charge", "蓄力"], ["wind", "風"], ["splat", "流血"]];SNL.forEach(([k,n])=>{const b=document.createElement('button');b.innerHTML=`${n}<small>${k}</small>`;b.onclick=()=>{cur(b);act(()=>L.snd(k))};Lt.appendChild(b)})}
+  else if(tab==='nw'){L.news().forEach(n=>{const d=document.createElement('div');d.className='hd';d.style.cssText='color:var(--tx);font-size:13px;line-height:1.5';d.innerHTML=`<b style="color:var(--gd)">v${n.v}　${n.t}</b><br>${n.b}`;Lt.appendChild(d)})}
   else{CL.forEach((c,i)=>{const b=document.createElement('button');b.textContent=c[2];if(i===ci)b.classList.add('cur');b.onclick=()=>{ci=i;$('#cls').value=i;setup();tab='sk';tabs();draw()};Lt.appendChild(b)})}}
 function tabs(){document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===tab))}
 CL.forEach((c,i)=>{const o=document.createElement('option');o.value=i;o.textContent=c[2];$('#cls').appendChild(o)});
@@ -81,7 +85,8 @@ document.querySelectorAll('#spd button').forEach(b=>b.onclick=()=>{spd=+b.datase
 ['loop','snd','frz'].forEach(id=>$('#'+id).onclick=()=>{$('#'+id).classList.toggle('on');snd();schedule()});
 $('#again').onclick=()=>{if(last)act(last)};
 document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{tab=b.dataset.t;tabs();draw()});
+G.src='index.html?fxlab=1&t='+Date.now();
 G.addEventListener('load',()=>{let n=0;const t=setInterval(()=>{const W=G.contentWindow;let good=false;try{good=!!W.eval('typeof PFX!=="undefined"&&!!PFX.kit&&typeof FX7V!=="undefined"')}catch(e){}
-  if(good){clearInterval(t);try{W.eval(HOOK)}catch(e){$('#msg').textContent='無法連上遊戲：'+e;return}L=W.LAB;L.areas().forEach((nm,i)=>{const o=document.createElement('option');o.value=i;o.textContent=nm;$('#area').appendChild(o)});$('#area').value=3;W.FXSPD=spd;setTimeout(()=>{setup();draw()},300)}
+  if(good){clearInterval(t);try{W.eval(HOOK)}catch(e){$('#msg').textContent='無法連上遊戲：'+e;return}L=W.LAB;try{$('#ver').textContent='v'+L.ver()}catch(e){}L.areas().forEach((nm,i)=>{const o=document.createElement('option');o.value=i;o.textContent=nm;$('#area').appendChild(o)});$('#area').value=3;W.FXSPD=spd;setTimeout(()=>{setup();draw()},300)}
   else if(++n>80){clearInterval(t);$('#msg').textContent='遊戲載入失敗，請重新整理。'}},250)});
 </script></body></html>
