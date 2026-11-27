@@ -348,7 +348,6 @@ rtSync=function(){try{if(B&&B.fx&&B.fx.by==='me'){const f=B.fx;B.lastP6={phys:f.
 function rtFstat(f,m){const o=[];const R=ROLE6[f.role6];
   if(m){const e=MEL[f.id];if(e&&e[0]&&S.dex&&S.dex.w&&S.dex.w[f.id])o.push(`<b class="w">弱 ${(ELI[e[0]]||e[0]).replace(/^[^一-鿿]+/,'')}</b>`);if(R&&R.id!=='BAL')o.push(`<b class="g">${R.n}</b>`);if(f.trait&&TRX(f.trait))o.push(`<b class="g">${TRX(f.trait).n}</b>`);if(f.fog>0)o.push(`<b>霧 ${f.fog}</b>`);if(f.fshield>0)o.push('<b class="g">盾</b>')}
   for(const k in f.st||{})if(f.st[k]>0)o.push(`<b>${FOE[k]||k}</b>`);
-  try{if(typeof stList==='function')stList(f).slice(0,3).forEach(id=>{const x=STX[id];if(x&&x.n)o.push(`<b${x.bad?'':' class="g"'}>${x.n}</b>`)})}catch(e){}
   (f.aff||[]).forEach(x=>AFF[x]&&o.push(`<b class="g">${AFF[x].n}</b>`));return o.slice(0,m?5:3).join('')}
 
 /* ============ 勝利結算：經驗、金幣、素材、裝備 ============ */
