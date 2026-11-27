@@ -387,6 +387,7 @@ body.pc #app{margin:0;flex:none;box-shadow:0 0 40px rgba(0,0,0,.45)}
 .duo{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:end}
 .duo .art{border:none;background:none}
 #pfx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:15}
+#pfxb{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:16;filter:blur(7px) saturate(1.5) brightness(1.35);mix-blend-mode:screen;opacity:.9}
 .art.shadowimg{transform:scaleX(-1)}.stage .spr.foe .art.shadowimg img,.art.shadowimg img{filter:brightness(.22) saturate(0) drop-shadow(0 0 10px #9a7aff)}
 .ico{position:relative;overflow:hidden}.ico i.at{position:absolute;inset:0;background:#fff url(art/atlas_ui.webp) no-repeat;background-size:1200% 2100%;color:#2c2742}.art i.sht{position:absolute;inset:0;background-repeat:no-repeat;background-size:400% 300%}.ico img.ii{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:var(--card)}
 .cmd .btn .bi{width:26px;height:26px;object-fit:contain;vertical-align:middle;margin-right:4px}i.bi.at{display:inline-block;background:url(art/atlas_ui.webp) no-repeat;background-size:1200% 2100%}
@@ -3092,6 +3093,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'19.6',d:'2026-11-28',t:'光暈回來了',b:'①特效加回柔和的泛光，改用不吃效能的方式，多重特效不會再卡。②劍士旋風斬、狂戰士旋風斧改回最初的樣子，刀光改用壓扁的菱形。'},
   {v:'19.5',d:'2026-11-27',t:'盾牌、旋風、順暢度',b:'①盾牌技能重做：盾劍擊、盾擊、盾衝是真的把盾牌砸過去（盾擊會飛回來），盾壁反擊在自己面前立起大盾，盾震從腳下沿地面震到每個敵人。②劍士旋風斬是刀光繞著敵人轉；狂戰士旋風斧是一把斧光沿大圈橫掃全場、捲起塵土；雙劍士是兩色刀光反向旋轉。③多段斬擊改成交錯的角度，不再好幾條平行。④箭雨、火雨等多重特效大幅減輕負擔，不再卡頓。'},
   {v:'19.4',d:'2026-11-27',t:'破甲與守勢',b:'破甲斬：對手身上先浮出一面護甲，被一刀劈成兩半往外裂開掉落（雙劍士的破甲斬是交叉兩刀劈成四塊）。守勢斬、反擊斬的盾牌改在自己身上。'},
   {v:'19.3',d:'2026-11-27',t:'刀光調整',b:'斬擊刀光改成壓得很扁的菱形，前後兩端收成尖點，中間一條白色細芯；刀光與狀態的顏色加強，在圖卡上更顯眼。'},
@@ -3694,10 +3696,10 @@ function rtKey(e){if(!B||!B.rt||!document.getElementById('rtb')||MODAL||STORY)re
 document.addEventListener('keydown',rtKey);
 
 /* ============ 粒子特效（Canvas） ============ */
-const PFX=(()=>{let HS=0,cv,cx,P=[],Q=[],raf=0,W=0,Hh=0,t0=0,SR={x:0,y:0,w:360,h:260};
+const PFX=(()=>{let bv,bx,HS=0,cv,cx,P=[],Q=[],raf=0,W=0,Hh=0,t0=0,SR={x:0,y:0,w:360,h:260};
   const rnd=(a,b)=>a+Math.random()*(b-a),pk=a=>Array.isArray(a)?a[Math.floor(Math.random()*a.length)]:a;
-  function ensure(){const app=$('#app');if(!cv||!app.contains(cv)){cv=document.createElement('canvas');cv.id='pfx';app.appendChild(cv);cx=cv.getContext('2d');try{const D=Object.getOwnPropertyDescriptor(CanvasRenderingContext2D.prototype,'shadowBlur');Object.defineProperty(cx,'shadowBlur',{get(){return D.get.call(this)},set(v){D.set.call(this,Math.min(v,window.FXBLUR??0))}})}catch(e){}}
-    const r=app.getBoundingClientRect(),d=Math.min(2,window.devicePixelRatio||1);if(W!==r.width||Hh!==r.height){W=r.width;Hh=r.height;cv.width=W*d;cv.height=Hh*d;cx.setTransform(d,0,0,d,0,0)}}
+  function ensure(){const app=$('#app');if(!cv||!app.contains(cv)){cv=document.createElement('canvas');cv.id='pfx';app.appendChild(cv);cx=cv.getContext('2d');bv=document.createElement('canvas');bv.id='pfxb';app.appendChild(bv);bx=bv.getContext('2d');W=0;try{const D=Object.getOwnPropertyDescriptor(CanvasRenderingContext2D.prototype,'shadowBlur');Object.defineProperty(cx,'shadowBlur',{get(){return D.get.call(this)},set(v){D.set.call(this,Math.min(v,window.FXBLUR??0))}})}catch(e){}}
+    const r=app.getBoundingClientRect(),d=Math.min(2,window.devicePixelRatio||1);if(W!==r.width||Hh!==r.height){W=r.width;Hh=r.height;cv.width=W*d;cv.height=Hh*d;cx.setTransform(d,0,0,d,0,0);bv.width=Math.ceil(W/2);bv.height=Math.ceil(Hh/2)}}
   function stage(){const st=(document.querySelector('.stage')||document.querySelector('#xfield')),a=$('#app').getBoundingClientRect();if(st){const r=st.getBoundingClientRect();SR={x:r.left-a.left,y:r.top-a.top,w:r.width,h:r.height}}}
   const pt=(fx,fy)=>[SR.x+SR.w*fx,SR.y+SR.h*fy];
   /* 元素粒子發光：鮮豔亮色用疊加光暈，深色魔法用柔邊，土石灰色維持描邊 */
@@ -3758,7 +3760,9 @@ const PFX=(()=>{let HS=0,cv,cx,P=[],Q=[],raf=0,W=0,Hh=0,t0=0,SR={x:0,y:0,w:360,h
       if(p.tr&&Math.random()<(p.tr.r||.9)){const t=p.tr;add({x:p.x+rnd(-1,1)*p.sz*.6,y:p.y+rnd(-1,1)*p.sz*.6,vx:rnd(-1,1)*SR.w*.04,vy:(t.up||0)*SR.w,life:rnd(.2,.45),sz:p.sz*rnd(.4,.8),c:pk(t.c),sh:t.sh||'dot',add:t.add!==false,grow:t.grow||-.6})}
       const k=p.age/p.life;draw(p,k,p.fade==='in'?Math.sin(k*Math.PI)*1.2:p.fade==='none'?1:1-k*k)}
     cx.globalCompositeOperation='source-over';cx.globalAlpha=1;
-    if(!P.length&&!Q.length){cancelAnimationFrame(raf);raf=0;t0=0;cx.clearRect(0,0,W,Hh)}}
+    /* 泛光：把特效縮小複製到一張用 CSS 模糊的畫布上（GPU 處理，取代很慢的 shadowBlur） */
+    if(bx&&window.FXBLOOM!==0){bx.clearRect(0,0,bv.width,bv.height);bx.drawImage(cv,0,0,bv.width,bv.height)}
+    if(!P.length&&!Q.length){if(bx)bx.clearRect(0,0,bv.width,bv.height);cancelAnimationFrame(raf);raf=0;t0=0;cx.clearRect(0,0,W,Hh)}}
   function run(){ensure();stage();if(!raf){t0=0;raf=requestAnimationFrame(loop)}}
   const H=[.21,.6],F=[.74,.33],AL=[.4,.5];
   const GY=f=>f&&f.g!=null?f.g:.13;
