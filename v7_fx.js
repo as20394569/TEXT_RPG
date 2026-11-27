@@ -669,6 +669,40 @@ function acidPool(f,p){p=p||1;cel(1.2,(c,k)=>{const [x,y]=P2(f),gy=y+GY(f)*SR().
   pe([f[0],f[1]+GY(f)],{n:Math.round(10*p),a:-PI/2,spr:.5,v0:.04,v1:.1,ay:-.08,drag:1.4,l0:.7,l1:1.2,s0:.015,s1:.06,al:.45,im:[spr(150,70,200),spr(110,170,60)],jx:.05,wob:.15});later(100,()=>SN.hiss(0,.5))}
 function corrodeDrip(f){physL(f,'drop',8,{spd:[.2,.6],sz:[.004,.008],life:[.6,1],col:'#9a4ad0'});acidPool(f,.8)}
 function acid(f){physL(f,'drop',14,{spd:[.5,1.2],sz:[.004,.008],life:[.5,.9],col:'#b05ae0'});acidPool(f,1)}
+/* ================= 大魔導士：星辰＋真實元素 ================= */
+const STAR=spr(210,230,255),STAR2=spr(255,240,200);
+/* 星塵：會閃爍的細小光點 */
+function stardust(f,n,o){o=o||{};pe(f,Object.assign({n:n||14,spr:PI,v0:.05,v1:.3,ay:.02,drag:3,l0:.5,l1:1,s0:.008,s1:.002,al:.9,add:1,im:[STAR,STAR2],jx:.02,jy:.02},o))}
+function starBurst(f,p){p=p||1;flash(f,'#e8f0ff',.14*p,.25);stardust(f,Math.round(20*p),{v1:.4*p});bits(f,{n:Math.round(10*p),col:'#dfe8ff',spd:[.4,1.1],life:[.3,.6]})}
+/* 光芒改成柔和細長的光束（不再是三角形） */
+function rays(f,col,o){o=o||{};col=vivid(col);const n=10,ang=[...Array(n)].map((_,i)=>i/n*6.283+Math.random()*.3),len=ang.map(()=>.6+Math.random()*.5);cel(o.life||.7,(c,k)=>{const [x,y]=P2(f),u=U(),R=u*(o.R||.2)*eo(k*2),a=Math.sin(PI*Math.min(1,k*1.2));ADD(c);c.lineCap='round';
+  ang.forEach((t,i)=>{const L=R*len[i],g=c.createLinearGradient(x,y,x+Math.cos(t)*L,y+Math.sin(t)*L);g.addColorStop(0,'rgba(255,255,255,.9)');g.addColorStop(.25,col);g.addColorStop(1,T0);c.strokeStyle=g;c.globalAlpha=a*.6;c.lineWidth=Math.max(1,u*.006);c.beginPath();c.moveTo(x,y);c.lineTo(x+Math.cos(t)*L,y+Math.sin(t)*L);c.stroke()});
+  c.globalAlpha=a*.8;const r=R*.35;c.drawImage(spr(255,250,230),x-r,y-r,r*2,r*2)})}
+/* 星彈：星光球拖著星塵 */
+function starOrb(from,to,o){o=o||{};const dur=o.dur||.3,sz=o.sz||1;let last=0;cel(dur,(c,k0)=>{const el=k0*dur,e=eo(Math.min(1,el/dur)),[x0,y0]=P2(from),[x1,y1]=P2(to),u=U(),x=x0+(x1-x0)*e,y=y0+(y1-y0)*e-Math.sin(PI*e)*u*(o.arc??.05),fx=[(x-SR().x)/SR().w,(y-SR().y)/SR().h];
+  if(el-last>.016){last=el;stardust(fx,2,{v0:.02,v1:.08,l0:.3,l1:.6,s0:.01*sz});if(o.fire)flameAt(fx,{n:2,s0:.026*sz,l0:.2,l1:.35,v0:.03,v1:.08})}
+  const R=u*.028*sz;ADD(c);c.globalAlpha=.9;c.drawImage(o.fire?FTS[1]:STAR,x-R*2,y-R*2,R*4,R*4);c.globalAlpha=1;c.drawImage(spr(255,255,255),x-R*.7,y-R*.7,R*1.4,R*1.4)});
+  later(dur*1000,()=>{if(o.hit)o.hit();else starBurst(to,.7)})}
+/* 火焰風暴：由下往上、越往上越寬的火焰漏斗，頂端冒煙 */
+function fireStorm(f){const gy=GY(f);let t=0;const id=setInterval(()=>{t+=.035;if(t>1.1){clearInterval(id);return}
+  for(let i=0;i<6;i++){const h=Math.random(),a=t*18+Math.random()*6.283,r=.012+h*.075;pe([f[0]+Math.cos(a)*r,f[1]+gy-h*.32],{n:1,a:-PI/2,spr:.3,v0:.04,v1:.1,vx:-Math.sin(a)*.35,ay:-.25,drag:2.5,l0:.25,l1:.45,s0:.02+h*.025,s1:.006,al:.45,add:1,fire:1})}
+  if(Math.random()<.4)smokeAt([f[0]+rnd2(-.06,.06),f[1]+gy-.34],{n:1,al:.3,s1:.08})},35/(window.FXSPD||1));
+  bits(f,{n:16,col:'#ffb040',spd:[.4,1.1],life:[.5,1]});later(150,()=>flash([f[0],f[1]+gy*.5],'#ff9a40',.18,.8))}
+/* 太陽聚能：火粒子從四周被吸進頭上的火球 */
+function sunCharge(at,dur){let t=0;const id=setInterval(()=>{t+=.03;if(t>dur){clearInterval(id);return}const [x,y]=P2(at),u=U();for(let i=0;i<4;i++){const a=Math.random()*6.283,r=.12;PS.push({x:x+Math.cos(a)*r*u,y:y+Math.sin(a)*r*u,vx:-Math.cos(a)*r*u*3,vy:-Math.sin(a)*r*u*3,ay:0,drag:0,life:.3,age:0,s0:u*.02,s1:u*.008,a:.6,add:true,fire:true,cool:.6,im:FTS[0],wob:0,wf:1,ph:0})}psRun()},30/(window.FXSPD||1));
+  cel(dur,(c,k)=>{const [x,y]=P2(at),u=U(),R=u*.07*eo(k);ADD(c);c.globalAlpha=.9;c.drawImage(FTS[2],x-R*1.6,y-R*1.6,R*3.2,R*3.2);c.drawImage(FTS[0],x-R*.7,y-R*.7,R*1.4,R*1.4)})}
+/* 球狀閃電：電漿球一路帶著電弧飛過去 */
+function ballLightning(from,to,dur){cel(dur,(c,k0)=>{const e=eo(k0),[x0,y0]=P2(from),[x1,y1]=P2(to),u=U(),x=x0+(x1-x0)*e,y=y0+(y1-y0)*e-Math.sin(PI*e)*u*.04,R=u*.035;ADD(c);c.globalAlpha=1;c.drawImage(spr(200,215,255),x-R*1.8,y-R*1.8,R*3.6,R*3.6);c.drawImage(spr(255,255,255),x-R*.6,y-R*.6,R*1.2,R*1.2);
+  c.strokeStyle='#e8f0ff';c.lineWidth=Math.max(1,u*.003);for(let j=0;j<3;j++){const a=Math.random()*6.283,p=lpath(x,y,x+Math.cos(a)*R*1.8,y+Math.sin(a)*R*1.8,3,u*.015);c.beginPath();p.forEach((q,i)=>i?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1]));c.stroke()}})}
+Object.assign(MG,{
+  J07S1:{v:()=>starOrb(HP0(),F),s:t=>{SN.star(t);SN.zip(t+.02,.3);SN.star(t+.3);SN.thud(t+.3,.2)},el:'holy'},
+  J07S2:{v:()=>{stardust(HP0(),10,{v1:.15});later(100,()=>starOrb(HP0(),F,{fire:1,sz:1.4,dur:.32,hit:()=>{fireBurst(F,1.1);starBurst(F,.9)}}))},s:t=>{SN.ignite(t);SN.star(t+.1);SN.boom(t+.44,.6);SN.star(t+.46)},el:'fire'},
+  J07S3:{v:()=>{coldMist(F,1.2);frostRime(F,{life:1.2});later(150,()=>crystals(F,'#8fdcff',{n:7,h:.14,sp:.12,life:1,gy:GY(F)}));later(250,()=>{stardust(F,14,{im:[VAP,STAR]});shieldFx(H,'#bfe8ff',1)})},s:t=>{SN.frost(t);SN.shatter(t+.25);SN.shield(t+.3)},el:'ice'},
+  J07S7:{aoe:1,v:k=>aoePts(k).forEach((p,j)=>later(j*80,()=>fireStorm(p))),s:t=>{SN.ignite(t);SN.roar(t+.1,1.2,.55);SN.wind(t+.1)},el:'fire'},
+  J07S8:{aoe:1,v:k=>aoePts(k).forEach((p,j)=>later(j*70,()=>iceNova(p))),s:t=>{SN.frost(t);SN.shatter(t+.08)},el:'ice'},
+  J07S9:{v:()=>{ballLightning(HP0(),F,.36);later(360,()=>{bolt(F,'#cfe0ff');thunderBall(F)})},s:t=>{SN.crackle(t,.35);SN.zap(t+.36);SN.boom(t+.38,.4)},el:'thunder'},
+  J07S12:{v:()=>multi(4,80,i=>starOrb(HP0(),F,{fire:1,sz:.7,dur:.34,arc:(i-1.5)*.1,hit:()=>i===3?(fireBurst(F,.9),starBurst(F,.6)):fireBurst(F,.4,1)})),s:t=>{for(let i=0;i<4;i++){SN.zip(t+i*.08,.3);SN.ignite(t+.34+i*.08)}SN.boom(t+.6,.5)},el:'fire'},
+  J07S13:{v:()=>{const at=[HP0()[0]+.02,HP0()[1]-.12];sunCharge(at,.45);later(450,()=>fireball(at,F,{dur:.42,sz:2.6,arc:.02,hit:()=>{fireBurst(F,2);starBurst(F,1.2);tint('rgba(255,170,90,.3)',.25);shock(F,'#ffd090',.5,.6,.35)}}))},s:t=>{SN.charge(t,.45);SN.roar(t,.45,.3);SN.ignite(t+.45);SN.boom(t+.87,1)},el:'fire'}});
 /* ================= 接到現有流程 ================= */
 const RC={};const getR=k=>k in RC?RC[k]:(RC[k]=(SF[k]?{v:()=>{castPose('me');SF[k].v()},s:()=>SF[k].s(0),el:'holy'}:null)||designed(k)||recipe(k));
 /* 依配方的屬性選擇命中碎屑 */
