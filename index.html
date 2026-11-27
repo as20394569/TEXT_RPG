@@ -831,7 +831,7 @@ const shPos=i=>`background-position:${(i%4)/3*100}% ${Math.floor(i/4)/2*100}%`;
 /* 新版魔物動作圖：待機／_a1 普攻／_a2 技能／_a3 首領大招／_lose 倒地；舊鍵自動對應 */
 function mobN(k){const m=k&&k.match(/^mob_([a-z]+)_(atk|hurt|low|charge|win)$/);if(!m||!ARTSET||!ARTSET.has('mob_'+m[1]+'_a1'))return k;const b='mob_'+m[1];return m[2]==='atk'||m[2]==='win'?b+'_a1':m[2]==='charge'&&ARTSET.has(b+'_a3')?b+'_a3':b}
 function art(key,label,r='r169',extra='',under){let vf='';key=mobN(key);under=mobN(under);{const m=key&&key.match(/^mob_([a-z]+)(_\w+)?$/);if(m&&typeof MVAR!=='undefined'&&MVAR[m[1]]&&!(ARTSET&&ARTSET.has(key))){vf=MVAR[m[1]].f;key='mob_'+MVAR[m[1]].base+(m[2]||'')}if(under){const u2=under.match(/^mob_([a-z]+)(_\w+)?$/);if(u2&&typeof MVAR!=='undefined'&&MVAR[u2[1]]&&!(ARTSET&&ARTSET.has(under)))under='mob_'+MVAR[u2[1]].base+(u2[2]||'')}}if(key&&/^npc_\w+$/.test(key))key='portrait_'+key;if(under&&/^npc_\w+$/.test(under))under='portrait_'+under;
-  {const sc=key&&key.match(/^(story_ch\d+_(?:intro|mid|outro)_[mf])(_\w+)?$/);if(sc&&ARTSET&&ARTSET.has(sc[1]+'_usual'))key=sc[1]+'_usual'}
+  {const sc=key&&key.match(/^(story_ch\d+_(?:intro|mid|outro)_[mf])(_\w+)?$/);if(sc&&ARTSET&&ARTSET.has(sc[1]+'_usual'))key=sc[1]+'_usual';if(sc&&ARTSET&&!ARTSET.has(key)&&!ARTSET.has(sc[1]+'_usual')&&!ARTSET.has(sc[1])){const n=+key.match(/^story_ch(\d+)/)[1],a=AREAS[n-1];if(a&&ARTSET.has('area_'+a.id))key='area_'+a.id}}
   const sk=shKey(key);if(sk)return `<div class="art ${r} ${extra} has" data-art="${key}"${vf?` style="filter:${vf}"`:''}><i class="sht" style="background-image:url(art/${sk.f}.webp);${shPos(sk.i)}"></i></div>`;
   const src=artSrc(key);
   const u=under&&under!==src&&!MISS.has(under)&&PRE[under]?`<img class="under" src="art/${under}.webp" alt="">`:'';
@@ -885,15 +885,6 @@ const ADV={
 const SK={};/* 技能資料在 v6_skill.js（企劃表 V6.SKILL） */
 /* 被動技能：達到等級自動生效 */
 const PASS={};
-/* 職業流派：每個職業兩種打法，戰鬥外可隨時切換，改變職業資源的用途 */
-const STN={
-  swordsman:[{n:'破陣',d:'破綻越多傷害越高。'},{n:'鐵壁',d:'破綻改成減少受到的傷害，反擊變強。'}],
-  mage:[{n:'引爆',d:'先上印記，再一次引爆。'},{n:'延燒',d:'印記不會消失，灼燒和中毒的傷害提高。'}],
-  ranger:[{n:'狙擊',d:'專注提高攻擊力。'},{n:'連射',d:'專注改成提高連擊率。'}],
-  dual:[{n:'亂舞',d:'連段越高傷害越高；6 層以上更容易閃開。'},{n:'殘影',d:'每招多砍幾下，連段的加成減半。'}],
-  cleric:[{n:'祈禱',d:'信仰越高受傷越少，集滿時回復 HP。'},{n:'審判',d:'信仰集滿時改成打出一次重擊。'}]};
-/* 戰法已併入流派：不再手動切換，身上湊出指定共鳴（2 件）時打法自動改變 */
-const STNK={swordsman:['guard','thorn'],mage:['burn'],ranger:['double','gale'],cleric:['stun','back'],dual:['double','back']};
 const stn=()=>0;
 const hasP=id=>false;
 const SKA={db_twin:['slash','#bff4ff'],db_flurry:['slash','#bff4ff'],db_step:['buff','#8fe9ff'],db_fin:['spin','#ffffff'],db_gale:['slash','#8fe9ff'],db_feint:['slash','#ffd6a0'],db_ult:['spin','#bff4ff'],db_cross:['slash','#ffffff'],db_dance:['buff','#8fe9ff'],charge:['slash','#cfe0ff'],flurry:['slash','#dfe8ff'],skyslash:['slash','#ffffff'],nova:['ice','#8fdcff'],firestorm:['fire','#ff8a2a'],collapse:['meteor','#e0b8ff'],pierce:['arrow','#ffffff'],trap:['arrow','#c9b08a'],arrowstorm:['arrow','#cfff9a'],
@@ -1492,6 +1483,120 @@ if(P2&&P3){
    ['艾德溫','還有一件事。名冊夾頁裡有一張地圖，標著霧最早停住的地方。'],
    ['露娜','……那是霜語村。我的村子。'],
    ['旁白','【第七章 完】第八章「霜語村的早晨」製作中。']]});
+}
+/* ===== 第八～十章：大改版新增的龍之山谷、地下裂谷、古城 ===== */
+if(P2&&P3){
+  CH[6].outro[CH[6].outro.length-1]=['旁白','【第七章 完】'];
+  Object.assign(NPC,{'巨龍':'mob_elderdragon','深淵魔物':'mob_abyssbeast','古城守衛':'mob_castleguard'});
+  CH.push({t:'第八章　霜語村的早晨',goal:'穿過龍之山谷，回到霜語村',steps:[{type:'kill',mob:'wyvern',n:5},{type:'boss',mob:'elderdragon'}],rw:{gold:14000,exp:10000,gem:360,items:{stone:8,pot2:8}},
+  intro:[
+   ['旁白','名冊夾頁裡的地圖只畫了一條路：從北方大道往東，穿過龍之山谷，盡頭是霜語村。'],
+   ['露娜','我離開的時候，村子已經結冰了。爺爺把燈塞給我，叫我往西跑，不要回頭。'],
+   ['艾德溫','山谷以前有龍守著。商隊要過，得先在谷口放下一隻羊。'],
+   ['露娜','現在谷口什麼都沒有。連鳥都不飛過去。'],
+   ['{name}','那就我們先過去。']],
+  mid:[
+   ['旁白','谷底的岩壁上全是爪痕。走近一看，有些不是爪痕，是字。'],
+   ['露娜','……是守燈人的字。「別往前，村子在等，別吵醒它。」'],
+   ['旁白','再往前，霧裡站著一排人。商人、獵戶、背著孩子的婦人。眼睛開著，一動也不動。'],
+   ['艾德溫','跟二十年前一樣。他們沒死，只是停住了。'],
+   ['露娜','最前面那個……是村裡的郵差。他每天早上都會經過我家。'],
+   {q:'霧裡的郵差要怎麼辦？',choice:[
+    {t:'叫他的名字',fx:{flag:'postman'},lines:[['露娜','卡爾叔叔……卡爾叔叔！'],['旁白','郵差的手指動了一下，又停住了。'],['露娜','他聽到了。我知道他聽到了。']]},
+    {t:'不要吵醒他，繼續走',fx:{bond:1},lines:[['{name}','等把霧弄清楚，再來帶他回家。'],['露娜','……嗯。卡爾叔叔，再等一下。']]}]}],
+  pre:[
+   ['旁白','谷口最窄的地方，一頭巨龍趴在路中間。身上的鱗片掉了一半，霧從縫裡慢慢滲出來。'],
+   ['巨龍','……回去。'],
+   ['露娜','牠會說話？'],
+   ['巨龍','村子在睡。吵醒它，霧會往外走。我守了二十年，不讓任何人過去。'],
+   ['{name}','村子裡的人在等。我們是來帶他們回來的。'],
+   ['巨龍','每個走到這裡的人都這麼說。']],
+  outro:[
+   ['旁白','巨龍倒在谷口，沒有再起來。牠閉上眼睛之前，看了露娜手上的燈很久。'],
+   ['巨龍','……那盞燈，以前是我替她提的。'],
+   ['旁白','山谷另一頭，霜語村的屋簷正在滴水。'],
+   ['旁白','村民一個一個推開門，伸懶腰，罵這場霧下得真久。他們以為只過了一天。'],
+   ['露娜','爺爺……'],
+   ['旁白','村口的井邊站著一個人。鎧甲還是要塞那天裂開的樣子。','!galeAlly'],
+   ['露娜','哥哥！你走進霧裡以後，就再也沒有消息！','!galeAlly'],
+   ['蓋爾','我在霧裡走了很久。','!galeAlly'],
+   ['旁白','蓋爾一路都沒說話。走到村口的井邊，他才停下來。','#galeAlly'],
+   ['蓋爾','要塞那天，我被霧捲進去過一次。','#galeAlly'],
+   ['蓋爾','裡面的人都還活著。他們在等門打開。'],
+   ['蓋爾','可是王國不想讓門打開。……你們聽。'],
+   ['旁白','腳下傳來很深的震動。村子南邊的地面裂開一條縫，一路往下，看不到底。'],
+   ['旁白','【第八章 完】']]});
+  CH.push({t:'第九章　地下裂谷',goal:'下到地下裂谷，找出地面裂開的原因',steps:[{type:'kill',mob:'voidhound',n:5},{type:'boss',mob:'abyssbeast'}],rw:{gold:17000,exp:13000,gem:400,items:{stone:9,pot2:9}},
+  intro:[
+   ['希瑟','我騎了三天的馬。……陛下收下名冊了。'],
+   ['希瑟','然後他下令加快第二座引擎的工程。工地就在你們腳下。'],
+   ['艾德溫','第二座引擎？第一座不是已經毀在要塞了嗎？'],
+   ['希瑟','那座是澤諾斯造的，用來開門。這座是王國造的，用來把門永遠封死。'],
+   ['蓋爾','封死，門後的人就再也出不來了。'],
+   ['希瑟','我知道。所以我才來。'],
+   ['旁白','裂谷邊緣插著王國的旗子。繩梯斷了，下面傳來狗叫，可是那不是狗。']],
+  mid:[
+   ['旁白','裂谷的岩壁上長滿灰白色的晶石。手一碰，就有聲音從裡面傳出來。'],
+   ['旁白','「排好隊，一個一個進去。生病的先走，小孩跟著母親。」'],
+   ['旁白','「到了那邊就不會痛了。門會替我們關上，等瘟疫過去再打開。」'],
+   ['露娜','……這是三百年前的聲音。'],
+   ['艾德溫','所以那些人不是被霧吃掉的。他們是自己走進去的，為了活下來。'],
+   ['蓋爾','霧是一道門。三百年來，一直有人在門的另一邊等它打開。'],
+   ['希瑟','而王國要做的事，是把他們埋在裡面。'],
+   {q:'晶石要怎麼處理？',choice:[
+    {t:'敲下一塊，交給希瑟',fx:{flag:'crystal'},lines:[['希瑟','讓陛下自己聽。聽完了還要封門，那就是他的選擇。']]},
+    {t:'留在原處，讓聲音待在家',fx:{bond:1},lines:[['露娜','他們等了三百年。不該再被帶去別的地方。'],['蓋爾','……謝謝。']]}]}],
+  pre:[
+   ['旁白','裂谷最底下是王國的工地。鑽頭還在轉，工人全不見了。'],
+   ['旁白','鑽頭打穿的洞口，有東西正往外爬。比房子還大，身上帶著另一邊的霧。'],
+   ['蓋爾','不是門後的人。是門縫裡的東西。鑽頭打得太深了。'],
+   ['希瑟','……工人呢？'],
+   ['旁白','沒有人回答。']],
+  outro:[
+   ['旁白','深淵魔物縮回洞口，被落石壓住，再也沒有動靜。'],
+   ['旁白','工地的帳篷裡留著一張圖。第二座引擎已經造好，運往北邊的古城。'],
+   ['艾德溫','古城……霧最早出現的地方。三百年前，門就開在那裡。'],
+   ['希瑟','圖上寫著啟動的日子。……就是後天。'],
+   ['希瑟','我是騎士，本來該站在陛下那邊。','#crystal'],
+   ['希瑟','可是我聽過那些聲音了。我不想當把門關上的人。','#crystal'],
+   ['露娜','我們還來得及。'],
+   ['旁白','【第九章 完】']]});
+  CH.push({t:'第十章　霧之門',goal:'趕在封門之前進入古城',steps:[{type:'kill',mob:'castleknight',n:5},{type:'boss',mob:'castleguard'}],rw:{gold:20000,exp:16000,gem:450,items:{stone:10,pot2:10}},
+  intro:[
+   ['旁白','古城的城門沒有關。三百年來，一直沒有人關。'],
+   ['旁白','城裡到處是王國的腳印，一路往王座廳去。'],
+   ['希瑟','禁衛隊比我們早到一天。引擎應該已經裝好了。'],
+   ['蓋爾','門就在王座廳後面。我出來的時候，就是從那裡。'],
+   ['艾德溫','二十年前，我們也是從這座城門走進去的。……艾琳走在最前面。'],
+   ['露娜','{name}，走吧。']],
+  mid:[
+   ['旁白','長廊兩側站著穿舊式盔甲的騎士。三百年前的守衛，被霧停在站崗的那一刻。'],
+   ['旁白','王國的鑽頭把霧震散了。他們一個一個醒過來，只記得最後一道命令。'],
+   ['蓋爾','「守住門，不准任何人靠近。」'],
+   ['露娜','他們以為我們是來害門後的人的。'],
+   ['旁白','走廊盡頭的牆上刻著一行字，跟檔案館石門上的一樣。'],
+   ['旁白','「我們沒有死。我們在等。」'],
+   ['希瑟','……母親也在那邊。']],
+  pre:[
+   ['旁白','王座廳裡沒有王座，只有一扇比城牆還高的石門，門縫透出淡藍色的光。'],
+   ['旁白','門前立著王國的引擎。一具巨大的守衛抱著引擎的核心，身上刻著王國的紋章。'],
+   ['古城守衛','啟動程序開始。所有人離開。'],
+   ['希瑟','我以騎士的身分命令你，停下來。'],
+   ['古城守衛','命令來源不符。'],
+   ['{name}','那就只好讓它停下來了。']],
+  outro:[
+   ['旁白','守衛倒下，核心從它懷裡滾出來，光慢慢暗下去。引擎停了。'],
+   ['旁白','石門震了一下。門縫沒有關上，反而開大了一點點。'],
+   ['旁白','藍光裡傳出一個女人的聲音，很輕，像是剛睡醒。'],
+   ['艾琳','……艾德溫？你是艾德溫吧。你長大了。'],
+   ['艾德溫','艾琳……我回來了。我說了，他們都說了。'],
+   ['艾琳','我知道。我們都聽到了。'],
+   ['艾琳','門還不能全開。這邊有很多人，要一起走才行。……再等一下下。'],
+   ['希瑟','母親——'],
+   ['艾琳','希瑟。我在名冊上寫的那句話，是寫給妳的。'],
+   ['旁白','光暗了下去。門留著一道縫，剛好能伸進一隻手。'],
+   ['露娜','{name}，下一次，換我們走進去。'],
+   ['旁白','【第二部 完】第三部「走進霧裡」製作中。']]});
 }
 const SQ=[
   {id:'s1',ch:0,n:'黏答答的麻煩',npc:'蜜可',d:'擊敗史萊姆 5 隻',type:'kill',mob:'slime',c:5,rw:{gold:80,exp:60,items:{pot:3}}},
@@ -2125,7 +2230,7 @@ let IDLESEL=0,IDLERES=null;
 setInterval(()=>{if(!S||!S.idle)return;const t=$('#idleT'),g=$('#idleG');if(!t)return;const c=idleCalc();t.textContent=hms(c.ms);g.innerHTML=idleLine(c)},1000);
 function idleSettle(){const c=idleCalc();if(!c)return;const lv0=S.lv,gs=[];S.idle=null;gainExp(c.exp);S.gold+=c.gold;if(c.stone)addItem('stone',c.stone);if(c.pot)addItem('pot',c.pot);
   for(let i=0;i<c.gear;i++){const g=rollGear(AREAS.indexOf(c.a),0);gs.push(g)}for(let i=0;i<c.rare;i++)gs.push(rollGear(AREAS.indexOf(c.a),2));DROPS=[];IDLERES={c,lv0,lv1:S.lv,gs};save();openM('idleRes')}
-function vAreas(){return `<h2>選擇冒險地點</h2>`+vGift()+vIdle()+vDg()+AREAS.map((a,i)=>{const open=typeof areaOpen6==='function'?areaOpen6(i):S.main.ch>=i,bossOn=bossReady(i);
+function vAreas(){return `<h2>選擇冒險地點</h2>`+vIdle()+vDg()+AREAS.map((a,i)=>{const open=typeof areaOpen6==='function'?areaOpen6(i):S.main.ch>=i,bossOn=bossReady(i);
   return `<div class="panel area ${open?'':'lock'}">${art('area_'+a.id,a.n)}
   <div class="row"><h3 class="grow">${a.n}</h3><span class="tag">Lv ${a.lv}</span>${S.cleared[i]?'<span class="tag ok">已通關</span>':''}</div>
   <p class="sub">${a.d}</p><div class="chips">${a.mobs.map(m=>`<span class="chip">${MOBS[m].n}</span>`).join('')}<span class="chip" style="color:var(--hp)">首領 ${MOBS[a.boss].n}${bossOn?'':'（未現身）'}</span></div>${open&&bossOn&&!S.cleared[i]&&S.lv<MOBS[a.boss].lv?`<p class="sub" style="color:var(--hp)">⚠ ${MOBS[a.boss].n} 已在深處等著（Lv ${MOBS[a.boss].lv}）。現在 Lv ${S.lv}，這趟終點會直接碰上它——不夠強就先在岔路多打幾場、換好裝備。</p>`:''}
@@ -2259,7 +2364,7 @@ function vBattle(){const s=stats(),fx=B.fx||{},intro=B.intro,a=AREAS[RUN.area];B
   else if(mine&&(sk||atk))swap('.spr.me',mIdle(B.php),(sk?950:250)+500);
   if(AL&&ARTSET&&ARTSET.has('an_'+AL.id+'_fn')&&(aD||aH||aHit)&&AL.hp>0)swap('.stage .ally','an_'+AL.id+'_'+(AL.hp<AL.max*.3?'fh':'fn'),1200);
   let cmd;
-  if(B.menu==='skill')cmd=`<div class="cmd col">${battleSkills().map(k=>{const lv=S.skl[k]||1;return `<button class="btn" data-a="bSkill" data-v="${k}" ${S.mp<mpCost(k)||(SK[k].ult&&B.ultUsed)?'disabled':''} ${SK[k].ult?'style="border-color:var(--r4);color:var(--r4)"':''}>${('skill_'+k) in ATL?`<i class="bi at" style="background-position:${(ATL['skill_'+k]%ATC)/(ATC-1)*100}% ${Math.floor(ATL['skill_'+k]/ATC)/(ATR-1)*100}%"></i>`:''}${SK[k].n}${skxOn(k,stats().KW).map(w=>RZ[w].ic).join('')} Lv${lv}<small>${SK[k].ult?(B.ultUsed?'已使用':'奧義'):'MP '+mpCost(k)}</small></button>`}).join('')}<button class="btn" data-a="bMenu" data-v="main">返回</button></div>`;
+  if(B.menu==='skill')cmd=`<div class="cmd col">${battleSkills().map(k=>{const lv=S.skl[k]||1;return `<button class="btn" data-a="bSkill" data-v="${k}" ${S.mp<mpCost(k)||(SK[k].ult&&B.ultUsed)?'disabled':''} ${SK[k].ult?'style="border-color:var(--r4);color:var(--r4)"':''}>${('skill_'+k) in ATL?`<i class="bi at" style="background-position:${(ATL['skill_'+k]%ATC)/(ATC-1)*100}% ${Math.floor(ATL['skill_'+k]/ATC)/(ATR-1)*100}%"></i>`:''}${SK[k].n} Lv${lv}<small>${SK[k].ult?(B.ultUsed?'已使用':'奧義'):'MP '+mpCost(k)}</small></button>`}).join('')}<button class="btn" data-a="bMenu" data-v="main">返回</button></div>`;
   else if(B.menu==='item'){const us=Object.keys(S.items).filter(k=>ITEMS[k].use);cmd=`<div class="cmd col">${us.map(k=>`<button class="btn" data-a="bItem" data-v="${k}">${ITEMS[k].n} ×${S.items[k]}<small>${ITEMS[k].d}</small></button>`).join('')||'<p class="empty">沒有可用的道具</p>'}<button class="btn" data-a="bMenu" data-v="main">返回</button></div>`}
   else cmd=`<div class="cmd"><button class="btn pri" data-a="bAtk">攻擊</button><button class="btn" data-a="bMenu" data-v="skill">技能</button><button class="btn" data-a="bMenu" data-v="item">道具</button><button class="btn" data-a="bGuard">防禦</button><button class="btn" data-a="bFlee">逃跑</button><button class="btn ${B.auto?'pri':''}" data-a="bAuto">自動 ${B.auto?'開':'關'}</button></div>`;
   return `<div class="battle"><div class="stage v2 ${pd?'pd':''} ${AL?'hasal':''} bg-${a.id} ${S.hp>0&&S.hp<stats().HP*.3?'danger':''} ${atk&&fx.d>0&&(fx.cr||B.hp<=0)?(sk?'punchl':'punch'):''} ${fx.quake&&!fk?'quake':''} ${(sk&&sk[0]==='meteor')||(fk&&fk.fx==='slam')?'quakel':''}" ${sk?`style="--c:${sk[1]}"`:fk?`style="--c:${fk.c}"`:''}><img class="bg" src="art/${bgKey(a)}.webp" alt="" ${MISS.has(bgKey(a))?'hidden':''} onerror="reTry(this,'${bgKey(a)}')||(MISS.add('${bgKey(a)}'),this.remove())">
@@ -2307,12 +2412,6 @@ function vChar(){const s=stats(),sc=setCounts();
    <div class="cy-grid">${mg?cell('魔法攻擊',s.MAG,'main')+cell('物理攻擊',s.ATK):cell('物理攻擊',s.ATK,'main')+cell('魔法攻擊',s.MAG)}${cell('防禦',s.DEF)}${cell('魔抗',s.MRES)}${cell('爆擊',s.CRIT+'%')}${cell('爆傷',s.CD+'%')}${cell('迴避',s.EVA+'%')}${cell('吸血',s.LS+'%')}</div>
    ${s.RF||s.RI||s.RT||s.RD?`<div class="cy-res"><span>火 ${s.RF}%</span><span>冰 ${s.RI}%</span><span>雷 ${s.RT}%</span><span>暗 ${s.RD}%</span></div>`:''}</div>`:CTAB==='build'?`${buildPanel()}${jobPanel6()}`:CTAB==='attr'?`<div class="panel"><h3>屬性　<span class="tag ${S.pts?'red':'off'}">可用 ${S.pts} 點</span><button class="btn sm" style="float:right" data-a="respec">重置（${respecCost()} G）</button></h3>${Object.keys(ATTR).map(k=>`<div class="attr"><span><b class="cy-k">${k}</b> ${ATTR[k]}<span class="sub">　${{STR:'物理攻擊・物防穿透',DEX:'行動速度・迴避',INT:'魔力・MP・技能省 MP',VIT:'HP・防禦・每 3 秒回血',LUK:'爆擊・爆傷・連擊・掉寶'}[k]}</span></span><b>${S.attr[k]}${s.A[k]>S.attr[k]?`<small class="up">+${s.A[k]-S.attr[k]}</small>`:''}</b><button class="btn sm" data-a="addPt" data-v="${k}" ${S.pts&&S.attr[k]<ATTRMAX?'':'disabled'}>＋</button></div><div class="cy-ab"><u style="width:${Math.min(100,s.A[k]/60*100)}%"></u></div>`).join('')}</div>`:CTAB==='gear'?`<div class="panel"><h3>裝備</h3>${eq}<div class="row" style="justify-content:center;gap:8px"><button class="btn sm pri" data-a="autoEq">一鍵換上最強</button><span class="sub">點部位看詳細</span></div>${setHtml}</div>`:CTAB==='ally'?`${Object.keys(ALLY).some(k=>ALLY[k].open())?`<div class="panel"><h3>同行夥伴</h3><div class="party">${[...Object.keys(ALLY).filter(k=>ALLY[k].open()),'none'].map(k=>`<button class="btn ${(S.party||'none')===k?'on':''}" data-a="setParty" data-v="${k}">${k==='none'?'<b>獨自冒險</b><span class="sub">不帶夥伴</span>':`${art(ALLY[k].img,ALLY[k].n,'r11','mini')}<b>${ALLY[k].n}</b><span class="sub">${ALLY[k].role}</span>`}</button>`).join('')}</div><p class="sub">${S.party&&S.party!=='none'?ALLY[S.party].d+(S.party==='luna'?'　羈絆越高，露娜越強。':''):'沒有夥伴同行。'}</p>${S.party==='luna'?`<div class="gsec"><b>露娜・燈術士　羈絆 ${Math.floor(S.bond||0)}</b><span class="sub">下一級進度 ${Math.round(((S.bond||0)%1)*100)}%・今日已累積 ${(S.daily&&S.daily.bond||0).toFixed(2)}／1.5（一起冒險、打首領、營火閒聊）</span>${Object.values(LUNASK).map(k=>`<span class="sub ${k.ok()?'son':''}">${k.ok()?'◆':'◇'} 【${k.n}】${k.d}${k.ok()?'':`（解鎖：${k.need}）`}</span>`).join('')}</div>`:''}</div>`:''}`:CTAB==='tal'?talTab6():skTab6();
   return `<div class="cyb">${tabs}${sec}</div>`}
-function buildPanel(){const c=kwCount(),ks=Object.keys(RZ).filter(k=>c[k]),nm=buildName(c);
-  return `<div class="panel bld"><h3>我的流派　${nm?`<span class="tag red">${nm}</span>`:'<span class="tag off">尚未成形</span>'}</h3>
-   ${ks.length?ks.sort((a,b)=>c[b]-c[a]).map(k=>{const n=c[k],x=RZ[k];return `<div class="bk"><div class="bkh"><b>${x.ic} ${x.n}</b><span class="pips">${[1,2,3].map(i=>`<i class="${i<=n?'on':''}"></i>`).join('')}</span></div>
-     <span class="sub ${n>=2?'son':''}">2 件：${x.i}</span><span class="sub ${n>=3?'son':''}">3 件：${x.ii}</span></div>`}).join('')
-   :'<p class="sub">同一種詞綴穿 2 件、3 件會有共鳴效果。</p>'}
-   <p class="sub">稀有以上的裝備才會有詞綴。</p></div>`}
 function vBag(){
   const tabs=`<div class="tabs">${[['gear','裝備'],['use','道具'],['mat','素材']].map(([k,n])=>`<button class="${BAGTAB===k?'on':''}" data-a="bagTab" data-v="${k}">${n}</button>`).join('')}</div>`;
   let body='';
@@ -2400,7 +2499,7 @@ const MV={
       <div class="list">${gs.map(g=>`<div class="item"><span class="ico c${g.r}">${gIco(g.id)}</span><span class="grow" data-a="openGear" data-v="${g.u}"><b class="c${g.r}">${gearName(g)}</b><span class="sub">${g.p>=15?'已達強化上限':`${enhCost(g)} G・強化石×${enhStone(g)}・成功率 ${enhRate(g)}%`}${eqd.includes(g.u)?'・裝備中':''}</span></span><button class="btn sm pri" data-a="enh" data-v="${g.u}" ${canEnh(g)?'':'disabled'}>強化</button></div>`).join('')}</div>
       <p class="sub">每 +1 提升 8% 主屬性，上限 +15。點裝備名稱可以洗練詞條、鎖定或分解。</p>`}},
   inn(){const c=S.lv*4;return{t:'旅店',b:npcSay('npc_martha','瑪莎','累了吧？睡一覺就能恢復精神。')+`<button class="btn pri big" data-a="rest" ${S.gold>=c?'':'disabled'}>休息一晚（${c} G）</button>`}},
-  altar(){const rows=AREAS.map((A,i)=>{const lock=i>=S.main.ch+1&&!S.main.done;return `<div class="gsec"><b>${A.n}　<small class="sub">Lv.${A.lv}</small></b>${lock?'<span class="sub">星象尚未顯現……推進主線後再來。</span>':`<span class="subl" style="color:#c2410c">⚠ 本週惡夢首領特性【${BTRAIT[weekTrait(A.boss)].n}】${BTRAIT[weekTrait(A.boss)].d}</span><span class="subl">◆ 此地常見詞綴【${RZ[SETS[ASET(i)]?SETKW[SETS[ASET(i)].n]:'back'].n}】</span><span class="subl">◆ 首領專屬【${GEAR[BOSSU[A.boss]].n}】：${MOBS[A.boss].n}，掉落率 8%（惡夢 20%）</span>`}</div>`}).join('');
+  altar(){const rows=AREAS.map((A,i)=>{const lock=i>=S.main.ch+1&&!S.main.done;return `<div class="gsec"><b>${A.n}　<small class="sub">Lv.${A.lv}</small></b>${lock?'<span class="sub">星象尚未顯現……推進主線後再來。</span>':`<span class="subl" style="color:#c2410c">⚠ 本週惡夢首領特性【${BTRAIT[weekTrait(A.boss)].n}】${BTRAIT[weekTrait(A.boss)].d}</span>`}</div>`}).join('');
     const cs=SETS[CSET[S.cls]];
     const ft=fortune(),FI=FORT[ft&&ft.k];
     return{t:'星象台',b:npcSay('npc_oracle','占星師',FI?`今天的星象是【${FI.n}】。${FI.say}`:'星辰不賣裝備，只告訴你去哪裡找。……要看看今天的星象嗎？')+`<div class="gsec"><b>今日星象</b>${FI?`<span class="subl">✦ ${FI.n}：${FI.d}（今天有效）</span>`:`<span class="sub">每天免費占卜一次，抽一個整天有效的祝福。</span><button class="btn pri" data-a="fortune">占卜今天的星象</button>`}</div>`+rows}},
@@ -2420,10 +2519,6 @@ const MV={
       <textarea id="fbText" maxlength="300" rows="4" placeholder="寫下你的意見（最多 300 字）" style="width:100%;box-sizing:border-box;border:2px solid var(--line);border-radius:8px;padding:8px;font:inherit;resize:vertical"></textarea>
       <button class="btn pri big" data-a="fbSend">送出意見</button></div>
       <div class="list">${L.length?L.map(x=>`<div class="item" style="display:block"><div class="row"><b class="grow">${esc(x.name)}</b><span class="tag">${FBCAT[x.cat]||FBCAT.other}</span></div><span class="sub">${esc(x.cls||'')}・Lv.${x.lv}・${new Date(x.ts).toLocaleString()}</span><p style="white-space:pre-wrap;margin:6px 0 0">${esc(x.text)}</p>${x.reply?`<p class="gsec" style="margin-top:6px"><b>開發者回覆</b><span class="sub" style="white-space:pre-wrap">${esc(x.reply)}</span></p>`:''}</div>`).join(''):`<p class="empty">${FBERR?'⚪ 伺服器暫時連不上，稍後再試。':FBL?'還沒有人留言，來當第一個吧！':'讀取中……'}</p>`}</div>`}},
-  insc(u){const g=gearBy(+u);if(!g)return{t:'銘刻',b:''};const c=inscCost(g),ok=S.gold>=c.g&&(S.items.stone||0)>=c.s&&(S.items.dust||0)>=c.d,cnt=kwCount();
-    return{t:'銘刻詞綴',b:`<div class="panel"><p class="sub">把【<b class="c${g.r}">${esc(gearName(g))}</b>】的稀有詞綴改成你指定的一種${g.sp?`（目前：${RZ[g.sp]?RZ[g.sp].n:'—'}）`:''}。</p>
-      <p class="sub">費用：${c.g} G、強化石×${c.s}（持有 ${S.items.stone||0}）、星塵×${c.d}（持有 ${S.items.dust||0}）</p>
-      <div class="list">${Object.keys(RZ).map(k=>`<button class="item" data-a="inscGo" data-v="${g.u}|${k}" ${ok&&g.sp!==k?'':'disabled'} style="text-align:left"><span class="grow"><b>${RZ[k].ic} ${RZ[k].n}</b>　<span class="sub">${SPEC[k].d}</span><span class="sub">目前身上 ${cnt[k]||0} 件　2 件：${RZ[k].i}</span></span></button>`).join('')}</div></div>`}},
   rank(){if(!RANKTOP||Date.now()-RANKT>60e3)rankSync(true);const online=Array.isArray(RANKTOP);const tab=RKTAB||'power',cf=RKCLS||'all';
     const base=c=>{for(const k in CLS){if(CLS[k].n===c)return k;if((CLS[k].adv||[]).some(a=>ADV[a].n===c))return k}return ''};
     const P=[{n:S.name,p:power(),me:1,c:clsName(),l:S.lv,hk:HK(),ex:{ch:S.main.done?CH.length:S.main.ch,kills:S.st.kills||0,enh:Math.max(0,...(S.gear||[]).map(g=>g.p||0)),ab:abSt().best,abw:abW()}}];
@@ -2799,7 +2894,7 @@ function bondGain(v,why){if(!S||!withLuna())return;checkDaily();const used=S.dai
 /* ============ 大副本：把幾個區域串成一趟，只往前打 ============
    每一段內部仍是原本的區域（地區特性、首領、劇情照舊）；打倒該段首領後可直接深入下一段，不回城、不回血。
    連續深入每段：稀有以上機率加成 +15%、首領專屬裝備機率 ×1.2。 */
-const DG=[{id:'dg1',n:'翠原迷森',d:'從草原一路打進森林深處。',segs:[0,1]},{id:'dg2',n:'凍脈深坑',d:'穿過廢棄礦坑，爬上霜雪山脈。',segs:[2,3]},{id:'dg3',n:'霧都長征',d:'攻破要塞，沿著石板路走進王都地下。',segs:[4,5,6]}];
+const DG=[{id:'dg1',n:'翠原迷森',d:'從草原一路打進森林深處。',segs:[0,1]},{id:'dg2',n:'凍脈深坑',d:'穿過廢棄礦坑，爬上霜雪山脈。',segs:[2,3]},{id:'dg3',n:'霧都長征',d:'攻破要塞，沿著石板路走進王都地下。',segs:[4,5,6]},{id:'dg4',n:'龍淵古城',d:'越過龍之山谷，下到裂谷，走進最早起霧的古城。',segs:[7,8,9]}];
 const DGX={plain:{mobs:['thornboar','mosscrab','windfairy'],mid:'wolfrider'},forest:{mobs:['sporemother','mirrormoth','rootguard'],mid:'elderdruid'},mine:{mobs:['orebeetle','gasbat','lampghost'],mid:'drillmole'},snow:{mobs:['icebear','snowshaman','icethorn'],mid:'yetichief'},castle:{mobs:['cursearmor','shadowpriest'],mid:'gatewarden'},road:{mobs:['mistcrow','shieldbandit'],mid:'tollcaptain'},archive:{mobs:['inkslime','pagewraith'],mid:'sealguard'}};
 const DGDN=['普通','困難','煉獄'];let DGDIFF=0;
 const dgMax=d=>Math.min(2,(S.dgc&&S.dgc[d])||0);
@@ -2807,25 +2902,19 @@ const dgB=()=>RUN&&RUN.dg?1+.15*(RUN.dg.depth||0)+.1*(RUN.dg.diff||0):1;
 const dgOf=()=>RUN&&RUN.dg?DG[RUN.dg.d]:null;
 const dgNextArea=()=>{const D=dgOf();if(!D)return -1;const na=D.segs[RUN.dg.k+1];return na==null?-1:na};
 const dgCanGo=()=>dgNextArea()>=0&&RUN.nodes[RUN.nodes.length-1]==='boss'&&!!S.cleared[RUN.area];
-function startDg(d,k){const D=DG[d];if(!D||D.segs[k]==null)return;const ar=D.segs[k];if(S.main.ch<ar||(k>0&&!S.cleared[D.segs[k-1]])){toast('這一段還沒解鎖');return}const df=Math.min(DGDIFF,dgMax(d));RUN={dg:{diff:df}};startRun(ar);if(RUN){RUN.dg={d,k,depth:0,diff:df};save();render()}}
+function startDg(d,k){const D=DG[d];if(!D||D.segs[k]==null)return;const ar=D.segs[k];if(!areaOpen6(ar)||(k>0&&!S.cleared[D.segs[k-1]])){toast('這一段還沒解鎖');return}const df=Math.min(DGDIFF,dgMax(d));RUN={dg:{diff:df}};startRun(ar);if(RUN){RUN.dg={d,k,depth:0,diff:df};save();render()}}
 function dgEnter(){const o=RUN,D=dgOf(),nk=o.dg.k+1,na=D.segs[nk],a=AREAS[o.area];const bonus=Math.round((12+a.base*6)*2);S.gold+=bonus;o.loot.gold+=bonus;track('run');bondGain(.25,'一起完成冒險');
   RUN={dg:{diff:o.dg.diff||0}};startRun(na,o.nm);if(!RUN)return;RUN.loot=o.loot;RUN.bless=o.bless;RUN.core=o.core;RUN.coreUp=o.coreUp;RUN.coreN=o.coreN;RUN.dg={d:o.dg.d,k:nk,depth:(o.dg.depth||0)+1,diff:o.dg.diff||0};if(D.segs.length>=3){const st=stats();S.hp=Math.min(st.HP,S.hp+Math.round(st.HP*.4));S.mp=Math.min(st.MP,S.mp+Math.round(st.MP*.4))}save();render();toast(`深入第 ${nk+1} 段：${AREAS[na].n}（掉寶加成 +${Math.round((dgB()-1)*100)}%）`)}
 function dgNext(){if(!RUN||!RUN.dg||B||!dgCanGo())return;const na=dgNextArea(),m=S.main;
-  const s2=()=>{if(S.main.ch<na){toast('下一段還沒開放');render();return}if(m.ch===na&&!m.acc&&CH[na]&&chLvOk()){const c=CH[na];play(c.intro,SKEY(na+1,'intro'),c.t+' 開場',()=>{m.acc=true;m.step=0;m.prog=0;save();toast('已接受主線任務');dgEnter()})}else dgEnter()};
+  const s2=()=>{if(!areaOpen6(na)){toast('下一段還沒開放');render();return}if(m.ch===na&&!m.acc&&CH[na]&&chLvOk()){const c=CH[na];play(c.intro,SKEY(na+1,'intro'),c.t+' 開場',()=>{m.acc=true;m.step=0;m.prog=0;save();toast('已接受主線任務');dgEnter()})}else dgEnter()};
   if(m.ch===RUN.area&&mainReady()){const c=CH[m.ch];play(c.outro,SKEY(m.ch+1,'outro'),c.t+' 結尾',()=>{const t=give(c.rw);m.ch++;m.acc=false;m.step=0;m.prog=0;m.mid=false;m.pre=false;sys(`${S.name} 完成了「${c.t}」！`);toast(`章節完成，獲得：${t}`);save();s2()})}else s2()}
 /* 重製補償：v14.0 之前建立、Lv.5 以上的角色，可自選一套同等級的新版稀有裝備（六個部位） */
-const G14T=1795611600000;
-const giftOk=()=>!!(S&&!S.g14&&S.lv>=5&&S.created&&S.created<G14T);
-const giftTier=()=>{let t=0;for(let i=0;i<TLV.length;i++)if(S.lv>=TLV[i])t=i;return Math.min(t,tierCap(),TLV.length-1)};
-function giftSets(){return Object.keys(RZ)}
-function gift14(k){if(!giftOk()||!RZ[k])return;const t=giftTier(),got=[];for(const sl in SLOTS){const id=sl==='weapon'?`w_${S.cls}_${t}`:`${SLOTP[sl]}_${t}`;if(!GEAR[id])continue;const g=addGear(id,2);g.sp=k;got.push(gearName(g))}S.g14=1;DROPS=[];save();render();openM('msg',{t:'重製補償',b:`<div class="panel"><h3>${RZ[k].ic} ${RZ[k].n}・六件</h3><p>已放進背包：${got.join('、')}</p></div><button class="btn pri big" data-a="closeM">確定</button>`})}
-function vGift(){if(!giftOk())return '';return `<div class="panel" style="border-color:var(--exp)"><div class="row"><h3 class="grow">重製補償</h3><span class="tag red">限領一次</span></div><p class="sub">裝備重製了。選一種流派，帶走一整套同階稀有裝。</p><div class="list">${giftSets().map(k=>`<div class="item"><span class="grow"><b>${RZ[k].ic} ${RZ[k].n}</b><span class="sub">${SPEC[k].d}</span></span><button class="btn pri sm" data-a="gift14" data-v="${k}">選這個</button></div>`).join('')}</div></div>`}
 function vDg(){return DG.map((D,d)=>{
   return `<div class="panel area" style="border-color:var(--exp)">${art('area_'+AREAS[D.segs[D.segs.length-1]].id,D.n)}<div class="row"><h3 class="grow">${D.n}</h3><span class="tag red">大副本</span></div><p class="sub">${D.d}</p>
   <div class="gsec"><b>規則</b><span class="sub">打倒首領可直接深入：不回城、不回血。越深掉得越好。${D.segs.length>=3?'路太長，每段之間能喘口氣。':''}</span></div>
   <div class="lbl">難度</div><div class="chips">${DGDN.map((n,i)=>`<button class="chip ${Math.min(DGDIFF,dgMax(d))===i?'on':''}" data-a="dgDiff" data-v="${i}" ${i>dgMax(d)?'disabled':''}>${n}${i>dgMax(d)?' 🔒':''}</button>`).join('')}</div>
   <p class="sub">有些傳說裝只在這裡掉。</p>
-  <div class="list">${D.segs.map((ar,k)=>{const a=AREAS[ar],open=S.main.ch>=ar&&(k===0||S.cleared[D.segs[k-1]]),u=BOSSU[a.boss]&&GEAR[BOSSU[a.boss]];
+  <div class="list">${D.segs.map((ar,k)=>{const a=AREAS[ar],open=areaOpen6(ar)&&(k===0||S.cleared[D.segs[k-1]]),u=BOSSU[a.boss]&&GEAR[BOSSU[a.boss]];
     return `<div class="item"><span class="grow"><b>第 ${k+1} 段　${a.n}</b>　<span class="sub">Lv ${a.lv}・首領 ${MOBS[a.boss].n}${S.cleared[ar]?'・已通關':''}</span>${u?`<span class="sub">首領專屬：<b class="c4">${u.n}</b></span>`:''}</span>${open?`<button class="btn ${k===0?'pri':''} sm" data-a="startDg" data-v="${d}:${k}">${k===0?'從頭挑戰':'從這段開始'}</button>`:`<span class="sub">${k===0?'主線到這裡後解鎖':'打倒上一段首領後解鎖'}</span>`}</div>`}).join('')}</div></div>`}).join('')}
 function finish(done){const l=RUN.loot,a=AREAS[RUN.area];let extra='';if(done&&RUN.dg){const D=DG[RUN.dg.d];if(RUN.dg.k===D.segs.length-1&&RUN.nodes[RUN.nodes.length-1]==='boss'&&S.cleared[RUN.area]){S.dgc=S.dgc||{};const df=RUN.dg.diff||0;if(df===2)try{wkSt().hell++}catch(e){}if((S.dgc[RUN.dg.d]||0)<df+1){S.dgc[RUN.dg.d]=df+1;if(df<2)extra+=`<p style="color:var(--exp)">「${D.n}」${DGDN[df]}難度通關！解鎖${DGDN[df+1]}難度。</p>`}}}if(done&&!RUN.tower)bondGain(.25,'一起完成冒險');
   if(done){const bonus=Math.round((12+a.base*6)*2);S.gold+=bonus;track('run');extra+=`<p>完成獎勵：${bonus} G</p>`}
@@ -2916,7 +3005,6 @@ const ACH=[
   {id:'enh15',n:'傳說工匠',d:'擁有 +15 的裝備',c:()=>S.gear.some(g=>g.p>=15),rw:{gold:20000}},
   {id:'leg',n:'傳說的重量',d:'取得一件傳說裝備',c:()=>S.gear.some(g=>g.r>=4),rw:{items:{dust:30}}},
   {id:'uniq',n:'首領的遺物',d:'取得一件首領專屬裝備',c:()=>S.gear.some(g=>GEAR[g.id].uniq),rw:{items:{gem_b:1}}},
-  {id:'set4',n:'整套行頭',d:'同一種詞綴湊到 3 件',c:()=>Object.values(kwCount()).some(n=>n>=3),rw:{gold:3000}},
   {id:'dexm',n:'魔物博士',d:'魔物圖鑑全部登錄',c:()=>dexMobs().every(k=>S.dex.m[k]),rw:{gold:10000,items:{gem_g:1}}},
   {id:'dexg',n:'收藏家',d:'裝備圖鑑登錄一半以上',c:()=>{const g=dexGear();return g.filter(k=>S.dex.g[k]).length>=g.length/2},rw:{items:{stone:5}}},
   {id:'story',n:'晨星鎮的朋友',d:'完成所有人物故事',c:()=>NST.every(q=>(S.nst[q.id]||{}).done),rw:{gold:8000,items:{gem_w:1}}},
@@ -2999,6 +3087,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'18.1',d:'2026-11-27',t:'第二部完結、新大副本',b:'主線新增第八章「霜語村的早晨」、第九章「地下裂谷」、第十章「霧之門」，第二部完結。新增大副本「龍淵古城」（龍之山谷→地下裂谷→古城）。舊的詞綴共鳴、銘刻全部移除，配裝以套裝、寶石、天賦為主。新魔物、新裝備、新技能圖示上線。'},
   {v:'18.0',d:'2026-11-27',t:'大改版',b:'等級上限 100，世界擴大到 10 區（新增龍之山谷、地下裂谷、古城）。初始屬性各 5 點，每升一級 1 點、每 10 級再 2 點。13 個職業各有 3 招主動技能與 3 個被動，加上天賦、技能熟練與武器熟練；Lv30 擊敗第 3 區首領後轉職，雙劍士開放。裝備改為 7 個部位（新增副手）、6 種稀有度與 60 種詞條，新增重鑄、精煉、繼承、鑲嵌、製作、套裝與神話效果。魔物有各自的定位、技能與首領階段。新增討伐委託、探索事件與 100 個成就。這次改版存檔重新開始。'},
   {v:'17.3',d:'2026-11-27',t:'屬性換算調整',b:'力量：物攻提高，並帶物防穿透。敏捷：決定行動速度與迴避，不再加爆擊與連擊。幸運：爆擊、爆傷、連擊。智力的魔攻提高。迴避、爆擊、省魔、回血的換算比例下修。強化失敗不再降級，高階成功率提高。'},
   {v:'17.2',d:'2026-11-27',t:'拿掉閃避按鈕',b:'戰鬥指令剩攻擊、防禦、格擋。魔法無法格擋，用防禦減傷。'},
@@ -4240,7 +4329,7 @@ const ACT={
   startRun(v){if(S.hp<=1){toast('HP 太低，先到旅店休息');return}startRun(+v)},
   trial(){if(S.adv||S.trial||S.lv<TRIAL.lv)return;if(S.hp<=1){toast('HP 太低，先到旅店休息');return}const sh=SHADOW[S.cls];MOBS.shadow.ty=sh[0];MOBS.shadow.sk=sh[1];
     closeM();TAB='adv';RUN={area:Math.min(4,Math.max(0,S.main.ch)),trial:true,nm:false,step:0,nodes:['boss'],loot:{gold:0,exp:0,items:[]},view:{type:'start'}};startBattle('shadow','boss');render()},
-  startDg(v){if(S.hp<=1){toast('HP 太低，先到旅店休息');return}const [d,k]=String(v).split(':').map(Number);startDg(d,k)},dgNext(){dgNext()},gift14(v){gift14(v)},dgDiff(v){DGDIFF=+v;render()},
+  startDg(v){if(S.hp<=1){toast('HP 太低，先到旅店休息');return}const [d,k]=String(v).split(':').map(Number);startDg(d,k)},dgNext(){dgNext()},dgDiff(v){DGDIFF=+v;render()},
   startNm(v){if(S.hp<=1){toast('HP 太低，先到旅店休息');return}startRun(+v,true)},
   runNext(){runNext()},bossGo(){if(!RUN)return;RUN.gate=1;runNext()},gatePrep(v){doPrep(v)},bossBox(v){bossBox(v)},core(v){corePick(v)},kiln(v){kilnPick(v)},camp(v){campPick(v)},retreat(){if(!RUN)return;if(FA&&!FA.selfRet)faStop('已撤退，全自動關閉');if(RUN.step<0){RUN=null;render()}else finish(false)},retreatAsk(){if(!RUN||B)return;if(confirm('要撤退回城嗎？\n已獲得的金幣、經驗與戰利品都會保留。'))ACT.retreat()},finish(){finish(true)},
   evPick(v){evPick(+v)},
@@ -4280,9 +4369,6 @@ const ACT={
   disAll(){const eqd=Object.values(S.eq),L=S.gear.filter(g=>g.r<=1&&!g.lock&&!eqd.includes(g.u));if(!L.length){toast('沒有可分解的普通或精良裝備');return}
     let d=0,st=0;L.forEach(g=>{const r=dismantle(g);d+=r[0];st+=r[1]});toast(`分解 ${L.length} 件，獲得星塵×${d}${st?`、強化石×${st}`:''}`);save();render()},
   skLoad(k){if(B){toast('戰鬥中不能調整技能');return}const L=battleSkills().slice();const i=L.indexOf(k);if(i>=0){if(L.length<=1){toast('至少要帶 1 招');return}L.splice(i,1)}else{if(L.length>=loadMax()){toast(`最多帶 ${loadMax()} 招，先取下一招`);return}L.push(k)}S.load=L;save();render()},
-  inscribe(u){MODAL={k:'insc',v:+u};drawModal()},
-  inscGo(v){const [u,k]=String(v).split('|'),g=gearBy(+u);if(!g||!RZ[k])return;const c=inscCost(g);if(S.gold<c.g||(S.items.stone||0)<c.s||(S.items.dust||0)<c.d){toast('材料不足');return}
-    S.gold-=c.g;addItem('stone',-c.s);addItem('dust',-c.d);g.sp=k;SFX.buff();toast(`銘刻完成：【${RZ[k].n}】`);MODAL={k:'gear',v:+u};save();render()},
   reforge(u){const g=gearBy(+u);if(!canReforge(g))return;const c=reforgeCost(g);addItem('dust',-c.d);S.gold-=c.g;g.sub=rollSubs(GEAR[g.id].t,g.r);if(g.sh)shine(g);SFX.buff();toast('洗練完成，詞條已重新隨機');save();render()},
   rest(){const c=S.lv*4;if(S.gold<c)return;S.gold-=c;const s=stats();S.hp=s.HP;S.mp=s.MP;toast('睡了一覺，HP 與 MP 全滿');save();closeM();render()},
   advance(k){if(S.lv<TRIAL.lv||S.adv||!S.trial)return;S.adv=k;WARM=0;const b=ADV[k].bonus;for(const a in b)S.attr[a]+=b[a];learn();const s=stats();S.hp=s.HP;S.mp=s.MP;sys(`${S.name} 轉職為【${ADV[k].n}】！`);toast(`轉職成功：${ADV[k].n}`);save();render()},
@@ -4374,8 +4460,6 @@ function faTick(){faDraw();if(!FA||!S||FA.busy)return;if(FA.hold&&Date.now()-FA.
   if(!FA.towned){FA.towned=1;faTown();return}
   const s=stats();if(S.hp<s.HP*.7||S.mp<s.MP*.5){const c=S.lv*4;if(S.gold>=c){ACT.rest();return}if(S.hp<s.HP*.4){faStop('金幣不足以休息，全自動停止');return}}
   FA.towned=0;TAB='adv';if(FA.dg){DGDIFF=FA.dg.diff;startDg(FA.dg.d,0);if(!RUN)faStop('進不了副本，全自動停止')}else startRun(FA.area,FA.nm)}
-/* 沒有共鳴時：挑背包裡湊得出最多部位的那一種 */
-function faDom(){const c={};for(const g of S.gear){const b=GEAR[g.id];if(!b||!g.sp||!RZ[g.sp]||(b.cls&&b.cls!==S.cls)||S.lv<b.lv)continue;(c[g.sp]=c[g.sp]||{})[b.slot]=1}const k=Object.keys(c).sort((a,b)=>Object.keys(c[b]).length-Object.keys(c[a]).length)[0];return k&&Object.keys(c[k]).length>=2?k:null}
 /* 全自動回城整備：配點、技能、換裝、補藥、領每日、換地區 */
 function faTown(){const msgs=[];try{checkDaily();
   if(!S.daily.sign){ACT.sign();msgs.push('簽到')}
@@ -4383,10 +4467,7 @@ function faTown(){const msgs=[];try{checkDaily();
   if(typeof fortune==='function'&&!fortune()&&S.main.ch>=1){ACT.fortune()}
   if(S.pts>0){const main=CLS[S.cls].basic==='MAG'?'INT':CLS[S.cls].atk;let n=0;while(S.pts>0&&n<999){const k=(n++%3===2)?'VIT':main;if(S.attr[k]>=ATTRMAX){const o=Object.keys(ATTR).find(x=>S.attr[x]<ATTRMAX);if(!o)break;S.pts--;S.attr[o]++;continue}S.pts--;S.attr[k]++}msgs.push('配點')}
   if(S.sp>0){const ks=mySkills().filter(k=>(S.skl[k]||1)<5&&SK[k].dmg).sort((a,b)=>(S.skl[a]||1)-(S.skl[b]||1));const all=ks.length?ks:mySkills().filter(k=>(S.skl[k]||1)<5);let i=0;while(S.sp>0&&all.length){const k=all[i++%all.length];if((S.skl[k]||1)<5){S.sp--;S.skl[k]=(S.skl[k]||1)+1}else if(all.every(x=>(S.skl[x]||1)>=5))break}msgs.push('升技能')}
-  const kc=kwCount(),dom=Object.keys(kc).sort((a,b)=>kc[b]-kc[a])[0]||faDom(),kwOf=g=>{const u=GEAR[g.id]&&GEAR[g.id].uq;return g.sp===dom||g.sp2===dom||(u&&dom in u)},fp=g=>gearPower(g)*(dom&&kwOf(g)?1.4:1);
-  let ch=0;for(const sl in SLOTS){const cur=gearBy(S.eq[sl]);let best=cur,bp=cur?fp(cur):-1;
-    for(const g of S.gear){const b=GEAR[g.id];if(!b||b.slot!==sl||g===cur)continue;if((b.cls&&b.cls!==S.cls)||(b.adv&&b.adv!==S.adv)||S.lv<b.lv||sealed(g))continue;const p=fp(g);if(p>bp*1.02){bp=p;best=g}}
-    if(best&&best!==cur){S.eq[sl]=best.u;ch++}}if(ch)msgs.push(`換上 ${ch} 件裝備`);
+  {const ch=autoEquip6();if(ch)msgs.push(`換上 ${ch} 件裝備`)}
   const tier=TLV.reduce((a,v,i)=>v<=S.lv?i:a,0),hp=tier>=2?'pot2':'pot',mp=tier>=2?'eth2':'eth',keep=S.lv*4*3;let bought=0;
   for(const [k,want] of [[hp,6],[mp,3],...(S.main.ch>=4?[['pot3',2]]:[])])while((S.items[k]||0)<want&&ITEMS[k]&&S.gold-ITEMS[k].price>=keep){S.gold-=ITEMS[k].price;addItem(k,1);bought++}
   if(bought)msgs.push(`補了 ${bought} 瓶藥`);

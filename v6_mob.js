@@ -174,7 +174,7 @@ function condOk6(k,f){const s=stats(),hp=S.hp/Math.max(1,s.HP)*100,fh=f.hp/f.max
   switch(k.cond){case 'hitP':return !!L.phys;case 'pShield':return B.shield>0||has6('p','SHIELD');case 'evaded':return !!L.miss;case 'pSkill':return !!L.skill;
     case 'pDebuff':return pDebuff6();case 'selfLow':return fh<k.cv;case 'pLow':return hp<k.cv;case 'pHigh':return hp>k.cv;case 'pSt':return has6('p',k.cv)||(k.cv==='POISON'&&B.pst&&B.pst.poison>0)||(k.cv==='BURN'&&B.pst&&B.pst.burn>0);
     case 'selfRage':return has6(f,'RAGE');case 'acts5':return (f.acts6||0)>=5}return true}
-function pDebuff6(){try{if(typeof stList==='function')return stList('p').some(x=>x.bad)}catch(e){}const p=B.pst||{};if(p.poison>0||p.burn>0||p.bleed>0||p.weak>0||p.stun>0)return true;return ['POISON','BURN','BLEED','WEAK','ARMOR','RESIST','SLOW','FROST','SHOCK','CURSE','BLIND','VULN','FEAR','MARK','DRAIN','ROOT','WOUND','FATIGUE','SILENCE'].some(x=>has6('p',x))}
+function pDebuff6(){try{if(typeof stList==='function')return stList('p').some(id=>STX[id]&&STX[id].bad)}catch(e){}const p=B.pst||{};if(p.poison>0||p.burn>0||p.bleed>0||p.weak>0||p.stun>0)return true;return ['POISON','BURN','BLEED','WEAK','ARMOR','RESIST','SLOW','FROST','SHOCK','CURSE','BLIND','VULN','FEAR','MARK','DRAIN','ROOT','WOUND','FATIGUE','SILENCE'].some(x=>has6('p',x))}
 function foePick(){if(!B||!B.sk6)return null;const f=B,t=now6(),fh=f.hp/f.max,ph=f.hp/f.max<.5?1:0;
   const C=f.sk6.filter(id=>{const k=SKM[id];if(!k)return false;if((f.mcd[id]||0)>t)return false;if(k.cond&&!condOk6(k,f))return false;if(k.heal&&fh>.7)return false;if(k.cleanse&&!foeDebuff6(f))return false;if(k.selfSt&&has6(f,k.selfSt))return false;return true});
   if(!C.length)return null;
@@ -346,7 +346,7 @@ rtSync=function(){try{if(B&&B.fx&&B.fx.by==='me'){const f=B.fx;B.lastP6={phys:f.
 function rtFstat(f,m){const o=[];const R=ROLE6[f.role6];
   if(m){const e=MEL[f.id];if(e&&e[0]&&S.dex&&S.dex.w&&S.dex.w[f.id])o.push(`<b class="w">弱 ${(ELI[e[0]]||e[0]).replace(/^[^一-鿿]+/,'')}</b>`);if(R&&R.id!=='BAL')o.push(`<b class="g">${R.n}</b>`);if(f.trait&&TRX(f.trait))o.push(`<b class="g">${TRX(f.trait).n}</b>`);if(f.fog>0)o.push(`<b>霧 ${f.fog}</b>`);if(f.fshield>0)o.push('<b class="g">盾</b>')}
   for(const k in f.st||{})if(f.st[k]>0)o.push(`<b>${FOE[k]||k}</b>`);
-  try{if(typeof stList==='function')stList(f).slice(0,3).forEach(x=>o.push(`<b${x.bad?'':' class="g"'}>${x.n}</b>`))}catch(e){}
+  try{if(typeof stList==='function')stList(f).slice(0,3).forEach(id=>{const x=STX[id];if(x&&x.n)o.push(`<b${x.bad?'':' class="g"'}>${x.n}</b>`)})}catch(e){}
   (f.aff||[]).forEach(x=>AFF[x]&&o.push(`<b class="g">${AFF[x].n}</b>`));return o.slice(0,m?5:3).join('')}
 
 /* ============ 勝利結算：經驗、金幣、素材、裝備 ============ */
