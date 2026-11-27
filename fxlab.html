@@ -21,19 +21,37 @@ button.on{background:var(--gd);color:#1a1408;border-color:var(--gd);font-weight:
 #list button.cur{outline:2px solid var(--ac)}
 #list .hd{grid-column:1/-1;color:var(--sub);font-size:12px;margin-top:4px}
 .seg{display:inline-flex;border:1px solid var(--ln);border-radius:8px;overflow:hidden}.seg button{border:0;border-radius:0;padding:6px 9px}
+
+/* 手機：遊戲畫面小一點、控制列單行可橫向滑動、按鈕加大方便點 */
+@media (max-width:819px){
+  html,body{height:100%;overflow:hidden}
+  #app{height:100vh;height:100dvh}
+  #gw{flex:0 0 46%;flex:0 0 46dvh}
+  .bar{flex-wrap:nowrap;padding:6px 8px;gap:6px}
+  .b1 b{font-size:14px;white-space:nowrap;margin-right:0}
+  .b1 select{flex:1;min-width:0;padding:8px 6px}
+  .b2{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}.b2::-webkit-scrollbar{display:none}
+  .b2>*{flex:0 0 auto}
+  .b2 button,.seg button{min-height:38px;padding:7px 11px}
+  .tabs button{padding:11px 4px;font-size:14px}
+  #list{grid-template-columns:repeat(3,1fr);gap:6px;padding:8px 8px calc(12px + env(safe-area-inset-bottom))}
+  #list button{min-height:48px;padding:7px 8px}
+  #list .hd .seg button{min-height:34px}
+}
 @media (min-width:820px){#app{flex-direction:row}#gw{flex:0 0 420px}#pn{border-top:0;border-left:1px solid var(--ln)}}
 </style></head><body>
 <div id="app">
   <div id="gw"><iframe id="g"></iframe><div id="msg">載入中…</div></div>
   <div id="pn">
-    <div class="bar"><b>特效工作室 <small id="ver" style="color:var(--sub);font-weight:400"></small></b>
+    <div class="bar b1"><b>特效工作室 <small id="ver" style="color:var(--sub);font-weight:400"></small></b>
       <select id="cls"></select>
       <select id="area"></select>
-      <span class="seg" id="nf"><button data-n="1">1隻</button><button data-n="2">2</button><button data-n="3">3</button><button data-n="4" class="on">4</button></span>
     </div>
-    <div class="bar">
+    <div class="bar b2">
+      <button id="again">重播</button>
       <span class="seg" id="spd"><button data-s="1" class="on">×1</button><button data-s="0.5">×0.5</button><button data-s="0.25">×0.25</button><button data-s="0.1">×0.1</button></span>
-      <button id="loop">循環</button><button id="snd" class="on">音效</button><button id="frz" class="on">敵人不動</button><button id="again">重播</button>
+      <button id="loop">循環</button><button id="snd" class="on">音效</button><button id="frz" class="on">敵人不動</button>
+      <span class="seg" id="nf"><button data-n="1">1隻</button><button data-n="2">2</button><button data-n="3">3</button><button data-n="4" class="on">4</button></span>
     </div>
     <div class="tabs"><button data-t="sk" class="on">技能</button><button data-t="st">狀態</button><button data-t="sn">音效</button><button data-t="nw">更新</button><button data-t="all">職業</button></div>
     <div id="list"></div>
@@ -45,7 +63,7 @@ const JP={swordsman:'J01',mage:'J02',ranger:'J03',cleric:'J04',knight:'J05',bers
 const $=s=>document.querySelector(s),G=$('#g');let L=null,tab='sk',last=null,loopT=0,ready=false,ci=0,nf=4,spd=1;const tgtOn={who:'foe'};
 /* 在遊戲頁的全域範圍裡建立控制器（才拿得到遊戲內的變數） */
 const HOOK=`window.LAB={
- gm(){return FXLAB},
+ gm(){if(!document.getElementById('labcss')){const st=document.createElement('style');st.id='labcss';st.textContent='#xlog,#xcmds,#bcast,.chatbar{display:none!important}';document.head.appendChild(st)}return FXLAB},
  areas(){return AREAS.map(a=>a.n)},
  setup(base,adv,a,nf){const m=document.getElementById('maint');if(m)m.remove();MAINT=false;B=null;RUN=null;MODAL=null;STORY=null;const _t=toast,_s=sys;toast=()=>{};sys=()=>{};try{newGame('工作室',base,'m');if(adv)S.adv=adv;S.tut=Object.fromEntries(Object.keys(TIPS).map(k=>[k,1]));
    while(S.lv<60)gainExp(need(S.lv));learn(true)}finally{toast=_t;sys=_s}for(let i=0;i<10;i++)S.cleared[i]=1;S.party=null;TAB='adv';startRun(a);RUN.step=1;const mb=AREAS[a].mobs;startBattle(mb[0],'',0);for(let i=1;i<nf;i++)addFoe7(mb[i%mb.length],'',{});grpDone7(false);B.auto=false;MODAL=null;render()},
