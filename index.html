@@ -858,24 +858,29 @@ function toast(t){const T=$('#toast');while(T.children.length>=3)T.firstChild.re
 
 /* ============ 資料 ============ */
 const ATTR={STR:'力量',DEX:'敏捷',INT:'智力',VIT:'體質',LUK:'幸運'};
+/* V6.3 企劃表：等級上限 100；每級 1 點、每 10 級再 +2；單項裸裝上限 45；HP／防禦倍率看職業 */
+const LVMAX=100,ATTRMAX=45;
+const CMUL={swordsman:[1.1,1.1],mage:[.85,.85],ranger:[.95,.95],cleric:[1,.9],knight:[1.25,1.25],berserker:[1.2,1],archmage:[.85,.85],warlock:[.9,.9],sniper:[.95,.95],assassin:[.9,.9],bishop:[1,.95],templar:[1.3,1.25],dual:[1,1]};
+const cmul=()=>CMUL[S.adv]||CMUL[S.cls]||[1,1];
+const ptsAt=lv=>lv-1+2*Math.floor(lv/10);
 const CLS={
-  swordsman:{n:'劍士',d:'血多防高的前排，四個職業裡最耐打。',f:'攻擊會讓敵人累積「破綻」，再用清算招式一次打出去。',base:{STR:8,DEX:5,INT:3,VIT:8,LUK:4},grow:{STR:1,VIT:1},atk:'STR',basic:'ATK',adv:['knight','berserker']},
-  mage:{n:'法師',d:'魔法傷害最高，但血少、不耐打。',f:'技能會在敵人身上留下印記，再用引爆招式一起炸開。',base:{STR:2,DEX:4,INT:10,VIT:5,LUK:5},grow:{INT:2},atk:'STR',basic:'MAG',adv:['archmage','warlock']},
-  ranger:{n:'遊俠',d:'閃避和爆擊都高，出手快。',f:'攻擊和閃避會累積「專注」，專注越高，下一招越痛。',base:{STR:4,DEX:10,INT:3,VIT:9,LUK:6},grow:{DEX:1,LUK:1},atk:'DEX',basic:'ATK',adv:['sniper','assassin']},
-  cleric:{n:'神官',d:'能補血又耐打，傷害比較低。',f:'補血和攻擊會累積「信仰」，集滿後自動發動一次。',base:{STR:4,DEX:4,INT:8,VIT:8,LUK:4},grow:{INT:1,VIT:1},atk:'STR',basic:'MAG',adv:['bishop','templar']},
-  dual:{n:'雙劍士',ex:1,hide:1,d:'雙手各拿一把單手劍，一招砍很多下。血不厚。',f:'每砍中一下累積「連段」，連段越高越痛；被打中會掉 3 層。',base:{STR:7,DEX:8,INT:3,VIT:7,LUK:5},grow:{STR:1,DEX:1},atk:'STR',basic:'ATK',adv:[]}
+  swordsman:{n:'劍士',d:'血多防高的前排，四個職業裡最耐打。',f:'攻擊會讓敵人累積「破綻」，再用清算招式一次打出去。',base:{STR:5,DEX:5,INT:5,VIT:5,LUK:5},grow:{},atk:'STR',basic:'ATK',adv:['knight','berserker']},
+  mage:{n:'法師',d:'魔法傷害最高，但血少、不耐打。',f:'技能會在敵人身上留下印記，再用引爆招式一起炸開。',base:{STR:5,DEX:5,INT:5,VIT:5,LUK:5},grow:{},atk:'STR',basic:'MAG',adv:['archmage','warlock']},
+  ranger:{n:'遊俠',d:'閃避和爆擊都高，出手快。',f:'攻擊和閃避會累積「專注」，專注越高，下一招越痛。',base:{STR:5,DEX:5,INT:5,VIT:5,LUK:5},grow:{},atk:'DEX',basic:'ATK',adv:['sniper','assassin']},
+  cleric:{n:'神官',d:'能補血又耐打，傷害比較低。',f:'補血和攻擊會累積「信仰」，集滿後自動發動一次。',base:{STR:5,DEX:5,INT:5,VIT:5,LUK:5},grow:{},atk:'STR',basic:'MAG',adv:['bishop','templar']},
+  dual:{n:'雙劍士',ex:1,hide:1,d:'雙手各拿一把單手劍，一招砍很多下。血不厚。',f:'每砍中一下累積「連段」，連段越高越痛；被打中會掉 3 層。',base:{STR:5,DEX:5,INT:5,VIT:5,LUK:5},grow:{},atk:'STR',basic:'ATK',adv:[]}
 };
 /* 還沒開放的職業（hide:1）不出現在創角與篩選；已經是該職業的存檔照常運作 */
 const CLSV=()=>Object.keys(CLS).filter(k=>!CLS[k].hide||(S&&S.cls===k));
 const ADV={
-  knight:{n:'騎士',d:'主打防禦的前排。體質 +5、力量 +3。',bonus:{VIT:5,STR:3}},
-  berserker:{n:'狂戰士',d:'扣自己的血換高傷害。力量 +8。',bonus:{STR:8}},
-  archmage:{n:'大魔導士',d:'印記引爆的傷害更高。智力 +8。',bonus:{INT:8}},
-  warlock:{n:'咒術師',d:'邊打邊吸血的法師。智力 +5、體質 +3。',bonus:{INT:5,VIT:3}},
-  sniper:{n:'神射手',d:'專注的加成更高。敏捷 +8、體質 +4。',bonus:{VIT:4,DEX:8}},
-  assassin:{n:'刺客',d:'爆擊高，擅長一擊解決。敏捷 +5、幸運 +5、體質 +4。',bonus:{VIT:4,DEX:5,LUK:5}},
-  bishop:{n:'主教',d:'信仰累積得更快。智力 +6、體質 +2。',bonus:{INT:6,VIT:2}},
-  templar:{n:'聖殿騎士',d:'拿鎚子近戰的神官。力量 +6、體質 +4。',bonus:{STR:6,VIT:4}}
+  knight:{n:'騎士',d:'主打防禦的前排。體質 +5、力量 +3。',bonus:{}},
+  berserker:{n:'狂戰士',d:'扣自己的血換高傷害。力量 +8。',bonus:{}},
+  archmage:{n:'大魔導士',d:'印記引爆的傷害更高。智力 +8。',bonus:{}},
+  warlock:{n:'咒術師',d:'邊打邊吸血的法師。智力 +5、體質 +3。',bonus:{}},
+  sniper:{n:'神射手',d:'專注的加成更高。敏捷 +8、體質 +4。',bonus:{}},
+  assassin:{n:'刺客',d:'爆擊高，擅長一擊解決。敏捷 +5、幸運 +5、體質 +4。',bonus:{}},
+  bishop:{n:'主教',d:'信仰累積得更快。智力 +6、體質 +2。',bonus:{}},
+  templar:{n:'聖殿騎士',d:'拿鎚子近戰的神官。力量 +6、體質 +4。',bonus:{}}
 };
 const SK={
   slash:{n:'裂甲擊',c:'swordsman',lv:1,mp:4,dmg:{s:'ATK',p:1.55,rend:1},brk:2,d:'踏前一步重砍，敵人破綻 +2。劈開護甲：無視物理抗性。'},
@@ -1184,7 +1189,7 @@ Object.assign(SKM,{s_cut:{n:'影斬',pow:1.7,pierce:.3,fx:'claw',c:'#9a7aff',d:'
   s_light:{n:'偽聖光',mag:1,pow:1.6,fx:'beam',c:'#9a7aff',d:'扭曲的聖光'},
   s_mirror:{n:'鏡像分身',self:{atk:.3,def:.3,t:3},fx:'aura',c:'#9a7aff',d:'攻防 +30%，持續 9 秒'}});
 const SHADOW={swordsman:['brute',['s_cut','m_dread','s_mirror']],mage:['caster',['s_bolt','m_engulf','s_mirror']],ranger:['swift',['s_arrow','s_cut','s_mirror']],dual:['swift',['s_cut','s_cut','s_mirror']],cleric:['tank',['s_light','m_sap','s_mirror']]};
-const TRIAL={lv:20,gold:3000,items:{m_ore:5,m_ice:3}};
+const TRIAL={lv:30,gold:3000,items:{m_ore:5,m_ice:3}};
 const AFF={rage:{n:'狂暴',d:'攻擊 +40%'},shell:{n:'堅殼',d:'防禦 +80%'},regen:{n:'再生',d:'每 3 秒回復 6% HP'},leech:{n:'吸血',d:'攻擊吸取 30% 傷害'},
   reflect:{n:'反射',d:'反彈 15% 受到的傷害'},swift:{n:'迅捷',d:'迴避 +15%、爆擊 +15%'},venom:{n:'劇毒',d:'攻擊附帶中毒'}};
 const HST={poison:'中毒',burn:'灼燒',bleed:'流血',weak:'虛弱',stun:'暈眩'};
@@ -1822,16 +1827,16 @@ const WEEKLY=[{k:'ab',c:20,n:'霧淵走到第 20 層',rw:{gold:6000,items:{stone
 function wkSt(){const w=abW();if(!S.wk||S.wk.w!==w)S.wk={w,sal:0,hell:0,got:{}};return S.wk}
 const wkP=k=>k==='ab'?abSt().best:(wkSt()[k]||0);
 /* ============ 狀態 ============ */
-const KEY='azure_oath_save_v1';
+const KEY='azure_oath_save_v2',KEY_OLD='azure_oath_save_v1',SAVEV=3; /* 大改版清檔：舊金鑰的存檔留在裝置上不讀取，之後發補償用 */
 let S=null,TAB='town',RUN=null,B=null,MODAL=null,STORY=null;
 let NEWCLS='swordsman',NEWSEX='m',BAGF='all',NEWNAME='',BAGTAB='gear',QTAB='main',AUTO=false,CHATQ=[];
 /* 冒險途中重新整理不丟進度：把本趟路線存起來；戰鬥中斷則回到該節點重打 */
 function runSnap(){try{if(!S||!RUN||RUN.step<0||RUN.tower||RUN.trial){localStorage.removeItem(KEY+'_run');return}const o=JSON.parse(JSON.stringify(RUN,(k,v)=>typeof v==='function'?undefined:v));if(B){if(o.nodes[o.step]==='chest')o.nodes[o.step]='ambush';o.step--;o.view={type:'res',title:'戰鬥中斷',text:'你回過神來——魔物還擋在前面。'}}else if(!o.view||o.view.type!=='fork'&&o.view.type!=='gate'&&o.view.type!=='res'&&o.view.type!=='camp'&&o.view.type!=='kiln'&&o.view.type!=='shrine')o.view={type:'res',title:'繼續冒險',text:'你整理好行囊，繼續沿著路走。'};else if(o.view.type==='res')delete o.view.drop;localStorage.setItem(KEY+'_run',JSON.stringify({n:S.name,r:o}))}catch(e){}}
 function runLoad(){try{const j=localStorage.getItem(KEY+'_run');if(!j||!S)return;const o=JSON.parse(j);if(!o||o.n!==S.name||!o.r||!AREAS[o.r.area]||!Array.isArray(o.r.nodes)){localStorage.removeItem(KEY+'_run');return}RUN=o.r;B=null;TAB='adv';setTimeout(()=>toast('已回到冒險途中'),600)}catch(e){try{localStorage.removeItem(KEY+'_run')}catch(_){}}}
 let BAKT=0;function save(){runSnap();try{if(S&&S.ach)checkAch()}catch(e){}try{const j=JSON.stringify(S);localStorage.setItem(KEY,j);try{accDirty()}catch(e){}if(Date.now()-BAKT>300000){BAKT=Date.now();localStorage.setItem(KEY+'_bak',j)}}catch(e){}}
-function load(){try{const s=localStorage.getItem(KEY);if(s)S=JSON.parse(s)}catch(e){S=null}if(!S||!S.cls){try{const b=localStorage.getItem(KEY+'_bak');if(b){S=JSON.parse(b);setTimeout(()=>toast('主存檔損壞，已從備份還原'),800)}}catch(e){}}}
+function load(){try{const s=localStorage.getItem(KEY);if(s)S=JSON.parse(s)}catch(e){S=null}if(S&&(S.v||0)<SAVEV)S=null;if(!S||!S.cls){try{const b=localStorage.getItem(KEY+'_bak');if(b){S=JSON.parse(b);setTimeout(()=>toast('主存檔損壞，已從備份還原'),800)}}catch(e){}}}
 function newGame(name,cls,sex){
-  S={created:Date.now(),v:2,name,cls,sex,adv:null,lv:1,exp:0,gold:100,attr:Object.assign({},CLS[cls].base),pts:0,sp:0,skl:{},hp:1,mp:1,
+  S={created:Date.now(),v:SAVEV,vet:(()=>{try{return localStorage.getItem(KEY_OLD)?1:0}catch(e){return 0}})(),name,cls,sex,adv:null,lv:1,exp:0,gold:100,attr:Object.assign({},CLS[cls].base),pts:0,sp:0,skl:{},hp:1,mp:1,
      eq:{weapon:null,head:null,body:null,feet:null,ring:null,neck:null},gear:[],items:{pot:3,eth:1},uid:1,
      main:{ch:0,step:0,prog:0,acc:false},side:{},nst:{},cleared:{},flags:{},bond:0,
      st:{kills:0,run:0,enh:0,check:0,craft:0,nmboss:0},tut:{},dex:{m:{},g:{}},ach:{},tower:{best:0},daily:{date:'',kill:0,run:0,enh:0,got:{},sign:false}};
@@ -1995,7 +2000,7 @@ document.addEventListener('visibilitychange',()=>{try{if(!document.hidden){windo
 ['pointerdown','keydown'].forEach(e=>document.addEventListener(e,()=>{if(!BGMOFF&&!BGMCUR&&typeof S!=='undefined')bgmAuto();else if(AC&&AC.state==='suspended')AC.resume()},{passive:true}));
 
 /* ============ 計算 ============ */
-const need=lv=>Math.round((30+lv*28+lv*lv*4)*(2+lv*.8+Math.max(0,lv-25)*1.2));
+const need=lv=>Math.round(40+18*Math.pow(lv,1.65));
 const CHLV=[1,7,13,19,24,26];const chLvOk=()=>S.lv>=(CHLV[S.main.ch]||1);
 const xpPen=L=>{const d=S.lv-L-5;return d>0?Math.max(.2,1-d*.15):1};
 const clsName=()=>S.adv?ADV[S.adv].n:CLS[S.cls].n;
@@ -2023,8 +2028,8 @@ const MS={
   LUK:[{n:'強運',d:'爆擊率 +6%',f:r=>{r.CRIT+=6}},{n:'奇蹟',d:'擊倒敵人回復 5% HP 與 MP',f:r=>{r.REAP+=5}}]
 };
 function stats(){const e=gearTotals(),a={},c=CLS[S.cls],v=k=>e[k]||0,p=k=>1+v(k)/100;for(const k in ATTR)a[k]=S.attr[k]+v(k);
-  const rgB=S.cls==='ranger'?1.35:S.cls==='dual'?1.4:S.cls==='swordsman'?1.3-Math.min(.15,Math.max(0,S.lv-15)*.01):S.cls==='mage'?1.2:1;const R={HP:Math.round((60+a.VIT*14+S.lv*8+Math.max(0,S.lv-10)*(S.cls==='mage'?24:S.cls==='ranger'?21:S.cls==='dual'?18:0)+v('hp'))*p('hpp')*rgB),MP:Math.round((20+a.INT*5+S.lv*3+v('mp'))*p('mpp')),ATK:Math.round((a[c.atk]*2.5+v('atk'))*p('atkp')),MAG:Math.round((a.INT*2.5+v('mag'))*p('magp')),
-    DEF:Math.round((a.VIT*1.4+v('def'))*p('defp')*rgB),MRES:Math.round((a.INT*.8+a.VIT*.4+S.lv+v('mres'))*p('mresp')),RF:Math.min(60,v('rfire')),RI:Math.min(60,v('rice')),RT:Math.min(60,v('rthunder')),RD:Math.min(60,v('rdark')),CRIT:Math.min(75,Math.round(5+a.LUK*.45+v('crit')+(fortK('crit')?8:0))),CD:Math.min(250,150+Math.round(a.LUK*.6)+v('cd')),EVA:Math.min(45,Math.round(a.DEX*.35+v('eva'))),SPD:Math.min(30,Math.round((a.DEX*.3+v('spd'))*10)/10),PEN:Math.min(30,Math.round(a.STR*.15+v('pen'))),
+  const cm=cmul();const R={HP:Math.round(((60+a.VIT*14+S.lv*8)*cm[0]+v('hp'))*p('hpp')),MP:Math.round((20+a.INT*5+S.lv*3+v('mp'))*p('mpp')),ATK:Math.round((a[c.atk]*2.5+v('atk'))*p('atkp')),MAG:Math.round((a.INT*2.5+v('mag'))*p('magp')),
+    DEF:Math.round((a.VIT*1.4*cm[1]+v('def'))*p('defp')),MRES:Math.round((a.INT*.8+a.VIT*.4+S.lv+v('mres'))*p('mresp')),RF:Math.min(60,v('rfire')),RI:Math.min(60,v('rice')),RT:Math.min(60,v('rthunder')),RD:Math.min(60,v('rdark')),CRIT:Math.min(75,Math.round(5+a.LUK*.45+v('crit')+(fortK('crit')?8:0))),CD:Math.min(250,150+Math.round(a.LUK*.6)+v('cd')),EVA:Math.min(45,Math.round(a.DEX*.35+v('eva'))),SPD:Math.min(30,Math.round((a.DEX*.3+v('spd'))*10)/10),PEN:Math.min(30,Math.round(a.STR*.15+v('pen'))),
     LS:v('ls'),REGEN:v('regen')+Math.min(3,a.VIT*.02),MPCUT:Math.min(50,Math.round(v('mpcut')+Math.min(20,a.INT*.12))),BURN:v('burn'),DOUBLE:v('double')+Math.min(20,Math.round(a.LUK*.12)),STUN:v('stun'),GUARD:v('guard'),SHIELD:v('shield'),BACK:Math.min(60,v('back')),THORN:Math.min(50,v('thorn')),GALE:v('gale'),REAP:Math.min(25,v('reap')),MPREG:v('mpreg'),RESMAX:v('resmax'),BRKCD:v('brkcd'),DETAMP:v('detamp'),FOCUSATK:v('focusatk'),ANSWER:v('answer'),HEALP:v('healp'),FAITHG:v('faithg'),KW:kwCount(),A:a};R.CRIT=Math.min(75,R.CRIT);R.EVA=Math.min(45,R.EVA);R.BACK=Math.min(60,R.BACK);R.THORN=Math.min(50,R.THORN);R.REAP=Math.min(25,R.REAP);return R}
 
 /* ===== 流派共鳴：同一種詞綴裝 2 件、3 件會改變戰鬥行為 ===== */
@@ -2048,7 +2053,7 @@ function buildName(c){c=c||kwCount();const top=Object.entries(c).filter(([k,n])=
 function power(){const s=stats();return Math.round(s.HP/4+s.MP/4+s.ATK*3+s.MAG*3+s.DEF*2.5+s.CRIT*4+(s.CD-150)*1.5+s.EVA*3+s.LS*5+(s.BURN+s.DOUBLE+s.STUN+s.GUARD+s.SHIELD+s.BACK+s.THORN+s.REAP)*3+s.GALE*40)}
 const baseAttr=()=>{const a=Object.assign({},CLS[S.cls].base),g=CLS[S.cls].grow;for(const k in g)a[k]+=g[k]*(S.lv-1);if(S.adv){const b=ADV[S.adv].bonus;for(const k in b)a[k]+=b[k]}return a};
 const freePts=()=>{const b=baseAttr();let n=0;for(const k in ATTR)n+=Math.max(0,S.attr[k]-b[k]);return n};
-const respecCost=()=>S.lv<10?0:S.lv*150;
+const respecCost=()=>S.respec?S.lv*100:0;
 let CT={};const confirmTap=k=>{const t=Date.now();if(CT[k]&&t-CT[k]<3000){CT={};return true}CT={[k]:t};toast('再按一次確認');return false};
 const mpCost=k=>Math.max(1,Math.round(SK[k].mp*(1-stats().MPCUT/100)));
 function clamp(){const s=stats();S.hp=Math.min(S.hp,s.HP);S.mp=Math.min(S.mp,s.MP)}
@@ -2093,10 +2098,10 @@ const rollGear=(tier,minR,bonus,hard)=>makeGear(tier,rollRar(minR||0,bonus),hard
 function dismantle(g){try{wkSt().sal++}catch(e){}const d=DIS[g.r][0]+g.p*2,st=DIS[g.r][1];addItem('dust',d);if(st)addItem('stone',st);for(const gm of g.sock||[])if(gm)addItem(gm,1);S.gear=S.gear.filter(x=>x.u!==g.u);return [d,st]}
 function gainExp(n){
   S.exp+=n;let up=false;
-  while(S.lv<40&&S.exp>=need(S.lv)){S.exp-=need(S.lv);S.lv++;S.pts+=2;S.sp++;const g=CLS[S.cls].grow;for(const k in g)S.attr[k]+=g[k];up=true}
-  if(S.lv>=40)S.exp=Math.min(S.exp,need(40)-1);
+  while(S.lv<LVMAX&&S.exp>=need(S.lv)){S.exp-=need(S.lv);S.lv++;S.pts+=1+(S.lv%10===0?2:0);S.sp++;up=true}
+  if(S.lv>=LVMAX)S.exp=Math.min(S.exp,need(LVMAX)-1);
   if(up)for(const id in PASS)if(PASS[id].lv===S.lv&&hasP(id))toast(`習得被動【${PASS[id].n}】`);
-  if(up){const s=stats();S.hp=s.HP;S.mp=s.MP;learn();toast(`升級！Lv.${S.lv}　屬性點 +2　技能點 +1`);if(S.lv%5===0)sys(`${S.name} 升到了 Lv.${S.lv}！`)}
+  if(up){const s=stats();S.hp=s.HP;S.mp=s.MP;learn();toast(`升級！Lv.${S.lv}　屬性點 +${1+(S.lv%10===0?2:0)}　技能點 +1`);if(S.lv%5===0)sys(`${S.name} 升到了 Lv.${S.lv}！`)}
 }
 function give(rw){const t=[];
   const gd=(rw.gold||0)+(rw.gem||0)*5;if(gd){S.gold+=gd;t.push(`${gd} G`)}
@@ -2313,7 +2318,7 @@ async function accPush(force){if(!ACC||!S||ACCBUSY||ACCCONF&&!force)return;if(B&
     else if(st===409){ACCCONF=j;ACCST='另一台裝置有較新的進度';toast(`雲端有來自${j.dev||'另一台裝置'}的較新進度，請到「設定 → 雲端帳號」選擇要保留哪一份`)}
     else if(st===403){ACCST='登入已失效，請重新登入';ACC=null;accStore()}else ACCST='同步失敗，稍後自動重試'}catch(e){ACCST='連不上伺服器，稍後自動重試'}
   ACCBUSY=false;if(MODAL&&MODAL.k==='settings')drawModal()}
-function accApply(code){const o=loadCode(code);if(!o)return false;S=o;migrate();RUN=null;B=null;try{checkDaily()}catch(e){}const j=JSON.stringify(S);try{localStorage.setItem(KEY,j)}catch(e){}return true}
+function accApply(code){const o=loadCode(code);if(!o||(o.v||0)<SAVEV)return false;S=o;migrate();RUN=null;B=null;try{checkDaily()}catch(e){}const j=JSON.stringify(S);try{localStorage.setItem(KEY,j)}catch(e){}return true}
 async function accPull(){if(!ACC)return;try{const {st,j}=await accApi('load',{name:ACC.n,token:ACC.tk});if(st===200&&j.data&&accApply(j.data)){ACC.ts=j.ts;ACC.dirty=0;ACCCONF=null;ACCST='已下載雲端進度';accStore();MODAL=null;TAB='town';render();toast(`已載入雲端進度：${S.name} Lv.${S.lv}`)}else toast(st===403?'登入已失效，請重新登入':'下載失敗')}catch(e){toast('連不上伺服器')}}
 /* 開啟遊戲時：雲端比這台新就自動下載，否則把這台的變更上傳 */
 async function accBoot(){if(!ACC)return;try{const {st,j}=await accApi('load',{name:ACC.n,token:ACC.tk,meta:1});if(st===403){ACC=null;accStore();toast('雲端帳號登入已失效，請重新登入');return}if(st!==200)return;
@@ -2564,7 +2569,7 @@ function vChar(){const s=stats(),sc=setCounts();
    <div class="cy-pw"><span>戰力</span><b>${power()}</b></div>${radar}</div>
    <div class="cy-bars">${gauge('hp',S.hp,s.HP)}${gauge('mp',S.mp,s.MP)}${gauge('exp',S.exp,need(S.lv))}</div>
    <div class="cy-grid">${mg?cell('魔法攻擊',s.MAG,'main')+cell('物理攻擊',s.ATK):cell('物理攻擊',s.ATK,'main')+cell('魔法攻擊',s.MAG)}${cell('防禦',s.DEF)}${cell('魔抗',s.MRES)}${cell('爆擊',s.CRIT+'%')}${cell('爆傷',s.CD+'%')}${cell('迴避',s.EVA+'%')}${cell('吸血',s.LS+'%')}</div>
-   ${s.RF||s.RI||s.RT||s.RD?`<div class="cy-res"><span>火 ${s.RF}%</span><span>冰 ${s.RI}%</span><span>雷 ${s.RT}%</span><span>暗 ${s.RD}%</span></div>`:''}</div>`:CTAB==='build'?`${buildPanel()}<div class="panel"><h3>職業特色</h3><p class="sub">${CLS[S.cls].f}</p><div class="gsec"><b>目前打法：${STN[S.cls][stn()].n}</b><span class="sub">${STN[S.cls][stn()].d}</span><span class="sub" style="opacity:.7">裝備的共鳴會影響打法。</span></div>${Object.keys(PASS).filter(id=>PASS[id].c===S.cls||PASS[id].c===S.adv).map(id=>`<span class="subl row ${hasP(id)?'':'sub'}" style="gap:6px"><span class="ico c4" style="width:30px;height:30px">${icon('pass_'+id,ic('skill'))}</span><span class="grow">被動【${PASS[id].n}】Lv.${PASS[id].lv}：${PASS[id].d}${PASS[id].sx?PASS[id].sx.map((x,i)=>`<br><span style="${stn()===i?'color:var(--r4);font-weight:700':'opacity:.6'}">${stn()===i?'✔ ':''}${STN[S.cls][i].n}：${x.d}</span>`).join(''):''}</span></span>`).join('')}${S.adv?`<p class="sub">${ADV[S.adv].n}：${ADV[S.adv].d}</p>`:''}</div>`:CTAB==='attr'?`<div class="panel"><h3>屬性　<span class="tag ${S.pts?'red':'off'}">可用 ${S.pts} 點</span><button class="btn sm" style="float:right" data-a="respec">重置（${respecCost()} G）</button></h3>${Object.keys(ATTR).map(k=>`<div class="attr"><span><b class="cy-k">${k}</b> ${ATTR[k]}<span class="sub">　${{STR:'物理攻擊・物防穿透',DEX:'行動速度・迴避',INT:'魔力・MP・技能省 MP',VIT:'HP・防禦・每 3 秒回血',LUK:'爆擊・爆傷・連擊・掉寶'}[k]}</span></span><b>${S.attr[k]}${s.A[k]>S.attr[k]?`<small class="up">+${s.A[k]-S.attr[k]}</small>`:''}</b><button class="btn sm" data-a="addPt" data-v="${k}" ${S.pts?'':'disabled'}>＋</button></div><div class="cy-ab"><u style="width:${Math.min(100,s.A[k]/75*100)}%"></u></div>`).join('')}</div>`:CTAB==='gear'?`<div class="panel"><h3>裝備</h3>${eq}<p class="sub" style="text-align:center">點部位查看裝備詳細資料</p>${setHtml}</div>`:CTAB==='ally'?`${Object.keys(ALLY).some(k=>ALLY[k].open())?`<div class="panel"><h3>同行夥伴</h3><div class="party">${[...Object.keys(ALLY).filter(k=>ALLY[k].open()),'none'].map(k=>`<button class="btn ${(S.party||'none')===k?'on':''}" data-a="setParty" data-v="${k}">${k==='none'?'<b>獨自冒險</b><span class="sub">不帶夥伴</span>':`${art(ALLY[k].img,ALLY[k].n,'r11','mini')}<b>${ALLY[k].n}</b><span class="sub">${ALLY[k].role}</span>`}</button>`).join('')}</div><p class="sub">${S.party&&S.party!=='none'?ALLY[S.party].d+(S.party==='luna'?'　羈絆越高，露娜越強。':''):'沒有夥伴同行。'}</p>${S.party==='luna'?`<div class="gsec"><b>露娜・燈術士　羈絆 ${Math.floor(S.bond||0)}</b><span class="sub">下一級進度 ${Math.round(((S.bond||0)%1)*100)}%・今日已累積 ${(S.daily&&S.daily.bond||0).toFixed(2)}／1.5（一起冒險、打首領、營火閒聊）</span>${Object.values(LUNASK).map(k=>`<span class="sub ${k.ok()?'son':''}">${k.ok()?'◆':'◇'} 【${k.n}】${k.d}${k.ok()?'':`（解鎖：${k.need}）`}</span>`).join('')}</div>`:''}</div>`:''}`:`<div class="panel"><h3>技能　<span class="tag ${S.sp?'red':'off'}">技能點 ${S.sp}</span></h3><div class="list">${sk}</div>${nxt?`<div class="chips">${nxt}</div>`:''}</div>`;
+   ${s.RF||s.RI||s.RT||s.RD?`<div class="cy-res"><span>火 ${s.RF}%</span><span>冰 ${s.RI}%</span><span>雷 ${s.RT}%</span><span>暗 ${s.RD}%</span></div>`:''}</div>`:CTAB==='build'?`${buildPanel()}<div class="panel"><h3>職業特色</h3><p class="sub">${CLS[S.cls].f}</p><div class="gsec"><b>目前打法：${STN[S.cls][stn()].n}</b><span class="sub">${STN[S.cls][stn()].d}</span><span class="sub" style="opacity:.7">裝備的共鳴會影響打法。</span></div>${Object.keys(PASS).filter(id=>PASS[id].c===S.cls||PASS[id].c===S.adv).map(id=>`<span class="subl row ${hasP(id)?'':'sub'}" style="gap:6px"><span class="ico c4" style="width:30px;height:30px">${icon('pass_'+id,ic('skill'))}</span><span class="grow">被動【${PASS[id].n}】Lv.${PASS[id].lv}：${PASS[id].d}${PASS[id].sx?PASS[id].sx.map((x,i)=>`<br><span style="${stn()===i?'color:var(--r4);font-weight:700':'opacity:.6'}">${stn()===i?'✔ ':''}${STN[S.cls][i].n}：${x.d}</span>`).join(''):''}</span></span>`).join('')}${S.adv?`<p class="sub">${ADV[S.adv].n}：${ADV[S.adv].d}</p>`:''}</div>`:CTAB==='attr'?`<div class="panel"><h3>屬性　<span class="tag ${S.pts?'red':'off'}">可用 ${S.pts} 點</span><button class="btn sm" style="float:right" data-a="respec">重置（${respecCost()} G）</button></h3>${Object.keys(ATTR).map(k=>`<div class="attr"><span><b class="cy-k">${k}</b> ${ATTR[k]}<span class="sub">　${{STR:'物理攻擊・物防穿透',DEX:'行動速度・迴避',INT:'魔力・MP・技能省 MP',VIT:'HP・防禦・每 3 秒回血',LUK:'爆擊・爆傷・連擊・掉寶'}[k]}</span></span><b>${S.attr[k]}${s.A[k]>S.attr[k]?`<small class="up">+${s.A[k]-S.attr[k]}</small>`:''}</b><button class="btn sm" data-a="addPt" data-v="${k}" ${S.pts&&S.attr[k]<ATTRMAX?'':'disabled'}>＋</button></div><div class="cy-ab"><u style="width:${Math.min(100,s.A[k]/60*100)}%"></u></div>`).join('')}</div>`:CTAB==='gear'?`<div class="panel"><h3>裝備</h3>${eq}<p class="sub" style="text-align:center">點部位查看裝備詳細資料</p>${setHtml}</div>`:CTAB==='ally'?`${Object.keys(ALLY).some(k=>ALLY[k].open())?`<div class="panel"><h3>同行夥伴</h3><div class="party">${[...Object.keys(ALLY).filter(k=>ALLY[k].open()),'none'].map(k=>`<button class="btn ${(S.party||'none')===k?'on':''}" data-a="setParty" data-v="${k}">${k==='none'?'<b>獨自冒險</b><span class="sub">不帶夥伴</span>':`${art(ALLY[k].img,ALLY[k].n,'r11','mini')}<b>${ALLY[k].n}</b><span class="sub">${ALLY[k].role}</span>`}</button>`).join('')}</div><p class="sub">${S.party&&S.party!=='none'?ALLY[S.party].d+(S.party==='luna'?'　羈絆越高，露娜越強。':''):'沒有夥伴同行。'}</p>${S.party==='luna'?`<div class="gsec"><b>露娜・燈術士　羈絆 ${Math.floor(S.bond||0)}</b><span class="sub">下一級進度 ${Math.round(((S.bond||0)%1)*100)}%・今日已累積 ${(S.daily&&S.daily.bond||0).toFixed(2)}／1.5（一起冒險、打首領、營火閒聊）</span>${Object.values(LUNASK).map(k=>`<span class="sub ${k.ok()?'son':''}">${k.ok()?'◆':'◇'} 【${k.n}】${k.d}${k.ok()?'':`（解鎖：${k.need}）`}</span>`).join('')}</div>`:''}</div>`:''}`:`<div class="panel"><h3>技能　<span class="tag ${S.sp?'red':'off'}">技能點 ${S.sp}</span></h3><div class="list">${sk}</div>${nxt?`<div class="chips">${nxt}</div>`:''}</div>`;
   return `<div class="cyb">${tabs}${sec}</div>`}
 function buildPanel(){const c=kwCount(),ks=Object.keys(RZ).filter(k=>c[k]),nm=buildName(c);
   return `<div class="panel bld"><h3>我的流派　${nm?`<span class="tag red">${nm}</span>`:'<span class="tag off">尚未成形</span>'}</h3>
@@ -3174,7 +3179,7 @@ const ACH=[
   {id:'k1000',n:'魔物剋星',d:'累計擊敗 1000 隻魔物',c:()=>S.st.kills>=1000,rw:{gold:8000,items:{stone:5}}},
   {id:'run50',n:'老練旅人',d:'完成 50 次冒險',c:()=>S.st.run>=50,rw:{gold:3000}},
   {id:'lv20',n:'獨當一面',d:'等級達到 20',c:()=>S.lv>=20,rw:{items:{pot2:5}}},
-  {id:'lv40',n:'登峰造極',d:'等級達到 40',c:()=>S.lv>=40,rw:{gold:20000,items:{gem_y:1}}},
+  {id:'lv40',n:'登峰造極',d:'等級達到 100',c:()=>S.lv>=LVMAX,rw:{gold:20000,items:{gem_y:1}}},
   {id:'adv',n:'第二次誕生',d:'完成轉職',c:()=>!!S.adv,rw:{items:{stone:3}}},
   {id:'boss5',n:'五燈守護者',d:'討伐所有地區首領',c:()=>[0,1,2,3,4].every(i=>S.cleared[i]),rw:{gold:5000}},
   {id:'nm1',n:'惡夢行者',d:'擊敗一隻惡夢首領',c:()=>S.st.nmboss>=1,rw:{items:{stone:3}}},
@@ -3516,7 +3521,7 @@ function procs(s,d){const ps=[];
   if(B.aff.includes('reflect')&&d>0){const r=Math.max(1,Math.round(d*.15));S.hp=Math.max(1,S.hp-r);ps.push(`被反射 ${r} 傷害`)}
   return ps}
 const buffSum=k=>B.buffs.reduce((a,b)=>a+(b[k]||0),0);
-const CDM={swordsman:.017,cleric:.011,ranger:.014,mage:.008,dual:.012};const clsDm=()=>1+(CDM[S.cls]||0)*(S.cls==='swordsman'?Math.min(S.lv,24):S.lv);
+const CDM={swordsman:.017,cleric:.011,ranger:.014,mage:.008,dual:.012};const clsDm=()=>1;
 
 /* 屬性弱點：w=弱點（×1.5）、r=抗性（×0.6） */
 const ELN={phys:'物理',fire:'火',ice:'冰',thunder:'雷',holy:'聖',dark:'闇',poison:'毒',arcane:'奧術'};
@@ -4627,8 +4632,8 @@ const ACT={
   rtPause(){if(!B||!B.rt||B.rt.done)return;B.rt.paused=!B.rt.paused;rtPauseV()},
   rtItems(){rtItems()},
   rtFoe(v){if(!B||!B.rt)return;const i=+v;if(i<0||!B.adds||!B.adds[i]){openM('foe');return}if(B.adds[i].hp<=0)return;swapFoe(i);B.rt.vhT=0;B.fx=null;render()},
-  addPt(v){if(S.pts<1)return;S.pts--;S.attr[v]++;save();render()},
-  respec(){const c=respecCost();if(S.gold<c){toast(`需要 ${c} G`);return}const fr=freePts();if(fr<1){toast('目前沒有分配過的點數');return}if(!confirmTap('respec'))return;S.gold-=c;S.attr=baseAttr();S.pts+=fr;clamp();toast(`已重置，退回 ${fr} 點`);save();render()},
+  addPt(v){if(S.pts<1)return;if(S.attr[v]>=ATTRMAX){toast(`單項上限 ${ATTRMAX}`);return}S.pts--;S.attr[v]++;save();render()},
+  respec(){const c=respecCost();if(S.gold<c){toast(`需要 ${c} G`);return}const fr=freePts();if(fr<1){toast('目前沒有分配過的點數');return}if(!confirmTap('respec'))return;S.gold-=c;S.respec=1;S.attr=baseAttr();S.pts+=fr;clamp();toast(`已重置，退回 ${fr} 點`);save();render()},
   skUp(v){if(S.sp<1||(S.skl[v]||1)>=5)return;S.sp--;S.skl[v]=(S.skl[v]||1)+1;toast(`【${SK[v].n}】提升到 Lv.${S.skl[v]}`);save();render()},
   bagTab(v){BAGTAB=v;render()},gearF(v){BAGF=v;render()},gearR(v){S.bagf.r=+v;render()},gearS(v){S.bagf.sort=v;render()},gearT(v){S.bagf[v]=S.bagf[v]?0:1;render()},qTab(v){QTAB=v;render()},
   useItem(k){if(RUN&&B)return;const it=ITEMS[k],s=stats();if(it.use.hp&&S.hp>=s.HP||it.use.mp&&S.mp>=s.MP){toast('已經是滿的');return}
@@ -4753,7 +4758,7 @@ function faTown(){const msgs=[];try{checkDaily();
   if(!S.daily.sign){ACT.sign();msgs.push('簽到')}
   for(const d of DAILY)if(!S.daily.got[d.k]&&(S.daily[d.k]||0)>=d.c){ACT.dailyGet(d.k);msgs.push('領每日')}
   if(typeof fortune==='function'&&!fortune()&&S.main.ch>=1){ACT.fortune()}
-  if(S.pts>0){const main=CLS[S.cls].basic==='MAG'?'INT':CLS[S.cls].atk;let n=0;while(S.pts>0){S.pts--;S.attr[(n++%3===2)?'VIT':main]++}msgs.push('配點')}
+  if(S.pts>0){const main=CLS[S.cls].basic==='MAG'?'INT':CLS[S.cls].atk;let n=0;while(S.pts>0&&n<999){const k=(n++%3===2)?'VIT':main;if(S.attr[k]>=ATTRMAX){const o=Object.keys(ATTR).find(x=>S.attr[x]<ATTRMAX);if(!o)break;S.pts--;S.attr[o]++;continue}S.pts--;S.attr[k]++}msgs.push('配點')}
   if(S.sp>0){const ks=mySkills().filter(k=>(S.skl[k]||1)<5&&SK[k].dmg).sort((a,b)=>(S.skl[a]||1)-(S.skl[b]||1));const all=ks.length?ks:mySkills().filter(k=>(S.skl[k]||1)<5);let i=0;while(S.sp>0&&all.length){const k=all[i++%all.length];if((S.skl[k]||1)<5){S.sp--;S.skl[k]=(S.skl[k]||1)+1}else if(all.every(x=>(S.skl[x]||1)>=5))break}msgs.push('升技能')}
   const kc=kwCount(),dom=Object.keys(kc).sort((a,b)=>kc[b]-kc[a])[0]||faDom(),kwOf=g=>{const u=GEAR[g.id]&&GEAR[g.id].uq;return g.sp===dom||g.sp2===dom||(u&&dom in u)},fp=g=>gearPower(g)*(dom&&kwOf(g)?1.4:1);
   let ch=0;for(const sl in SLOTS){const cur=gearBy(S.eq[sl]);let best=cur,bp=cur?fp(cur):-1;
