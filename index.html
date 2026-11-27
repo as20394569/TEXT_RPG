@@ -1742,9 +1742,10 @@ const KEY='azure_oath_save_v2',KEY_OLD='azure_oath_save_v1',SAVEV=3; /* 大改�
 let S=null,TAB='town',RUN=null,B=null,MODAL=null,STORY=null;
 let NEWCLS='swordsman',NEWSEX='m',BAGF='all',NEWNAME='',BAGTAB='gear',QTAB='main',AUTO=false,CHATQ=[];
 /* 冒險途中重新整理不丟進度：把本趟路線存起來；戰鬥中斷則回到該節點重打 */
-function runSnap(){try{if(!S||!RUN||RUN.step<0||RUN.tower||RUN.trial){localStorage.removeItem(KEY+'_run');return}const o=JSON.parse(JSON.stringify(RUN,(k,v)=>typeof v==='function'?undefined:v));if(B){if(o.nodes[o.step]==='chest')o.nodes[o.step]='ambush';o.step--;o.view={type:'res',title:'戰鬥中斷',text:'你回過神來——魔物還擋在前面。'}}else if(!o.view||o.view.type!=='fork'&&o.view.type!=='gate'&&o.view.type!=='res'&&o.view.type!=='camp'&&o.view.type!=='kiln'&&o.view.type!=='shrine')o.view={type:'res',title:'繼續冒險',text:'你整理好行囊，繼續沿著路走。'};else if(o.view.type==='res')delete o.view.drop;localStorage.setItem(KEY+'_run',JSON.stringify({n:S.name,r:o}))}catch(e){}}
+function runSnap(){if(FXLAB)return;try{if(!S||!RUN||RUN.step<0||RUN.tower||RUN.trial){localStorage.removeItem(KEY+'_run');return}const o=JSON.parse(JSON.stringify(RUN,(k,v)=>typeof v==='function'?undefined:v));if(B){if(o.nodes[o.step]==='chest')o.nodes[o.step]='ambush';o.step--;o.view={type:'res',title:'戰鬥中斷',text:'你回過神來——魔物還擋在前面。'}}else if(!o.view||o.view.type!=='fork'&&o.view.type!=='gate'&&o.view.type!=='res'&&o.view.type!=='camp'&&o.view.type!=='kiln'&&o.view.type!=='shrine')o.view={type:'res',title:'繼續冒險',text:'你整理好行囊，繼續沿著路走。'};else if(o.view.type==='res')delete o.view.drop;localStorage.setItem(KEY+'_run',JSON.stringify({n:S.name,r:o}))}catch(e){}}
 function runLoad(){try{const j=localStorage.getItem(KEY+'_run');if(!j||!S)return;const o=JSON.parse(j);if(!o||o.n!==S.name||!o.r||!AREAS[o.r.area]||!Array.isArray(o.r.nodes)){localStorage.removeItem(KEY+'_run');return}RUN=o.r;B=null;TAB='adv';setTimeout(()=>toast('已回到冒險途中'),600)}catch(e){try{localStorage.removeItem(KEY+'_run')}catch(_){}}}
-let BAKT=0;function save(){runSnap();try{if(S&&S.ach)checkAch()}catch(e){}try{const j=JSON.stringify(S);localStorage.setItem(KEY,j);try{accDirty()}catch(e){}if(Date.now()-BAKT>300000){BAKT=Date.now();localStorage.setItem(KEY+'_bak',j)}}catch(e){}}
+var FXLAB=false;/* 特效工作室：不存檔 */
+let BAKT=0;function save(){if(FXLAB)return;runSnap();try{if(S&&S.ach)checkAch()}catch(e){}try{const j=JSON.stringify(S);localStorage.setItem(KEY,j);try{accDirty()}catch(e){}if(Date.now()-BAKT>300000){BAKT=Date.now();localStorage.setItem(KEY+'_bak',j)}}catch(e){}}
 function load(){try{const s=localStorage.getItem(KEY);if(s)S=JSON.parse(s)}catch(e){S=null}if(S&&(S.v||0)<SAVEV)S=null;if(!S||!S.cls){try{const b=localStorage.getItem(KEY+'_bak');if(b){S=JSON.parse(b);setTimeout(()=>toast('主存檔損壞，已從備份還原'),800)}}catch(e){}}}
 function newGame(name,cls,sex){
   S={created:Date.now(),v:SAVEV,vet:(()=>{try{return localStorage.getItem(KEY_OLD)?1:0}catch(e){return 0}})(),name,cls,sex,adv:null,lv:1,exp:0,gold:100,attr:Object.assign({},CLS[cls].base),pts:0,sp:0,skl:{},hp:1,mp:1,
@@ -2114,6 +2115,7 @@ function forkTalk(){const L=withLuna();const t=pick(L?FORKL.luna:FORKL.me);retur
 let MAINT=false;
 /* 管理者通行：網址帶 #gm-azure7319 開一次，之後這台裝置停服也能進（不上排行榜） */
 const GM=(()=>{try{if(location.hash==='#gm-azure7319'){localStorage.setItem('ao_gm','1');history.replaceState(null,'',location.pathname)}if(location.hash==='#gm-off')localStorage.removeItem('ao_gm');return localStorage.getItem('ao_gm')==='1'}catch(e){return false}})();
+FXLAB=GM&&/[?&]fxlab=1/.test(location.search);
 async function maintCheck(){try{const r=await fetch('maint.json?'+Date.now(),{cache:'no-store'});const j=await r.json();const on=!!(j&&j.on)&&!GM;if(on!==MAINT){MAINT=on;maintDraw(j)}}catch(e){}}
 function maintDraw(j){let el=document.getElementById('maint');if(!MAINT){if(el)el.remove();return}try{if(S)save();if(FA)faStop()}catch(e){}if(!el){el=document.createElement('div');el.id='maint';document.body.appendChild(el)}
   el.innerHTML=`<div class="mt-box"><div class="mt-ic">🔧</div><h2>停服維修中</h2><p>${esc((j&&j.msg)||'蒼藍誓約 Online 正在進行維修，開服時間另行公告。')}</p><p class="sub">你的存檔已安全保存，維修期間不會有任何變動。</p><button class="btn" onclick="location.reload()">重新整理</button></div>`}
@@ -3703,7 +3705,7 @@ const PFX=(()=>{let HS=0,cv,cx,P=[],Q=[],raf=0,W=0,Hh=0,t0=0,SR={x:0,y:0,w:360,h
   function emit(o){const [x,y]=pt(o.x,o.y),U=SR.w,N=Math.max(1,Math.round((o.n||1)*.6));for(let i=0;i<N;i++){const a=rnd(o.a0??0,o.a1??6.283),sp=rnd(o.s0||0,o.s1||0)*U;
     add({x:x+rnd(-1,1)*(o.jx||0)*U,y:y+rnd(-1,1)*(o.jy||0)*U,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:rnd(o.l0||.4,o.l1||.8),sz:rnd(o.z0||.006,o.z1||.012)*U,
       c:pk(o.c),sh:o.sh||'dot',g:(o.g||0)*U,drag:o.drag||0,gy:o.gy!=null?SR.y+SR.h*o.gy:null,bn:o.bn,add:o.add!==false,vr:rnd(-1,1)*(o.spin||0),rot:rnd(0,6.28),grow:o.grow||0,fade:o.fade,len:o.len})}}
-  const at=(ms,fn)=>Q.push({t:performance.now()+ms,fn});
+  const at=(ms,fn)=>Q.push({t:performance.now()+ms/(window.FXSPD||1),fn});
   /* 飛行物：from→to，dur 秒，沿途留尾跡 */
   function shot(f,t,dur,o){const [x0,y0]=pt(f[0],f[1]),[x1,y1]=pt(t[0],t[1]),arc=o.arc!=null?o.arc:o.sh==='arrow'?1.1:0,g=arc*SR.w,vy=(y1-y0)/dur-.5*g*dur;add({x:x0,y:y0,vx:(x1-x0)/dur,vy,g,aim:o.sh==='arrow',life:dur,sz:(o.z||.012)*SR.w,c:o.c,sh:o.sh||'dot',len:o.len,tr:o.tr,rot:Math.atan2(vy,x1-x0)})}
   function slash(f,ang,len,wd,c,bend){const [x,y]=pt(f[0],f[1]);add({x,y,life:.3,sh:'slash',ang,L:len*SR.w,bend:bend??.22,sz:wd*SR.w,c})}
@@ -3746,7 +3748,7 @@ const PFX=(()=>{let HS=0,cv,cx,P=[],Q=[],raf=0,W=0,Hh=0,t0=0,SR={x:0,y:0,w:360,h
   function loop(now){raf=requestAnimationFrame(loop);stage();
     if(t0&&now-t0>700){Q.length=0;P.length=0;t0=now}/* 分頁切回：丟掉積欠的特效，不要一口氣全播 */
     for(let i=Q.length-1;i>=0;i--)if(now>=Q[i].t){const f=Q[i].fn;Q.splice(i,1);try{f()}catch(e){}}
-    const dt=now<HS?0:Math.min(.05,t0?(now-t0)/1000:.016);t0=now;cx.clearRect(0,0,W,Hh);
+    const dt=(now<HS?0:Math.min(.05,t0?(now-t0)/1000:.016))*(window.FXSPD||1);t0=now;cx.clearRect(0,0,W,Hh);
     for(let i=P.length-1;i>=0;i--){const p=P[i];p.age+=dt;if(p.age>=p.life){P.splice(i,1);continue}
       if(p.drag){const f=Math.max(0,1-p.drag*dt);p.vx*=f;p.vy*=f}p.vy+=p.g*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.rot+=p.vr*dt;if(p.aim)p.rot=Math.atan2(p.vy,p.vx);if(p.gy!=null&&p.y>p.gy){p.y=p.gy;p.vy*=-(p.bn||.3);p.vx*=.55;p.vr*=.5;if(Math.abs(p.vy)<SR.w*.04){p.vy=0;p.g=0}}
       if(p.tr&&Math.random()<(p.tr.r||.9)){const t=p.tr;add({x:p.x+rnd(-1,1)*p.sz*.6,y:p.y+rnd(-1,1)*p.sz*.6,vx:rnd(-1,1)*SR.w*.04,vy:(t.up||0)*SR.w,life:rnd(.2,.45),sz:p.sz*rnd(.4,.8),c:pk(t.c),sh:t.sh||'dot',add:t.add!==false,grow:t.grow||-.6})}

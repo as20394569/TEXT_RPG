@@ -347,7 +347,7 @@ function clockRing(f,col){cel(.9,(c,k)=>{const [x,y]=P2(f),u=U(),r=u*.05;ADD(c);
 /* 施加：包住 stAdd，成功時在目標身上播一次（同一目標短時間內的相同狀態不重複播） */
 const LASTA=new WeakMap();
 if(typeof stAdd==='function'){const _sa=stAdd;stAdd=function(t,id,o){const r=_sa.apply(this,arguments);try{if(r&&B&&B.rt){const D=STV[STALIAS[id]||id];if(D&&!D.quiet){const key=t==='p'?H:t,m=LASTA.get(key)||{},n=performance.now();if(!(m[id]>n-500)){m[id]=n;LASTA.set(key,m);
-    const dl=t==='p'?380:520;setTimeout(()=>{try{D.s(0)}catch(e){}if(reduce())return;const f=ptOf(t);if(!f)return;run();locate();try{D.on(f)}catch(e){}stRun()},dl)}}}}catch(e){}return r}}
+    const dl=(t==='p'?380:520)/(window.FXSPD||1);setTimeout(()=>{try{D.s(0)}catch(e){}if(reduce())return;const f=ptOf(t);if(!f)return;run();locate();try{D.on(f)}catch(e){}stRun()},dl)}}}}catch(e){}return r}}
 /* 跳傷：持續傷害每跳一次在目標身上冒一下 */
 if(typeof stTick==='function'){const _tk=stTick;stTick=function(t){let dots=[];try{if(B&&B.rt){const bx=stBox(t),nw=acOf(t);for(const id in bx){const D=STX[id];if(D&&(D.dot||D.hot)&&bx[id].e>nw)dots.push(id)}}}catch(e){}const r=_tk.apply(this,arguments);
   if(dots.length)setTimeout(()=>{const f=ptOf(t);dots.forEach((id,i)=>setTimeout(()=>{const v=STV[id];if(!v)return;try{tickSnd(id)}catch(e){}if(reduce()||!f)return;run();locate();tickFx(f,id,v.c)},i*120))},60);return r}}
