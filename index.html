@@ -3092,6 +3092,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'19.5',d:'2026-11-27',t:'盾牌、旋風、順暢度',b:'①盾牌技能重做：盾劍擊、盾擊、盾衝是真的把盾牌砸過去（盾擊會飛回來），盾壁反擊在自己面前立起大盾，盾震從腳下沿地面震到每個敵人。②劍士旋風斬是刀光繞著敵人轉；狂戰士旋風斧是一把斧光沿大圈橫掃全場、捲起塵土；雙劍士是兩色刀光反向旋轉。③多段斬擊改成交錯的角度，不再好幾條平行。④箭雨、火雨等多重特效大幅減輕負擔，不再卡頓。'},
   {v:'19.4',d:'2026-11-27',t:'破甲與守勢',b:'破甲斬：對手身上先浮出一面護甲，被一刀劈成兩半往外裂開掉落（雙劍士的破甲斬是交叉兩刀劈成四塊）。守勢斬、反擊斬的盾牌改在自己身上。'},
   {v:'19.3',d:'2026-11-27',t:'刀光調整',b:'斬擊刀光改成壓得很扁的菱形，前後兩端收成尖點，中間一條白色細芯；刀光與狀態的顏色加強，在圖卡上更顯眼。'},
   {v:'19.2',d:'2026-11-27',t:'特效再打磨',b:'①斬擊改成壓扁的菱形刃光，每招排列都不同：單刃、十字、交叉、三連、星芒、扇形、迴旋、突刺、巨刃。②法術與射擊逐招設計：星彈、冰鎖、火焰龍捲、冰爆、雷球、靈魂抽取、影刺地波、咒鎖、光波、羽落、光之劍；箭有散射、追蹤弧線、音爆、狙擊彈道。③負面狀態各有專屬圖案：骷髏咒、魔法陣、冷汗、裂紋、聚光、蒙眼、禁言、傷痕、魔力流失等。'},
@@ -3695,7 +3696,7 @@ document.addEventListener('keydown',rtKey);
 /* ============ 粒子特效（Canvas） ============ */
 const PFX=(()=>{let HS=0,cv,cx,P=[],Q=[],raf=0,W=0,Hh=0,t0=0,SR={x:0,y:0,w:360,h:260};
   const rnd=(a,b)=>a+Math.random()*(b-a),pk=a=>Array.isArray(a)?a[Math.floor(Math.random()*a.length)]:a;
-  function ensure(){const app=$('#app');if(!cv||!app.contains(cv)){cv=document.createElement('canvas');cv.id='pfx';app.appendChild(cv);cx=cv.getContext('2d')}
+  function ensure(){const app=$('#app');if(!cv||!app.contains(cv)){cv=document.createElement('canvas');cv.id='pfx';app.appendChild(cv);cx=cv.getContext('2d');try{const D=Object.getOwnPropertyDescriptor(CanvasRenderingContext2D.prototype,'shadowBlur');Object.defineProperty(cx,'shadowBlur',{get(){return D.get.call(this)},set(v){D.set.call(this,Math.min(v,window.FXBLUR??0))}})}catch(e){}}
     const r=app.getBoundingClientRect(),d=Math.min(2,window.devicePixelRatio||1);if(W!==r.width||Hh!==r.height){W=r.width;Hh=r.height;cv.width=W*d;cv.height=Hh*d;cx.setTransform(d,0,0,d,0,0)}}
   function stage(){const st=(document.querySelector('.stage')||document.querySelector('#xfield')),a=$('#app').getBoundingClientRect();if(st){const r=st.getBoundingClientRect();SR={x:r.left-a.left,y:r.top-a.top,w:r.width,h:r.height}}}
   const pt=(fx,fy)=>[SR.x+SR.w*fx,SR.y+SR.h*fy];
@@ -4294,7 +4295,7 @@ const PFX=(()=>{let HS=0,cv,cx,P=[],Q=[],raf=0,W=0,Hh=0,t0=0,SR={x:0,y:0,w:360,h
   const heroFxn=fx=>fx.skill?(HFXO[fx.skill]||HFXN[(SKA[fx.skill]||[])[0]]||'impact_hit'):({swordsman:'slash_white',dual:'slash_white',ranger:'impact_hit',mage:'magic_burst',cleric:'holy_burst'}[S_CLS()]||'impact_hit');
   const foeFxn=fx=>fx.fsk?(FFXN[fx.fsk]||'impact_hit'):'claw_red';
   const SELF={heal:'heal_sparkle',buff:'buff_aura',shield:'shield_bubble'};
-  const kit={cel,P2,U,F,H,AL,HP_,FMp,SKY,later,multi,flash,shock,spark,hitFx,phys,debris,cut,streak,comet,ray,column,zapB,rune,charge,vine,flames,crystals,fog,auraUp,bubble,claw,bite,wind,swirl,twinkle,lunge,hop,castPose,tint,run,locate,rg,ADD,eo,rnd2,GY,emit,reduce,SR:()=>SR,T0};
+  const kit={cel,P2,U,F,H,AL,HP_,FMp,SKY,later,multi,flash,shock,spark,hitFx,phys,debris,cut,streak,comet,ray,column,zapB,rune,charge,vine,flames,crystals,fog,auraUp,bubble,claw,bite,wind,swirl,twinkle,lunge,hop,castPose,tint,run,locate,rg,ADD,eo,rnd2,GY,emit,reduce,SR:()=>SR,T0,n:()=>[P.length,Q.length]};
   return{kit,
     impact,heroFxn,foeFxn,marks(l){if(!B){MS=[];return}locate();syncMarks(l);const a=B.st||{},b=B.pst||{};if(Object.values(a).some(v=>v>0)||Object.values(b).some(v=>v>0)){run();stLayer()}},
     ally(k){if(reduce())return;run();locate();const LB='#6ac8ff',HP2=[AL[0]+.03,AL[1]-.04];castPose&&0;
