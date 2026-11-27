@@ -4,6 +4,8 @@
    - 探索遭遇權重、探索事件、討伐委託、成就、圖鑑揭露、首領紀錄、終局難度 */
 (function(){'use strict';})();
 const ZN6=V6.ZONE;
+/* 平衡（主線）：企劃表的經驗基準要打上百隻才升一級，改成同級普通怪約 8～20 隻升一級 */
+const expBase6=L=>Math.max(V6.MLV[Math.max(1,Math.min(100,Math.round(L)))-1][11],Math.round(need(Math.max(1,Math.min(99,Math.round(L))))/(8+.12*L)));
 const MLV6=lv=>V6.MLV[Math.max(1,Math.min(100,Math.round(lv)))-1];/* [lv,hp低,hp高,攻低,攻高,防低,防高,抗低,抗高,秒低,秒高,EXP,金幣] */
 const RANK6={N:V6.MRANK[0],E:V6.MRANK[1],B:V6.MRANK[2]};
 const ROLE6=Object.fromEntries(V6.MROLE.map(r=>[r.id,r]));
@@ -357,7 +359,7 @@ function gearDrop6(L,rk,got,opt){try{if(typeof dropGear6==='function'){const gs=
 function zst6(z){S.z6=S.z6||{};return S.z6[z]||(S.z6[z]={ex:0,kN:0,kE:0,kB:0,ch:0,ga:0})}
 function spoil(){const m=B.m,L=B.L,bs=B.kind==='boss',rk=B.rank6||(bs?'B':B.kind==='elite'?'E':'N'),T=B.tot||(B.tot={exp:0,gold:0,got:[],names:[]}),got=T.got,s=stats();
   const row=MLV6(L),R=RANK6[rk],xm=(B.nm?2.5:1)*(B.xmul||1),z=zoneOf6();
-  const exp=Math.round(row[11]*R.exp*xm*(fortK('exp')?1.15:1)*liveExp()*xpPen(L)*(1+(s.EXP||0)/100));
+  const exp=Math.round(expBase6(L)*R.exp*xm*(fortK('exp')?1.15:1)*liveExp()*xpPen(L)*(1+(s.EXP||0)/100));
   const gold=Math.round(row[12]*R.gold*(B.gmul||1)*(B.nm?2.5:1)*(.9+Math.random()*.2)*(fortK('gold')?1.25:1)*(RUN&&RUN.bless==='luck'?1.3:1)*(1+(s.GOLD||0)/100));
   S.gold+=gold;T.exp+=exp;T.gold+=gold;T.names.push(B.name);
   if(B.id!=='shadow'){if(Math.random()<({N:.15,E:.5,B:1}[rk]))give6(zmat6(z,Math.random()<.5?2:3),1,got);if(bs)give6(zmat6(z,5),1,got)}
@@ -423,7 +425,7 @@ function ev6Do(o){const v=RUN.view,i=ev6Idx(v.id),z=zoneOf6(),L=ZN6[z].lo,row=ML
   else if(i===5){const g=row[12]*3;S.gold+=g;RUN.loot.gold+=g;give6(zcons6(z,0),1,got);res('搜尋',`找到 ${g} G、${got.join('、')}。`)}
   else if(i===6){const s=stats();S.hp=Math.min(s.HP,S.hp+Math.round(s.HP*.3));S.mp=Math.min(s.MP,S.mp+Math.round(s.MP*.3));res('飲用','HP 與 MP 回復了 30%。')}
   else if(i===7){RUN.rare6=1;startBattle(pick(AREAS[RUN.area].mobs),'elite',0);render()}
-  else if(i===8){const x=row[11]*2;RUN.loot.exp+=x;gainExp(x);res('調查',`獲得 ${x} EXP。`)}
+  else if(i===8){const x=expBase6(row[0])*2;RUN.loot.exp+=x;gainExp(x);res('調查',`獲得 ${x} EXP。`)}
   else if(i===9){RUN.bonus6={mat:5,n:1};startBattle(pick(AREAS[RUN.area].mobs),'elite',0);render()}}
 
 /* ============ 討伐委託（V6.QUEST，每區 5 條）＋首領紀錄＋終局 ============ */
@@ -433,7 +435,7 @@ function q6Need(q){const c=q.cond;let m;if((m=c.match(/普通怪(\d+)/)))return[
 const q6Z=q=>parseInt(q.z.slice(1),10)-1;
 function q6Prog(q){const st=(S.q6||{})[q.id];if(!st||!st.acc)return 0;const [k,n]=q6Need(q),z=q6Z(q);if(k==='herb')return Math.min(n,S.items[zmat6(z,1)]||0);return Math.min(n,zst6(z)[k]-(st.b||0))}
 function q6Rw(q,doit){const z=q6Z(q),row=MLV6(zMid6(z)),out=[];let m;const r=q.rw;
-  const ex=(m=r.match(/EXP(?:基準)?×(\d+)/))?row[11]*+m[1]:0,gd=(m=r.match(/金幣×(\d+)/))?row[12]*+m[1]:0;
+  const ex=(m=r.match(/EXP(?:基準)?×(\d+)/))?expBase6(row[0])*+m[1]:0,gd=(m=r.match(/金幣×(\d+)/))?row[12]*+m[1]:0;
   if(ex)out.push(`${ex} EXP`);if(gd)out.push(`${gd} G`);
   const mats=[];if((m=r.match(/魔晶(\d+)/)))mats.push([zmat6(z,2),+m[1]]);if((m=r.match(/首領印記(\d+)/)))mats.push([zmat6(z,5),+m[1]]);mats.forEach(([id,n])=>out.push(itemN6(id)+'×'+n));
   const rg=/稀有裝備1/.test(r);if(rg)out.push('稀有裝備');

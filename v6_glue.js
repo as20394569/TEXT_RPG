@@ -20,3 +20,8 @@ function foeDmgMod6(d,c){const f=c.f||B,o=c.o||{},s=stats();if(!f)return d;
   return d}
 /* 怪物韌性：負面狀態時間縮短 */
 {const _sa=stAdd;stAdd=function(t,id,o){try{const D=V6.STAT.find(x=>x.id===id);if(t&&t!=='p'&&t.ten6&&D&&D.bad){o=Object.assign({},o||{});o.dur=(o.dur||D.dur)*(1-Math.min(30,t.ten6)/100)}}catch(e){}return _sa.call(this,t,id,o)}}
+/* 一鍵換上戰力最高的裝備（每格挑 gearPower 最高的） */
+function autoEquip6(){let n=0;for(const sl of SL6){const cur=gearBy(S.eq[sl]);let best=cur,bp=cur?gearPower(cur):-1;
+    for(const g of S.gear){if(g===cur||!canEquip(g,sl)||SL6.some(s=>s!==sl&&S.eq[s]===g.u))continue;const p=gearPower(g);if(p>bp){bp=p;best=g}}
+    if(best&&best!==cur&&eqSet(best,sl))n++}return n}
+Object.assign(ACT,{autoEq(){const n=autoEquip6();toast(n?`換上 ${n} 件裝備`:'已經是最好的組合');save();render()}});

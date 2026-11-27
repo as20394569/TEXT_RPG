@@ -497,3 +497,12 @@
 - 存檔：`KEY='azure_oath_save_v2'`、`SAVEV=3`；`load()`／`accApply()` 拒絕舊版；新角色 `S.vet` 記有沒有舊存檔。
 - 角色：`LVMAX=100`、`ATTRMAX=45`、`ptsAt(lv)`；`CLS.base` 全 5、`grow`／`ADV.bonus` 清空；`CMUL` 職業 HP／防禦倍率（看進階職）；`need(lv)=40+18×lv^1.65`；重置首次免費之後 100×Lv；轉職 Lv30；`clsDm()` 固定 1（之後由技能倍率決定）。
 - **現在數值是壞的**：怪物、裝備、技能還是舊的，要等階段 2～4。停服期間不要拿來量平衡。
+
+## 大改版 階段 2～8 合併（2026-11-27，仍停服）
+- 三條線並行（git worktree，分支 v6_a／v6_b／v6_c）後合併。模組：`v6_gear.js`（B 裝備經濟＋stats）、`v6_mob.js`（A 怪物地區內容）、`v6_skill.js`（C 技能狀態天賦）、`v6_glue.js`（主線接線）。載入順序 gear → mob → skill → glue（skill 的包裝要包到 mob 的 foeTurn／rtAddGo／win）。遊戲在 DOMContentLoaded 啟動（`boot6`）。
+- 接線：狀態只在 C 的 rtStep 每 3 秒結算一次（A 的 tick6 在即時戰鬥不再呼叫 stTick）；怪物行動條減速只由 A 的 rtFT 算；`foeDmgMod6` 讓怪物被動（首擊減傷、爆擊減傷、元素抗性、格擋率、反刺）與 B 的神話／套裝增傷生效；怪物韌性縮短負面狀態；不屈（MY05）與低血護盾（SET04/14）掛在 A 的 foeAttack6；`autoEquip6()`＋角色裝備頁「一鍵換上最強」。
+- 修正：項鍊／戒指可以塞進任何欄位（canUseType）；合併時 pAct 的逃跑機率與道具使用接回；`selfSt6` 名稱衝突改名 `mobSelfSt6`；HP 顯示 NaN。
+- 平衡：經驗改 `expBase6(L)=max(企劃表基準, need(L)/(8+0.12L))`（企劃表原值要打上百隻才升級）。測試倍率 `window.RTX` 也會縮短勝敗結算延遲。
+- 實測（自動、一路從 Lv1 打）：劍士 480 場 Lv56、第 5 區；法師 400 場 Lv54；神官 360 場 Lv46；遊俠出手慢、同時間只到 Lv34。首領大約在該區最低等級＋6～9 打過。第 6～10 區抽測（區域最低＋6 級、首領裝）：普通怪全勝、首領約 7 成。
+- 美術清單：`.docs/v6art.md`（A 怪物地區、B 裝備圖示、C 技能圖示）。
+- 開服前要做：發補償（`S.vet` 標記老玩家）、清排行榜、maint.json 關掉。

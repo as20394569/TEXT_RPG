@@ -70,7 +70,7 @@ const zoneSets=z=>[V6.SET[2*z],V6.SET[2*z+1]].filter(Boolean).map(s=>s.id);
 const jobName=()=>S.adv&&ADV[S.adv]?ADV[S.adv].n:CLS[S.cls].n;
 const jobEq=()=>V6.JOBEQ.find(j=>j.job===jobName())||V6.JOBEQ.find(j=>j.job===CLS[S.cls].n)||V6.JOBEQ[0];
 const dexMain=()=>jobEq().main_attr==='敏';
-function canUseType(k,sl){const J=jobEq();if(/^[HBF]_/.test(k))return k.endsWith('_'+ARMK[J.armor])&&(!sl||slotsOfType(k).includes(sl));if(k==='NECK'||k==='RING')return true;
+function canUseType(k,sl){const J=jobEq();if(/^[HBF]_/.test(k))return k.endsWith('_'+ARMK[J.armor])&&(!sl||slotsOfType(k).includes(sl));if(k==='NECK'||k==='RING')return !sl||slotsOfType(k).includes(sl);
   if(sl==='off')return !['空','占用'].includes(J.off)&&TYK[J.off]===k;if(sl==='main'||!sl)return TYK[J.main]===k||(!sl&&TYK[J.off]===k);return false}
 function equipSlots(g){return slotsOfType(g.k).filter(sl=>canUseType(g.k,sl))}
 const offBlocked=()=>{const J=jobEq();if(['空','占用'].includes(J.off))return true;const m=gearBy(S.eq.main);return !!(m&&V6.EQ[m.k].occ===2)};
