@@ -17,7 +17,7 @@ const rng6=seed=>{let x=hash6(seed);return()=>{x=(x+0x6D2B79F5)>>>0;let t=Math.i
 const lerp6=(a,b,u)=>a+(b-a)*u;
 const clamp6=(v,a,b)=>Math.max(a,Math.min(b,v));
 const has6=(t,id)=>{try{return typeof stHas==='function'&&!!stHas(t,id)}catch(e){return false}};
-const now6=()=>B&&B.rt?B.rt.t:(B?B.turn*3:0);
+const now6=()=>B?(B.ac||0):0;
 const zoneOf6=()=>RUN&&AREAS[RUN.area]?RUN.area:0;
 
 /* ============ 地區：現有 7 區對到 Z01～Z07，新增 Z08～Z10 ============ */
@@ -85,8 +85,8 @@ function msk2skm6(t){const fx=t.fx||'',k={n:t.n,v6:t.id,cd:t.cd||0,cat:t.cat,min
   if((m=fx.match(/分(\d)段/))){k.h=+m[1];k.pow=k.pow/k.h}
   if(/預告/.test(fx))k.tele=1;
   if(!/^自身/.test(fx)&&(m=fx.match(/(?:命中後|命中附加|命中必定附加|^附加)\s*([A-Z]+)/))){k.inf=m[1];const p=fx.match(/機率(\d+)%/);k.p=p?+p[1]/100:1}
-  if(/^中毒/.test(fx)){k.inf='POISON';k.p=1;k.idur=6}
-  if(/^灼燒/.test(fx)){k.inf='BURN';k.p=1;k.idur=6}
+  if(/^中毒/.test(fx)){k.inf='POISON';k.p=1;k.idur=2}
+  if(/^灼燒/.test(fx)){k.inf='BURN';k.p=1;k.idur=2}
   if((m=fx.match(/自身附加([A-Z]+)/)))k.selfSt=m[1];
   if((m=fx.match(/恢復最大HP(\d+)%/)))k.heal=+m[1]/100;
   if((m=fx.match(/吸收實際傷害(\d+)%/)))k.drain=+m[1]/100;
@@ -175,7 +175,7 @@ function condOk6(k,f){const s=stats(),hp=S.hp/Math.max(1,s.HP)*100,fh=f.hp/f.max
     case 'pDebuff':return pDebuff6();case 'selfLow':return fh<k.cv;case 'pLow':return hp<k.cv;case 'pHigh':return hp>k.cv;case 'pSt':return has6('p',k.cv)||(k.cv==='POISON'&&B.pst&&B.pst.poison>0)||(k.cv==='BURN'&&B.pst&&B.pst.burn>0);
     case 'selfRage':return has6(f,'RAGE');case 'acts5':return (f.acts6||0)>=5}return true}
 function pDebuff6(){try{if(typeof stList==='function')return stList('p').some(id=>STX[id]&&STX[id].bad)}catch(e){}const p=B.pst||{};if(p.poison>0||p.burn>0||p.bleed>0||p.weak>0||p.stun>0)return true;return ['POISON','BURN','BLEED','WEAK','ARMOR','RESIST','SLOW','FROST','SHOCK','CURSE','BLIND','VULN','FEAR','MARK','DRAIN','ROOT','WOUND','FATIGUE','SILENCE'].some(x=>has6('p',x))}
-function foePick(){if(!B||!B.sk6)return null;const f=B,t=now6(),fh=f.hp/f.max,ph=f.hp/f.max<.5?1:0;
+function foePick(f){f=f||B;if(!B||!f||!f.sk6)return null;const t=f.ac||0,fh=f.hp/f.max,ph=f.hp/f.max<.5?1:0;
   const C=f.sk6.filter(id=>{const k=SKM[id];if(!k)return false;if((f.mcd[id]||0)>t)return false;if(k.cond&&!condOk6(k,f))return false;if(k.heal&&fh>.7)return false;if(k.cleanse&&!foeDebuff6(f))return false;if(k.selfSt&&has6(f,k.selfSt))return false;return true});
   if(!C.length)return null;
   const W=C.map(id=>{const k=SKM[id];let w=k.w||50;const ai=f.ai6;
@@ -247,18 +247,18 @@ function applyHit6(f,r,fx,k,nm,o){o=o||{};const s=stats();let d=r.d;
   blog(`${f.name} 的${nm}造成 ${d} 傷害${r.cr?'（爆擊）':''}${ab?`（護盾吸收 ${ab}）`:''}${r.blk?'（格擋率）':''}`);
   if(S.hp<=0&&B.endure){S.hp=1;B.endure=0;blog('鬥氣護體！以 1 HP 撐了下來')}
   if(S.hp<=0&&typeof gearFatal6==='function'&&gearFatal6()){S.hp=1;blog('【不屈】撐住了致命一擊')}
-  if(S.hp>0&&typeof gearLowHp6==='function'&&S.hp<stats().HP*.3){const a=gearLowHp6();if(a>0&&typeof stAdd==='function'){try{stAdd('p','SHIELD',{amt:a,dur:6});blog(`套裝護盾展開（${a}）`)}catch(e){}}}
+  if(S.hp>0&&typeof gearLowHp6==='function'&&S.hp<stats().HP*.3){const a=gearLowHp6();if(a>0&&typeof stAdd==='function'){try{stAdd('p','SHIELD',{amt:a,dur:2});blog(`套裝護盾展開（${a}）`)}catch(e){}}}
   if(s.THORN&&d>0&&f.hp>1){const t=Math.min(f.hp-1,Math.max(1,Math.round(d*s.THORN/100)));f.hp-=t;blog(`反傷 ${t}`)}
   const ps=f.pass6||[],dr=(k&&k.drain||0)+(ps.includes('P18')?.05:0)+(f.role6==='DRAIN'?.08:0)+((f.aff||[]).includes('leech')?.3:0);
   if(dr&&d>0){const h=Math.round(d*dr);f.hp=Math.min(f.max,f.hp+h);if(h>0){fx.fheal=(fx.fheal||0)+h;blog(`${f.name} 吸取了 ${h} HP`)}}
   if(k&&k.inf&&Math.random()<(k.p||1))inflict6(k.inf,f,{dur:k.idur,v:k.iv});
   if(f.nextInf6){inflict6(f.nextInf6,f,{});f.nextInf6=null}
-  const P={P11:'POISON',P12:'BURN',P13:'FROST',P14:'BLEED',P15:'SHOCK'};for(const p of ps)if(P[p]&&(f.mcd[p]||0)<=now6()&&Math.random()<.15){f.mcd[p]=now6()+9;inflict6(P[p],f,{})}
-  if(f.role6==='VENOM'&&Math.random()<.2)inflict6('POISON',f,{dur:6});
+  const P={P11:'POISON',P12:'BURN',P13:'FROST',P14:'BLEED',P15:'SHOCK'};for(const p of ps)if(P[p]&&(f.mcd[p]||0)<=(f.ac||0)&&Math.random()<.15){f.mcd[p]=(f.ac||0)+4;inflict6(P[p],f,{})}
+  if(f.role6==='VENOM'&&Math.random()<.2)inflict6('POISON',f,{dur:2});
   if((f.aff||[]).includes('venom')&&B.pst)B.pst.poison=Math.max(B.pst.poison||0,2);
   if(k&&k.atbHit&&B.rt){B.rt.pg=Math.max(0,B.rt.pg-k.atbHit);blog(`你的行動條被打退了`)}}
 function foeAttack6(f,id,fx,o){o=o||{};const s=stats(),k=id?SKM[id]:null,nm=k?`【${k.n}】`:'攻擊';
-  if(k&&k.v6&&B.rt)f.mcd[id]=now6()+(k.cd||0);
+  if(k&&k.v6&&B.rt)f.mcd[id]=(f.ac||0)+(k.cd||0)+1;
   if(k){fx.cut=k.n;fx.fsk=id;dexSkill6(id)}
   if(k&&!k.pow){const ps=[];
     if(k.heal){const h=Math.round(f.max*Math.min(k.heal,f.kind==='boss'?.03:1)*(has6(f,'BURN')||(f.st&&f.st.burn>0)?.5:1));f.hp=Math.min(f.max,f.hp+h);fx.fheal=h;ps.push(`回復 ${h} HP`)}
@@ -281,8 +281,9 @@ function foeAttack6(f,id,fx,o){o=o||{};const s=stats(),k=id?SKM[id]:null,nm=k?`�
 function foeTurn(){if(!B)return;
   if(B.treasure&&B.turn>=(B.rt?6:3)&&B.hp>0){B=null;RUN.view={type:'res',title:'寶藏魔物逃走了',text:'牠抱著閃亮的寶物鑽進草叢，不見了。'};render();return}
   if(MODAL&&MODAL.k==='foe'){setTimeout(foeTurn,300);return}
-  const TK=!B.rt||B.rtPh==='tick',AC=!B.rt||B.rtPh==='act';if(TK)B.tk=0;const s=stats();
-  if(TK){tick6(s);if(!B)return;if(B.hp<=0){render();winSoon(1350);return}if(S.hp<=0){if(B.rt)B.rt.done=1;render();setTimeout(lose,1100);return}}
+  const TK=!B.rt||B.rtPh==='act',AC=!B.rt||B.rtPh==='act';if(TK)B.tk=0;const s=stats();
+  /* V7.3：沒有每 3 秒結算，全部改在怪物自己行動前結算 */
+  if(TK){B.actor=B;tick6(s);if(!B)return;if(B.hp<=0||S.hp<=0)B.actor=null;if(!B)return;if(B.hp<=0){render();winSoon(1350);return}if(S.hp<=0){if(B.rt)B.rt.done=1;render();setTimeout(lose,1100);return}}
   if(!B.rt){allyAct();if(B.hp<=0){render();winSoon(1350);return}}
   const fx=AC?(B.fx={by:'foe'}):{};
   if(AC){phaseChk6(fx);
@@ -290,19 +291,20 @@ function foeTurn(){if(!B)return;
     else{const id='next' in B?B.next:foePick();delete B.next;const k=id?SKM[id]:null;
       foeAttack6(B,id,fx,{big:!!(k&&isDng(k))});B.acts6=(B.acts6||0)+1;B.lastP6={}}
     if(B.opn2){B.opening=0;B.opn2=0}
-    if(!('next' in B))B.next=foePick();}
+    if(!('next' in B))B.next=foePick();
+    if(B.rt){B.ac=(B.ac||0)+1;B.actor=null;if(B.st&&!has6(B,'STUN'))B.st.stun=0}}
   if(!B.rt)for(const f of B.adds||[]){if(f.hp<=0||S.hp<=0)continue;if(f.st.stun>0){f.st.stun--;continue}const r={};foeAttack6(f,null,fx,{add:1})}
   if(S.hp<=0){if(B.rt)B.rt.done=1;render();setTimeout(lose,1100);return}
   if(B.hp<=0){render();winSoon(1350);return}
   if(B.rt){if(AC)rtFoeDone(fx);render();return}
   B.busy=false;render()}
 function tick6(s){const usedTick=typeof stTick==='function';
-  if(usedTick){if(!B.rt)try{stTick('p');stTick(B);for(const f of B.adds||[])if(f.hp>0)stTick(f)}catch(e){}}
+  if(usedTick){try{if(B.rt)stTick(B);else{stTick('p');stTick(B);for(const f of B.adds||[])if(f.hp>0)stTick(f)}}catch(e){}}
   else{for(const k of ['poison','burn'])if(B.st[k]>0){const d=Math.max(1,Math.round(B.max*(k==='poison'?.05:.04)*(B.kind==='boss'?.5:1)));B.hp=Math.max(0,B.hp-d);try{dsrc(k==='burn'?'灼燒':'中毒',d)}catch(e){}B.st[k]--;blog(`${B.name} 受到${FOE[k]}傷害 ${d}`)}
     try{addsDot()}catch(e){}
     for(const [h,r,n] of [['poison',.04,'毒素發作'],['burn',.05,'灼燒'],['bleed',.035,'流血']])if(S.hp>0&&B.pst[h]>0){const d=Math.max(1,Math.round(s.HP*r));S.hp=Math.max(0,S.hp-d);B.pst[h]--;blog(`${n}，損失 ${d} HP`)}
     if(B.pst.weak>0)B.pst.weak--;if(B.st.weak>0)B.st.weak--;}
-  if(B.st.stun>0&&B.rt){B.st.stun--;if(!B.st.stun)blog(`${B.name} 醒過來了`)}
+  
   const f=B,ps=f.pass6||[];
   if(f.hp>0){
     if((ps.includes('P17')||f.role6==='REGEN')&&!(has6(f,'BURN')||f.st.burn>0)){const h=Math.max(1,Math.round(f.max*(ps.includes('P17')?.005:0)+f.max*(f.role6==='REGEN'?.01:0)));f.hp=Math.min(f.max,f.hp+h)}
@@ -310,7 +312,7 @@ function tick6(s){const usedTick=typeof stTick==='function';
     if(ps.includes('P23')&&!f.p23&&f.hp/f.max<.2){f.p23=1;const h=Math.round(f.max*.05);f.hp=Math.min(f.max,f.hp+h);blog(`${f.name}【復甦】回復 ${h} HP`)}
     if(ps.includes('P24')&&f.hp/f.max<.3&&!f.p24){f.p24=1;f.ft6=Math.max(2,f.ft6/1.1)}
     if(ps.includes('P25')){f.mresB6=f.mresB6||f.mres;f.mres=f.hp/f.max>.8?Math.round(f.mresB6*1.1):f.mresB6}
-    if(ps.includes('P33')&&B.turn%6===5){const ks=Object.keys(f.st||{}).filter(x=>f.st[x]>0);if(ks.length){f.st[ks[0]]=0;blog(`${f.name}【淨化】清掉了一個負面狀態`)}try{if(typeof stClear==='function')stClear(f,false,1)}catch(e){}}
+    if(ps.includes('P33')&&(f.ac||0)%6===5){const ks=Object.keys(f.st||{}).filter(x=>f.st[x]>0);if(ks.length){f.st[ks[0]]=0;blog(`${f.name}【淨化】清掉了一個負面狀態`)}try{if(typeof stClear==='function')stClear(f,false,1)}catch(e){}}
     if(f.role6==='GUARD'&&(f.acts6||0)>0&&(f.acts6%3===0)&&f.gdA6!==f.acts6){f.gdA6=f.acts6;f.fshield=(f.fshield||0)+Math.round(f.max*.05)}
     phaseChk6(null)}
   /* 保留的魔物機制（大副本霧紋等） */
@@ -321,9 +323,9 @@ function tick6(s){const usedTick=typeof stTick==='function';
   if((B.aff||[]).includes('regen')&&B.turn<20){const h=Math.round(B.max*.06);B.hp=Math.min(B.max,B.hp+h)}
   if(RUN&&RUN.tower&&B.turn>=12&&B.hp>0){B.atk=Math.round(B.atk*1.1);B.mag=Math.round(B.mag*1.1);if(B.turn===12)blog('霧越來越濃，牠的力氣變大了')}
   if(B.turn===8&&!B.talkDrag){B.talkDrag=1;setTimeout(()=>{try{talk('drag')}catch(e){}},900)}
-  /* 玩家側：裝備回血回魔、舊增益遞減 */
-  if(S.hp>0&&s.REGEN){const h=Math.max(1,Math.round(s.HP*s.REGEN/100*(has6('p','SAPPED')?.5:1)));S.hp=Math.min(s.HP,S.hp+h)}
-  if(S.hp>0&&(s.MREGEN||s.MPREG)){S.mp=Math.min(s.MP,S.mp+Math.max(1,Math.round(s.MP*(s.MREGEN||s.MPREG)/100)))}
+  /* 玩家側的回血回魔改在玩家行動前（v7_core.js pPre7） */
+  if(!B.rt){if(S.hp>0&&s.REGEN){const h=Math.max(1,Math.round(s.HP*s.REGEN/100*(has6('p','SAPPED')?.5:1)));S.hp=Math.min(s.HP,S.hp+h)}
+  if(S.hp>0&&(s.MREGEN||s.MPREG)){S.mp=Math.min(s.MP,S.mp+Math.max(1,Math.round(s.MP*(s.MREGEN||s.MPREG)/100)))}}
   B.fb.forEach(b=>b.t--);B.fb=B.fb.filter(b=>b.t>0);
   if(B.buffs){B.buffs.forEach(b=>b.t--);B.buffs=B.buffs.filter(b=>b.t>0)}
   B.turn++;

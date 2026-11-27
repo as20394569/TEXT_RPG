@@ -57,12 +57,16 @@ def hue(im,deg):
     hsv=mc.rgb_to_hsv(rgb);hsv[:,:,0]=(hsv[:,:,0]+deg/360)%1;a[:,:,:3]=mc.hsv_to_rgb(hsv)
     return Image.fromarray((a*255).astype('uint8'))
 SKILLS=[r[0] for r in json.load(open(os.path.join(ROOT,'.docs','v6','v63.json')))['職業技能'][1:] if r[0]]
+SKILLS7=[r[0] for r in json.load(open(os.path.join(ROOT,'.docs','v6','v73.json')))['職業技能'][1:] if r[0] and int(str(r[0]).split('S')[1])>=7]
 GEARK={'greatsword','axe','dagger','wand','book','mace','shield','hc','bc','fc'}
 def run(id,src):
     im=Image.open(src)
     if id.startswith('area_'):save(cover(im,1280,720),id)
     elif id.startswith('battle_'):save(cover(im,960,720),id)
     elif id.startswith('mob_'):save(fit(im,640,24),id)
+    elif id.startswith('skill7_sheet'):
+        n=int(id[12:]);ids=SKILLS7[n*9:n*9+9]
+        for k,c in zip(ids,cells(im,3,3)):save(fit(c,128,6),'skill_'+k)
     elif id.startswith('skill_sheet'):
         n=int(id[11:]);ids=SKILLS[n*9:n*9+9]
         for k,c in zip(ids,cells(im,3,3)):save(fit(c,128,6),'skill_'+k)

@@ -1,6 +1,6 @@
-# 把 .docs/v6/v63.json（使用者的 V6.3 企劃表）轉成 v6data.js，遊戲直接讀
+# 把 .docs/v6/v73.json（使用者的 V7.3 企劃表；V6.3 舊檔 v63.json 保留）轉成 v6data.js，遊戲直接讀
 import json,re,os
-D=json.load(open(os.path.join(os.path.dirname(__file__),'..','.docs','v6','v63.json'),encoding='utf8'))
+D=json.load(open(os.path.join(os.path.dirname(__file__),'..','.docs','v6','v73.json'),encoding='utf8'))
 def rows(n,skip=1):return [r for r in D[n][skip:] if r and r[0] is not None]
 def num(v):
     if v is None:return 0
@@ -26,7 +26,7 @@ O['DROP']=[{'k':r[0],'p':num(r[1]),'r':[num(x) for x in r[2:8]]} for r in rows('
 O['ENH']=[{'m':num(r[1]),'p':num(r[2]),'mat':num(r[3]),'g':num(r[4])} for r in rows('強化')]
 O['JOBEQ']=[{'job':r[0],'armor':r[1],'main':r[2],'off':r[3],'hp':num(r[4]),'def':num(r[5]),'main_attr':r[6]} for r in rows('職業裝備')]
 O['MYTH']=[{'id':r[0],'n':r[1],'for':r[2],'when':r[3],'fx':r[4],'lim':r[5]} for r in rows('神話效果')]
-O['SKILL']=[{'id':r[0],'job':r[1],'n':r[2],'kind':r[3],'lv':num(r[4]),'dt':r[5],'pow':num(r[6]),'mp':num(r[7]),'cd':num(r[8]),'fx':r[9]} for r in rows('職業技能')]
+O['SKILL']=[{'id':r[0],'job':r[1],'n':r[2],'kind':r[3],'lv':num(r[4]),'dt':r[5],'pow':num(r[6]),'mp':num(r[7]),'cd':num(r[8]),'fx':r[9],'tags':str(r[10] or '').split('|'),'tg':r[11],'mx':num(r[12]),'minE':num(r[13]),'pick':r[14]} for r in rows('職業技能')]
 O['MLV']=[[num(x) for x in r[:13]] for r in rows('怪物等級範圍')]
 O['MRANK']=[{'k':r[0],'hp':[num(r[1]),num(r[2])],'atk':[num(r[3]),num(r[4])],'def':num(r[5]),'spd':num(r[6]),'exp':num(r[7]),'gold':num(r[8]),'sk':r[9]} for r in rows('怪物階級')]
 O['MROLE']=[{'id':r[0],'n':r[1],'hp':num(r[2]),'atk':num(r[3]),'def':num(r[4]),'mres':num(r[5]),'spd':num(r[6]),'fx':r[7]} for r in rows('怪物特性')]
@@ -38,7 +38,7 @@ O['MAI']=[{'id':r[0],'n':r[1],'rule':r[2]} for r in rows('怪物AI')]
 O['STAT']=[{'id':r[0],'n':r[1],'fx':r[2],'dur':num(r[3]),'max':num(r[4]),'rep':r[5],'bad':r[6]=='負面'} for r in rows('異常與增益狀態')]
 O['ZONE']=[{'id':r[0],'n':r[1],'lo':num(r[2]),'hi':num(r[3]),'race':r[4],'boss':r[5],'env':r[6],'req':r[7]} for r in rows('地圖與首領')]
 O['ELEM']=[{'id':r[0],'n':r[1],'weak':r[2],'res':r[3]} for r in rows('傷害相剋')]
-O['TAL']=[{'id':r[0],'job':r[1],'br':r[2],'n':r[3],'lv':num(r[4]),'max':num(r[5]),'pre':r[6],'fx':r[7],'calc':r[8],'lim':r[9]} for r in rows('職業天賦')]
+O['TAL']=[{'id':r[0],'job':r[1],'br':r[2],'n':r[3],'lv':num(r[4]),'max':num(r[5]),'pre':r[6],'fx':r[7],'calc':r[8],'lim':r[9],'tag':r[10]} for r in rows('職業天賦')]
 O['SET']=[{'id':r[0],'n':r[1],'lv':num(r[2]),'s2':r[3],'s3':r[4],'s4':r[5],'src':r[6]} for r in rows('裝備套裝')]
 O['MAT']=[{'id':r[0],'n':r[1],'lv':num(r[2]),'src':r[3],'sell':num(r[4])} for r in rows('材料資料')]
 O['CONS']=[{'id':r[0],'n':r[1],'lv':num(r[2]),'fx':r[3],'v':num(r[4]),'cd':num(r[5]),'price':num(r[6])} for r in rows('消耗道具')]
@@ -51,6 +51,20 @@ txt={}
 for n in ['使用說明','生成規則','戰鬥規則','技能共通規則','怪物生成規則','狀態結算規則','配點規則','遊戲循環','探索與遭遇','傷害標籤規則','天賦技能成長','怪物配置補充','裝備經濟','終局與難度','新增詞條與上限']:
     txt[n]={r[0]:r[1] for r in rows(n)}
 O['RULE']=txt
-js='/* 自動產生：tools/v6gen.py ← 使用者的 MMORPG ATB V6.3 企劃表。不要手改 */\nconst V6='+json.dumps(O,ensure_ascii=False,separators=(',',':'))+';\n'
+
+# ---- V7.3 新增表 ----
+def kv(n):return {r[0]:r[1] for r in rows(n)}
+O['GRPM']=[{'n':num(r[0]),'hp':num(r[1]),'atk':num(r[2]),'def':num(r[3]),'spd':num(r[4]),'exp':num(r[5]),'gold':num(r[6]),'drop':num(r[7])} for r in rows('群體遭遇倍率')]
+O['GRPP']=[{'z':r[0],'p':[num(x) for x in r[1:5]]} for r in rows('群體遭遇機率')]
+O['MLIST']=[{'id':r[0],'z':r[1],'n':r[3],'rk':r[4],'lv':num(r[5])} for r in rows('區域怪物名單') if str(r[0]).startswith('MON')]
+O['FLOW']=[{'i':num(r[0]),'t':r[1],'a':r[2],'b':r[3],'story':r[4],'done':r[5]} for r in rows('八格關卡流程')]
+O['FORKW']={r[0]:[num(x) for x in r[1:6]] for r in rows('岔路遭遇權重') if r[0]!='合計'}
+O['DUNG']=[{'id':r[0],'n':r[1],'path':r[2],'k':num(r[3]),'cells':num(r[4]),'lv':num(r[5]),'boss':r[6]} for r in rows('大型副本配置')]
+O['INIT']={r[0]:[num(x) for x in r[1:6]] for r in rows('初始職業屬性')}
+O['LOAD']=[{'job':r[0],'style':r[1],'a':[r[2],r[3],r[4]],'base':r[5],'cond':r[6],'p':str(r[7]).split('|')} for r in rows('推薦技能配置')]
+O['GTPL']=[{'id':r[0],'n':r[1],'k':num(r[2]),'cfg':r[3],'lim':r[4]} for r in rows('群體隊伍模板')]
+for n in ['自動ATB總則','技能自動條件','多怪戰鬥規則','八格探索規則','大型副本規則']:O['RULE'][n]=kv(n)
+
+js='/* 自動產生：tools/v6gen.py ← 使用者的 MMORPG ATB V7.3 企劃表。不要手改 */\nconst V6='+json.dumps(O,ensure_ascii=False,separators=(',',':'))+';\n'
 open(os.path.join(os.path.dirname(__file__),'..','v6data.js'),'w',encoding='utf8').write(js)
 print(len(js),{k:len(v) for k,v in O.items()})

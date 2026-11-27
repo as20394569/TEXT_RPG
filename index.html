@@ -601,6 +601,7 @@ body.noanim *{transition:none!important}
 #rtb .bec{position:relative;min-width:0;flex:0 0 25%;height:clamp(108px,17vh,140px);cursor:pointer;display:flex;flex-direction:column;overflow:visible;transition:transform .15s,opacity .4s,filter .4s}
 #rtb .bec.big{flex:0 0 44%;height:clamp(150px,29vh,232px)}
 #rtb #xew:has(.bec:only-child) .bec.big{flex-basis:58%}
+#rtb #xew:has(.bec:nth-child(4)){gap:3px;left:3px;right:3px}#rtb #xew:has(.bec:nth-child(4)) .bec{flex-basis:21.5%}#rtb #xew:has(.bec:nth-child(4)) .bec.big{flex-basis:33%}#rtb #xew:has(.bec:nth-child(4)) .bec .en{font-size:11px}
 #rtb .bec .ecbg{position:absolute;inset:0;z-index:0;background:linear-gradient(165deg,rgba(58,54,64,.72),rgba(16,16,20,.88));border:1px solid rgba(255,255,255,.16);border-radius:14px;box-shadow:0 8px 20px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.12)}
 #rtb .bec.boss .ecbg{border-color:rgba(255,120,90,.65);box-shadow:0 0 18px rgba(255,90,60,.3),0 8px 20px rgba(0,0,0,.5)}
 #rtb .bec>*:not(.ecbg){position:relative;z-index:1}
@@ -3089,6 +3090,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'19.0',d:'2026-11-27',t:'V7.3 改版',b:'①戰鬥改成行動制：狀態、冷卻、藥水都照自己的行動次數算，持續傷害和回血在自己行動前結算。②技能每職 16 招：帶 4 個主動（含基礎技）、3 個被動，3 組配置，每招可設 2 個自動條件；新增範圍技、蓄力技。③一場最多 4 隻怪，有精英隊、伏擊、首領會叫幫手。④每區 16 種怪，八格路線照新權重；第 5 格中段強敵，第 8 格首領或強敵；營地回 HP 35%、MP 40%，可換技能。⑤大型副本改成 4 個。⑥四個基礎職業的初始屬性不同。'},
   {v:'18.1',d:'2026-11-27',t:'第二部完結、新大副本',b:'主線新增第八章「霜語村的早晨」、第九章「地下裂谷」、第十章「霧之門」，第二部完結。新增大副本「龍淵古城」（龍之山谷→地下裂谷→古城）。舊的詞綴共鳴、銘刻全部移除，配裝以套裝、寶石、天賦為主。新魔物、新裝備、新技能圖示上線。'},
   {v:'18.0',d:'2026-11-27',t:'大改版',b:'等級上限 100，世界擴大到 10 區（新增龍之山谷、地下裂谷、古城）。初始屬性各 5 點，每升一級 1 點、每 10 級再 2 點。13 個職業各有 3 招主動技能與 3 個被動，加上天賦、技能熟練與武器熟練；Lv30 擊敗第 3 區首領後轉職，雙劍士開放。裝備改為 7 個部位（新增副手）、6 種稀有度與 60 種詞條，新增重鑄、精煉、繼承、鑲嵌、製作、套裝與神話效果。魔物有各自的定位、技能與首領階段。新增討伐委託、探索事件與 100 個成就。這次改版存檔重新開始。'},
   {v:'17.3',d:'2026-11-27',t:'屬性換算調整',b:'力量：物攻提高，並帶物防穿透。敏捷：決定行動速度與迴避，不再加爆擊與連擊。幸運：爆擊、爆傷、連擊。智力的魔攻提高。迴避、爆擊、省魔、回血的換算比例下修。強化失敗不再降級，高階成功率提高。'},
@@ -3550,7 +3552,6 @@ function rtStep(dt){const R=B.rt;R.t+=dt;if(R.t<0)return;
   if(can&&R.pg<100)R.pg=Math.min(100,R.pg+dt*100/rtPT());
   if(can&&R.pg>=100){if(R.q){rtDo(R.q);if(!B||!B.rt||R.done)return}else if(B.auto){if(!R.ac)R.ac=R.t+.12;if(R.t>=R.ac){R.ac=0;rtAuto();if(!B||!B.rt||R.done)return}}}
   const fr=(!B.auto&&can&&R.pg>=100)?.5:1;
-  R.rc+=dt*fr;if(R.rc>=3){R.rc-=3;B.rtPh='tick';R.vh0=B.hp;foeTurn();if(!B||!B.rt||R.done)return}
   if(B.hp>0){
     if(B.st.stun>0){if(B.rtw&&B.rtw.k!=='big'){B.rtw=null;B.rtg=30;$('#rtb .warnb')&&$('#rtb .warnb').remove();const mc=rtMain();rtPop(mc&&mc.el,'打斷','p')}else if(B.rtw&&B.chgNeed&&brkDone()>=B.chgNeed)rtFoeGo()}
     else if(B.rtw){if(B.rtw.k==='big'&&B.chgNeed&&brkDone()>=B.chgNeed)rtFoeGo();else{B.rtw.t+=dt*fr;if(B.rtw.t>=B.rtw.dur)rtFoeGo()}}
@@ -4505,6 +4506,8 @@ setInterval(()=>{try{if(!B||!B.busy||MODAL||STORY||document.hidden){if(B)B.wd=0;
 <script src="v6_mob.js"></script>
 <script src="v6_skill.js"></script>
 <script src="v6_glue.js"></script>
+<script src="v7_core.js"></script>
+<script src="v7_map.js"></script>
 <script>if('serviceWorker' in navigator&&/github\.io$/.test(location.hostname))navigator.serviceWorker.register('sw.js').catch(()=>{})</script>
 </body>
 </html>

@@ -6,6 +6,8 @@ const JOBK={'劍士':'swordsman','法師':'mage','遊俠':'ranger','神官':'cle
 const JOBN=Object.fromEntries(Object.entries(JOBK).map(([n,k])=>[k,n]));
 const job6=()=>S?(S.adv||S.cls):'swordsman';
 const bt6=()=>B&&B.rt?B.rt.t:0;
+/* V7.3：狀態、冷卻都以「受影響者自己的行動次數」計算 */
+const acOf=t=>!B?0:t==='p'?(B.acP||0):((t&&t.ac)||0);
 const cl6=(v,a,b)=>Math.max(a,Math.min(b,v));
 
 /* ---------- 職業與轉職 ---------- */
@@ -49,51 +51,50 @@ const STX={POISON:{dot:'atk',r:.2},BURN:{dot:'mag',r:.2,noRegen:1},BLEED:{dot:'a
   HARDEN:{m:{def:25}},IMMUNE:{flag:1},CHILL:{m:{fireIn:10}},SCORCH:{m:{def:-8}},HEX:{m:{mag:-15}},SAPPED:{m:{regen:-50}},EXPOSE:{m:{eva:-8}},FORTIFY:{m:{healIn:15}},CLARITY:{m:{mpcut:5}},KEEN:{m:{pen:5}},
   ARCANE:{m:{mpen:5}},MEND:{hot:1},
   /* 職業專屬（企劃表：獨立標記，不和通用狀態重複計算） */
-  SEAL:{n:'聖印',bad:1,dur:6,m:{dmgOut:-10}},JUDGE:{n:'審判印',bad:1,dur:6,m:{dmgOut:-12}},CORRODE:{n:'腐蝕',bad:1,dur:9,dot:'mag',r:.4},
-  BLOCKUP:{n:'盾壁',dur:6,m:{block:20}},EVAUP:{n:'影襲',dur:6,m:{eva:8}},COMBOUP:{n:'疾風',dur:6,m:{combo:6}},TAKEUP:{n:'捨身',bad:0,dur:4,m:{dmgIn:10}},POST:{n:'庇護',dur:3,m:{dr:0}}};
-(V6.STAT||[]).forEach(r=>{STX[r.id]=Object.assign({n:r.n,bad:r.bad,dur:r.dur,rep:r.rep,txt:r.fx},STX[r.id]||{})});
+  SEAL:{n:'聖印',bad:1,dur:2,m:{dmgOut:-10}},JUDGE:{n:'審判印',bad:1,dur:2,m:{dmgOut:-12}},CORRODE:{n:'腐蝕',bad:1,dur:3,dot:'mag',r:.4},
+  BLOCKUP:{n:'盾壁',dur:2,m:{block:20}},EVAUP:{n:'影襲',dur:2,m:{eva:8}},COMBOUP:{n:'疾風',dur:2,m:{combo:6}},TAKEUP:{n:'捨身',bad:0,dur:2,m:{dmgIn:10}},POST:{n:'庇護',dur:1,m:{dr:0}}};
+/* 企劃表 V7 的 ID 對到這裡的職業專屬狀態 */
+const STALIAS={CORROSION:'CORRODE',HOLYMARK:'SEAL',JUDGMENT:'JUDGE'};
+(V6.STAT||[]).forEach(r=>{const id=STALIAS[r.id]||r.id;STX[id]=Object.assign({n:r.n,bad:r.bad,dur:r.dur,rep:r.rep,txt:r.fx},STX[id]||{});if(STALIAS[r.id])STX[id].dur=r.dur});
 const SLOWK=['FROST','SLOW','ROOT','FEAR'];
 const stBox=t=>t==='p'?(B?(B.psx=B.psx||{}):{}):(t?(t.sx=t.sx||{}):{});
-function stHas(t,id){const x=stBox(t)[id];return !!x&&x.e>bt6()}
-function stAdd(t,id,o){o=o||{};if(!B)return false;const D=STX[id];if(!D)return false;const bx=stBox(t),now=bt6(),cur=bx[id],me=t==='p',boss=!me&&t&&t.kind==='boss';
-  if(id==='STUN'&&(boss||stHas(t,'IMMUNE')))return false;
+function stHas(t,id){id=STALIAS[id]||id;const x=stBox(t)[id];return !!x&&x.e>acOf(t)}
+/* 施加：持續 N 次受影響者行動；在受影響者自己的行動中施加時，這次不算 */
+function stAdd(t,id,o){o=o||{};if(!B)return false;id=STALIAS[id]||id;const D=STX[id];if(!D)return false;const bx=stBox(t),now=acOf(t),cur=bx[id],me=t==='p',boss=!me&&t&&t.kind==='boss';
+  if((id==='STUN'||id==='ROOT')&&(boss&&id==='STUN'||stHas(t,'IMMUNE')))return false;
   if(cur&&cur.e>now&&(D.rep==='不刷新'))return false;
-  let dur=o.dur!=null?o.dur:D.dur||6,v=o.v!=null?o.v:null;
-  if(me&&D.bad&&id!=='IMMUNE'){const ten=Math.min(30,(rtS6().TEN||0));dur*=1-ten/100}
+  let dur=o.dur!=null?o.dur:D.dur||2,v=o.v!=null?o.v:null;
+  if(D.bad&&id!=='IMMUNE'){const ten=me?Math.min(30,(rtS6().TEN||0)):Math.min(30,(t&&t.ten6)||0);if(ten)dur=Math.max(1,Math.round(dur*(1-ten/100)))}
+  dur=Math.max(1,Math.round(dur));
   if(boss&&D.m&&D.m.spd<0)v=(v!=null?v:-D.m.spd)/2;
-  const x={e:now+dur,a:now,nt:now+3,v,r:o.r!=null?o.r:D.r,src:o.src||null,by:o.by||(me?'foe':'me'),amp:o.amp||0};
+  const own=B.actor===t?1:0;
+  const x={e:now+dur+own,a:now,v,r:o.r!=null?o.r:D.r,src:o.src||null,by:o.by||(me?'foe':'me'),amp:o.amp||0};
   if(D.shield){const cap=Math.round((me?rtS6().HP:t.max)*.3),amt=Math.min(cap,Math.round(o.amt||0));if(cur&&cur.e>now&&(cur.amt||0)>=amt){cur.e=Math.max(cur.e,x.e);return true}x.amt=amt}
   else if(cur&&cur.e>now&&v!=null&&cur.v!=null&&Math.abs(cur.v)>Math.abs(v)){cur.e=x.e;return true}
   bx[id]=x;
-  if(id==='STUN'){if(me){B.rt.pstun=Math.max(B.rt.pstun,now+dur);B.rt.q=null}else{t.st=t.st||{};t.st.stun=1;stAdd(t,'IMMUNE',{dur:dur+4})}}
+  if(id==='STUN'){if(me){B.rt&&(B.rt.q=null)}else{t.st=t.st||{};t.st.stun=1}stAdd(t,'IMMUNE',{dur:dur+2})}
   return true}
 function stClear(t,id){const bx=stBox(t);if(id)delete bx[id];else for(const k in bx)delete bx[k]}
-function stList(t){const bx=stBox(t),now=bt6();return Object.keys(bx).filter(k=>bx[k].e>now)}
-function stVal(t,key){const bx=stBox(t),now=bt6();let v=0;for(const id in bx){const x=bx[id];if(x.e<=now)continue;const D=STX[id];if(!D||!D.m||D.m[key]==null)continue;
+function stList(t){const bx=stBox(t),now=acOf(t);return Object.keys(bx).filter(k=>bx[k].e>now)}
+function stVal(t,key){const bx=stBox(t),now=acOf(t);let v=0;for(const id in bx){const x=bx[id];if(x.e<=now)continue;const D=STX[id];if(!D||!D.m||D.m[key]==null)continue;
   let d=D.m[key];if(x.v!=null&&Object.keys(D.m).length===1)d=Math.sign(d||1)*Math.abs(x.v);v+=d}return v}
 function stCap(t,key){const v=stVal(t,key);if(key==='spd')return Math.max(-30,v);if(['atk','mag','def','mres'].includes(key))return Math.max(-30,v);if(key==='dmgIn')return Math.min(25,v);if(key==='healIn')return Math.max(-50,v);if(key==='dr')return Math.min(40,v);return v}
 const rtS6=()=>{try{return B&&B.rt&&typeof rtS==='function'?rtS():stats()}catch(e){return stats()}};
-/* 持續傷害／回復：施加後第 3 秒首次跳，之後每 3 秒；到期前最後一跳也算 */
-function stTick(t,force){if(!B)return;const bx=stBox(t),now=bt6(),me=t==='p';
-  for(const id in bx){const x=bx[id],D=STX[id];if(!D)continue;
-    while(x.nt<=Math.min(now,x.e+.001)||(force&&x.nt<=x.e)){x.nt+=3;
-      if(D.dot&&x.src){let base=(x.src[D.dot]||0)*(x.r||.2)*(1+(x.amp||0));
-        if(me){const s=rtS6();const df=D.dot==='mag'?s.MRES:s.DEF;let d=Math.max(1,Math.round(base*100/(100+df)*pInMul6(D.dot==='mag')));S.hp=Math.max(0,S.hp-d);B.log.push(you(`${STX[id].n}，損失 ${d} HP`));B.fx=B.fx||{by:'foe'};}
-        else{const df=D.dot==='mag'?(t.mres??t.def):t.def;let d=Math.max(1,Math.round(base*100/(100+(df||0)*(1+stCap(t,D.dot==='mag'?'mres':'def')/100))));d=foeTake6(t,d,STX[id].n);B.log.push(`${t.name} 受到${STX[id].n}傷害 ${d}`);(B.pops=B.pops||[]).push({d,k:STX[id].n})}}
-      if(D.hot){if(me){const s=rtS6();const h=Math.round(s.HP*D.hot/100*healInM6());S.hp=Math.min(s.HP,S.hp+h)}else{t.hp=Math.min(t.max,t.hp+Math.round(t.max*D.hot/100*(t.kind==='boss'?.5:1)))}}
-      if(D.mpdrain&&me){const s=rtS6();S.mp=Math.max(0,S.mp-Math.round(s.MP*D.mpdrain/100))}
-      if(x.nt>x.e+3)break}
-    if(x.e<=now){delete bx[id];if(id==='STUN'&&!me&&t.st)t.st.stun=0}}}
+/* 持續傷害／回復：受影響者每次行動前跳一次（最後一次也算）；到期的狀態清掉 */
+function stTick(t){if(!B)return;const bx=stBox(t),now=acOf(t),me=t==='p';
+  for(const id in bx){const x=bx[id],D=STX[id];if(!D||x.e<=now){if(x.e<=now){delete bx[id];if(id==='STUN'&&!me&&t.st)t.st.stun=0}continue}
+    if(D.dot&&x.src){let base=(x.src[D.dot]||0)*(x.r||.2)*(1+(x.amp||0));
+      if(me){const s=rtS6();const df=D.dot==='mag'?s.MRES:s.DEF;let d=Math.max(1,Math.round(base*100/(100+df)*pInMul6(D.dot==='mag')));S.hp=Math.max(0,S.hp-d);B.log.push(you(`${STX[id].n}，損失 ${d} HP`));B.fx=B.fx||{by:'foe'};}
+      else{const df=D.dot==='mag'?(t.mres??t.def):t.def;let d=Math.max(1,Math.round(base*100/(100+(df||0)*(1+stCap(t,D.dot==='mag'?'mres':'def')/100))));d=foeTake6(t,d,STX[id].n);B.log.push(`${t.name} 受到${STX[id].n}傷害 ${d}`);(B.pops=B.pops||[]).push({d,k:STX[id].n,f:t})}}
+    if(D.hot){if(me){const s=rtS6();const h=Math.round(s.HP*D.hot/100*healInM6());S.hp=Math.min(s.HP,S.hp+h)}else{t.hp=Math.min(t.max,t.hp+Math.round(t.max*D.hot/100*(t.kind==='boss'?.5:1)))}}
+    if(D.mpdrain&&me){const s=rtS6();S.mp=Math.max(0,S.mp-Math.round(s.MP*D.mpdrain/100))}}}
 function foeTake6(f,d,src){const bx=stBox(f),sh=bx.SHIELD;if(sh&&sh.e>bt6()&&sh.amt>0){const ab=Math.min(sh.amt,d);sh.amt-=ab;d-=ab}if(f.fshield>0){const ab=Math.min(f.fshield,d);f.fshield-=ab;d-=ab}f.hp=Math.max(0,f.hp-d);if(f===B){try{dsrc(src||'攻擊',d)}catch(e){}try{bossPhase()}catch(e){}}return d}
 const healInM6=()=>(1+Math.min(30,(rtS6().HEALIN||0))/100)*(1+stCap('p','healIn')/100);
-function stStep6(){if(!B||!B.rt)return;const R=B.rt;if(R.t<0)return;const h0=B.hp;
-  stTick('p');stTick(B);(B.adds||[]).forEach(f=>{if(f.hp>0)stTick(f)});
-  if(S.hp<=0&&!R.done){if(typeof rtLose==='function')rtLose();return}
-  if(B.hp<=0&&h0>0&&!R.done){render();winSoon(900)}}
+function stStep6(){}
 
 /* 玩家受到的傷害倍率（A 線打玩家時乘上）：防禦姿態、易傷、減傷上限 40% */
 function pInMul6(isMag){if(!B)return 1;let dr=stCap('p','dr')+lowDr6();const P=effs6();for(const e of P)if(e.k==='shdr'&&stHas('p','SHIELD'))dr+=e.v;
-  if(B.healDr&&B.healDr.e>bt6())dr+=B.healDr.v;dr=Math.min(40,dr);
+  if(B.healDr&&B.healDr.e>acOf('p'))dr+=B.healDr.v;dr=Math.min(40,dr);
   const vin=stCap('p','dmgIn');return Math.max(.05,(1-dr/100)*(1+vin/100)*(isMag?1+stVal('p','magIn')/100:1))}
 /* 怪物打出的傷害倍率：虛弱／恐懼／狂怒、聖印、審判印、腐蝕（咒術師被動） */
 function foeOutMul6(f,isMag){f=f||B;if(!f)return 1;let m=1+stCap(f,isMag?'mag':'atk')/100;let o=stVal(f,'dmgOut');
@@ -106,7 +107,7 @@ const PSV={J01S4:[{k:'stat',key:'atkp',v:5}],J01S5:[{k:'stat',key:'hpp',v:5}],J0
   J02S4:[{k:'stat',key:'magp',v:5}],J02S5:[{k:'zmp',v:1}],J02S6:[{k:'cond',st:['BURN'],sk:'J02S3',v:20}],
   J03S4:[{k:'stat',key:'crit',v:3}],J03S5:[{k:'winhp',v:3}],J03S6:[{k:'cond',st:SLOWK,v:10}],
   J04S4:[{k:'stat',key:'magp',v:5}],J04S5:[{k:'stat',key:'healp',v:10}],J04S6:[{k:'next',ev:'cast',src:'J04S3',sk:'J04S1',v:35}],
-  J05S4:[{k:'stat',key:'block',v:8}],J05S5:[{k:'stat',key:'hpp',v:8}],J05S6:[{k:'counter',v:35,cd:3}],
+  J05S4:[{k:'stat',key:'block',v:8}],J05S5:[{k:'stat',key:'hpp',v:8}],J05S6:[{k:'counter',v:35,cd:1}],
   J06S4:[{k:'stat',key:'atkp',v:8}],J06S5:[{k:'lowhp',th:40,type:'dmg',v:12}],J06S6:[{k:'lowhp',th:25,type:'dr',v:15}],
   J07S4:[{k:'stat',key:'magp',v:8}],J07S5:[{k:'zmp',v:1.5}],J07S6:[{k:'cond',st:['BURN'],sk:'J07S3',v:25}],
   J08S4:[{k:'stat',key:'dot',v:15}],J08S5:[{k:'stat',key:'mresp',v:10}],J08S6:[{k:'corrDown',v:10}],
@@ -123,6 +124,11 @@ const STN6={破甲:'ARMOR',灼燒:'BURN',減速:SLOWK,中毒:'POISON',聖印:'SE
 const stOf6=w=>STN6[w]?[].concat(STN6[w]):null;
 const STATK={'物防穿透':'pen','爆傷':'cd','連擊率':'double','格擋':'block','最大HP':'hpp','最大MP':'mpp','魔抗':'mresp','行動速度':'spd','受治療':'healin','受到治療':'healin'};
 function parseTal6(j,t,n){const N=x=>+x*n,m=(re)=>t.match(re);let r;
+  if(r=m(/^具有(.+?)標籤的直接技能傷害\+(\d+)%$/))return {k:'tagdmg',tag:r[1],v:N(r[2])};
+  if(r=m(/^(.+?)每累計施放(\d+)次該技能，該技能剩餘冷卻減1次；每級門檻減1（最低(\d+)次）$/))return {k:'skcdn',sk:skBy6(j,r[1]),th:Math.max(+r[3],+r[2]-(n-1))};
+  if(r=m(/^(.+?)持續\+([\d.]+)次行動$/))return {k:'skdur',sk:skBy6(j,r[1]),v:N(r[2])};
+  if(r=m(/^有效治療後減傷(\d+)%，持續(\d+)次行動$/))return {k:'healDr',v:N(r[1]),dur:+r[2]};
+  if(r=m(/^每第三次(.+?)命中後(.+?)剩餘冷卻減(\d+)次$/))return {k:'third',src:skBy6(j,r[1]),sk:skBy6(j,r[2]),v:+r[3]};
   if(r=m(/^HP低於(\d+)%時?傷害\+(\d+)%$/))return {k:'lowhp',th:+r[1],type:'dmg',v:N(r[2])};
   if(r=m(/^HP低於(\d+)%爆擊\+(\d+)百分點$/))return {k:'lowhp',th:+r[1],type:'crit',v:N(r[2])};
   if(r=m(/^HP低於(\d+)%減傷額外(\d+)百分點$/))return {k:'lowhp',th:+r[1],type:'dr',v:N(r[2])};
@@ -217,8 +223,8 @@ function wpnBase6(){try{const u=S.eq.main||S.eq.weapon,g=u&&gearBy(u);if(!g)retu
 /* ---------- 成本、冷卻 ---------- */
 function mpCost6(k){const x=SK[k];if(!x||!x.mp)return 0;const s=rtS6();let c=x.mp*(.5+S.lv/100)*(1-Math.min(50,s.MPCUT||0)/100);
   if(!x.dmg&&!x.heal)c*=1-(skmLv6(k)-1)/100;c*=1-effSum('skmp',k)/100;if(B&&B.psx)c*=1+stVal('p','mpCost')/100;return Math.max(1,Math.round(c))}
-function cdOf6(k){const x=SK[k];if(!x||!x.cd)return 0;return Math.max(x.cd*.5,x.cd-effSum('skcd',k))}
-const cdLeft6=k=>B&&B.cd6&&B.cd6[k]?Math.max(0,B.cd6[k]-bt6()):0;
+function cdOf6(k){const x=SK[k];if(!x||!x.cd)return 0;return Math.max(Math.ceil(x.cd*.5),x.cd-Math.floor(effSum('skcd',k)))}
+const cdLeft6=k=>B&&B.pcd6&&B.pcd6[k]?Math.max(0,B.pcd6[k]-acOf('p')):0;
 const skReady6=k=>!!SK[k]&&SK[k].act&&skOk6(k)&&cdLeft6(k)<=0&&S.mp>=mpCost6(k)&&!(stHas('p','SILENCE')&&SK[k].s==='MAG'&&mpCost6(k)>0);
 const durOf6=(k,base)=>base+effSum('skdur',k);
 const fxvOf6=(k,what)=>effs6().filter(e=>e.k==='fxv'&&e.sk===k&&(!what||e.what===what)).reduce((a,e)=>a+e.v,0);
@@ -242,8 +248,8 @@ function hitFoe(stat,pow,o){o=o||{};if(!B)return {d:0,cr:false};const s=rtS6(),f
 
 /* ---------- 出手 ---------- */
 function nextBuff6(k,direct){const P=B.p6;if(!P||!P.nx.length)return {v:0,pen:0};let v=0,pen=0;P.nx=P.nx.filter(n=>{if(n.sk?n.sk===k:direct){v+=n.v||0;pen+=n.pen||0;return false}return true});return {v,pen}}
-function trig6(ev,o){if(!B||!B.p6)return;o=o||{};const P=B.p6,now=bt6(),s=rtS6();
-  const pool=e=>{if(e.lim==='6秒共用觸發冷卻'){if(P.tcd>now)return false;P.tcd=now+6}if(e.lim==='每場一次'||e.once){if(P.once[e.from])return false;P.once[e.from]=1}return true};
+function trig6(ev,o){if(!B||!B.p6)return;o=o||{};const P=B.p6,now=acOf('p'),s=rtS6();
+  const pool=e=>{if(/共用觸發冷卻/.test(e.lim||'')){if(P.tcd>now)return false;P.tcd=now+3}if(e.lim==='每場一次'||e.once){if(P.once[e.from])return false;P.once[e.from]=1}return true};
   for(const e of effs6()){
     if(e.k==='next'&&e.ev===ev&&(!e.src||e.src===o.sk)&&(!e.need||e.need.some(x=>stHas(B,x)))){if(pool(e))P.nx.push({sk:e.sk||null,v:e.v,pen:e.pen||0})}
     else if(e.k==='gauge'&&e.ev===ev&&(!e.src||e.src===o.sk)&&(!e.st||e.st.some(x=>stHas(B,x)))){if(pool(e))B.rt.pgB=(B.rt.pgB||0)+e.v}
@@ -261,8 +267,9 @@ function pAct(type,arg){if(!B||B.busy)return false;const s=rtS6();B.p6=B.p6||{nx
   else if(type==='flee'){if(Math.random()<(typeof fleeChance6==='function'?fleeChance6():B.kind==='elite'?.5:.8)){B=null;RUN.view={type:'res',title:'成功逃離',text:'你甩開了魔物，繼續趕路。'};render();return true}blog('逃跑失敗')}
   if(B.rt){rtAfterP(type);const R=B.rt;if(R.pgB){R.pg=Math.min(100,R.pg+R.pgB);R.pgB=0}return true}
   B.menu='main';B.busy=true;render();if(B.hp<=0){winSoon(1350);return true}setTimeout(foeTurn,AS(850));return true}
-function useSkill6(k,s){const x=SK[k],P=B.p6,now=bt6(),c=mpCost6(k),j=job6(),ps=[];try{lunaSkill(k)}catch(e){}
-  S.mp-=c;P.mpUse+=c;if(x.cd)B.cd6[k]=now+cdOf6(k);
+function useSkill6(k,s){const x=SK[k],P=B.p6,now=acOf('p'),c=mpCost6(k),j=job6(),ps=[];try{lunaSkill(k)}catch(e){}
+  if(typeof FX7!=='undefined'&&FX7[k]&&FX7[k].charge&&B.rt){S.mp-=c;P.mpUse+=c;if(x.cd)B.pcd6[k]=now+cdOf6(k)+1;B.chg7=k;B.fx={by:'me',cut:x.n+'・蓄力',skill:k,glow:1};try{SFX.buff()}catch(e){}blog(`你開始蓄力【${x.n}】`);return}
+  S.mp-=c;P.mpUse+=c;if(x.cd){B.pcd6[k]=now+cdOf6(k)+1;for(const e of effK('skcdn'))if(e.sk===k){P.cast=P.cast||{};P.cast[k]=(P.cast[k]||0)+1;if(P.cast[k]%e.th===0)B.pcd6[k]-=1}}
   {const L=Math.abs((B.L||B.lv||S.lv)-S.lv);if(L<=10){S.skm=S.skm||{};S.skm[k]=(S.skm[k]||0)+1}}
   const fx=B.fx={by:'me',cut:x.n,skill:k,el:dmgTag6(k).toLowerCase(),hits:x.dmg?x.dmg.h:1};B.srcNow=x.n;
   try{playSkillSfx(k,x)}catch(e){}
@@ -276,11 +283,12 @@ function useSkill6(k,s){const x=SK[k],P=B.p6,now=bt6(),c=mpCost6(k),j=job6(),ps=
     for(const e of effK('exec'))if(B.hp<B.max*e.th/100)amp+=e.v;
     for(const e of effK('lowhp'))if(e.type==='dmg'&&S.hp<s.HP*e.th/100)amp+=e.v;
     if(k==='J08S3'&&stHas(B,'CORRODE'))amp+=25;
+    if(typeof skAmp7==='function'){amp+=skAmp7(k,B);pen+=skPen7(k);cr+=skCrit7(B);cdB+=skCd7(B)}
     const r=hitFoe(x.s,x.pow,{skill:1,tag:dmgTag6(k),amp,pen,cr,cd:cdB});tot=r.d;fx.d=r.d;fx.cr=r.cr;
     if(x.dmg.h>1&&r.d>0){const a=Math.floor(r.d/x.dmg.h);fx.hl=Array.from({length:x.dmg.h},(_,i)=>i===x.dmg.h-1?r.d-a*(x.dmg.h-1):a)}
     if(r.miss)ps.push(`${B.name} 閃開了`);else{ps.push(`造成 ${r.d} 傷害${r.cr?'（爆擊！）':''}`);
       /* 連擊：只判一次，追加這招實際傷害的 35% */
-      const dbl=Math.min(20,(s.DOUBLE||0));if(B.hp>0&&Math.random()*100<dbl){const ex=Math.max(1,Math.round(r.d*(.35+effSum('comboAmp')/100)));foeTake6(B,ex,'連擊');tot+=ex;ps.push(`連擊 +${ex}`);(fx.tags=fx.tags||[]).push('連擊');trig6('combo',{sk:k})}
+      const dbl=Math.min(20,(s.DOUBLE||0));if(B.hp>0&&Math.random()*100<dbl){const ex=Math.max(1,Math.round(r.d*(.35+effSum('comboAmp')/100)));foeTake6(B,ex,'連擊');tot+=ex;ps.push(`連擊 +${ex}`);(fx.tags=fx.tags||[]).push('連擊');trig6('combo',{sk:k});try{onCombo7()}catch(e){}}
       if(s.LS){const h=Math.round(r.d*Math.min(10,s.LS)/100*healInM6());if(h>0){S.hp=Math.min(s.HP,S.hp+h);fx.heal=(fx.heal||0)+h}}
       trig6('hit',{sk:k});if(r.cr)trig6('crit',{sk:k});
       if(c===0){const z=effSum('zmp');if(z)S.mp=Math.min(s.MP,S.mp+Math.max(1,Math.round(s.MP*z/100)))}
@@ -288,11 +296,13 @@ function useSkill6(k,s){const x=SK[k],P=B.p6,now=bt6(),c=mpCost6(k),j=job6(),ps=
       for(const e of effK('extra'))if(e.src===k&&e.st&&e.st.some(t=>stHas(B,t))&&B.hp>0){const r2=hitFoe(e.stat,e.v/100,{sure:1,tag:dmgTag6(k)});tot+=r2.d;ps.push(`追加 ${r2.d}`)}
       for(const e of effK('extraHeal'))if(e.src===k&&e.st&&e.st.some(t=>stHas(B,t))){const h=Math.round(s.HP*e.v/100*healInM6());S.hp=Math.min(s.HP,S.hp+h);fx.heal=(fx.heal||0)+h}
       for(const e of effK('markexec'))if(stHas(B,'MARK')&&B.hp>0&&B.hp<B.max*e.th/100&&!P.once[e.from]){P.once[e.from]=1;const r2=hitFoe('ATK',e.v/100,{sure:1});tot+=r2.d;ps.push(`追加 ${r2.d}`)}
-      for(const e of effK('corrShield'))if(stHas(B,'CORRODE')&&!P.once[e.from]){P.once[e.from]=1;stAdd('p','SHIELD',{amt:s.HP*e.v/100,dur:6})}
+      for(const e of effK('corrShield'))if(stHas(B,'CORRODE')&&!P.once[e.from]){P.once[e.from]=1;stAdd('p','SHIELD',{amt:s.HP*e.v/100,dur:2})}
       for(const e of effK('push'))if(e.src===k)B.rtg=Math.max(0,(B.rtg||0)-e.v);
-      for(const e of effK('third'))if(e.src===k){P.third[e.from]=(P.third[e.from]||0)+1;if(P.third[e.from]%3===0&&B.cd6[e.sk])B.cd6[e.sk]-=e.v}}
-    skFx6(k,s,r.d,ps,B.hp>0&&!r.miss)}
-  else skFx6(k,s,0,ps,false);
+      for(const e of effK('third'))if(e.src===k){P.third[e.from]=(P.third[e.from]||0)+1;if(P.third[e.from]%3===0&&B.pcd6[e.sk])B.pcd6[e.sk]-=e.v}}
+    skFx6(k,s,r.d,ps,B.hp>0&&!r.miss);
+    if(typeof aoeHit7==='function')tot+=aoeHit7(k,s,amp,pen,cr,cdB,ps);
+    try{afterCast7(k,s,!r.miss)}catch(e){}}
+  else{skFx6(k,s,0,ps,false);try{afterCast7(k,s,false)}catch(e){}}
   /* 三種不同技能依序使用 */
   if(new Set(P.seq).size===3&&P.seq.length===3){trig6('seq3',{sk:k});P.seq=[]}
   trig6('cast',{sk:k});
@@ -304,43 +314,44 @@ const selfSt6=k=>({J01S3:'GUARD',J05S3:'BLOCKUP',J07S3:'SHIELD',J12S3:'SHIELD',J
 function heal6(k,pct,magR,s,ps){let amp=effSum('skheal',k)+(skmLv6(k)-1);for(const e of effK('lowhealp'))if(e.sk===k&&S.hp<s.HP*e.th/100)amp+=e.v;
   let h=(s.HP*pct+s.MAG*magR)*(1+Math.min(30,s.HEALP||0)/100)*(1+amp/100)*healInM6();for(const e of effK('lowheal'))if(e.sk===k&&S.hp<s.HP*e.th/100)h+=s.HP*e.pct/100;
   h=Math.round(h);const room=s.HP-S.hp,real=Math.min(room,h);S.hp+=real;B.fx.heal=(B.fx.heal||0)+real;ps.push(`回復 ${real} HP`);
-  for(const e of effK('overShield'))if(e.sk===k&&h>real)stAdd('p','SHIELD',{amt:Math.min(s.HP*e.v/100,h-real),dur:6});
-  for(const e of effK('healDr'))if(real>0)B.healDr={v:e.v,e:bt6()+e.dur};
+  for(const e of effK('overShield'))if(e.sk===k&&h>real)stAdd('p','SHIELD',{amt:Math.min(s.HP*e.v/100,h-real),dur:2});
+  for(const e of effK('healDr'))if(real>0)B.healDr={v:e.v,e:acOf('p')+e.dur+1};
   if(real>0)trig6('heal',{sk:k});return real}
 /* 主動技能效果（企劃表「效果」欄） */
-function skFx6(k,s,d,ps,hit){const T=B,dot=x=>1+(effSum('skdot',k)+(rtS6().DOT||0)+(x==='POISON'?effSum('dotst'):0))/100,foeSt=(id,o)=>{if(hit&&stAdd(T,id,o))ps.push(`敵人陷入${STX[id].n}`)};
+function skFx6(k,s,d,ps,hit){const T=B,dot=x=>1+(effSum('skdot',k)+(rtS6().DOT||0)+(x==='POISON'?effSum('dotst'):0)+(typeof dotK7==='function'?dotK7(x||''):0))/100,foeSt=(id,o)=>{if(hit&&stAdd(T,id,o))ps.push(`敵人陷入${STX[id].n}`)};
   switch(k){
-    case 'J01S2':foeSt('ARMOR',{v:12+fxvOf6(k),dur:durOf6(k,6)});break;
-    case 'J05S2':foeSt('ARMOR',{v:10+fxvOf6(k),dur:durOf6(k,6)});break;
-    case 'J12S2':foeSt('ARMOR',{v:10+fxvOf6(k),dur:durOf6(k,6)});break;
-    case 'J01S3':stAdd('p','GUARD',{v:20+fxvOf6(k),dur:durOf6(k,4)});ps.push('減傷');break;
-    case 'J02S2':foeSt('BURN',{src:{mag:s.MAG},r:.25,amp:dot()-1,dur:durOf6(k,6)});break;
-    case 'J07S2':foeSt('BURN',{src:{mag:s.MAG},r:.30,amp:dot()-1,dur:durOf6(k,6)});break;
-    case 'J02S3':foeSt('FROST',{v:15+fxvOf6(k),dur:durOf6(k,6)});break;
-    case 'J03S3':foeSt('SLOW',{v:15+fxvOf6(k),dur:durOf6(k,6)});break;
-    case 'J04S2':foeSt('SEAL',{dur:durOf6(k,6)});break;
-    case 'J11S2':foeSt('JUDGE',{dur:durOf6(k,6)});break;
+    case 'J01S2':foeSt('ARMOR',{v:12+fxvOf6(k),dur:durOf6(k,2)});break;
+    case 'J05S2':foeSt('ARMOR',{v:10+fxvOf6(k),dur:durOf6(k,2)});break;
+    case 'J12S2':foeSt('ARMOR',{v:10+fxvOf6(k),dur:durOf6(k,2)});break;
+    case 'J01S3':stAdd('p','GUARD',{v:20+fxvOf6(k),dur:durOf6(k,2)});ps.push('減傷');break;
+    case 'J02S2':foeSt('BURN',{src:{mag:s.MAG},r:.25,amp:dot('BURN')-1,dur:durOf6(k,2)});break;
+    case 'J07S2':foeSt('BURN',{src:{mag:s.MAG},r:.30,amp:dot('BURN')-1,dur:durOf6(k,2)});break;
+    case 'J02S3':foeSt('FROST',{v:15+fxvOf6(k),dur:durOf6(k,2)});break;
+    case 'J03S3':foeSt('SLOW',{v:15+fxvOf6(k),dur:durOf6(k,2)});break;
+    case 'J04S2':foeSt('SEAL',{dur:durOf6(k,2)});break;
+    case 'J11S2':foeSt('JUDGE',{dur:durOf6(k,2)});break;
     case 'J04S3':heal6(k,.08,.5,s,ps);break;
-    case 'J11S3':{heal6(k,.10,.6,s,ps);const bad=stList('p').find(id=>STX[id].bad&&id!=='STUN');if(bad){stClear('p',bad);ps.push(`解除${STX[bad].n}`);trig6('cleanse',{sk:k});for(const e of effK('cleanseShield'))stAdd('p','SHIELD',{amt:s.HP*e.v/100,dur:6})}break}
-    case 'J05S3':stAdd('p','BLOCKUP',{v:20+fxvOf6(k),dur:durOf6(k,6)});ps.push('格擋率提升');break;
-    case 'J06S2':stAdd('p','TAKEUP',{v:Math.max(0,10+fxvOf6(k,'承傷')),dur:4});break;
+    case 'J11S3':{heal6(k,.10,.6,s,ps);const bad=stList('p').find(id=>STX[id].bad&&id!=='STUN');if(bad){stClear('p',bad);ps.push(`解除${STX[bad].n}`);trig6('cleanse',{sk:k});for(const e of effK('cleanseShield'))stAdd('p','SHIELD',{amt:s.HP*e.v/100,dur:2})}break}
+    case 'J05S3':stAdd('p','BLOCKUP',{v:20+fxvOf6(k),dur:durOf6(k,2)});ps.push('格擋率提升');break;
+    case 'J06S2':stAdd('p','TAKEUP',{v:Math.max(0,10+fxvOf6(k,'承傷')),dur:2});break;
     case 'J06S3':case 'J08S3':{const r=(k==='J06S3'?20:10)+fxvOf6(k,'吸血');const h=Math.round(d*r/100*healInM6());if(h>0){S.hp=Math.min(s.HP,S.hp+h);B.fx.heal=(B.fx.heal||0)+h;ps.push(`吸取 ${h} HP`)}break}
-    case 'J07S3':stAdd('p','SHIELD',{amt:s.HP*.10*(1+effSum('skshield',k)/100),dur:durOf6(k,6)});ps.push('獲得護盾');break;
-    case 'J12S3':stAdd('p','SHIELD',{amt:s.HP*.12*(1+effSum('skshield',k)/100),dur:durOf6(k,6)});ps.push('獲得護盾');break;
-    case 'J08S2':foeSt('CORRODE',{src:{mag:s.MAG},r:.4,amp:dot()-1,dur:durOf6(k,9)});break;
-    case 'J09S3':foeSt('MARK',{v:10+fxvOf6(k),dur:durOf6(k,6)});break;
-    case 'J10S2':foeSt('POISON',{src:{atk:s.ATK},r:.3,amp:dot('POISON')-1,dur:durOf6(k,9)});break;
-    case 'J10S3':stAdd('p','EVAUP',{v:8+fxvOf6(k),dur:durOf6(k,6)});ps.push('迴避提升');break;
-    case 'J13S3':stAdd('p','COMBOUP',{v:6+fxvOf6(k),dur:durOf6(k,6)});ps.push('連擊率提升');break}}
+    case 'J07S3':stAdd('p','SHIELD',{amt:s.HP*.10*(1+(effSum('skshield',k)+effSum('shamp'))/100),dur:durOf6(k,2)});ps.push('獲得護盾');break;
+    case 'J12S3':stAdd('p','SHIELD',{amt:s.HP*.12*(1+(effSum('skshield',k)+effSum('shamp'))/100),dur:durOf6(k,2)});ps.push('獲得護盾');break;
+    case 'J08S2':foeSt('CORRODE',{src:{mag:s.MAG},r:.4,amp:dot('CORRODE')-1,dur:durOf6(k,3)});break;
+    case 'J09S3':foeSt('MARK',{v:10+fxvOf6(k),dur:durOf6(k,2)});break;
+    case 'J10S2':foeSt('POISON',{src:{atk:s.ATK},r:.3,amp:dot('POISON')-1,dur:durOf6(k,3)});break;
+    case 'J10S3':stAdd('p','EVAUP',{v:8+fxvOf6(k),dur:durOf6(k,2)});ps.push('迴避提升');break;
+    case 'J13S3':stAdd('p','COMBOUP',{v:6+fxvOf6(k),dur:durOf6(k,2)});ps.push('連擊率提升');break;
+    default:if(typeof fx7Apply==='function')fx7Apply(k,s,d,ps,hit)}}
 
 /* 格擋（玩家按的格擋成功，或 A 線的格擋率被動觸發都呼叫）、閃避、受傷 */
 function onBlock6(){if(!B)return;B.p6=B.p6||{nx:[],once:{},tcd:0,seq:[],third:{},mpUse:0};trig6('block');
-  for(const e of effK('counter')){const cd=e.cd-effSum('counterCd');if((B.p6.cntT||-9)+cd>bt6())continue;B.p6.cntT=bt6();const r=hitFoe('ATK',(e.v+effSum('counterAmp'))/100,{sure:1,tag:dmgTag6(battleSkills()[0])});B.log.push(`【反制】反擊 ${r.d}`);(B.pops=B.pops||[]).push({d:r.d,k:'反制'});trig6('hit',{sk:'counter'})}}
+  for(const e of effK('counter')){const cd=e.cd;if(B.p6.cntT!=null&&B.p6.cntT+cd+1>acOf('p'))continue;B.p6.cntT=acOf('p');const r=hitFoe('ATK',(e.v+effSum('counterAmp'))/100,{sure:1,tag:dmgTag6(battleSkills()[0])});B.log.push(`【反制】反擊 ${r.d}`);(B.pops=B.pops||[]).push({d:r.d,k:'反制'});trig6('hit',{sk:'counter'})}}
 function onEvade6(){if(!B)return;B.p6=B.p6||{nx:[],once:{},tcd:0,seq:[],third:{},mpUse:0};trig6('evade')}
 function onHurt6(d,sh0){if(!B||!B.p6)return;const s=rtS6(),P=B.p6;
   if(sh0&&!stHas('p','SHIELD'))trig6('shbreak');
   if(d>0&&stHas('p','GUARD'))trig6('hurtGuard');
-  for(const e of effK('lowshield'))if(S.hp>0&&S.hp<s.HP*e.th/100&&!P.once[e.from]){P.once[e.from]=1;stAdd('p','SHIELD',{amt:s.HP*e.v/100,dur:6});B.log.push('護盾展開')}
+  for(const e of effK('lowshield'))if(S.hp>0&&S.hp<s.HP*e.th/100&&!P.once[e.from]){P.once[e.from]=1;stAdd('p','SHIELD',{amt:s.HP*e.v/100,dur:2});B.log.push('護盾展開')}
   for(const e of effK('lowgauge'))if(S.hp>0&&S.hp<s.HP*e.th/100&&!P.once[e.from]){P.once[e.from]=1;B.rt.pg=Math.min(100,B.rt.pg+e.v)}}
 /* 勝利：回 5% HP、8% MP（企劃表）＋被動；武器熟練 +1 */
 function onWin6(){if(!S)return;const s=stats();let hp=5;for(const e of effK('winhp'))hp+=e.v;S.hp=Math.min(s.HP,S.hp+Math.round(s.HP*hp/100));S.mp=Math.min(s.MP,S.mp+Math.round(s.MP*.08));
@@ -348,7 +359,7 @@ function onWin6(){if(!S)return;const s=stats();let hp=5;for(const e of effK('win
 
 /* ---------- 掛到戰鬥流程 ---------- */
 try{if(Array.isArray(FK)&&!FK.includes('sx'))FK.push('sx')}catch(e){}
-{const _sb=startBattle;startBattle=function(){const r=_sb.apply(this,arguments);if(B){B.cd6={};B.psx={};B.p6={nx:[],once:{},tcd:0,seq:[],third:{},mpUse:0};B.mx6=stats().HP;B.sx=B.sx||{};(B.adds||[]).forEach(f=>f.sx=f.sx||{})}return r}}
+{const _sb=startBattle;startBattle=function(){const r=_sb.apply(this,arguments);if(B){B.pcd6={};B.psx={};B.p6={nx:[],once:{},tcd:0,seq:[],third:{},mpUse:0};B.mx6=stats().HP;B.sx=B.sx||{};(B.adds||[]).forEach(f=>f.sx=f.sx||{})}return r}}
 {const _rs=rtStep;rtStep=function(dt){_rs(dt);if(B&&B.rt&&!B.rt.done)stStep6()}}
 {const _w=win;win=function(){const fin=B&&B.hp<=0&&!(B.adds||[]).some(f=>f.hp>0);const r=_w.apply(this,arguments);if(fin)try{onWin6()}catch(e){}return r}}
 /* 怪物出手：玩家護盾吸收、量掉血觸發被動；A 線沒有自己乘倍率時（window.MOB6_MUL 未設），這裡暫時把狀態倍率乘到怪物攻擊上 */
@@ -363,7 +374,7 @@ foeTurn=foeWrap6(foeTurn,false);if(typeof rtAddGo==='function')rtAddGo=foeWrap6(
 /* 玩家格擋成功（即時格擋按鈕）也算格擋 */
 {const _rr=rtReact;rtReact=function(fx){const r=_rr.apply(this,arguments);if(r&&fx&&fx.parry)try{onBlock6()}catch(e){}if(r&&fx&&fx.evade)try{onEvade6()}catch(e){}return r}}
 /* 行動條：玩家看行動速度、狀態速度另乘；怪物被減速時變慢（首領減半已在施加時處理） */
-function rtPT(){let t=3/(1+(rtS6().SPD||0)/100);if(job6()==='dual')t*=.85;const sp=B&&B.psx?stCap('p','spd'):0;return t/Math.max(.7,1+sp/100)}
+function rtPT(){let t=3/(1+Math.min(25,rtS6().SPD||0)/100);if(job6()==='dual')t*=.9;const sp=B&&B.psx?stCap('p','spd'):0;return t/Math.max(.7,1+sp/100)}
 
 /* 冷卻中的技能：保留預約，冷卻好了才放 */
 {const _rd=rtDo;rtDo=function(c){if(B&&B.rt&&SK[c]&&!skReady6(c)){if(S.mp<mpCost6(c)){B.rt.q=null;return}B.rt.q=c;return}return _rd.apply(this,arguments)}}
@@ -392,19 +403,19 @@ function myPd(k,s){s=s||rtS6();return estD6(k||battleSkills()[0],s)}
 const skIcK6=k=>['skill_'+k,'skill_'+(FXA[k]||'')].find(q=>q in ATL||(ARTSET&&ARTSET.has(q)))||'skill_'+k;
 function rtSkIc(k){const ks=['skill_'+k,'skill_'+(FXA[k]||'')];for(const q of ks){if(q in ATL)return `<i class="bi at" style="background-position:${(ATL[q]%ATC)/(ATC-1)*100}% ${Math.floor(ATL[q]/ATC)/(ATR-1)*100}%"></i>`;if(ARTSET&&ARTSET.has(q))return `<img class="bi" src="art/${q}.webp" alt="">`}return ''}
 function rtCmdB(){const el=$('#xcmds');if(!el)return;const sk=battleSkills();
-  const a=sk.map((k,i)=>{const x=SK[k];return `<button class="bcm sk c-${x.heal?'heal':x.dmg?'atk':'sup'}" style="grid-column:span 20" data-a="rtCmd" data-v="${k}"><span class="ci">${rtSkIc(k)||(i===0?RTI.atk:'')}</span><span class="cn">${esc(x.n)}</span><span class="cf"></span><i class="cdv"></i><span class="cq">預約</span><span class="kn">${i===0?'Z':i+1}</span></button>`}).join('');
+  const a=sk.map((k,i)=>{const x=SK[k];return `<button class="bcm sk c-${x.heal?'heal':x.dmg?'atk':'sup'}" style="grid-column:span ${Math.floor(60/sk.length)}" data-a="rtCmd" data-v="${k}"><span class="ci">${rtSkIc(k)||(i===0?RTI.atk:'')}</span><span class="cn">${esc(x.n)}</span><span class="cf"></span><i class="cdv"></i><span class="cq">預約</span><span class="kn">${i===0?'Z':i+1}</span></button>`}).join('');
   const b=[['guard','防禦','c-def','減傷','X'],['parry','格擋','c-par','擋下反擊','空白']].map(([k,n,c,f,kb])=>`<button class="bcm ${c}" style="grid-column:span 30" data-a="rtCmd" data-v="@${k}"><span class="ci">${RTI[k]}</span><span class="cn">${n}</span><span class="cf">${f}</span><span class="cq">預約</span><span class="kn">${kb}</span></button>`).join('');
   el.innerHTML=a+b;RTK.cb=[...el.querySelectorAll('.bcm')]}
 function rtCd6(){if(!B||!B.rt||!RTK.cb)return;for(const b of RTK.cb){const k=b.dataset.v;if(!SK[k])continue;const cd=cdLeft6(k),c=mpCost6(k),e=b.querySelector('.cf'),v=b.querySelector('.cdv');
-  const t=cd>0?`冷卻 ${cd.toFixed(1)}`:c?`MP ${c}`:'';if(e.textContent!==t)e.textContent=t;b.classList.toggle('na',B.rt.done||S.mp<c||cd>0);b.classList.toggle('cdn',cd>0);
+  const t=cd>0?`冷卻 ${cd}`:c?`MP ${c}`:'';if(e.textContent!==t)e.textContent=t;b.classList.toggle('na',B.rt.done||S.mp<c||cd>0);b.classList.toggle('cdn',cd>0);
   if(v){const p=cd>0?cd/Math.max(.1,cdOf6(k))*100:0;v.style.height=p+'%'}}}
 {const _rf=rtFrame;rtFrame=function(){_rf.apply(this,arguments);try{rtCd6()}catch(e){}}}
 function rtPose(k){const ks=battleSkills(),i=ks.indexOf(k);if(i<1)return false;const n=i===1?1:2,key=AK()+'_s'+n,x=$('#xfield');if(!x||!(ARTSET&&ARTSET.has(key)))return false;
   const d=document.createElement('div');d.className='posein p'+n;d.style.setProperty('--c',(SKA[k]||[])[1]||'#ffd86b');d.innerHTML=`<i></i><img src="art/${key}.webp" alt=""><b>${esc(SK[k].n)}</b>`;x.appendChild(d);setTimeout(()=>d.remove(),600);return true}
 try{const _me=PFX.me;PFX.me=function(fx){return _me.call(this,fx&&fx.skill&&FXA[fx.skill]?Object.assign({},fx,{skill:FXA[fx.skill]}):(fx&&fx.skill&&!FXA[fx.skill]?Object.assign({},fx,{skill:null}):fx))};
   const _hf=PFX.heroFxn;PFX.heroFxn=function(fx){return _hf.call(this,fx&&fx.skill?Object.assign({},fx,{skill:FXA[fx.skill]||null}):fx)}}catch(e){}
-function stChip6(t){const now=bt6(),bx=stBox(t);return Object.keys(bx).filter(id=>bx[id].e>now&&id!=='IMMUNE').map(id=>{const x=bx[id],D=STX[id];return `<${t==='p'?'span':'b'} class="${D.bad?'bad':'g'}">${D.n}${id==='SHIELD'&&x.amt?' '+Math.round(x.amt):''}</${t==='p'?'span':'b'}>`}).join('')}
-function rtPchips(R){const o=[];if(R.t<R.pstun)o.push('<b>暈眩</b>');if(R.pr>R.t)o.push('<b>格擋</b>');if(B.guard)o.push('<b>防禦</b>');if(B.opening)o.push('<b>下一擊 +50%</b>');
+function stChip6(t){const now=acOf(t),bx=stBox(t);return Object.keys(bx).filter(id=>bx[id].e>now&&id!=='IMMUNE').map(id=>{const x=bx[id],D=STX[id];return `<${t==='p'?'span':'b'} class="${D.bad?'bad':'g'}">${D.n}${id==='SHIELD'&&x.amt?' '+Math.round(x.amt):''}</${t==='p'?'span':'b'}>`}).join('')}
+function rtPchips(R){const o=[];if(R.pr>R.t)o.push('<b>格擋</b>');if(B.guard)o.push('<b>防禦</b>');if(B.opening)o.push('<b>下一擊 +50%</b>');
   if(B.p6&&B.p6.nx.length)o.push('<span>蓄勢</span>');return o.join('')+stChip6('p')}
 {const _fs=rtFstat;rtFstat=function(f,m){let o='';try{o=_fs.apply(this,arguments)}catch(e){}return o+stChip6(f)}}
 /* 戰鬥紀錄的分類：新狀態名 */

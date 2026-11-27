@@ -124,7 +124,7 @@ function stats(){const e=gearTotals(),a={},v=k=>e[k]||0,cp=(k,m)=>1+Math.min(m||
     DEF:Math.round((a.VIT*1.4*cm[1]+v('def'))*cp('defp')),MRES:Math.round((a.INT*.8+a.VIT*.4+S.lv+v('mres'))*cp('mresp')),
     CRIT:r2(Math.min(75,5+a.LUK*.45+v('crit')+(typeof fortK==='function'&&fortK('crit')?8:0))),CD:r2(Math.min(250,150+a.LUK*.6+v('cd'))),EVA:r2(Math.min(45,a.DEX*.35+v('eva'))),
     DOUBLE:r2(Math.min(20,a.LUK*.12+v('double'))),MPCUT:r2(Math.min(20,a.INT*.12+v('mpcut'))),REGEN:r2(Math.min(3,a.VIT*.02+v('regen'))),MREGEN:r2(Math.min(3,v('mregen'))),
-    SPD:r2(Math.min(30,a.DEX*.3+v('spd'))),PEN:r2(Math.min(30,a.STR*.15+v('pen'))),MPEN:r2(Math.min(30,v('mpen'))),BLOCK:r2(Math.min(35,v('block'))),HIT:r2(v('hit')),
+    SPD:r2(Math.min(25,a.DEX*.25+v('spd'))),PEN:r2(Math.min(30,a.STR*.15+v('pen'))),MPEN:r2(Math.min(30,v('mpen'))),BLOCK:r2(Math.min(35,v('block'))),HIT:r2(v('hit')),
     LS:r2(Math.min(10,v('ls'))),HEALP:r2(Math.min(30,v('healp'))),HEALIN:r2(v('healin')),SKILL:r2(Math.min(20,v('skill'))),BOSS:r2(Math.min(25,v('boss'))),ELITE:r2(Math.min(25,v('elite'))),
     DOT:r2(Math.min(20,v('dot'))),TEN:r2(Math.min(30,v('ten'))),SHD:r2(Math.min(30,v('shd'))),PRED:r2(Math.min(40,v('pred'))),MRED:r2(Math.min(40,v('mred'))),
     GOLD:r2(v('gold')),DROP:r2(Math.min(20,v('drop'))),EXP:r2(v('exp')),MAT:r2(Math.min(20,v('mat'))),TYPED:TD,TYPER:TR,MYTH:mythOn6(),SETFX:setFx6(),
