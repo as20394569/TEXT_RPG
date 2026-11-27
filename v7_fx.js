@@ -329,6 +329,20 @@ function slashP(f,P){const c1=P.c,c2=P.c2||'#ffffff',L=P.L||.36,W=P.W||.045,ang=
 function sweep(pts,P){const y=pts.reduce((a,p)=>a+p[1],0)/pts.length,x=pts.reduce((a,p)=>a+p[0],0)/pts.length;dia([x,y+(P.dy||0)],P.a??-.05,1.05,P.W||.05,P.c,{life:.48,bias:.55});if(P.c2)later(P.gap||90,()=>dia([x,y+.035+(P.dy||0)],-(P.a??-.05)+.08,1.05,(P.W||.05)*.7,P.c2,{life:.42}));pts.forEach((p,i)=>later(70+i*35,()=>{if(P.ef)edgeFx(p,0,P.ef,P.c);spark(p,'#ffffff',.06,6,.2)}))}
 function hitSl(f,P,dl){later((dl||0)+60,()=>{if(P.ef)edgeFx(f,P.a||0,P.ef,P.c);spark(f,'#ffffff',.07,7,.2);if(P.p==='big'||P.heavy)shock(f,P.c,.22,.45,.35)})}
 
+/* 破甲：對手身上浮出一面護甲，被刀光一刀劈開，兩半往外裂開掉落 */
+function armorCut(f,ang,col,two){col=vivid(col);const t0=.22;cel(1.1,(c,k)=>{const [x,y]=P2(f),u=U(),s=u*.125;c.translate(x,y);
+  const sh=()=>{c.beginPath();c.moveTo(0,-s);c.lineTo(s*.82,-s*.62);c.lineTo(s*.72,s*.25);c.quadraticCurveTo(s*.4,s*.8,0,s*1.05);c.quadraticCurveTo(-s*.4,s*.8,-s*.72,s*.25);c.lineTo(-s*.82,-s*.62);c.closePath()};
+  const paint=(a)=>{c.globalCompositeOperation='source-over';c.globalAlpha=a*.55;sh();const g=c.createLinearGradient(-s,-s,s,s);g.addColorStop(0,'rgba(230,235,245,1)');g.addColorStop(.5,'rgba(140,150,170,1)');g.addColorStop(1,'rgba(70,75,90,1)');c.fillStyle=g;c.fill();
+    c.globalAlpha=a;ADD(c);c.strokeStyle=col;c.shadowColor=col;c.shadowBlur=10;c.lineWidth=Math.max(1.5,u*.005);sh();c.stroke();c.shadowBlur=0;c.globalCompositeOperation='source-over';c.strokeStyle='rgba(255,255,255,.8)';c.lineWidth=1;c.beginPath();c.moveTo(0,-s*.75);c.lineTo(0,s*.75);c.moveTo(-s*.5,-s*.2);c.lineTo(s*.5,-s*.2);c.stroke()};
+  if(k<t0){paint(Math.min(1,k/(t0*.6)));return}
+  const q=(k-t0)/(1-t0),fd=q<.5?1:1-(q-.5)/.5,cuts=two?[ang,-ang]:[ang];
+  const pieces=two?[[1,1],[1,-1],[-1,1],[-1,-1]]:[[1,0],[-1,0]];
+  for(const [sa,sb] of pieces){c.save();const n0=[-Math.sin(cuts[0]),Math.cos(cuts[0])],n1=two?[-Math.sin(cuts[1]),Math.cos(cuts[1])]:null,dx=(n0[0]*sa+(n1?n1[0]*sb:0))*u*.06*eo(q*2),dy=(n0[1]*sa+(n1?n1[1]*sb:0))*u*.06*eo(q*2)+u*.18*q*q;
+    c.translate(dx,dy);c.rotate(sa*.35*q);c.beginPath();const R=s*3;
+    /* 用切線把護甲分成兩塊（或四塊） */
+    const half=(a,sg)=>{c.moveTo(Math.cos(a)*R,Math.sin(a)*R);c.lineTo(Math.cos(a)*R+Math.cos(a+PI/2)*R*sg,Math.sin(a)*R+Math.sin(a+PI/2)*R*sg);c.lineTo(-Math.cos(a)*R+Math.cos(a+PI/2)*R*sg,-Math.sin(a)*R+Math.sin(a+PI/2)*R*sg);c.lineTo(-Math.cos(a)*R,-Math.sin(a)*R);c.closePath()};
+    half(cuts[0],sa);c.clip();if(two){c.beginPath();half(cuts[1],sb);c.clip()}paint(fd);c.restore()}
+  if(q<.25){ADD(c);c.globalAlpha=1-q/.25;for(const a of cuts){c.save();c.rotate(a);c.fillStyle='#ffffff';c.shadowColor=col;c.shadowBlur=12;c.fillRect(-s*1.2,-1.5,s*2.4,3);c.restore()}}})}
 /* ================= 其他新元件 ================= */
 /* 星形彈：四芒星旋轉前進 */
 function starShot(from,to,col,o){o=o||{};const dur=o.dur||.32,tr=[];cel(dur+.12,(c,k0)=>{const el=k0*(dur+.12),k=Math.min(1,el/dur),[x0,y0]=P2(from),[x1,y1]=P2(to),u=U(),e=eo(k),x=x0+(x1-x0)*e,y=y0+(y1-y0)*e-Math.sin(PI*e)*u*(o.arc??.06);
@@ -375,11 +389,11 @@ function bullet(from,to){streak(from,to,'#ffffff',{w:.012,life:.18,over:1.1});la
 /* ================= 逐招設計表 ================= */
 /* 斬擊：p 排列、c/c2 顏色、ef 附加、s 音高 */
 const SL={
-  J01S1:{p:'one',c:'#cfe6ff',a:-.6},J01S2:{p:'plus',c:'#ffa040',c2:'#ffe0b0',ef:'armor',heavy:1},J01S3:{p:'rise',c:'#8fc8ff',ef:'guard'},J01S9:{p:'low',c:'#7fd3ff',ef:'frost'},
+  J01S1:{p:'one',c:'#cfe6ff',a:-.6},J01S2:{p:'one',c:'#ffa040',a:-.5,ef:'armorcut',L:.42},J01S3:{p:'rise',c:'#8fc8ff',ef:'guard'},J01S9:{p:'low',c:'#7fd3ff',ef:'frost'},
   J01S10:{p:'x',c:'#ff8a4a',c2:'#ffd0a0'},J01S11:{p:'zig',c:'#ff3a4a',c2:'#ffb0b8',ef:'blood'},J01S12:{p:'double',c:'#d8a0ff',c2:'#ffffff'},J01S13:{p:'big',c:'#ffe27a',a:-1.2},
   J05S2:{p:'tri',c:'#e8d27a',c2:'#ffffff',ef:'armor'},J05S10:{p:'x',c:'#bfe2ff',c2:'#ffffff',ef:'guard'},J05S12:{p:'v',c:'#ff9a4a',ef:'armor',heavy:1},
   J13S1:{p:'x',c:'#7ff0ff',c2:'#ff9ae8'},J13S2:{p:'moon',c:'#7ff0ff',c2:'#ff9ae8'},J13S3:{p:'storm',c:'#9ff8e8',c2:'#ffffff',n:7,ef:'wind'},J13S9:{p:'zig',c:'#ff4a6a',c2:'#7ff0ff',ef:'blood',n:4},
-  J13S10:{p:'pierce',c:'#7ff0ff',ef:'after'},J13S11:{p:'plus',c:'#ffb04a',c2:'#7ff0ff',ef:'armor'},J13S12:{p:'fan',c:'#7ff0ff',c2:'#ff9ae8',n:5},J13S13:{p:'star',c:'#7ff0ff',c2:'#ff9ae8',n:6,heavy:1},
+  J13S10:{p:'pierce',c:'#7ff0ff',ef:'after'},J13S11:{p:'x',c:'#ffb04a',c2:'#7ff0ff',a:-.6,ef:'armorcut2'},J13S12:{p:'fan',c:'#7ff0ff',c2:'#ff9ae8',n:5},J13S13:{p:'star',c:'#7ff0ff',c2:'#ff9ae8',n:6,heavy:1},
   J10S1:{p:'pierce',c:'#b080ff',a:-.25,ef:'shadow'},J10S2:{p:'tri',c:'#8be04a',c2:'#d8ffb0',ef:'poison',L:.3,W:.035},J10S3:{p:'star',c:'#a060ff',c2:'#ffffff',n:4,ef:'shadow'},J10S9:{p:'pierce',c:'#8be04a',a:.2,ef:'poison'},
   J10S10:{p:'zig',c:'#7ff0e0',c2:'#ffffff',ef:'wind',L:.3,W:.035},J10S11:{p:'v',c:'#c0304a',ef:'shadow'},J10S12:{p:'double',c:'#8be04a',c2:'#b080ff',a:-.2},J10S13:{p:'big',c:'#ff2a4a',a:-.4},
   J06S1:{p:'v',c:'#ff8a4a',heavy:1,ef:'crack',W:.07},J06S2:{p:'v',c:'#ff6a2a',heavy:1,ef:'quake',W:.09,L:.48},J06S3:{p:'one',c:'#ff3a4a',W:.07,ef:'lifesteal',a:-.9},J06S9:{p:'zig',c:'#d0142e',c2:'#ff8a8a',W:.065,ef:'blood'},
@@ -390,11 +404,11 @@ const SW={J01S7:{c:'#9fd8ff'},J05S8:{c:'#ffe0a0',c2:'#ffffff'},J06S8:{c:'#ff5a2a
 const WH={J01S8:{c:'#ffffff',c2:'#9fd8ff'},J06S7:{c:'#ff8a4a',c2:'#ff5a1a',W:.07},J13S7:{c:'#7ff0ff',c2:'#ff9ae8'}};
 function slashSnd(P,t){const pitch=P.c==='#ff8a4a'||/ff[4-9]/.test(P.c)?1600:2300;const n=P.p==='tri'?3:P.p==='zig'?(P.n||3):P.p==='storm'?5:P.p==='star'?3:P.p==='fan'?4:P.p==='ring'?4:(P.p==='x'||P.p==='plus'||P.p==='double'||P.p==='moon')?2:1;
   for(let i=0;i<n;i++)SN.cut(t+i*.07,pitch+i*180);if(P.W>=.065||P.heavy){SN.thud(t+.06,.6)}if(P.p==='big'){SN.boom(t+.05,.5)}
-  if(P.ef==='blood')SN.splat(t+.1);if(P.ef==='frost')SN.frost(t+.08);if(P.ef==='armor')SN.ring(t+.08,800,.08,.45);if(P.ef==='poison')SN.hiss(t+.1,.3);if(P.ef==='shadow')SN.whisper(t);if(P.ef==='lifesteal')SN.heal(t+.3);if(P.ef==='quake')SN.boom(t+.1,.6)}
+  if(P.ef==='blood')SN.splat(t+.1);if(P.ef==='frost')SN.frost(t+.08);if(/armor/.test(P.ef||''))SN.ring(t+.08,800,.08,.45);if(P.ef==='poison')SN.hiss(t+.1,.3);if(P.ef==='shadow')SN.whisper(t);if(P.ef==='lifesteal')SN.heal(t+.3);if(P.ef==='quake')SN.boom(t+.1,.6)}
 function slashExtra(f,P,dl){later(dl+60,()=>{const e=P.ef;
-  if(e==='crack')smash(f,P.c,{p:.7,crack:1});else if(e==='quake'){smash(f,P.c,{p:1.3,crack:1});tint('rgba(120,70,30,.18)',.25)}
+  if(e==='armorcut'||e==='armorcut2'){edgeFx(f,P.a||0,'armor',P.c);shock(f,P.c,.16,.35)}else if(e==='crack')smash(f,P.c,{p:.7,crack:1});else if(e==='quake'){smash(f,P.c,{p:1.3,crack:1});tint('rgba(120,70,30,.18)',.25)}
   else if(e==='lifesteal')multi(5,60,()=>comet([f[0]+rnd2(-.04,.04),f[1]],H,'#ff4a6a',.008,.38,{arc:rnd2(-.08,.08),hit:false}));
-  else if(e==='guard')guardFx(f,P.c);else if(e==='wind')wind(f,'#e0fff8',{dir:1,n:5,life:.45});else if(e==='after')for(let i=1;i<=3;i++)later(i*40,()=>dia([f[0]-i*.04,f[1]],-.06,.5,.025,P.c,{life:.25,bias:.75}));
+  else if(e==='guard')guardFx(H,P.c);else if(e==='wind')wind(f,'#e0fff8',{dir:1,n:5,life:.45});else if(e==='after')for(let i=1;i<=3;i++)later(i*40,()=>dia([f[0]-i*.04,f[1]],-.06,.5,.025,P.c,{life:.25,bias:.75}));
   else if(e==='shadow')shadow([f[0]+.03,f[1]],.45);else if(e)edgeFx(f,P.a||0,e,P.c);
   spark(f,'#ffffff',.07,7,.2);if(P.heavy)shock(f,P.c,.22,.45,.35)})}
 /* 鈍擊：錘與盾，每招不同的衝擊形狀 */
@@ -479,7 +493,7 @@ const MG={
   J11S13:{v:()=>lightSword(F),s:t=>{SN.bell(t,1568);SN.boom(t+.28,.6);SN.chime(t+.3,1047)},el:'holy'}};
 /* 由設計表產生配方；沒有列到的用舊規則 */
 function designed(k){const x=SK[k];if(!x)return null;const R=(v,s,el)=>({v,s,el});
-  if(SL[k]){const P=SL[k];return R(()=>{lunge('me',30);const tot=slashP(F,P);slashExtra(F,P,tot)},()=>slashSnd(P,.1),P.ef==='poison'?'poison':'slash')}
+  if(SL[k]){const P=SL[k];return R(()=>{lunge('me',30);if(/armorcut/.test(P.ef||'')){armorCut(F,P.a||-.5,P.c,P.ef==='armorcut2');later(200,()=>{const tot=slashP(F,P);slashExtra(F,P,tot)});return}const tot=slashP(F,P);slashExtra(F,P,tot)},()=>{if(/armorcut/.test(P.ef||'')){SN.guard(.05);slashSnd(P,.3);SN.shatter(.36)}else slashSnd(P,.1)},P.ef==='poison'?'poison':'slash')}
   if(SW[k]){const P=SW[k];return R(()=>{lunge('me',30);sweep(aoePts(k),P);if(P.ef==='crack')aoePts(k).forEach((p,i)=>later(80+i*40,()=>smash(p,P.c,{p:.6,crack:1})))},()=>{SN.swish(.1,1.4,1);SN.ring(.18,P.c2?2400:1900,.07,.3);if(P.c2)SN.swish(.2,1,1);if(P.ef==='crack')SN.boom(.2,.4)},'slash')}
   if(WH[k]){const P=WH[k];return R(()=>{lunge('me',30);aoePts(k).forEach((p,i)=>later(i*60,()=>{slashP(p,{p:'ring',c:P.c,c2:P.c2,L:.34,W:P.W||.05,n:6});later(220,()=>shock(p,P.c,.16,.35,.4))}))},()=>{for(let i=0;i<4;i++)SN.swish(.1+i*.07,.8,1);SN.ring(.4,1900,.06,.3)},'slash')}
   if(BL[k])return R(()=>BL[k](k),()=>(BLS[k]||(t=>SN.blunt(t)))(.05),/J12/.test(k)?'holy':'rock');
