@@ -703,8 +703,34 @@ Object.assign(MG,{
   J07S9:{v:()=>{ballLightning(HP0(),F,.36);later(360,()=>{bolt(F,'#cfe0ff');thunderBall(F)})},s:t=>{SN.crackle(t,.35);SN.zap(t+.36);SN.boom(t+.38,.4)},el:'thunder'},
   J07S12:{v:()=>multi(4,80,i=>starOrb(HP0(),F,{fire:1,sz:.7,dur:.34,arc:(i-1.5)*.1,hit:()=>i===3?(fireBurst(F,.9),starBurst(F,.6)):fireBurst(F,.4,1)})),s:t=>{for(let i=0;i<4;i++){SN.zip(t+i*.08,.3);SN.ignite(t+.34+i*.08)}SN.boom(t+.6,.5)},el:'fire'},
   J07S13:{v:()=>{const at=[HP0()[0]+.02,HP0()[1]-.12];sunCharge(at,.45);later(450,()=>fireball(at,F,{dur:.42,sz:2.6,arc:.02,hit:()=>{fireBurst(F,2);starBurst(F,1.2);tint('rgba(255,170,90,.3)',.25);shock(F,'#ffd090',.5,.6,.35)}}))},s:t=>{SN.charge(t,.45);SN.roar(t,.45,.3);SN.ignite(t+.45);SN.boom(t+.87,1)},el:'fire'}});
+/* ================= 雙劍士：華麗連擊 ================= */
+const DC1='#5ff0ff',DC2='#ff6ad8';
+function hitShake(f,amt){try{const el=f===F?document.querySelector('#rtb .bec.big .eart .art img:not(.under)'):null;if(el&&!SHAKEOFF)el.animate([{transform:'translate(0,0)'},{transform:`translate(${(Math.random()-.5)*amt}px,${(Math.random()-.5)*amt*.6}px)`},{transform:'translate(0,0)'}],{duration:70,composite:'add'})}catch(e){}}
+/* n 下連擊：節奏越來越快、角度依黃金角輪轉、雙色交替，每下都有命中閃光與震動 */
+function combo(f,n,o){o=o||{};const i0=o.i0||85,i1=o.i1||35,T=[];let t=0;for(let i=0;i<n;i++){T.push(t);t+=i0+(i1-i0)*(i/(Math.max(1,n-1)))}
+  T.forEach((tt,i)=>later(tt,()=>{const a=o.ang?o.ang(i):(i*2.4+(o.a0||0))%PI-PI/2,p=[f[0]+rnd2(-.025,.025),f[1]+rnd2(-.03,.03)],col=i%2?(o.c2||DC2):(o.c1||DC1);
+    dia(p,a,o.L||.32,o.W||.045,col,{life:.26,hold:.3});later(25,()=>{tick(p,col);if(o.ef)edgeFx(p,a,o.ef,col);hitShake(f,6)});if(i%3===2)spk(p,'#ffffff',.06,6,.16)}));
+  return t}
+/* 收尾：大十字＋星芒＋衝擊波＋閃白 */
+function finisher(f,o){o=o||{};const c1=o.c1||DC1,c2=o.c2||DC2;dia(f,-.75,.6,.09,c1,{life:.5,hold:.45});later(40,()=>dia(f,.75,.6,.09,c2,{life:.5,hold:.45}));
+  later(90,()=>{flash(f,'#ffffff',.26,.3);shock(f,c1,.26,.45,.45);shock(f,c2,.18,.4,.45);spk(f,'#ffffff',.14,12,.3);stardust(f,16,{im:[spr(140,240,255),spr(255,140,230)]});tint('rgba(255,255,255,.18)',.1);hitShake(f,14)})}
+function comboSnd(n,i0,i1,t0,fin){let t=t0||.1;for(let i=0;i<n;i++){SN.cut(t,2200+i*90);t+=(i0+(i1-i0)*(i/Math.max(1,n-1)))/1000}if(fin){SN.cut(t,2600);SN.boom(t+.08,.5);SN.star(t+.1)}}
+/* 殘影衝刺：自己快速穿過去，刀光在身後才一起炸開（居合） */
+function iaido(f,n,col){wind(H,'#e8fbff',{dir:1,n:6,life:.4});streak(H,[f[0]+.12,f[1]],col,{w:.02,life:.25,over:1});const angs=[...Array(n)].map((_,i)=>-1.2+i*(2.4/(n-1))+rnd2(-.1,.1));
+  later(260,()=>{angs.forEach((a,i)=>dia([f[0]+rnd2(-.02,.02),f[1]+rnd2(-.02,.02)],a,.38,.05,i%2?DC2:DC1,{life:.4,hold:.4,d0:.06}));later(40,()=>{flash(f,'#ffffff',.22,.3);spk(f,'#ffffff',.12,12,.28);hitShake(f,12)})})}
+const DUAL={
+  J13S1:{v:()=>{lunge('me',30);const t=combo(F,4,{i0:90,i1:60,ang:i=>[-.8,.8,-.1,PI/2-.1][i]});later(t,()=>finisher(F,{}))},s:()=>comboSnd(4,90,60,.1,1)},
+  J13S2:{v:()=>{lunge('me',30);arcSweep(F,DC1,{rx:.1,ry:.05,w:.014,turns:.55,span:2.6,life:.4});later(120,()=>arcSweep(F,DC2,{rx:.1,ry:.05,w:.014,turns:.55,span:2.6,life:.4,dir:-1,a0:PI}));later(260,()=>{const t=combo(F,4,{i0:60,i1:40});later(t,()=>finisher(F,{}))})},s:()=>{SN.swish(.1,1.2,1);SN.swish(.22,1.2,1);comboSnd(4,60,40,.36,1)}},
+  J13S3:{v:()=>{lunge('me',30);wind(F,'#e0fff8',{dir:1,n:6,life:.8});const t=combo(F,10,{i0:70,i1:25,L:.28,W:.038});later(t,()=>{dia(F,0,.7,.07,DC2,{life:.45});later(60,()=>{flash(F,'#ffffff',.2,.3);wind(F,'#ffffff',{dir:1,n:8,life:.5});hitShake(F,12)})})},s:()=>{SN.wind(.05);comboSnd(10,70,25,.1,0);SN.cut(.75,2800);SN.boom(.8,.35)}},
+  J13S7:{aoe:1,v:k=>{lunge('me',30);aoePts(k).forEach((p,i)=>later(i*50,()=>{swirlBlade(p,DC1,{dir:1,R:.075});swirlBlade(p,DC2,{dir:-1,R:.075});later(300,()=>combo(p,4,{i0:45,i1:30,L:.24,W:.035}))}))},s:()=>{for(let i=0;i<4;i++)SN.swish(.1+i*.07,.6,1);comboSnd(4,45,30,.42,0)}},
+  J13S8:{aoe:1,v:k=>{lunge('me',30);const pts=aoePts(k);sweep(pts,{c:DC1,c2:DC2,W:.05});later(220,()=>pts.forEach((p,i)=>later(i*40,()=>combo(p,3,{i0:50,i1:40,L:.24,W:.035}))))},s:()=>{SN.swish(.1,1.4,1);SN.swish(.22,1.2,1);comboSnd(3,50,40,.34,0)}},
+  J13S9:{v:()=>{lunge('me',30);const t=combo(F,6,{i0:75,i1:40,ef:'blood',c1:'#ff3a5a',c2:DC1,ang:i=>(i%2?1:-1)*(.7+i*.06)});later(t,()=>{finisher(F,{c1:'#ff3a5a',c2:DC1});edgeFx(F,0,'blood')})},s:()=>{comboSnd(6,75,40,.1,1);SN.splat(.3);SN.splat(.5)}},
+  J13S10:{v:()=>iaido(F,5,DC1),s:()=>{SN.wind(0);SN.swish(.05,1.4,1);for(let i=0;i<5;i++)SN.cut(.28+i*.015,2400+i*120);SN.boom(.3,.35)}},
+  J13S11:{v:()=>{lunge('me',30);armorCut(F,-.6,'#ffb04a',1);later(60,()=>combo(F,4,{i0:45,i1:35,L:.26,W:.035}));later(260,()=>{dia(F,-.6,.5,.07,'#ffb04a',{life:.4});later(40,()=>dia(F,.6,.5,.07,DC1,{life:.4}));later(80,()=>{edgeFx(F,0,'armor','#ffb04a');hitShake(F,12)})})},s:()=>{SN.guard(.05);comboSnd(4,45,35,.1,0);SN.cut(.36,2000);SN.ring(.4,800,.1,.5);SN.shatter(.42)}},
+  J13S12:{v:()=>{lunge('me',30);const t=combo(F,8,{i0:65,i1:30,ang:i=>-PI/2+i*PI/8});later(t,()=>finisher(F,{}))},s:()=>comboSnd(8,65,30,.1,1)},
+  J13S13:{v:()=>{lunge('me',40);tint('rgba(0,0,0,.25)',.6);const t=combo(F,12,{i0:70,i1:22,L:.34,W:.05});later(t,()=>{finisher(F,{});later(120,()=>{dia(F,PI/2,.9,.12,'#ffffff',{life:.5});shock(F,DC1,.4,.55,.4);hitShake(F,18)})})},s:()=>{comboSnd(12,70,22,.1,1);SN.boom(.75,.7)}}};
 /* ================= 接到現有流程 ================= */
-const RC={};const getR=k=>k in RC?RC[k]:(RC[k]=(SF[k]?{v:()=>{castPose('me');SF[k].v()},s:()=>SF[k].s(0),el:'holy'}:null)||designed(k)||recipe(k));
+const RC={};const getR=k=>k in RC?RC[k]:(RC[k]=(DUAL[k]?{v:()=>DUAL[k].v(k),s:()=>DUAL[k].s(),el:'slash'}:null)||(SF[k]?{v:()=>{castPose('me');SF[k].v()},s:()=>SF[k].s(0),el:'holy'}:null)||designed(k)||recipe(k));
 /* 依配方的屬性選擇命中碎屑 */
 const ELN={slash:'slash_white',fire:'fire_burst',ice:'ice_shatter',thunder:'lightning_strike',holy:'holy_burst',dark:'dark_burst',poison:'poison_cloud',pierce:'impact_hit',rock:'rock_burst'};
 const _me=PFX.me,_hf=PFX.heroFxn;
