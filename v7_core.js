@@ -131,7 +131,7 @@ function pPre7(){if(!B||!B.rt)return 'ok';if(B.preAc===acOf('p'))return B.preRes
   if(S.hp<=0){B.preRes='dead';if(typeof rtLose==='function')rtLose();return 'dead'}
   if(stHas('p','STUN')){B.preRes='skip';blog(you('你動彈不得'));return 'skip'}
   B.preRes='ok';return 'ok'}
-function pPost7(){if(!B)return;const P=B.p6||{};P.lb=P.nb||0;P.le=P.ne||0;P.lh=P.nh||0;P.lc=P.nc||0;P.nb=P.ne=P.nh=P.nc=0;P.mpAct=0;P.trigAct=0;
+function pPost7(){if(!B)return;const P=B.p6||{};P.lb=P.nb||0;P.le=P.ne||0;P.lh=P.nh||0;P.lc=P.nc||0;P.nb=P.ne=P.nh=P.nc=0;P.mpAct=0;P.trigAct=0;P.cmb=0;/* v21.4：J13S15 連擊回魔每兩次玩家行動之間最多一次 */
   B.acP=(B.acP||0)+1;B.actor=null;B.preAc=-1}
 /* 只有真的出手才結算；MP 不足等失敗不算行動 */
 {const _pa=pAct;pAct=function(type,arg){if(!B||!B.rt)return _pa.apply(this,arguments);

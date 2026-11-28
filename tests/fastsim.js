@@ -28,12 +28,13 @@ const SIM=W.SIM={knob:{},errs:[],err(e){if(SIM.errs.length<20)SIM.errs.push(Stri
 /* ---------- 怪物分類（開戰時標記；換位會跟著怪物走） ---------- */
 {const _g=grpDone7;grpDone7=function(){const r=_g.apply(this,arguments);try{const L=[B,...(B.adds||[])];
   for(const f of L){let c;if(B.mid7)c=f===B?'mid':'mid_add';else if(B.kind==='boss')c=f===B?'boss':'boss_add';else if(B.kind==='elite')c=f===B?'elite':'elite_add';else c=L.length>1?'grp':'solo';f.cat7=c}}catch(e){SIM.err(e)}return r}}
-{const _a=addFoe7;addFoe7=function(){const f=_a.apply(this,arguments);try{if(B&&B.rt&&B.rt.t>0)f.cat7='summon'}catch(e){}return f}}
+/* v21.4 分析修正：舊版把戰鬥中途 addFoe7 加入的單位一律標成 summon，連副本首領也被標錯；召喚物只看 summon7 旗標（catOf） */
 /* 難度測試選項（只在測試）：SIM.diff={dgHp,dgAtk,exHp,exAtk,z0Mid} */
 {const _mk=mkFoe;mkFoe=function(){const f=_mk.apply(this,arguments);try{const D=SIM.diff;if(D&&f&&RUN){const dg=!!RUN.dg,h=dg?D.dgHp:(RUN.area>=1?D.exHp:1),a=dg?D.dgAtk:(RUN.area>=1?D.exAtk:1);
   if(h&&h!==1){f.max=Math.round(f.max*h);f.hp=f.max}if(a&&a!==1){f.atk=Math.round(f.atk*a);if(f.mag)f.mag=Math.round(f.mag*a)}}}catch(e){SIM.err(e)}return f}}
 {const _sm=startMid7;startMid7=function(){const r=_sm.apply(this,arguments);try{const D=SIM.diff;if(D&&D.z0Mid&&B&&RUN&&RUN.area===0&&B.mid7){B.atk=Math.round(B.atk*D.z0Mid);if(B.mag)B.mag=Math.round(B.mag*D.z0Mid)}}catch(e){SIM.err(e)}return r}}
 const catOf=f=>f.summon7?'summon':(f.kind==='boss'&&!f.mid7&&!f.cat7?'boss':(f.cat7||'solo'));
+SIM.catOf=catOf;
 /* 候選方案：只改怪物「技能」的直接傷害與冷卻 */
 function candMul(f){const C=SIM.cand;if(!C)return [1,0];const c=catOf(f);return C[c]||[1,0]}
 {const _h=foeHit6;foeHit6=function(f,k,s,o){const r=_h.apply(this,arguments);try{if(r&&!r.miss&&k&&k.pow){const m=candMul(f)[0];if(m!==1)r.d=Math.max(1,Math.round(r.d*m))}
@@ -116,14 +117,16 @@ function view(M){if(typeof STORY!=='undefined'&&STORY){try{stNext()}catch(e){STO
 function drive(M){for(let i=0;i<4000;i++){if(SIM.res)return;if(!RUN){if(!SIM.res)SIM.res='LOSE';return}
   if(B){M.where={area:RUN.area,step:RUN.step,dg:RUN.dg?RUN.dg.k:null,foes:[B,...(B.adds||[])].map(f=>(f.cat7||'?')+':'+f.name)};battle(M);continue}
   view(M);adv(30)}SIM.res=SIM.res||'STUCK'}
-function newM(){return {mech:{},heal:{},lvups:0,btime:0,battles:0,taken:0,skillT:0,dot:0,mp:0,casts:0,pots:0,fsk:0,zones:0,skillBy:{},takenBy:{},where:null}}
+function newM(){return {an:SIM.anNew?SIM.anNew():null,mech:{},heal:{},lvups:0,btime:0,battles:0,taken:0,skillT:0,dot:0,mp:0,casts:0,pots:0,fsk:0,zones:0,skillBy:{},takenBy:{},where:null}}
 SIM.run=function(kind,arg,keep){const M=SIM.M=newM();SIM.res='';if(window.C761)C761.log={};if(!keep)refill();TAB='adv';RUN=null;B=null;MODAL=null;
   try{if(kind==='dg'){DGDIFF=0;startDg(arg,0)}else startRun(arg)}catch(e){SIM.err(e);return {res:'NOSTART'}}
   if(!RUN)return {res:'NOSTART'};const s=stats(),hpMax=s.HP,mpMax=s.MP;
+  try{if(M.an)M.an.eff=effs6().map(e=>e.from+':'+e.k)}catch(e){}
   try{drive(M)}catch(e){SIM.err(e);SIM.res='ERR'}
+  if(M.an){M.an.minHp=M.an._mh!=null?+M.an._mh.toFixed(2):null;delete M.an._mh;delete M.an.ring}
   B=null;RUN=null;MODAL=null;STORY=null;Q.length=0;
   return {res:SIM.res,bt:Math.round(M.btime),nb:M.battles,hp:+(M.taken/hpMax).toFixed(2),mp:+(M.mp/mpMax).toFixed(2),pots:M.pots,sk:M.taken?+(M.skillT/M.taken).toFixed(3):0,
-    skillBy:M.skillBy,takenBy:M.takenBy,where:SIM.res==='WIN'?null:M.where,zones:M.zones,mech:M.mech,c761:window.C761?Object.assign({},C761.log):null,heal:Object.fromEntries(Object.entries(M.heal).map(([k,v])=>[k,+(v/hpMax).toFixed(3)])),lvups:M.lvups,lv:S.lv}};
+    skillBy:M.skillBy,takenBy:M.takenBy,where:SIM.res==='WIN'?null:M.where,zones:M.zones,an:M.an,mech:M.mech,c761:window.C761?Object.assign({},C761.log):null,heal:Object.fromEntries(Object.entries(M.heal).map(([k,v])=>[k,+(v/hpMax).toFixed(3)])),lvups:M.lvups,lv:S.lv}};
 SIM.qlen=()=>Q.length;
 /* 回城整備（照全自動）：配點（主屬性 2：體力 1）、天賦照原路線、一鍵換裝 */
 function townPrep(){const ma=MA[jobEq().main_attr]||'STR';let n=0;while(S.pts>0&&n<999){const k=(n++%3===2)?'VIT':ma;if(S.attr[k]>=ATTRMAX){const x=Object.keys(ATTR).find(a=>S.attr[a]<ATTRMAX);if(!x)break;S.attr[x]++}else S.attr[k]++;S.pts--}

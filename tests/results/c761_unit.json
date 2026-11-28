@@ -65,7 +65,7 @@
     45,
     45,
     45,
-    45
+    60
    ]
   }
  },
@@ -123,7 +123,10 @@
   "ok": true,
   "info": {
    "ok": true,
-   "dh": 17
+   "dh": 17,
+   "ev": 1,
+   "hb": 1,
+   "HP": 583
   }
  },
  "J04S8 cleric": {
@@ -154,7 +157,7 @@
   "ok": true,
   "info": {
    "ok": true,
-   "sh": 203,
+   "sh": 152,
    "HP": 1692
   }
  },
@@ -230,12 +233,9 @@
   "ok": true,
   "info": {
    "ok": true,
-   "r": {
-    "d": {
-     "J07S7.stack2": 2
-    },
-    "dh": 0
-   }
+   "e1": 5,
+   "e2": 2,
+   "prom": true
   }
  },
  "J07S8 archmage": {
@@ -277,7 +277,8 @@
  "J08S7 warlock": {
   "ok": true,
   "info": {
-   "ok": true
+   "ok": true,
+   "again": false
   }
  },
  "J08S8 warlock": {
@@ -339,7 +340,8 @@
   "ok": true,
   "info": {
    "ok": true,
-   "note": "命中率 +10 在現行公式下無作用"
+   "seen": 25,
+   "after": 25
   }
  },
  "J09S11 sniper": {
@@ -392,6 +394,7 @@
    "ok": true,
    "r": {
     "d": {
+     "rule.weakerSkip": 1,
      "J10S7.eva": 1
     },
     "dh": 0
