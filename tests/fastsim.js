@@ -84,6 +84,7 @@ const enrage=f=>{const ac=f.ac||0;return ac>=5?Math.min(.45,.15+.10*Math.floor((
 const MA={'力':'STR','敏':'DEX','智':'INT'};
 const SLOTTY=()=>{const J=jobEq(),o={};for(const sl of SL6){const ks=Object.keys(V6.EQ).filter(k=>{try{return slotsOfType(k).includes(sl)&&canUseType(k,sl)}catch(e){return false}});o[sl]=ks}return o};
 SIM.setup=function(o){/* o:{cls,adv,lv,area,build:'auto'|'opt',rar,style,tal} */
+  try{if(window.C761){if(SIM.knob&&SIM.knob.c761)C761.on();else C761.off();C761.log={}}}catch(e){SIM.err(e)}
   const m=document.getElementById('maint');if(m)m.remove();MAINT=false;try{localStorage.clear()}catch(e){}
   newGame('測試',o.cls,'m');S.tut=Object.fromEntries(Object.keys(TIPS).map(k=>[k,1]));while(S.lv<o.lv)gainExp(need(S.lv));if(o.adv)S.adv=o.adv;learn(true);EFC=null;
   const ma=MA[jobEq().main_attr]||'STR';let n=0;while(S.pts>0&&n<999){const k=(n++%3===2)?'VIT':ma;if(S.attr[k]>=ATTRMAX){const x=Object.keys(ATTR).find(a=>S.attr[a]<ATTRMAX);if(!x)break;S.attr[x]++}else S.attr[k]++;S.pts--}
@@ -96,6 +97,7 @@ SIM.setup=function(o){/* o:{cls,adv,lv,area,build:'auto'|'opt',rar,style,tal} */
   EFC=null;
   /* 技能配置 */
   S.lo7=null;try{const L=lo7();const st=o.style||'均衡',jn=clsName(),R=V6.LOAD.find(x=>x.job===jn&&x.style===st);if(R){const ok=R.a.filter(k=>SK[k]&&skOk6(k));L.a=[baseSk7().id,...ok].slice(0,4);L.p=R.p.filter(k=>SK[k]&&skOk6(k)).slice(0,3)}}catch(e){SIM.err(e)}
+  if(o.loadC&&window.C761){try{const L=lo7(),j=job6(),ca=C761.CAND.filter(k=>SK[k]&&SK[k].c===j&&skOk6(k));const A=ca.filter(k=>SK[k].act&&k!==baseSk7().id),P=ca.filter(k=>!SK[k].act);L.a=[...A,...L.a.filter(k=>!A.includes(k))].slice(0,3);L.p=[...P,...L.p.filter(k=>!P.includes(k))].slice(0,3);EFC=null}catch(e){SIM.err(e)}}
   if(o.party==='gale'){S.flags=S.flags||{};S.flags.galeBack=1}if(o.party!==undefined)S.party=o.party;else S.party='luna';EFC=null;const best=re=>(V6.CONS.filter(x=>x.lv<=S.lv&&re.test(x.n||'')).sort((a,b)=>b.lv-a.lv)[0]||{}).id;SIM.cons=best(/生命藥/);SIM.cons2=best(/魔力藥/);
   SIM.snap=JSON.stringify(S);return {job:clsName(),lv:S.lv,eq:SL6.filter(s=>S.eq[s]).length,pow:power(),tal:talUsed6(),luna:typeof withLuna==='function'?withLuna():null,ally:!!mkAlly()}};
 function refill(){const s=stats();S.hp=s.HP;S.mp=s.MP;S.items={};if(SIM.cons)S.items[SIM.cons]=5;if(SIM.cons2)S.items[SIM.cons2]=3;EFC=null}
@@ -115,13 +117,13 @@ function drive(M){for(let i=0;i<4000;i++){if(SIM.res)return;if(!RUN){if(!SIM.res
   if(B){M.where={area:RUN.area,step:RUN.step,dg:RUN.dg?RUN.dg.k:null,foes:[B,...(B.adds||[])].map(f=>(f.cat7||'?')+':'+f.name)};battle(M);continue}
   view(M);adv(30)}SIM.res=SIM.res||'STUCK'}
 function newM(){return {mech:{},heal:{},lvups:0,btime:0,battles:0,taken:0,skillT:0,dot:0,mp:0,casts:0,pots:0,fsk:0,zones:0,skillBy:{},takenBy:{},where:null}}
-SIM.run=function(kind,arg,keep){const M=SIM.M=newM();SIM.res='';if(!keep)refill();TAB='adv';RUN=null;B=null;MODAL=null;
+SIM.run=function(kind,arg,keep){const M=SIM.M=newM();SIM.res='';if(window.C761)C761.log={};if(!keep)refill();TAB='adv';RUN=null;B=null;MODAL=null;
   try{if(kind==='dg'){DGDIFF=0;startDg(arg,0)}else startRun(arg)}catch(e){SIM.err(e);return {res:'NOSTART'}}
   if(!RUN)return {res:'NOSTART'};const s=stats(),hpMax=s.HP,mpMax=s.MP;
   try{drive(M)}catch(e){SIM.err(e);SIM.res='ERR'}
   B=null;RUN=null;MODAL=null;STORY=null;Q.length=0;
   return {res:SIM.res,bt:Math.round(M.btime),nb:M.battles,hp:+(M.taken/hpMax).toFixed(2),mp:+(M.mp/mpMax).toFixed(2),pots:M.pots,sk:M.taken?+(M.skillT/M.taken).toFixed(3):0,
-    skillBy:M.skillBy,takenBy:M.takenBy,where:SIM.res==='WIN'?null:M.where,zones:M.zones,mech:M.mech,heal:Object.fromEntries(Object.entries(M.heal).map(([k,v])=>[k,+(v/hpMax).toFixed(3)])),lvups:M.lvups,lv:S.lv}};
+    skillBy:M.skillBy,takenBy:M.takenBy,where:SIM.res==='WIN'?null:M.where,zones:M.zones,mech:M.mech,c761:window.C761?Object.assign({},C761.log):null,heal:Object.fromEntries(Object.entries(M.heal).map(([k,v])=>[k,+(v/hpMax).toFixed(3)])),lvups:M.lvups,lv:S.lv}};
 SIM.qlen=()=>Q.length;
 /* 回城整備（照全自動）：配點（主屬性 2：體力 1）、天賦照原路線、一鍵換裝 */
 function townPrep(){const ma=MA[jobEq().main_attr]||'STR';let n=0;while(S.pts>0&&n<999){const k=(n++%3===2)?'VIT':ma;if(S.attr[k]>=ATTRMAX){const x=Object.keys(ATTR).find(a=>S.attr[a]<ATTRMAX);if(!x)break;S.attr[x]++}else S.attr[k]++;S.pts--}

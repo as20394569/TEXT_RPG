@@ -1,0 +1,535 @@
+{
+ "J01S7 swordsman": {
+  "ok": true,
+  "info": {
+   "ok": true,
+   "r": {
+    "d": {
+     "J01S7.second70": 1,
+     "J01S7.armor2": 1
+    },
+    "dh": 0
+   }
+  }
+ },
+ "J01S8 swordsman": {
+  "ok": true,
+  "info": {
+   "ok": true,
+   "v": 20,
+   "a": {
+    "d": {
+     "J01S8.set": 1
+    },
+    "dh": 0
+   },
+   "b": {
+    "d": {
+     "J01S8.next": 1
+    },
+    "dh": 0
+   }
+  }
+ },
+ "swordsman 關閉候選後不觸發任何候選效果": {
+  "ok": true,
+  "info": {
+   "k": "J01S7",
+   "log": {},
+   "act": false
+  }
+ },
+ "swordsman 無頁面錯誤": {
+  "ok": true,
+  "info": []
+ },
+ "J02S3 mage": {
+  "ok": true,
+  "info": {
+   "ok": true,
+   "sh": 23
+  }
+ },
+ "J02S7 mage": {
+  "ok": true,
+  "info": {
+   "ok": true,
+   "pow": 0.7
+  }
+ },
+ "J02S8 mage": {
+  "ok": true,
+  "info": {
+   "ok": true,
+   "g": [
+    45,
+    45,
+    45,
+    45
+   ]
+  }
+ },
+ "mage 關閉候選後不觸發任何候選效果": {
+  "ok": true,
+  "info": {
+   "k": "J02S3",
+   "log": {},
+   "act": false
+  }
+ },
+ "mage 無頁面錯誤": {
+  "ok": true,
+  "info": []
+ },
+ "J03S7 ranger": {
+  "ok": true,
+  "info": {
+   "ok": true,
+   "r": {
+    "d": {
+     "J03S7.slow2": 1
+    },
+    "dh": 0
+   }
+  }
+ },
+ "J03S8 ranger": {
+  "ok": true,
+  "info": {
+   "ok": true,
+   "h": 3
+  }
+ },
+ "J03S15 ranger": {
+  "ok": true,
+  "info": {
+   "ok": true,
+   "n": "追獵本能"
+  }
+ },
+ "ranger 關閉候選後不觸發任何候選效果": {
+  "ok": true,
+  "info": {
+   "k": "J03S7",
+   "log": {},
+   "act": false
+  }
+ },
+ "ranger 無頁面錯誤": {
+  "ok": true,
+  "info": []
+ },
+ "J04S7 cleric": {
+  "ok": true,
+  "info": {
+   "ok": true,
+   "dh": 17
+  }
+ },
+ "J04S8 cleric": {
+  "ok": true,
+  "info": {
+   "ok": true,
+   "r": {
+    "d": {
+     "J04S8.seal2": 1
+    },
+    "dh": 0
+   }
+  }
+ },
+ "cleric 關閉候選後不觸發任何候選效果": {
+  "ok": true,
+  "info": {
+   "k": "J04S7",
+   "log": {},
+   "act": false
+  }
+ },
+ "cleric 無頁面錯誤": {
+  "ok": true,
+  "info": []
+ },
+ "J05S7 knight": {
+  "ok": true,
+  "info": {
+   "ok": true,
+   "sh": 203,
+   "HP": 1692
+  }
+ },
+ "J05S8 knight": {
+  "ok": true,
+  "info": {
+   "ok": true,
+   "r": {
+    "d": {
+     "J05S8.block": 1
+    },
+    "dh": 0
+   }
+  }
+ },
+ "knight 關閉候選後不觸發任何候選效果": {
+  "ok": true,
+  "info": {
+   "k": "J05S7",
+   "log": {},
+   "act": false
+  }
+ },
+ "knight 無頁面錯誤": {
+  "ok": true,
+  "info": []
+ },
+ "J06S7 berserker": {
+  "ok": true,
+  "info": {
+   "ok": true,
+   "a": {
+    "d": {
+     "J06S7.cost": 1
+    },
+    "dh": -75
+   },
+   "b": {
+    "d": {
+     "J06S7.cost": 1,
+     "J06S7.low": 4
+    },
+    "dh": -75
+   },
+   "ready": false
+  }
+ },
+ "J06S8 berserker": {
+  "ok": true,
+  "info": {
+   "ok": true,
+   "r": {
+    "d": {
+     "J06S8.kill": 1
+    },
+    "dh": 75
+   }
+  }
+ },
+ "berserker 關閉候選後不觸發任何候選效果": {
+  "ok": true,
+  "info": {
+   "k": "J06S7",
+   "log": {},
+   "act": false
+  }
+ },
+ "berserker 無頁面錯誤": {
+  "ok": true,
+  "info": []
+ },
+ "J07S7 archmage": {
+  "ok": true,
+  "info": {
+   "ok": true,
+   "r": {
+    "d": {
+     "J07S7.stack2": 2
+    },
+    "dh": 0
+   }
+  }
+ },
+ "J07S8 archmage": {
+  "ok": true,
+  "info": {
+   "ok": true,
+   "r": {
+    "d": {
+     "J07S8.stun": 1
+    },
+    "dh": 0
+   }
+  }
+ },
+ "J07S15 archmage": {
+  "ok": true,
+  "info": {
+   "ok": true
+  }
+ },
+ "J07S16 archmage": {
+  "ok": true,
+  "info": {
+   "ok": true
+  }
+ },
+ "archmage 關閉候選後不觸發任何候選效果": {
+  "ok": true,
+  "info": {
+   "k": "J07S7",
+   "log": {},
+   "act": false
+  }
+ },
+ "archmage 無頁面錯誤": {
+  "ok": true,
+  "info": []
+ },
+ "J08S7 warlock": {
+  "ok": true,
+  "info": {
+   "ok": true
+  }
+ },
+ "J08S8 warlock": {
+  "ok": true,
+  "info": {
+   "ok": true,
+   "r": {
+    "d": {
+     "J08S8.amp": 2
+    },
+    "dh": 0
+   }
+  }
+ },
+ "J08S15 warlock": {
+  "ok": true,
+  "info": {
+   "ok": true
+  }
+ },
+ "warlock 關閉候選後不觸發任何候選效果": {
+  "ok": true,
+  "info": {
+   "k": "J08S7",
+   "log": {},
+   "act": false
+  }
+ },
+ "warlock 無頁面錯誤": {
+  "ok": true,
+  "info": []
+ },
+ "J09S7 sniper": {
+  "ok": true,
+  "info": {
+   "ok": true,
+   "r": {
+    "d": {
+     "J09S7.crit": 4,
+     "J09S14.mark": 4
+    },
+    "dh": 0
+   }
+  }
+ },
+ "J09S8 sniper": {
+  "ok": true,
+  "info": {
+   "ok": true,
+   "r": {
+    "d": {
+     "J09S8.mark": 2
+    },
+    "dh": 0
+   }
+  }
+ },
+ "J09S10 sniper": {
+  "ok": true,
+  "info": {
+   "ok": true,
+   "note": "命中率 +10 在現行公式下無作用"
+  }
+ },
+ "J09S11 sniper": {
+  "ok": true,
+  "info": {
+   "ok": true,
+   "r": {
+    "d": {
+     "J09S14.mark": 1,
+     "J09S11.crit": 1
+    },
+    "dh": 0
+   }
+  }
+ },
+ "J09S14 sniper": {
+  "ok": true,
+  "info": {
+   "ok": true,
+   "r": {
+    "d": {
+     "J09S14.mark": 1
+    },
+    "dh": 0
+   }
+  }
+ },
+ "sniper 關閉候選後不觸發任何候選效果": {
+  "ok": true,
+  "info": {
+   "k": "J09S7",
+   "log": {},
+   "act": false
+  }
+ },
+ "sniper 無頁面錯誤": {
+  "ok": true,
+  "info": []
+ },
+ "J10S3 assassin": {
+  "ok": true,
+  "info": {
+   "ok": true,
+   "ev": 12
+  }
+ },
+ "J10S7 assassin": {
+  "ok": true,
+  "info": {
+   "ok": true,
+   "r": {
+    "d": {
+     "J10S7.eva": 1
+    },
+    "dh": 0
+   }
+  }
+ },
+ "J10S8 assassin": {
+  "ok": true,
+  "info": {
+   "ok": true,
+   "r": {
+    "d": {
+     "J10S8.crit": 4
+    },
+    "dh": 0
+   }
+  }
+ },
+ "J10S14 assassin": {
+  "ok": true,
+  "info": {
+   "ok": true
+  }
+ },
+ "assassin 關閉候選後不觸發任何候選效果": {
+  "ok": true,
+  "info": {
+   "k": "J10S3",
+   "log": {},
+   "act": false
+  }
+ },
+ "assassin 無頁面錯誤": {
+  "ok": true,
+  "info": []
+ },
+ "J11S7 bishop": {
+  "ok": true,
+  "info": {
+   "ok": true,
+   "sh": 121
+  }
+ },
+ "J11S8 bishop": {
+  "ok": true,
+  "info": {
+   "ok": true,
+   "r": {
+    "d": {
+     "J11S8.amp": 2
+    },
+    "dh": 0
+   }
+  }
+ },
+ "J11S12 bishop": {
+  "ok": true,
+  "info": {
+   "ok": true
+  }
+ },
+ "bishop 關閉候選後不觸發任何候選效果": {
+  "ok": true,
+  "info": {
+   "k": "J11S7",
+   "log": {},
+   "act": false
+  }
+ },
+ "bishop 無頁面錯誤": {
+  "ok": true,
+  "info": []
+ },
+ "J12S7 templar": {
+  "ok": true,
+  "info": {
+   "ok": true,
+   "r": {
+    "d": {
+     "J12S7.armor": 4
+    },
+    "dh": 0
+   }
+  }
+ },
+ "J12S8 templar": {
+  "ok": true,
+  "info": {
+   "ok": true
+  }
+ },
+ "J12S16 templar": {
+  "ok": true,
+  "info": {
+   "ok": true
+  }
+ },
+ "templar 關閉候選後不觸發任何候選效果": {
+  "ok": true,
+  "info": {
+   "k": "J12S7",
+   "log": {},
+   "act": false
+  }
+ },
+ "templar 無頁面錯誤": {
+  "ok": true,
+  "info": []
+ },
+ "J13S7 dual": {
+  "ok": true,
+  "info": {
+   "ok": true,
+   "i": 0
+  }
+ },
+ "J13S8 dual": {
+  "ok": true,
+  "info": {
+   "ok": true
+  }
+ },
+ "J13S11 dual": {
+  "ok": true,
+  "info": {
+   "ok": true
+  }
+ },
+ "dual 關閉候選後不觸發任何候選效果": {
+  "ok": true,
+  "info": {
+   "k": "J13S7",
+   "log": {},
+   "act": false
+  }
+ },
+ "dual 無頁面錯誤": {
+  "ok": true,
+  "info": []
+ }
+}

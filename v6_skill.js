@@ -255,7 +255,7 @@ function trig6(ev,o){if(!B||!B.p6)return;o=o||{};const P=B.p6,now=acOf('p'),s=rt
   for(const e of effs6()){
     if(e.k==='next'&&e.ev===ev&&(!e.src||e.src===o.sk)&&(!e.need||e.need.some(x=>stHas(B,x)))){if(pool(e))P.nx.push({sk:e.sk||null,v:e.v,pen:e.pen||0})}
     else if(e.k==='gauge'&&e.ev===ev&&(!e.src||e.src===o.sk)&&(!e.st||e.st.some(x=>stHas(B,x)))){if(pool(e))B.rt.pgB=(B.rt.pgB||0)+e.v}
-    else if(e.k==='evmp'&&e.ev===ev){if(pool(e))S.mp=Math.min(s.MP,S.mp+Math.round(s.MP*e.v/100))}}}
+    else if(e.k==='evmp'&&e.ev===ev){/* v21.3：「每自身行動間隔一次」以玩家行動次數計，同一行動內多次觸發只算一次 */if(e.gap){P.gapT=P.gapT||{};if(P.gapT[e.from]===now)continue;P.gapT[e.from]=now}if(pool(e))S.mp=Math.min(s.MP,S.mp+Math.round(s.MP*e.v/100))}}}
 function pAct(type,arg){if(!B||B.busy)return false;const s=rtS6();B.p6=B.p6||{nx:[],once:{},tcd:0,seq:[],third:{},mpUse:0};
   if(type==='atk'){type='skill';arg=battleSkills()[0]}
   if(type==='skill'){const x=SK[arg];if(!x||!x.act||!skOk6(arg))return false;if(cdLeft6(arg)>0)return false;const c=mpCost6(arg);if(S.mp<c){toast('MP 不足');return false}
@@ -286,12 +286,12 @@ function useSkill6(k,s){const rel=B.chgRel===k,x=SK[k],P=B.p6,now=acOf('p'),c=re
     for(const e of effK('lowhp'))if(e.type==='dmg'&&S.hp<s.HP*e.th/100)amp+=e.v;
     if(k==='J08S3'&&stHas(B,'CORRODE'))amp+=25;
     if(typeof skAmp7==='function'){amp+=skAmp7(k,B);pen+=skPen7(k);cr+=skCrit7(B);cdB+=skCd7(B)}
-    const r=hitFoe(x.s,x.pow,{skill:1,tag:dmgTag6(k),amp,pen,cr,cd:cdB});tot=r.d;fx.d=r.d;fx.cr=r.cr;
+    B.ls7={d:0,r:0,hp0:S.hp};/* v21.3：本次施放的吸血統計 */
+    const r=hitFoe(x.s,x.pow,{skill:1,tag:dmgTag6(k),amp,pen,cr,cd:cdB});tot=r.d;fx.d=r.d;fx.cr=r.cr;if(!r.miss)B.ls7.d+=r.d;
     if(x.dmg.h>1&&r.d>0){const a=Math.floor(r.d/x.dmg.h);fx.hl=Array.from({length:x.dmg.h},(_,i)=>i===x.dmg.h-1?r.d-a*(x.dmg.h-1):a)}
     if(r.miss)ps.push(`${B.name} 閃開了`);else{ps.push(`造成 ${r.d} 傷害${r.cr?'（爆擊！）':''}`);
       /* 連擊：只判一次，追加這招實際傷害的 35% */
       const dbl=Math.min(20,(s.DOUBLE||0));if(B.hp>0&&Math.random()*100<dbl){const ex=Math.max(1,Math.round(r.d*(.35+effSum('comboAmp')/100)));foeTake6(B,ex,'連擊');tot+=ex;ps.push(`連擊 +${ex}`);(fx.tags=fx.tags||[]).push('連擊');trig6('combo',{sk:k});try{onCombo7()}catch(e){}}
-      if(s.LS){const h=Math.round(r.d*Math.min(10,s.LS)/100*healInM6());if(h>0){S.hp=Math.min(s.HP,S.hp+h);fx.heal=(fx.heal||0)+h}}
       trig6('hit',{sk:k});if(r.cr)trig6('crit',{sk:k});
       if(c===0){const z=effSum('zmp');if(z)S.mp=Math.min(s.MP,S.mp+Math.max(1,Math.round(s.MP*z/100)))}
       for(const e of effK('hitmp'))if(e.sk===k)S.mp=Math.min(s.MP,S.mp+Math.max(1,Math.round(s.MP*e.v/100)));
@@ -303,6 +303,7 @@ function useSkill6(k,s){const rel=B.chgRel===k,x=SK[k],P=B.p6,now=acOf('p'),c=re
       for(const e of effK('third'))if(e.src===k){P.third[e.from]=(P.third[e.from]||0)+1;if(P.third[e.from]%3===0&&B.pcd6[e.sk])B.pcd6[e.sk]-=e.v}}
     skFx6(k,s,r.d,ps,B.hp>0&&!r.miss);
     if(typeof aoeHit7==='function')tot+=aoeHit7(k,s,amp,pen,cr,cdB,ps);
+    ls7Fin(k,s,ps);
     try{afterCast7(k,s,!r.miss)}catch(e){}}
   else{skFx6(k,s,0,ps,false);try{afterCast7(k,s,false)}catch(e){}}
   /* 三種不同技能依序使用 */
@@ -338,7 +339,7 @@ function skFx6(k,s,d,ps,hit){const T=B,dot=x=>1+(effSum('skdot',k)+(rtS6().DOT||
     case 'J11S3':{heal6(k,.10,.6,s,ps);const bad=stList('p').find(id=>STX[id].bad&&id!=='STUN');if(bad){stClear('p',bad);ps.push(`解除${STX[bad].n}`);trig6('cleanse',{sk:k});for(const e of effK('cleanseShield'))stAdd('p','SHIELD',{amt:s.HP*e.v/100,dur:2})}break}
     case 'J05S3':stAdd('p','BLOCKUP',{v:20+fxvOf6(k),dur:durOf6(k,2)});ps.push('格擋率提升');break;
     case 'J06S2':stAdd('p','TAKEUP',{v:Math.max(0,10+fxvOf6(k,'承傷')),dur:2});break;
-    case 'J06S3':case 'J08S3':{const r=(k==='J06S3'?20:10)+fxvOf6(k,'吸血');const h=Math.round(d*r/100*healInM6());if(h>0){S.hp=Math.min(s.HP,S.hp+h);B.fx.heal=(B.fx.heal||0)+h;ps.push(`吸取 ${h} HP`)}break}
+    case 'J06S3':case 'J08S3':ls7Rate((k==='J06S3'?20:10)+fxvOf6(k,'吸血'));break;/* v21.3：改走統一吸血流程 ls7Fin */
     case 'J07S3':stAdd('p','SHIELD',{amt:s.HP*.10*(1+(effSum('skshield',k)+effSum('shamp'))/100),dur:durOf6(k,2)});ps.push('獲得護盾');break;
     case 'J12S3':stAdd('p','SHIELD',{amt:s.HP*.12*(1+(effSum('skshield',k)+effSum('shamp'))/100),dur:durOf6(k,2)});ps.push('獲得護盾');break;
     case 'J08S2':foeSt('CORRODE',{src:{mag:s.MAG},r:.4,amp:dot('CORRODE')-1,dur:durOf6(k,3)});break;
@@ -350,7 +351,7 @@ function skFx6(k,s,d,ps,hit){const T=B,dot=x=>1+(effSum('skdot',k)+(rtS6().DOT||
 
 /* 格擋（玩家按的格擋成功，或 A 線的格擋率被動觸發都呼叫）、閃避、受傷 */
 function onBlock6(){if(!B)return;B.p6=B.p6||{nx:[],once:{},tcd:0,seq:[],third:{},mpUse:0};trig6('block');
-  for(const e of effK('counter')){const cd=e.cd;if(B.p6.cntT!=null&&B.p6.cntT+cd+1>acOf('p'))continue;B.p6.cntT=acOf('p');{const P=B.p6;for(const t of effK('skcdn'))if(t.sk===e.from){P.cast=P.cast||{};P.cast[e.from]=(P.cast[e.from]||0)+1;if(P.cast[e.from]%t.th===0)P.cntT-=1}}const r=hitFoe('ATK',(e.v+effSum('counterAmp'))/100,{sure:1,tag:dmgTag6(battleSkills()[0])});B.log.push(`【反制】反擊 ${r.d}`);(B.pops=B.pops||[]).push({d:r.d,k:'反制'});trig6('hit',{sk:'counter'})}}
+  for(const e of effK('counter')){/* v21.3：T0532 以 ID 對應 J05S6；反制每觸發 4/3/2 次，該次之後的冷卻 −1（最低 0）；同一行動內不會重複觸發 */const P=B.p6,now=acOf('p'),cd=Math.max(0,e.cd-(P.cntRed||0));if(P.cntT!=null&&P.cntT+cd+1>now)continue;P.cntT=now;P.cntRed=0;P.cntN=(P.cntN||0)+1;for(const t of effK('counterCdn'))if(t.sk===e.from&&P.cntN%t.th===0)P.cntRed=1;const r=hitFoe('ATK',(e.v+effSum('counterAmp'))/100,{sure:1,tag:dmgTag6(battleSkills()[0])});B.log.push(`【反制】反擊 ${r.d}`);(B.pops=B.pops||[]).push({d:r.d,k:'反制'});trig6('hit',{sk:'counter'})}}
 function onEvade6(){if(!B)return;B.p6=B.p6||{nx:[],once:{},tcd:0,seq:[],third:{},mpUse:0};trig6('evade')}
 function onHurt6(d,sh0){if(!B||!B.p6)return;const s=rtS6(),P=B.p6;
   if(sh0&&!stHas('p','SHIELD'))trig6('shbreak');
@@ -367,6 +368,15 @@ try{if(Array.isArray(FK)&&!FK.includes('sx'))FK.push('sx')}catch(e){}
 {const _rs=rtStep;rtStep=function(dt){_rs(dt);if(B&&B.rt&&!B.rt.done)stStep6()}}
 {const _w=win;win=function(){const fin=B&&B.hp<=0&&!(B.adds||[]).some(f=>f.hp>0);const r=_w.apply(this,arguments);if(fin)try{onWin6()}catch(e){}return r}}
 /* 怪物出手：玩家護盾吸收、量掉血觸發被動；A 線沒有自己乘倍率時（window.MOB6_MUL 未設），這裡暫時把狀態倍率乘到怪物攻擊上 */
+/* v21.3 統一吸血：本次施放所有命中目標的實際 HP 傷害合計後計算一次（連擊、反傷、持續傷害不算）。
+   裝備吸血＝合計×min(10,吸血%)；技能明示吸血＝合計×技能吸血率×(1＋吸血加成 lsamp＋低血治療加成)；兩者相加後乘受治療倍率，每次施放上限最大HP 10%。
+   百分比治療（T0625 低血回血）另計，不吃吸血加成、不佔吸血上限。 */
+function ls7Rate(r){if(B&&B.ls7)B.ls7.r=Math.max(B.ls7.r,r)}
+function ls7Fin(k,s,ps){const L=B&&B.ls7;if(!L)return;B.ls7=null;const hpR=L.hp0/s.HP*100;
+  if(L.d>0){let amp=effSum('lsamp');for(const e of effK('lowhealp'))if(e.sk===k&&hpR<e.th)amp+=e.v;
+    let h=(L.d*Math.min(10,s.LS||0)/100+L.d*L.r/100*(1+amp/100))*healInM6();h=Math.round(Math.min(s.HP*.1,h));
+    if(h>0){const real=Math.min(h,s.HP-S.hp);S.hp+=real;B.fx.heal=(B.fx.heal||0)+real;if(L.r>0)ps.push(`吸取 ${real} HP`)}
+    for(const e of effK('lowheal'))if(e.sk===k&&hpR<e.th){const h=Math.round(s.HP*e.pct/100),real=Math.min(h,s.HP-S.hp);S.hp+=real;B.fx.heal=(B.fx.heal||0)+real;ps.push(`回復 ${real} HP`)}}}
 function pShieldAbsorb6(d){const sh=B&&B.psx&&B.psx.SHIELD;if(!sh||!stHas('p','SHIELD')||!(sh.amt>0))return d;const ab=Math.min(sh.amt,d);sh.amt-=ab;if(sh.amt<=0)delete B.psx.SHIELD;return d-ab}
 const foeWrap6=(fn,isAdd)=>function(){if(!B||window.MOB6_MUL)return fn.apply(this,arguments);const f=isAdd?arguments[0]:B,act=isAdd||!B.rt||B.rtPh!=='tick';
   const h0=S.hp,shx=B.psx&&B.psx.SHIELD&&stHas('p','SHIELD')?B.psx.SHIELD:null,amt=shx?shx.amt||0:0,mul=act&&f?foeOutMul6(f)*pInMul6(false):1,a0=f&&f.atk,m0=f&&f.mag;

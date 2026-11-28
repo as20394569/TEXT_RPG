@@ -5,6 +5,7 @@ import asyncio, json, sys, os, time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from harness import ensure_server, CHROME, PORT, SEED_JS
 from playwright.async_api import async_playwright
+CAND = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'cand761.js'), encoding='utf8').read()
 FAST = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fastsim.js'), encoding='utf8').read()
 async def main():
     cfg = json.load(open(sys.argv[1])); out = open(sys.argv[2], 'a')
@@ -17,7 +18,7 @@ async def main():
                 if pg: await pg.context.close()
                 pg = await (await b.new_context()).new_page()
                 await pg.goto(f'http://localhost:{PORT}/index.html', wait_until='commit'); await pg.wait_for_timeout(3500)
-                await pg.evaluate(FAST)
+                await pg.evaluate(FAST); await pg.evaluate(CAND)
             await pg.evaluate(SEED_JS % c.get('seed', 1))  # 每組設定重設亂數種子
             await pg.evaluate("()=>{SIM.errs=[]}")
             t = time.time()

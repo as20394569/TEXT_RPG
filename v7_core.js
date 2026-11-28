@@ -54,16 +54,16 @@ function parseSkFx7(r){const t=r.fx||'',o={};let m;
 Object.assign(PSV,{
   J01S14:[{k:'bigdmg',v:6}],J01S15:[{k:'condmp',st:['ARMOR'],v:1}],J01S16:[{k:'drbuff',v:6}],
   J02S14:[{k:'dotk',st:['BURN'],v:10}],J02S15:[{k:'cond',st:SLOWK,v:8}],J02S16:[{k:'mp3',v:3}],
-  J03S14:[{k:'stat',key:'pen',v:5}],J03S15:[{k:'condcrit',st:SLOWK,v:4}],J03S16:[{k:'stat',key:'eva',v:3},{k:'stat',key:'spd',v:2}],
+  J03S14:[{k:'pierce',v:5}],J03S15:[{k:'condcrit',st:SLOWK,v:4}],J03S16:[{k:'stat',key:'eva',v:3},{k:'stat',key:'spd',v:2}],
   J04S14:[{k:'cond',st:['SEAL'],v:6}],J04S15:[{k:'healsh',v:3,cd:2}],J04S16:[{k:'zmp',v:1}],
-  J05S14:[{k:'alldmg',v:6}],J05S15:[{k:'evmp',ev:'block',v:1}],J05S16:[{k:'counterAmp',v:10}],
+  J05S14:[{k:'alldmg',v:6}],J05S15:[{k:'evmp',ev:'block',v:1,gap:1}],J05S16:[{k:'counterAmp',v:10}],
   J06S14:[{k:'bigdmg',v:6}],J06S15:[{k:'lsamp',v:15}],J06S16:[{k:'lowhp',th:40,type:'crit',v:5}],
   J07S14:[{k:'dotk',st:['BURN'],v:12}],J07S15:[{k:'shamp',v:10}],J07S16:[{k:'mp3',v:4}],
   J08S14:[{k:'dotk',st:['POISON','CORRODE'],v:10}],J08S15:[{k:'lsamp',v:15}],J08S16:[{k:'debuffamp',v:6}],
-  J09S14:[{k:'stat',key:'pen',v:5}],J09S15:[{k:'condcrit',st:['MARK'],v:5}],J09S16:[{k:'execcd',th:30,v:10}],
-  J10S14:[{k:'dotk',st:['BLEED'],v:10}],J10S15:[{k:'cond',st:['POISON'],v:6}],J10S16:[{k:'evmp',ev:'evade',v:1}],
+  J09S14:[{k:'pierce',v:5}],J09S15:[{k:'condcrit',st:['MARK'],v:5}],J09S16:[{k:'execcd',th:30,v:10}],
+  J10S14:[{k:'dotk',st:['BLEED'],v:10}],J10S15:[{k:'cond',st:['POISON'],v:6}],J10S16:[{k:'evmp',ev:'evade',v:1,gap:1}],
   J11S14:[{k:'cond',st:['JUDGE'],v:6}],J11S15:[{k:'cleansh',v:5,cd:2}],J11S16:[{k:'healmp',v:2,cd:2}],
-  J12S14:[{k:'alldmg',v:6}],J12S15:[{k:'shamp',v:10}],J12S16:[{k:'evmp',ev:'block',v:1}],
+  J12S14:[{k:'alldmg',v:6}],J12S15:[{k:'shamp',v:10}],J12S16:[{k:'evmp',ev:'block',v:1,gap:1}],
   J13S14:[{k:'stat',key:'double',v:2}],J13S15:[{k:'combomp',v:1}],J13S16:[{k:'stat',key:'spd',v:2},{k:'skdmg',sk:'J13S2',v:4}]});
 
 /* ---------- 技能配置：4 主動（含基礎技）＋ 3 被動，3 組預設 ---------- */
@@ -95,9 +95,11 @@ battleSkills=function(){const L=lo7();const b=baseSk7();return [...(L?L.a:[]),b?
 mySkills=function(){return jobSk6(null,true).filter(k=>skOk6(k.id)).map(k=>k.id)};
 const pasOn7=k=>{const L=lo7();return !!L&&L.p.includes(k)};
 /* 被動只算配置的 3 個 */
+/* v21.3：明確 ID 映射的天賦（不再依賴文字解析） */
+const TALID7={T0532:n=>({k:'counterCdn',sk:'J05S6',th:[4,3,2][Math.max(1,Math.min(3,n))-1]})};
 effs6=function(){if(!S)return [];const j=job6(),L=lo7(),key=j+'|'+S.lv+'|'+JSON.stringify(S.tal||{})+'|'+(L?L.p.join(','):'');if(EFC&&EFCK===key)return EFC;const out=[];
   for(const k of jobSk6(j,false))if(skOk6(k.id)&&pasOn7(k.id))(PSV[k.id]||[]).forEach(e=>out.push(Object.assign({from:k.id},e)));
-  for(const t of TALS()){const n=(S.tal||{})[t.id]||0;if(!n)continue;const e=parseTal6(j,t.fx,n);e.from=t.id;e.lim=t.lim;out.push(e)}
+  for(const t of TALS()){const n=(S.tal||{})[t.id]||0;if(!n)continue;const e=TALID7[t.id]?TALID7[t.id](n):parseTal6(j,t.fx,n);e.from=t.id;e.lim=t.lim;out.push(e)}
   EFC=out;EFCK=key;return out};
 
 /* ---------- 自動條件 ---------- */
@@ -156,7 +158,9 @@ function skAmp7(k,f){f=f||B;const x=SK[k],o=FX7[k],s=rtS6();let a=0;
   for(const e of effK('drbuff'))if(stHas('p','GUARD')||stHas('p','POST'))a+=e.v;
   for(const e of effK('debuffamp'))if(stList(f).some(id=>STX[id]&&STX[id].bad))a+=e.v;
   return a}
-function skPen7(k){const o=FX7[k];return o&&o.pen?o.pen:0}
+function skPen7(k){const o=FX7[k];return (o&&o.pen?o.pen:0)+pierce7(k)}
+/* v21.3：穿刺技能物防穿透（J03S14、J09S14）只套物理且傷害標籤為 PIERCE 的技能（傷害標籤規則：弓、匕首＝穿刺） */
+function pierce7(k){const x=SK[k];if(!x||!x.dmg||x.s==='MAG'||dmgTag6(k)!=='PIERCE')return 0;return effSum('pierce')}
 function skCrit7(f){let c=0;for(const e of effK('condcrit'))if(e.st.some(t=>stHas(f,t)))c+=e.v;return c}
 function skCd7(f){let c=0;for(const e of effK('execcd'))if(f.hp<f.max*e.th/100)c+=e.v;return c}
 const dotK7=id=>effs6().filter(e=>e.k==='dotk'&&e.st.includes(id)).reduce((a,e)=>a+e.v,0);
@@ -171,7 +175,7 @@ function fx7Apply(k,s,d,ps,hit,f){const o=FX7[k];if(!o)return;const T=f||B;
   if(o.selfV){stAdd('p',o.selfV.id,{v:o.selfV.v,dur:durOf6(k,o.selfV.dur)});ps.push((STX[o.selfV.id]||{}).n+'提升')}
   if(o.heal)heal6(k,o.heal,0,s,ps);
   if(o.mp){const m=Math.round(s.MP*o.mp);S.mp=Math.min(s.MP,S.mp+m);ps.push(`回復 ${m} MP`)}
-  if(o.ls&&d>0){const cap=s.HP*.1;let h=Math.min(cap,d*o.ls*(1+effSum('lsamp')/100)*healInM6());h=Math.round(h);if(h>0){S.hp=Math.min(s.HP,S.hp+h);B.fx.heal=(B.fx.heal||0)+h;ps.push(`吸取 ${h} HP`)}}
+  if(o.ls)ls7Rate(o.ls*100);/* v21.3：改走統一吸血流程 ls7Fin（v6_skill.js） */
   if(o.cleanse){let n=0;for(const id of stList('p'))if(n<o.cleanse&&STX[id]&&STX[id].bad&&id!=='STUN'){stClear('p',id);n++}if(n){ps.push(`解除 ${n} 個負面`);trig6('cleanse',{sk:k});cleansh7()}}}
 function cleansh7(){const s=rtS6(),P=B.p6;for(const e of effK('cleansh')){if((P['c_'+e.from]||-9)>acOf('p'))continue;P['c_'+e.from]=acOf('p')+e.cd+1;stAdd('p','SHIELD',{amt:s.HP*e.v/100,dur:2})}}
 /* 有效治療後：護盾、回魔（各有 2 次行動冷卻） */
@@ -190,7 +194,7 @@ function onCombo7(){const P=B.p6,s=rtS6();P.nc=1;if(!P.cmb){for(const e of effK(
 /* ---------- 範圍技：主目標之外的目標（每個目標各自命中、爆擊、狀態） ---------- */
 function aoeTargets7(k){const x=SK[k];if(!x||!(x.tg==='雙體'||x.tg==='全體'))return [];const L=(B.adds||[]).filter(f=>f.hp>0).sort((a,b)=>a.hp-b.hp);return x.tg==='雙體'?L.slice(0,1):L.slice(0,3)}
 function aoeHit7(k,s,amp,pen,cr,cdB,ps){let tot=0;const x=SK[k];
-  const tB=tgtAmp6(k,B);for(const f of aoeTargets7(k)){const r=hitFoe(x.s,x.pow,{skill:1,tag:dmgTag6(k),amp:amp+skAmp7(k,f)-skAmp7(k,B)+tgtAmp6(k,f)-tB,pen,cr:cr+skCrit7(f)-skCrit7(B),cd:cdB,tgt:f});tot+=r.d;
+  const tB=tgtAmp6(k,B);for(const f of aoeTargets7(k)){const r=hitFoe(x.s,x.pow,{skill:1,tag:dmgTag6(k),amp:amp+skAmp7(k,f)-skAmp7(k,B)+tgtAmp6(k,f)-tB,pen,cr:cr+skCrit7(f)-skCrit7(B),cd:cdB,tgt:f});tot+=r.d;if(!r.miss&&B.ls7)B.ls7.d+=r.d;
     if(r.miss)ps.push(`${f.name} 閃開了`);else{f.rth=performance.now()+450;(B.pops=B.pops||[]).push({d:r.d,k:r.cr?'爆擊':'',f});fx7Apply(k,s,r.d,ps,true,f);
       /* 範圍技對副目標也附加原本的狀態（破甲、灼燒…） */
       try{skFx6sub7(k,s,f,ps)}catch(e){}

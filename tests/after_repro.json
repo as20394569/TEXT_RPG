@@ -20,7 +20,7 @@
    "weak": false,
    "poison": false,
    "stun": false,
-   "hpLost": 95
+   "hpLost": 96
   }
  },
  "P1-1 韌性只算一次": {
@@ -32,7 +32,7 @@
  "P1-2 怪物護盾以行動數判斷": {
   "ok": true,
   "info": {
-   "t": 11,
+   "t": 13,
    "absorbed": true
   }
  },
@@ -68,9 +68,10 @@
    ],
    "bossMain": false,
    "bossActs": 2,
-   "mcd": 1,
+   "mcd": 3,
    "log": [
-    "凜冬霜龍 的【震波】造成 73 傷害"
+    "凜冬霜龍 的【震波】造成 72 傷害",
+    "凜冬霜龍 的【強力衝擊】造成 123 傷害"
    ]
   }
  },
