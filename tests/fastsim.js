@@ -29,7 +29,11 @@ const SIM=W.SIM={errs:[],err(e){if(SIM.errs.length<20)SIM.errs.push(String(e&&e.
 {const _g=grpDone7;grpDone7=function(){const r=_g.apply(this,arguments);try{const L=[B,...(B.adds||[])];
   for(const f of L){let c;if(B.mid7)c=f===B?'mid':'mid_add';else if(B.kind==='boss')c=f===B?'boss':'boss_add';else if(B.kind==='elite')c=f===B?'elite':'elite_add';else c=L.length>1?'grp':'solo';f.cat7=c}}catch(e){SIM.err(e)}return r}}
 {const _a=addFoe7;addFoe7=function(){const f=_a.apply(this,arguments);try{if(B&&B.rt&&B.rt.t>0)f.cat7='summon'}catch(e){}return f}}
-const catOf=f=>f.summon7?'summon':(f.cat7||'solo');
+/* 難度測試選項（只在測試）：SIM.diff={dgHp,dgAtk,exHp,exAtk,z0Mid} */
+{const _mk=mkFoe;mkFoe=function(){const f=_mk.apply(this,arguments);try{const D=SIM.diff;if(D&&f&&RUN){const dg=!!RUN.dg,h=dg?D.dgHp:(RUN.area>=1?D.exHp:1),a=dg?D.dgAtk:(RUN.area>=1?D.exAtk:1);
+  if(h&&h!==1){f.max=Math.round(f.max*h);f.hp=f.max}if(a&&a!==1){f.atk=Math.round(f.atk*a);if(f.mag)f.mag=Math.round(f.mag*a)}}}catch(e){SIM.err(e)}return f}}
+{const _sm=startMid7;startMid7=function(){const r=_sm.apply(this,arguments);try{const D=SIM.diff;if(D&&D.z0Mid&&B&&RUN&&RUN.area===0&&B.mid7){B.atk=Math.round(B.atk*D.z0Mid);if(B.mag)B.mag=Math.round(B.mag*D.z0Mid)}}catch(e){SIM.err(e)}return r}}
+const catOf=f=>f.summon7?'summon':(f.kind==='boss'&&!f.mid7&&!f.cat7?'boss':(f.cat7||'solo'));
 /* 候選方案：只改怪物「技能」的直接傷害與冷卻 */
 function candMul(f){const C=SIM.cand;if(!C)return [1,0];const c=catOf(f);return C[c]||[1,0]}
 {const _h=foeHit6;foeHit6=function(f,k,s,o){const r=_h.apply(this,arguments);try{if(r&&!r.miss&&k&&k.pow){const m=candMul(f)[0];if(m!==1)r.d=Math.max(1,Math.round(r.d*m))}
@@ -48,8 +52,8 @@ SIM.setup=function(o){/* o:{cls,adv,lv,area,build:'auto'|'opt',rar,style,tal} */
   newGame('測試',o.cls,'m');S.tut=Object.fromEntries(Object.keys(TIPS).map(k=>[k,1]));while(S.lv<o.lv)gainExp(need(S.lv));if(o.adv)S.adv=o.adv;learn(true);EFC=null;
   const ma=MA[jobEq().main_attr]||'STR';let n=0;while(S.pts>0&&n<999){const k=(n++%3===2)?'VIT':ma;if(S.attr[k]>=ATTRMAX){const x=Object.keys(ATTR).find(a=>S.attr[a]<ATTRMAX);if(!x)break;S.attr[x]++}else S.attr[k]++;S.pts--}
   for(let i=0;i<10;i++)S.cleared[i]=i<o.area?1:0;S.main.ch=Math.max(S.main.ch||0,o.area);S.gear=[];S.eq={main:null,off:null,head:null,body:null,feet:null,neck:null,ring:null};
-  if(o.build==='auto'){for(let i=0;i<24;i++)dropGear6(S.lv,'N',{force:1});for(let i=0;i<4;i++)dropGear6(S.lv,'E',{force:1});autoEquip6()}
-  else{const T=SLOTTY();for(const sl of SL6){if(sl==='off'&&S.eq.main){const g0=gearBy(S.eq.main);if(g0&&V6.EQ[g0.k].occ===2)continue}const ks=T[sl];if(!ks.length)continue;let best=null;for(const k of ks){const g=genGear(k,S.lv,o.rar);if(!best||gearPower(g)>gearPower(best))best=g}S.gear.push(best);eqSet(best,sl)}}
+  if(o.build==='auto'){const nd=o.drops||24;for(let i=0;i<nd;i++)dropGear6(S.lv,'N',{force:1});for(let i=0;i<(o.drops?0:4);i++)dropGear6(S.lv,'E',{force:1});autoEquip6()}
+  else{const T=SLOTTY();for(const sl of SL6){if(sl==='off'&&S.eq.main){const g0=gearBy(S.eq.main);if(g0&&V6.EQ[g0.k].occ===2)continue}const ks=T[sl];if(!ks.length)continue;let best=null;for(const k of ks){const g=genGear(k,Math.max(1,S.lv-(o.glag||0)),o.rar);if(!best||gearPower(g)>gearPower(best))best=g}S.gear.push(best);eqSet(best,sl)}}
   /* 天賦 */
   S.tal={};if(o.tal!=null&&o.tal>=0){const T=TALS(),br=[...new Set(T.map(t=>t.br))],order=[br[o.tal%br.length],...br.filter((b,i)=>i!==o.tal%br.length)];
     for(let g=0;g<200&&talFree6()>0;g++){let did=false;for(const b of order){const c=T.filter(t=>t.br===b&&talCan6(t)).sort((a,b2)=>a.lv-b2.lv)[0];if(c){S.tal[c.id]=(S.tal[c.id]||0)+1;did=true;break}}if(!did)break}}

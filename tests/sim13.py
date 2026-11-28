@@ -53,4 +53,4 @@ async def main():
     for i in idx:
         res.append(await job(i, seed, nx, nd))
     json.dump(res, open(outp, 'w'), ensure_ascii=False, indent=1)
-asyncio.run(main())
+if __name__=="__main__":asyncio.run(main())

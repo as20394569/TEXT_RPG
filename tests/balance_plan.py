@@ -42,7 +42,7 @@ elif mode in ('main', 'gear'):
     B = best(sys.argv[2]); C = []
     for c, a in JOBS:
         st, t = B[jid(c, a)]
-        builds = [('auto', None), ('opt', 1)] if mode == 'main' else [('opt', 0), ('opt', 2), ('opt', 3)]
+        builds = [('auto', None), ('opt', 1)] if mode == 'main' else [('opt', 0), ('opt', 2), ('opt', 3), ('opt', '1lag'), ('auto', 'few')]
         nmul = 1 if mode == 'main' else 0.3
         for bd, rar in builds:
             for cand in [None, CAND]:
@@ -50,11 +50,29 @@ elif mode in ('main', 'gear'):
                 for z, lv, n in explore_cells(a):
                     nn = max(5, round(n * nmul))
                     for ch in range(0, nn, 10):
-                        C.append(dict(cls=c, adv=a, lv=lv, area=z, build=bd, rar=rar, style=st if bd == 'opt' else '均衡', tal=t if bd == 'opt' else None,
+                        C.append(dict(cls=c, adv=a, lv=lv, area=z, build=bd, rar=(1 if rar=='1lag' else rar if isinstance(rar,int) else None), glag=10 if rar=='1lag' else 0, drops=10 if rar=='few' else None, var=str(rar), style=st if bd == 'opt' else '均衡', tal=t if bd == 'opt' else None,
                                       kind='ex', arg=z, n=min(10, nn - ch), seed=1000 + z * 37 + ch, cand=cand, tag=tag))
                 for d, lv, n in dungeon_cells(a):
                     nn = max(5, round(n * nmul))
                     for ch in range(0, nn, 10):
-                        C.append(dict(cls=c, adv=a, lv=lv, area=min(9, [3, 5, 8, 9][d]), build=bd, rar=rar, style=st if bd == 'opt' else '均衡', tal=t if bd == 'opt' else None,
+                        C.append(dict(cls=c, adv=a, lv=lv, area=min(9, [3, 5, 8, 9][d]), build=bd, rar=(1 if rar=='1lag' else rar if isinstance(rar,int) else None), glag=10 if rar=='1lag' else 0, drops=10 if rar=='few' else None, var=str(rar), style=st if bd == 'opt' else '均衡', tal=t if bd == 'opt' else None,
                                       kind='dg', arg=d, n=min(10, nn - ch), seed=5000 + d * 53 + ch, cand=cand, tag=tag))
     shard(C, mode)
+
+if mode == 'diff':
+    B = best(sys.argv[2]); C = []
+    OPTS = {'A': {'dgHp': 1.25, 'dgAtk': 1.15, 'exHp': 1.15, 'exAtk': 1.1, 'z0Mid': 0.85},
+            'B': {'dgHp': 1.4, 'dgAtk': 1.25, 'exHp': 1.3, 'exAtk': 1.2, 'z0Mid': 0.8}}
+    for c, a in JOBS:
+        st, t = B[jid(c, a)]
+        for bd, rar in [('auto', None), ('opt', 1)]:
+            for on, D in OPTS.items():
+                for z, lv, n in explore_cells(a):
+                    nn = max(5, round(n * 0.5))
+                    for ch in range(0, nn, 10):
+                        C.append(dict(cls=c, adv=a, lv=lv, area=z, build=bd, rar=rar, style=st if bd == 'opt' else '均衡', tal=t if bd == 'opt' else None, kind='ex', arg=z, n=min(10, nn - ch), seed=1000 + z * 37 + ch, diff=D, tag='diff' + on))
+                for d, lv, n in dungeon_cells(a):
+                    nn = max(5, round(n * 0.5))
+                    for ch in range(0, nn, 10):
+                        C.append(dict(cls=c, adv=a, lv=lv, area=min(9, [3, 5, 8, 9][d]), build=bd, rar=rar, style=st if bd == 'opt' else '均衡', tal=t if bd == 'opt' else None, kind='dg', arg=d, n=min(10, nn - ch), seed=5000 + d * 53 + ch, diff=D, tag='diff' + on))
+    shard(C, 'diff')
