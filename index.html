@@ -2971,13 +2971,13 @@ function nstList(fac){const qs=NST.filter(q=>(!fac||q.fac===fac)&&nstState(q)!==
 /* ============ 同行夥伴 ============ */
 function allyAuto(){if(S.party===undefined&&ALLY.luna.open())S.party='luna'}
 function mkAlly(){if(!S.party||!ALLY[S.party]||!ALLY[S.party].open())return null;const s=stats(),pw=Math.max(s.ATK,s.MAG),bond=1+Math.min(20,S.bond||0)*.02;
-  return S.party==='luna'?{id:'luna',n:'露娜',max:Math.round(s.HP*.7),pw:pw*.5*bond,def:s.DEF*.6,cd:0,heal:.2*bond}
+  return S.party==='luna'?{id:'luna',n:'露娜',max:Math.round(s.HP*.7),pw:pw*.5*bond,def:s.DEF*.6,cd:0,heal:.1*bond}/* v21.2：露娜治療量 ×0.5 */
                          :{id:'gale',n:'蓋爾',max:Math.round(s.HP*1.05),pw:pw*.62,def:s.DEF*1.1,cd:0}}
 {const _ft=foeTurn;foeTurn=function(){try{if(B&&B.fogRe&&B.turn>=B.fogRe&&B.hp>0&&!(B.fog>0)){B.fogRe=0;B.fog=3;B.log.push('☁ 霧又纏回來了')}}catch(e){}return _ft.apply(this,arguments)}}
 function allyAct(){try{const A0=B&&B.ally;if(A0&&A0.id==='luna'&&A0.hp>0&&B.allyTurn!==B.turn&&B.hp>0&&B.fog>0)fogStrip(1,'luna')}catch(e){}const A=B.ally;if(!A||A.hp<=0||B.allyTurn===B.turn||B.hp<=0)return;const _src=B.srcNow;B.srcNow='露娜';setTimeout(()=>{if(B)B.srcNow=_src},0);B.allyTurn=B.turn;const s=stats();A.cd=Math.max(0,A.cd-1);
   const hit=(p,nm)=>{let d=A.pw*p*100/(100+B.def*(1+fbSum('def')))*(.9+Math.random()*.2);d=capB(Math.max(1,Math.round(d)));if(B.fshield>0){const ab=Math.min(B.fshield,d);B.fshield-=ab;d-=ab}B.hp=Math.max(0,B.hp-d);dsrc('露娜',d);bossPhase();B.allyD=d;blog(`${A.n}${nm}，造成 ${d} 傷害`)};
   if(A.id==='luna'){A.cd2=Math.max(0,(A.cd2||0)-1);A.cd3=Math.max(0,(A.cd3||0)-1);const has=k=>LUNASK[k].ok(),say=k=>{try{setTimeout(()=>bub('luna',`【${LUNASK[k].n}】`),200);setTimeout(()=>PFX.ally(k),250)}catch(e){}},dng=B.chg||(B.next&&isDng(SKM[B.next]));
-    if(has('oath')&&!A.ult&&(B.kind==='boss'||B.hp<B.max*.5)&&B.turn>=3){A.ult=1;say('oath');hit(3,'高舉雙手，奧義【星光爆裂】');const h=Math.round(s.HP*.15);S.hp=Math.min(s.HP,S.hp+h);B.allyH=h;blog(`蒼藍的光包住了你，回復 ${h} HP`)}
+    if(has('oath')&&!A.ult&&(B.kind==='boss'||B.hp<B.max*.5)&&B.turn>=3){A.ult=1;say('oath');hit(3,'高舉雙手，奧義【星光爆裂】');const h=Math.round(s.HP*.075);S.hp=Math.min(s.HP,S.hp+h);B.allyH=h;blog(`蒼藍的光包住了你，回復 ${h} HP`)}
     else if(S.hp<s.HP*.45&&!A.cd){const h=Math.round(s.HP*A.heal);S.hp=Math.min(s.HP,S.hp+h);A.cd=3;B.allyH=h;say('heal');blog(`露娜施展【治癒術】，為你回復 ${h} HP`)}
     else if(dng&&has('ward')&&!A.cd2){A.cd2=4;B.lunaWard=1;say('ward');blog('露娜展開【魔法護盾】，下一次受到的傷害降低 40%')}
     else if(has('clear')&&!A.cd3&&(B.st.poison>0||B.st.burn>0||(B.fb&&B.fb.length))&&Math.random()<.6){A.cd3=4;say('clear');B.st.weak=Math.max(B.st.weak||0,2);hit(.8,'放出【驅散術】');blog(`${B.name} 的力量被削弱了`)}
@@ -3112,6 +3112,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'21.2',d:'2026-11-28',t:'續航調整',b:'露娜的治療量減半，戰鬥中的自然回復減半。勝利後回血、升級回滿、職業治療、吸血、護盾、藥水與營地都不變。'},
   {v:'21.1',d:'2026-11-28',t:'藥水修正',b:'全自動在首領門口、回城補給、副本續戰都認得新版的生命藥與魔力藥，不會再明明有藥水卻撤退。舊版的治療藥水、魔力藥水會自動換成目前區域的新版藥水。'},
   {v:'21.0',d:'2026-11-28',t:'帳號安全',b:'管理員改用獨立金鑰登入，登入狀態只保留在目前分頁。排行榜會檢查戰力是否合理，異常數值不會上榜。'},
   {v:'20.9',d:'2026-11-28',t:'錯誤修正',b:'修正被動與戰鬥增減益算兩次的問題。多隻怪時，每隻怪都會照自己的方式出招，身上的狀態也會正常到期。換目標不會再讓首領只會普攻，也不會弄丟蓄力。戰敗會立刻停下全自動。重新整理會回到戰鬥原本的狀態。持續傷害會被護盾擋下。一鍵換裝會考慮套裝與神話。排行榜改成登入雲端帳號才會上傳。'},

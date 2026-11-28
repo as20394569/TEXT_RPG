@@ -124,7 +124,7 @@ function pickTgt7(){const L=aliveFoes7();if(L.length<2)return;let best=L[0];for(
 function pPre7(){if(!B||!B.rt)return 'ok';if(B.preAc===acOf('p'))return B.preRes||'ok';B.preAc=acOf('p');B.actor='p';
   B.p6=B.p6||{nx:[],once:{},tcd:0,seq:[],third:{},mpUse:0};
   stTick('p');const s=rtS6();
-  if(S.hp>0){const rg=Math.min(3,s.REGEN||0);if(rg>0&&!stHas('p','BURN')){const h=Math.max(1,Math.round(s.HP*rg/100*(stHas('p','SAPPED')?.5:1)));S.hp=Math.min(s.HP,S.hp+h)}
+  if(S.hp>0){const rg=Math.min(3,s.REGEN||0);if(rg>0&&!stHas('p','BURN')){const h=Math.max(1,Math.round(s.HP*rg/100*.5*(stHas('p','SAPPED')?.5:1)));/* v21.2：自然回復 ×0.5 */S.hp=Math.min(s.HP,S.hp+h)}
     const mr=Math.min(3,s.MREGEN||0);if(mr>0)S.mp=Math.min(s.MP,S.mp+Math.max(1,Math.round(s.MP*mr/100)))}
   if(S.hp<=0){B.preRes='dead';if(typeof rtLose==='function')rtLose();return 'dead'}
   if(stHas('p','STUN')){B.preRes='skip';blog(you('你動彈不得'));return 'skip'}
