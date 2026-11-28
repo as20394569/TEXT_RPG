@@ -36,16 +36,16 @@
   "info": []
  },
  "全自動門口：普通副本、已通關、HP30%、帶生命藥": {
-  "ok": false,
+  "ok": true,
   "info": {
    "lv": 32,
    "bossTableLv": 20,
-   "area": null,
-   "run": false,
-   "inBattle": false,
-   "view": null,
+   "area": 1,
+   "run": true,
+   "inBattle": true,
+   "view": "gate",
    "expect": "go",
-   "actual": "retreat"
+   "actual": "go"
   }
  },
  "全自動門口：普通副本、已通關、HP90%": {
@@ -72,6 +72,45 @@
    "view": null,
    "expect": "retreat",
    "actual": "retreat"
+  }
+ },
+ "舊版藥水 ID 換算成新版、可扣除、舊存檔轉換": {
+  "ok": true,
+  "info": {
+   "a": "{\"IT031\":2,\"IT032\":1}",
+   "hp": 2,
+   "mp": 1,
+   "b": 1,
+   "c": "{\"IT031\":3,\"IT032\":1}",
+   "shop": "IT031"
+  }
+ },
+ "戰鬥自動喝藥用新版生命藥": {
+  "ok": true,
+  "info": {
+   "used": 1,
+   "healed": true
+  }
+ },
+ "全自動回城補給買新版藥水": {
+  "ok": true,
+  "info": {
+   "hp": 6,
+   "mp": 3
+  }
+ },
+ "首領準備「陷阱」扣新版藥水": {
+  "ok": true,
+  "info": {
+   "left": 1,
+   "prep": "trap"
+  }
+ },
+ "事件「消耗藥水」選項認得新版藥水": {
+  "ok": true,
+  "info": {
+   "lack": false,
+   "lack2": true
   }
  },
  "ERR 無頁面錯誤(2)": {

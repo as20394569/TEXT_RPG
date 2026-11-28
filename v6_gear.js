@@ -308,7 +308,21 @@ MV.altar=function(){const rows=AREAS.map((A,i)=>{const lock=i>=S.main.ch+1&&!S.m
 
 /* 舊獎勵的強化石、星塵：換成目前所在區的強化石／魔晶 */
 const _addItem6=addItem;
-addItem=function(id,n){if(id==='stone'&&S)id=matId(zoneOf(S.lv),5);else if(id==='dust'&&S&&n>0){id=matId(zoneOf(S.lv),3);n=Math.max(1,Math.ceil(n/10))}return _addItem6(id,n)};
+/* v21.1 合法道具查詢：V7 能用的消耗品只有企劃表的 IT 系列（ITEMS[k].v6）。
+   舊版道具 ID（pot、pot2、pot3 治療藥水；eth、eth2 魔力藥水）一律換算成目前等級區域的生命藥／魔力藥，所有地方都用這組函式 */
+const CONSK={hp:'恢復最大HP',mp:'恢復最大MP',clean:'清除負面狀態數',shield:'護盾占最大HP'};
+const POTOLD={pot:'hp',pot2:'hp',pot3:'hp',eth:'mp',eth2:'mp'};
+function potList(kind){const fx=CONSK[kind];if(!S||!fx)return [];return Object.keys(S.items||{}).filter(k=>S.items[k]>0&&ITEMS[k]&&ITEMS[k].v6&&ITEMS[k].use&&ITEMS[k].use.v6===fx)}
+function potCount(kind){return potList(kind).reduce((a,k)=>a+S.items[k],0)}
+function potBest(kind){return potList(kind).sort((a,b)=>(ITEMS[b].use.v||0)-(ITEMS[a].use.v||0))[0]||null}
+function potShop(kind){return consId(zoneOf(S?S.lv:1),{hp:1,mp:2,clean:3,shield:4}[kind]||1)}
+function itemCount(id){return POTOLD[id]?potCount(POTOLD[id]):((S&&S.items[id])||0)}
+addItem=function(id,n){if(id==='stone'&&S)id=matId(zoneOf(S.lv),5);else if(id==='dust'&&S&&n>0){id=matId(zoneOf(S.lv),3);n=Math.max(1,Math.ceil(n/10))}
+  else if(POTOLD[id]&&S){const kind=POTOLD[id];if(n>0)id=potShop(kind);else{let left=-n;for(const k of potList(kind).sort((a,b)=>(ITEMS[a].use.v||0)-(ITEMS[b].use.v||0))){const t=Math.min(left,S.items[k]);_addItem6(k,-t);left-=t;if(!left)break}return}}
+  return _addItem6(id,n)};
+/* 舊存檔裡的舊版藥水換成新版 */
+function migratePots6(){if(!S||!S.items)return;for(const k of Object.keys(POTOLD)){const n=S.items[k]||0;if(n>0){delete S.items[k];_addItem6(potShop(POTOLD[k]),n)}else delete S.items[k]}}
+{const _ld=load;load=function(){const r=_ld.apply(this,arguments);try{migratePots6()}catch(e){}return r}}
 /* ---------- 戰鬥掛鉤（給戰鬥程式呼叫）：神話效果與套裝 4 件效果 ----------
    gearDmgMul6(o)：o={wsk:武器技能累計次數, mag:是否魔法, hpPct:自己HP比例, foeHpPct, foe:{burn,slow,poison,debuff}}，回傳傷害倍率
    gearFatal6()：受到致命傷時呼叫，回傳 true 表示保留 1 HP（神話「不屈」每場一次）

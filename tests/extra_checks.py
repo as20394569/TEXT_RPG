@@ -48,6 +48,19 @@ async def main():
             r2 = await pg.evaluate("()=>({run:!!RUN,inBattle:!!B,view:RUN&&RUN.view?RUN.view.type:null})")
             act = 'go' if r2['inBattle'] or (r2['view'] and r2['view'] != 'gate' and r2['run']) else ('retreat' if not r2['run'] else 'stay')
             rec('全自動門口：' + name, act == want, dict(r, **r2, expect=want, actual=act))
+        # 合法道具查詢（v21.1）
+        r = await pg.evaluate("""()=>{S.items={};addItem('pot',2);addItem('eth2',1);const a=JSON.stringify(S.items);const hp=potCount('hp'),mp=potCount('mp');
+          addItem('pot',-1);const b=potCount('hp');S.items={pot:3,eth:1};migratePots6();const c=JSON.stringify(S.items);return {a,hp,mp,b,c,shop:potShop('hp')}}""")
+        rec('舊版藥水 ID 換算成新版、可扣除、舊存檔轉換', r['hp'] == 2 and r['mp'] == 1 and r['b'] == 1 and 'pot' not in r['c'] and r['shop'] in r['c'], r)
+        r = await pg.evaluate("""()=>{RUN=null;B=null;TAB='adv';startRun(3);RUN.step=1;startBattle(AREAS[3].mobs[0],'',0);grpDone7(false);B.auto=AUTO=true;
+          S.items={};addItem(potShop('hp'),3);const s=stats();S.hp=Math.round(s.HP*.2);B.rt.pg=100;B.icd=-1;const h=S.hp,n=potCount('hp');autoAct();return {used:n-potCount('hp'),healed:S.hp>h}}""")
+        rec('戰鬥自動喝藥用新版生命藥', r['used'] == 1 and r['healed'], r)
+        r = await pg.evaluate("""()=>{B=null;RUN=null;FA={area:3};S.items={};S.gold=99999;FA.towned=0;faTown();const hp=potCount('hp'),mp=potCount('mp');FA=null;return {hp,mp}}""")
+        rec('全自動回城補給買新版藥水', r['hp'] >= 6 and r['mp'] >= 3, r)
+        r = await pg.evaluate("""()=>{RUN=null;B=null;TAB='adv';startRun(3);RUN.step=RUN.nodes.length-2;RUN.view={type:'gate'};S.items={};addItem(potShop('hp'),2);doPrep('trap');return {left:potCount('hp'),prep:RUN.prep}}""")
+        rec('首領準備「陷阱」扣新版藥水', r['left'] == 1 and r['prep'] == 'trap', r)
+        r = await pg.evaluate("""()=>{S.items={};addItem(potShop('hp'),1);return {lack:evLack({need:['pot2',1]}),lack2:evLack({need:['pot2',2]})}}""")
+        rec('事件「消耗藥水」選項認得新版藥水', (not r['lack']) and r['lack2'], r)
         rec('ERR 無頁面錯誤(2)', not pg.errs, pg.errs[:3])
     if out: json.dump(R, open(out, 'w'), ensure_ascii=False, indent=1)
 asyncio.run(main())

@@ -204,7 +204,7 @@ autoAct=function(){if(!B||B.busy||!B.auto)return;if(B.rt&&(B.rt.pg<100||B.rt.don
   const s=rtS6(),hpR=S.hp/s.HP;
   if(B.chg7)return pAct('skill',B.chg7);
   /* 道具：HP 低於 30% 用回復藥（占一次行動） */
-  if(hpR<.3){const p=Object.keys(S.items||{}).filter(k=>ITEMS[k]&&ITEMS[k].use&&(ITEMS[k].use.hp||ITEMS[k].use.v6==='恢復最大HP')&&S.items[k]>0&&itemReady7()).sort((a,b)=>(ITEMS[b].use.v||ITEMS[b].use.hp||0)-(ITEMS[a].use.v||ITEMS[a].use.hp||0))[0];if(p)return pAct('item',p)}
+  if(hpR<.3&&itemReady7()){const p=potBest('hp');if(p&&pAct('item',p)!==false)return}
   const L=battleSkills(),base=L[L.length-1];
   for(const k of L.slice(0,-1))if(skUsable7(k))return pAct('skill',k);
   pAct('skill',base)};

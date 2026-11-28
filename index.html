@@ -2316,14 +2316,14 @@ function bossBox(k){const v=RUN&&RUN.view;if(!v||v.box!==1||!BBOX[k])return;cons
   else if(k==='blue'){const g=minG(rollGear(t,Math.random()<.125?3:2,2));RUN.loot.items.push(gearName(g));x=`蒼紋在掌心亮起：獲得【${gearName(g)}】。`}
   else{if(Math.random()<.175){const g=rollGear(t,3,2,true);RUN.loot.items.push(gearName(g));x=`封印應聲碎裂——獲得【${gearName(g)}】！`}else{const g=10+L*5;S.gold+=g;RUN.loot.gold+=g;x=`鎖鏈落下，裡面只有灰塵和幾枚銅幣（${g} G）。下次運氣會更好。`}}
   v.box=2;v.boxR=`${dropFx()}<p class="sub" style="color:var(--exp)">${BBOX[k].n}：${x}</p>`;try{SFX.holy(0)}catch(e){}save();render()}
-function gatePrep(L){if(RUN.prep)return `<p class="sub" style="color:var(--exp)">已完成準備：${PREP[RUN.prep].n}</p>`;const g=prepCost(L),pot=S.items.pot||0;
+function gatePrep(L){if(RUN.prep)return `<p class="sub" style="color:var(--exp)">已完成準備：${PREP[RUN.prep].n}</p>`;const g=prepCost(L),pot=potCount('hp');
   return `<div class="lbl">戰前準備（只能選一項）</div><div class="list">${[['scout',S.gold>=g,`${g} G`],['trap',pot>0,'治療藥水×1'],['camp',true,'免費']].map(([k,ok,c])=>`<button class="btn" style="text-align:left" data-a="gatePrep" data-v="${k}" ${ok?'':'disabled'}><b>${PREP[k].n}</b>　<span class="tag ${ok?'':'off'}">${c}</span><br><span class="sub">${PREP[k].d}</span></button>`).join('')}</div>`}
 function doPrep(k){if(!RUN||RUN.prep||!PREP[k])return;const a=AREAS[RUN.area],L=MOBS[a.boss].lv+(RUN.nm?10:0),s=stats();
   if(k==='scout'){const g=prepCost(L);if(S.gold<g){toast('金幣不足');return}S.gold-=g}
-  else if(k==='trap'){if(!S.items.pot){toast('沒有治療藥水');return}addItem('pot',-1)}
+  else if(k==='trap'){const p=potBest('hp');if(!p){toast('沒有治療藥水');return}addItem(p,-1)}
   else{S.hp=Math.min(s.HP,S.hp+Math.round(s.HP*.3));S.mp=Math.min(s.MP,S.mp+Math.round(s.MP*.3))}
   RUN.prep=k;toast(`${PREP[k].n}：準備完成`);save();render()}
-function bossGate(a){const m=MOBS[a.boss],L=m.lv+(RUN.nm?10:0),d=L-S.lv,st=stats(),hp=S.hp/st.HP,pot=(S.items.pot||0)+(S.items.pot2||0)+(S.items.pot3||0);
+function bossGate(a){const m=MOBS[a.boss],L=m.lv+(RUN.nm?10:0),d=L-S.lv,st=stats(),hp=S.hp/st.HP,pot=potCount('hp');
   const [c,t]=d>=3?['var(--hp)','勝算很低']:d>=1?['var(--r4)','硬仗']:d>=-2?['var(--exp)','勢均力敵']:['var(--ok,#7fdc8a)','游刃有餘'];
   const warn=[hp<.5&&'HP 不到一半',S.mp<st.MP*.3&&'MP 見底',!pot&&'身上沒有藥水'].filter(Boolean);
   return `<div class="panel" style="border-color:${c}">${art('mob_'+a.boss,m.n,'r11')}<h3 style="color:${c}">★ 首領前哨：${m.n}　Lv ${L}</h3><p class="sub">你 Lv ${S.lv}・HP ${S.hp}/${st.HP}・MP ${S.mp}/${st.MP}・藥水 ${pot}　→　<b style="color:${c}">${t}</b></p>${warn.length?`<p class="sub" style="color:var(--hp)">⚠ ${warn.join('、')}</p>`:''}<p class="sub">${S.cleared[RUN.area]?'打過的首領，掉寶照樣豐厚。':'撤退不會失去戰利品；輸了會掉 10% 金幣。'}</p>${gatePrep(L)}<button class="btn pri big" data-a="bossGo">挑戰首領</button><button class="btn" data-a="retreat">撤退回城（保留戰利品）</button></div>`}
@@ -2891,8 +2891,8 @@ function wanderDone(ev,o){const w=S.wander[ev.w];w.aff=(w.aff||0)+(o.aff||0);con
   if(last){const hi=w.aff>=5;S.wander[ev.w].done=1;return (hi&&o.end?o.end:o.ok.t)+(hi?'\n（羈絆深厚的結局）':'')}return null}
 /* 事件選項的代價：need=[道具,數量]；免檢定又要付錢的選項，錢不夠就不能選 */
 function evGoldCost(o){return o.safe&&o.ok&&o.ok.gold<0?Math.round((12+AREAS[RUN.area].base*6)*-o.ok.gold):0}
-function evLack(o){if(o.need&&(S.items[o.need[0]]||0)<o.need[1])return true;if(o.safe&&o.ok&&o.ok.hone&&o.ok.gold<0&&honeMax())return true;const c=evGoldCost(o);return c>0&&S.gold<c}
-function evCostTag(o){if(o.need){const h=S.items[o.need[0]]||0;return `<span class="tag ${h<o.need[1]?'bad':'off'}">消耗 ${ITEMS[o.need[0]].n}×${o.need[1]}（持有 ${h}）</span>`}const c=evGoldCost(o);return c?`<span class="tag ${S.gold<c?'bad':'off'}">花費 ${c} G</span>`:'<span class="tag off">免檢定</span>'}
+function evLack(o){if(o.need&&itemCount(o.need[0])<o.need[1])return true;if(o.safe&&o.ok&&o.ok.hone&&o.ok.gold<0&&honeMax())return true;const c=evGoldCost(o);return c>0&&S.gold<c}
+function evCostTag(o){if(o.need){const h=itemCount(o.need[0]);return `<span class="tag ${h<o.need[1]?'bad':'off'}">消耗 ${ITEMS[o.need[0]].n}×${o.need[1]}（持有 ${h}）</span>`}const c=evGoldCost(o);return c?`<span class="tag ${S.gold<c?'bad':'off'}">花費 ${c} G</span>`:'<span class="tag off">免檢定</span>'}
 function evPick(i){const v=RUN.view,o=v.ev.o[i];if(!o||v.phase!=='ask'||evLack(o))return;if(o.need)addItem(o.need[0],-o.need[1]);
   if(o.safe){v.phase='done';v.r=null;v.text=you(o.ok.t);v.gain=applyOut(o.ok,false);if(v.ev.w){const e=wanderDone(v.ev,o);if(e){v.text=you(e);const g=applyOut({gold:4,exp:4,stone:2},false);v.gain=v.gain.concat(g)}}save();render();return}
   const d=R(1,20),mod=Math.floor(S.attr[o.a]/4),dc=o.dc+RUN.area*3,ok=d===20||(d!==1&&d+mod>=dc);
@@ -3112,6 +3112,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'21.1',d:'2026-11-28',t:'藥水修正',b:'全自動在首領門口、回城補給、副本續戰都認得新版的生命藥與魔力藥，不會再明明有藥水卻撤退。舊版的治療藥水、魔力藥水會自動換成目前區域的新版藥水。'},
   {v:'21.0',d:'2026-11-28',t:'帳號安全',b:'管理員改用獨立金鑰登入，登入狀態只保留在目前分頁。排行榜會檢查戰力是否合理，異常數值不會上榜。'},
   {v:'20.9',d:'2026-11-28',t:'錯誤修正',b:'修正被動與戰鬥增減益算兩次的問題。多隻怪時，每隻怪都會照自己的方式出招，身上的狀態也會正常到期。換目標不會再讓首領只會普攻，也不會弄丟蓄力。戰敗會立刻停下全自動。重新整理會回到戰鬥原本的狀態。持續傷害會被護盾擋下。一鍵換裝會考慮套裝與神話。排行榜改成登入雲端帳號才會上傳。'},
   {v:'20.8',d:'2026-11-28',t:'技能等級',b:'基礎職業的技能改在 Lv.1～30 學完，轉職前就能用到全部招式；轉職當下學會 6 招，其餘一路分布到 Lv.100。轉職說明改成正確的 Lv.30。'},
@@ -4491,7 +4492,7 @@ function faDice(sel,lab){const bs=[...document.querySelectorAll(sel)].filter(b=>
 /* 全自動中玩家自己點了選項：取消骰子，照玩家的選擇走 */
 function faCancelDice(){if(!FA||!FA.dv)return;clearInterval(FA.dv.iv);clearTimeout(FA.dv.tm);FA.dv.ov.remove();FA.dv=null;FA.busy=0}
 document.addEventListener('click',e=>{if(!e.isTrusted||!FA)return;const t=e.target.closest&&e.target.closest('[data-a="pickFork"],[data-a="evPick"],[data-a="storyPick"]');if(t){faCancelDice();FA.hold=Date.now()}},true);
-function faDeep(){if(!RUN||!RUN.dg||!document.querySelector('#main [data-a="dgNext"]'))return false;const st=stats(),pots=(S.items.pot||0)+(S.items.pot2||0)+(S.items.pot3||0),ok=S.hp>=st.HP*(DG[RUN.dg.d].segs.length>=3?.3:.5)||pots>=3;if(!ok){toast('全自動：傷太重，先回城');return faClick('#main [data-a="finish"]')}return faClick('#main [data-a="dgNext"]')}
+function faDeep(){if(!RUN||!RUN.dg||!document.querySelector('#main [data-a="dgNext"]'))return false;const st=stats(),pots=potCount('hp'),ok=S.hp>=st.HP*(DG[RUN.dg.d].segs.length>=3?.3:.5)||pots>=3;if(!ok){toast('全自動：傷太重，先回城');return faClick('#main [data-a="finish"]')}return faClick('#main [data-a="dgNext"]')}
 function faCamp(){const s=stats(),low=S.hp<s.HP*.6||S.mp<s.MP*.4,k=low?'rest':!honeMax()?'hone':!RUN.raid&&S.hp>=s.HP*.8?'raid':'rest';toast(`全自動：營地選擇「${CAMPO[k][1]}」`);campPick(k)}
 function faDelay(){if(!FA)return 1100;if(MODAL||($('#story')&&!$('#story').hidden))return 3500;if(RUN&&RUN.view&&['fork','event','shrine','gate','camp'].includes(RUN.view.type))return 3500;return 1750}
 function faLoop(){try{faTick()}catch(e){}setTimeout(faLoop,faDelay())}
@@ -4501,7 +4502,7 @@ function faTick(){faDraw();if(!FA||!S||FA.busy)return;if(FA.hold&&Date.now()-FA.
   if(MODAL){if(B&&MODAL.k==='foe')return;if(B&&MODAL.k!=='msg'){closeM();return}faClick('#modal .sheet-b [data-a="closeM"].pri')||faClick('#modal .x');return}
   if(B){if(!B.auto){B.auto=AUTO=true;render();setTimeout(autoAct,200)}return}
   if(RUN){if(TAB!=='adv'){TAB='adv';render();return}
-    if(RUN.view&&RUN.view.type==='gate'){const L=MOBS[AREAS[RUN.area].boss].lv+(RUN.nm?10:0)+(RUN.dg?[0,1,3][RUN.dg.diff||0]:0),st=stats();if(((!S.cleared[RUN.area]||(RUN.dg&&RUN.dg.diff))&&S.lv<L-1)||(S.hp<st.HP*.35&&!S.items.pot&&!S.items.pot2&&!S.items.pot3)){toast('全自動：首領太強，先撤退練功');FA.selfRet=1;faClick('#main [data-a="retreat"]');if(FA)FA.selfRet=0}else{if(!RUN.prep){if(S.hp<st.HP*.6)doPrep('camp');else if(S.gold>=prepCost(L)*3)doPrep('scout');else if((S.items.pot||0)>2)doPrep('trap')}faClick('#main [data-a="bossGo"]')}return}
+    if(RUN.view&&RUN.view.type==='gate'){const L=MOBS[AREAS[RUN.area].boss].lv+(RUN.nm?10:0)+(RUN.dg?[0,1,3][RUN.dg.diff||0]:0),st=stats();if(((!S.cleared[RUN.area]||(RUN.dg&&RUN.dg.diff))&&S.lv<L-1)||(S.hp<st.HP*.35&&!potCount('hp'))){toast('全自動：首領太強，先撤退練功');FA.selfRet=1;faClick('#main [data-a="retreat"]');if(FA)FA.selfRet=0}else{if(!RUN.prep){if(S.hp<st.HP*.6)doPrep('camp');else if(S.gold>=prepCost(L)*3)doPrep('scout');else if(potCount('hp')>2)doPrep('trap')}faClick('#main [data-a="bossGo"]')}return}
     (RUN.view&&RUN.view.type==='camp'&&(faCamp(),1))||((RUN.view&&RUN.view.type==='kiln'&&!RUN.view.done)?(kilnPick(S.hp>=stats().HP*.65?'forge':'rest'),true):false)||faClick('#main [data-a="bossBox"]',1)||faClick('#main [data-a="core"][data-fit]:not([data-v="greed"]):not([data-v="temper"])',1)||faClick('#main [data-a="core"]:not([data-v="greed"]):not([data-v="temper"])',1)||(document.querySelector('#main [data-a="pickFork"]')&&(faSmartFork()||faDice('#main [data-a="pickFork"]','岔路')))||(document.querySelector('#main [data-a="evPick"]')&&faDice('#main [data-a="evPick"]','事件抉擇'))||faClick('#main [data-a="evFight"]')||faClick('#main [data-a="bless"]',1)||faDeep()||faClick('#main [data-a="runNext"]')||faClick('#main [data-a="towerNext"]')||faClick('#main [data-a="finish"]');return}
   /* 回城：休息後重新出發同一地區 */
   if(FA.tower){faStop('離開霧淵');return}
@@ -4516,8 +4517,8 @@ function faTown(){const msgs=[];try{checkDaily();
   if(S.pts>0){const main={'力':'STR','敏':'DEX','智':'INT'}[jobEq().main_attr]||'STR';let n=0;while(S.pts>0&&n<999){const k=(n++%3===2)?'VIT':main;if(S.attr[k]>=ATTRMAX){const o=Object.keys(ATTR).find(x=>S.attr[x]<ATTRMAX);if(!o)break;S.pts--;S.attr[o]++;continue}S.pts--;S.attr[k]++}msgs.push('配點')}
   if(S.sp>0){const ks=mySkills().filter(k=>(S.skl[k]||1)<5&&SK[k].dmg).sort((a,b)=>(S.skl[a]||1)-(S.skl[b]||1));const all=ks.length?ks:mySkills().filter(k=>(S.skl[k]||1)<5);let i=0;while(S.sp>0&&all.length){const k=all[i++%all.length];if((S.skl[k]||1)<5){S.sp--;S.skl[k]=(S.skl[k]||1)+1}else if(all.every(x=>(S.skl[x]||1)>=5))break}msgs.push('升技能')}
   {const ch=autoEquip6();if(ch)msgs.push(`換上 ${ch} 件裝備`)}
-  const tier=TLV.reduce((a,v,i)=>v<=S.lv?i:a,0),hp=tier>=2?'pot2':'pot',mp=tier>=2?'eth2':'eth',keep=S.lv*4*3;let bought=0;
-  for(const [k,want] of [[hp,6],[mp,3],...(S.main.ch>=4?[['pot3',2]]:[])])while((S.items[k]||0)<want&&ITEMS[k]&&S.gold-ITEMS[k].price>=keep){S.gold-=ITEMS[k].price;addItem(k,1);bought++}
+  const keep=S.lv*4*3;let bought=0;
+  for(const [kind,want] of [['hp',6],['mp',3]]){const k=potShop(kind);while(potCount(kind)<want&&ITEMS[k]&&S.gold-ITEMS[k].price>=keep){S.gold-=ITEMS[k].price;addItem(k,1);bought++}}
   if(bought)msgs.push(`補了 ${bought} 瓶藥`);
   const top=AREAS.reduce((a,A,i)=>S.main.ch>=i&&A.base<=S.lv?i:a,0);if(!FA.nm&&!FA.tower&&!FA.dg&&top>FA.area&&S.cleared[FA.area]){FA.area=top;msgs.push('前往'+AREAS[top].n)}
   save()}catch(e){}if(msgs.length)toast('全自動整備：'+msgs.join('、'))}
