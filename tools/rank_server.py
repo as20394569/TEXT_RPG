@@ -1,7 +1,8 @@
 """蒼藍誓約 Online 排行榜伺服器（只用 Python 標準函式庫）
 GET  /api/top?n=50   -> 依戰力排序的玩家列表（最多 300）
 POST /api/submit     -> {"acc","token","cls","power",...} 用雲端帳號上榜；名字與等級以雲端存檔為準（v20.9 起不收匿名紀錄）
-POST /api/gm         -> {"key"} 管理員驗證（金鑰＝fb_token.txt），回傳 {"gm":true}
+POST /api/gm/login   -> {"key"} 管理員登入（金鑰＝gm_key.txt，與其他服務金鑰分開；第一次執行自動產生），回傳 8 小時的 {"sess"}
+POST /api/gm/check   -> {"sess"} 檢查管理員工作階段
 POST /api/acc/register|login|load|save|logout -> 雲端帳號（帳號＋密碼，多裝置共用存檔）
 POST /api/xfer        -> {"id","name","lv","data"} 上傳存檔換 6 碼轉移碼（24 小時）
 POST /api/xfer/get    -> {"code","take"} 用轉移碼取回存檔（take=1 取用後刪除）
@@ -10,6 +11,7 @@ POST /api/fb         -> {"id","name","cls","lv","cat","text"} 送出意見（每
 POST /api/fb/reply   -> {"token","ts","reply"} 開發者回覆（token 存在 fb_token.txt）
 """
 import json, os, re, threading, time
+import secrets as _gmsec
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse, parse_qs
 
@@ -35,6 +37,31 @@ def fb_save():
     with open(tmp, 'w', encoding='utf-8') as f:
         json.dump(FB, f, ensure_ascii=False)
     os.replace(tmp, FB_DATA)
+def gm_key():
+    """管理員金鑰：獨立檔案 gm_key.txt，不與意見回報、統計的 fb_token 共用；不存在時自動產生"""
+    p = os.path.join(HERE, 'gm_key.txt')
+    try:
+        k = open(p, encoding='utf-8').read().strip()
+        if k:
+            return k
+    except Exception:
+        pass
+    k = _gmsec.token_urlsafe(24)
+    try:
+        with open(p, 'w', encoding='utf-8') as f:
+            f.write(k)
+    except Exception:
+        return ''
+    return k
+# 戰力上限（由測試算出：各職業、各等級用神話裝 +15 能達到的最高戰力，再留 30% 餘裕；超過視為異常不收）
+POWCAP = [[1, 377], [5, 490], [10, 605], [15, 747], [20, 923], [25, 1071], [30, 1333], [35, 1462], [40, 1648], [45, 1807], [50, 1989], [55, 2205], [60, 2346], [65, 2566], [70, 2678], [75, 2817], [80, 2974], [85, 3301], [90, 3311], [95, 3619], [100, 3712]]
+def pow_cap(lv):
+    lv = max(1, min(100, int(lv)))
+    for (a, va), (b, vb) in zip(POWCAP, POWCAP[1:]):
+        if a <= lv <= b:
+            return (va + (vb - va) * (lv - a) / max(1, b - a)) * 1.3
+    return POWCAP[-1][1] * 1.3
+GM_SESS = {}  # 工作階段 token → 到期時間（只在記憶體，伺服器重啟即失效）
 def fb_token():
     try:
         with open(os.path.join(HERE, 'fb_token.txt'), encoding='utf-8') as f:
@@ -407,17 +434,25 @@ class H(BaseHTTPRequestHandler):
                 return self.reply(200, rep)
             except Exception:
                 return self.reply(400, {'error': 'bad request'})
-        if path == '/api/gm':
+        if path in ('/api/gm/login', '/api/gm/check'):
             try:
                 d = self.body(512)
-                ip = self.ip(); now = time.time()
+                now = time.time()
+                for k in [k for k, t in GM_SESS.items() if t < now]:
+                    GM_SESS.pop(k, None)
+                if path == '/api/gm/check':
+                    ok = str(d.get('sess', '')) in GM_SESS
+                    return self.reply(200 if ok else 403, {'gm': ok})
+                ip = self.ip()
                 hist = [t for t in GM_TRY.get(ip, []) if now - t < 600]
                 if len(hist) >= 10:
                     return self.reply(429, {'error': 'too many tries'})
                 hist.append(now); GM_TRY[ip] = hist
-                tok = fb_token()
-                ok = bool(tok) and hmac.compare_digest(str(d.get('key', '')), tok)
-                return self.reply(200 if ok else 403, {'gm': ok})
+                key = gm_key()
+                if not key or not hmac.compare_digest(str(d.get('key', '')), key):
+                    return self.reply(403, {'gm': False})
+                sess = _gmsec.token_urlsafe(24); GM_SESS[sess] = now + 8 * 3600
+                return self.reply(200, {'gm': True, 'sess': sess, 'exp': int((now + 8 * 3600) * 1000)})
             except Exception:
                 return self.reply(400, {'error': 'bad request'})
         if path == '/api/fb/reply':
@@ -450,6 +485,8 @@ class H(BaseHTTPRequestHandler):
             nm, lv = save_meta(a.get('data', ''))
             if not nm:
                 return self.reply(400, {'error': 'bad save'})
+            if int(d.get('power', 0) or 0) > pow_cap(lv):
+                return self.reply(403, {'error': 'power out of range'})
             pid = 'a' + hashlib.sha256(acc.lower().encode('utf-8')).hexdigest()[:12]
             now = time.time()
             if now - LAST.get(pid, 0) < 20:

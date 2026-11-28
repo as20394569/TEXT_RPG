@@ -1,0 +1,81 @@
+{
+ "範圍技一次擊殺 2 隻：獎勵完整": {
+  "ok": true,
+  "info": {
+   "expected_exp": 799,
+   "loot_exp": 799,
+   "view": "擊敗 火蜥蜴、岩石怪！獲得 799 EXP、50 G。"
+  }
+ },
+ "範圍技一次擊殺 3 隻：獎勵完整": {
+  "ok": true,
+  "info": {
+   "expected_exp": 1284,
+   "loot_exp": 1284,
+   "view": "擊敗 火蜥蜴、岩蛇、岩石怪！獲得 1284 EXP、81 G。"
+  }
+ },
+ "範圍技一次擊殺 4 隻：獎勵完整": {
+  "ok": true,
+  "info": {
+   "expected_exp": 1579,
+   "loot_exp": 1579,
+   "view": "擊敗 火蜥蜴、岩蛇、石蟲、岩石怪！獲得 1579 EXP、102 G。"
+  }
+ },
+ "首領與召喚物同時倒下：只算首領獎勵": {
+  "ok": true,
+  "info": {
+   "expected_boss_only": 5136,
+   "loot_exp": 5136,
+   "view": "擊敗 鑽岩巨蟲！獲得 5136 EXP、298 G。<br>戰利品：岩石峽谷獸材、岩石峽谷首領印記、裝備"
+  }
+ },
+ "ERR 無頁面錯誤": {
+  "ok": true,
+  "info": []
+ },
+ "全自動門口：普通副本、已通關、HP30%、帶生命藥": {
+  "ok": false,
+  "info": {
+   "lv": 32,
+   "bossTableLv": 20,
+   "area": null,
+   "run": false,
+   "inBattle": false,
+   "view": null,
+   "expect": "go",
+   "actual": "retreat"
+  }
+ },
+ "全自動門口：普通副本、已通關、HP90%": {
+  "ok": true,
+  "info": {
+   "lv": 32,
+   "bossTableLv": 20,
+   "area": 1,
+   "run": true,
+   "inBattle": true,
+   "view": "gate",
+   "expect": "go",
+   "actual": "go"
+  }
+ },
+ "全自動門口：一般探索、未通關、等級低於首領表定等級（Lv25 對表定 30）": {
+  "ok": true,
+  "info": {
+   "lv": 25,
+   "bossTableLv": 30,
+   "area": null,
+   "run": false,
+   "inBattle": false,
+   "view": null,
+   "expect": "retreat",
+   "actual": "retreat"
+  }
+ },
+ "ERR 無頁面錯誤(2)": {
+  "ok": true,
+  "info": []
+ }
+}

@@ -2125,10 +2125,15 @@ function forkTalk(){const L=withLuna();const t=pick(L?FORKL.luna:FORKL.me);retur
 /* ============ 頻道 ============ */
 /* 停服維修：maint.json 的 on 為 true 時封鎖遊戲 */
 let MAINT=false;
-/* 管理員：金鑰不寫在程式裡。用「#gm=伺服器 fb_token.txt 的內容」開一次，金鑰存在這台裝置；每次開遊戲都向伺服器驗證，通過才是管理員 */
+/* 管理員：金鑰（伺服器 gm_key.txt，與其他服務金鑰分開）只在登入時輸入一次，不放在網址、不存在本機。
+   登入成功後伺服器發 8 小時的工作階段，只存在這個分頁（sessionStorage），關掉分頁就失效。網址加 #gm 會跳出輸入框。 */
 let GM=false;
-(()=>{try{const m=location.hash.match(/^#gm=(.+)$/);if(m){localStorage.setItem('ao_gmk',decodeURIComponent(m[1]));history.replaceState(null,'',location.pathname+location.search)}if(location.hash==='#gm-off')localStorage.removeItem('ao_gmk');localStorage.removeItem('ao_gm')}catch(e){}})();
-async function gmCheck(){try{const k=localStorage.getItem('ao_gmk');if(!k)return;const u=await rankUrl();if(!u)return;const r=await fetch(u+'/api/gm',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:k})});let j={};try{j=await r.json()}catch(e){}GM=!!(j&&j.gm);if(r.status===403)localStorage.removeItem('ao_gmk');if(GM&&MAINT){MAINT=false;maintDraw(null)}if(GM)toast('管理員模式')}catch(e){}}
+try{localStorage.removeItem('ao_gm');localStorage.removeItem('ao_gmk')}catch(e){}
+async function gmApi(p,body){const u=await rankUrl();if(!u)return null;const r=await fetch(u+p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});let j={};try{j=await r.json()}catch(e){}return j}
+function gmOn(){GM=true;if(MAINT){MAINT=false;maintDraw(null)}toast('管理員模式')}
+async function gmCheck(){try{
+  if(/^#gm/.test(location.hash)){history.replaceState(null,'',location.pathname+location.search);const k=prompt('管理員金鑰');if(k){const j=await gmApi('/api/gm/login',{key:k});if(j&&j.gm&&j.sess){sessionStorage.setItem('ao_gms',j.sess);gmOn()}else toast('金鑰不對')}return}
+  const s=sessionStorage.getItem('ao_gms');if(!s)return;const j=await gmApi('/api/gm/check',{sess:s});if(j&&j.gm)gmOn();else sessionStorage.removeItem('ao_gms')}catch(e){}}
 setTimeout(gmCheck,300);
 FXLAB=/[?&]fxlab=1/.test(location.search);/* 特效工作室：不存檔，不需要管理員 */
 async function maintCheck(){try{const r=await fetch('maint.json?'+Date.now(),{cache:'no-store'});const j=await r.json();const on=!!(j&&j.on)&&!GM&&!FXLAB;if(on!==MAINT){MAINT=on;maintDraw(j)}}catch(e){}}
@@ -3107,6 +3112,7 @@ function loadCode(code){try{const [v,b,c]=code.trim().split('.');if(v!=='AO1')th
 
 /* ============ 公告與限時活動 ============ */
 const NEWS=[
+  {v:'21.0',d:'2026-11-28',t:'帳號安全',b:'管理員改用獨立金鑰登入，登入狀態只保留在目前分頁。排行榜會檢查戰力是否合理，異常數值不會上榜。'},
   {v:'20.9',d:'2026-11-28',t:'錯誤修正',b:'修正被動與戰鬥增減益算兩次的問題。多隻怪時，每隻怪都會照自己的方式出招，身上的狀態也會正常到期。換目標不會再讓首領只會普攻，也不會弄丟蓄力。戰敗會立刻停下全自動。重新整理會回到戰鬥原本的狀態。持續傷害會被護盾擋下。一鍵換裝會考慮套裝與神話。排行榜改成登入雲端帳號才會上傳。'},
   {v:'20.8',d:'2026-11-28',t:'技能等級',b:'基礎職業的技能改在 Lv.1～30 學完，轉職前就能用到全部招式；轉職當下學會 6 招，其餘一路分布到 Lv.100。轉職說明改成正確的 Lv.30。'},
   {v:'20.7',d:'2026-11-28',t:'角色頁',b:'總覽的角色立繪放大。套裝和職業被動併進屬性頁，說明縮短，被動依等級排序。'},
