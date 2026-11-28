@@ -4,7 +4,7 @@ const A=()=>SIM.M&&SIM.M.an;
 const inc=(o,k,v)=>{o[k]=(o[k]||0)+(v==null?1:v)};
 const catF=f=>{try{return SIM.catOf(f)}catch(e){return '?'}};
 SIM.anNew=()=>({deaths:[],inSk:{},inCat:{},inN:0,dot:0,minHp:[],act:0,mpStarve:0,mpZero:0,mpBins:[0,0,0,0,0],use:{},dmg:{},trig:{},nxGive:0,nxUse:0,nxV:0,gauge:0,trigMp:0,ampSum:0,ampN:0,crit:0,hitN:0,
-  heal:{},healOver:{},ls:{raw:0,cap:0,real:0},shAdd:0,shOver:0,shAbs:0,sumT:0,sumDmg:0,bt:0,ring:[],eff:null,ctr:0,pots:{n:0,real:0,capped:0}});
+  heal:{},healOver:{},ls:{raw:0,cap:0,real:0},mpG:{},mpCost:0,potH:{n:0,real:0,over:0},potM:{n:0,real:0,over:0},shAdd:0,shOver:0,shAbs:0,sumT:0,sumDmg:0,bt:0,ring:[],eff:null,ctr:0,pots:{n:0,real:0,capped:0}});
 /* ---- 受到的傷害 ---- */
 {const _fh=foeHit6;foeHit6=function(f,k,s,o){const r=_fh.apply(this,arguments);try{const a=A();if(a&&r&&!r.miss&&r.d>0){const c=catF(f),nm=(k&&k.n)||'普攻',hp=stats().HP;
   inc(a.inSk,c+'｜'+nm,r.d);inc(a.inCat,c,r.d);a.inN++;a.ring.push({t:B&&B.rt?+B.rt.t.toFixed(1):0,c,f:f.name,k:nm,d:Math.round(r.d),p:+(r.d/hp*100).toFixed(1),s7:f.summon7?1:0,kd:f.kind||''});if(a.ring.length>6)a.ring.shift();if(c==='summon')a.sumDmg+=r.d}}catch(e){}return r}}
@@ -12,7 +12,7 @@ SIM.anNew=()=>({deaths:[],inSk:{},inCat:{},inN:0,dot:0,minHp:[],act:0,mpStarve:0
 let dotCtx=false;
 /* ---- 死亡 ---- */
 {const _l=lose;lose=function(){try{const a=A();if(a&&B){const L=aliveFoes7(),s=stats();a.deaths.push({last:a.ring.slice(-4),alive:L.map(f=>catF(f)+':'+f.name+':'+Math.round(f.hp/f.max*100)+'%'+(f.summon7?':召喚':'')+':'+(f.kind||'')),
-  sum:L.filter(f=>f.summon7).length,mp:+(S.mp/s.MP).toFixed(2),pots:potCount('hp'),wind:B.rtw?B.rtw.n:null,t:B.rt?+B.rt.t.toFixed(0):0,area:RUN&&RUN.area,step:RUN&&RUN.step})}}catch(e){}return _l.apply(this,arguments)}}
+  sum:L.filter(f=>f.summon7).length,mp:+(S.mp/s.MP).toFixed(2),pots:potCount('hp'),mpots:potCount('mp'),main:catF(B),node:RUN&&RUN.nodes?RUN.nodes[RUN.step]:null,dg:RUN&&RUN.dg?RUN.dg.k:null,wind:B.rtw?B.rtw.n:null,t:B.rt?+B.rt.t.toFixed(0):0,area:RUN&&RUN.area,step:RUN&&RUN.step})}}catch(e){}return _l.apply(this,arguments)}}
 /* ---- 玩家行動：技能使用、MP ---- */
 {const _pa=pAct;pAct=function(type,arg){try{const a=A();if(a&&B&&B.rt&&!B.busy){const s=rtS6(),r=S.mp/s.MP;a.act++;a.mpBins[Math.min(4,Math.floor(r*5))]++;if(S.mp<1)a.mpZero++;
   const L=battleSkills().filter(k=>SK[k]&&SK[k].act&&k!==baseSk7().id);const starved=L.some(k=>cdLeft6(k)<=0&&S.mp<mpCost6(k));const key=type==='skill'?arg:type;inc(a.use,key);
@@ -36,7 +36,9 @@ let HC=null;
   const real=_hl.apply(this,arguments);try{if(a){inc(a.heal,'技能治療:'+k,real);inc(a.healOver,'技能治療:'+k,Math.max(0,want-real))}}catch(e){}return real}}
 {const _lf=ls7Fin;ls7Fin=function(k,s,ps){const a=A(),L=B&&B.ls7,h0=S.hp;let raw=0;try{if(L&&L.d>0){let amp=effSum('lsamp');for(const e of effK('lowhealp'))if(e.sk===k&&L.hp0/s.HP*100<e.th)amp+=e.v;raw=(L.d*Math.min(10,s.LS||0)/100+L.d*L.r/100*(1+amp/100))*healInM6()}}catch(e){}
   const r=_lf.apply(this,arguments);try{if(a&&raw>0){a.ls.raw+=raw;a.ls.cap+=Math.min(raw,s.HP*.1);a.ls.real+=S.hp-h0}}catch(e){}return r}}
-{const _ui=useItem6;useItem6=function(k,inB){const a=A(),h0=S.hp,n=potCount('hp');const r=_ui.apply(this,arguments);try{if(a&&potCount('hp')<n){a.pots.n++;a.pots.real+=S.hp-h0;if(S.hp>=stats().HP)a.pots.capped++}}catch(e){}return r}}
+{const _ui=useItem6;useItem6=function(k,inB){const a=A(),h0=S.hp,m0=S.mp,n=potCount('hp'),nm=potCount('mp');const r=_ui.apply(this,arguments);try{if(a){const s=stats(),u=(ITEMS[k]||{}).use||{};
+  if(potCount('hp')<n){a.pots.n++;a.pots.real+=S.hp-h0;if(S.hp>=s.HP)a.pots.capped++;const want=s.HP*(u.v||0)/100;a.potH.n++;a.potH.real+=S.hp-h0;a.potH.over+=Math.max(0,want-(S.hp-h0))}
+  if(potCount('mp')<nm){const want=s.MP*(u.v||0)/100;a.potM.n++;a.potM.real+=S.mp-m0;a.potM.over+=Math.max(0,want-(S.mp-m0))}}}catch(e){}return r}}
 /* ---- 護盾：獲得、被覆蓋浪費、吸收 ---- */
 {const _sa=stAdd;stAdd=function(t,id,o){const a=A();let old=0;try{if(a&&t==='p'&&id==='SHIELD'){const c=B.psx&&B.psx.SHIELD;old=c&&c.e>acOf('p')?(c.amt||0):0}}catch(e){}
   const r=_sa.apply(this,arguments);try{if(a&&t==='p'&&id==='SHIELD'&&r){a.shAdd+=(o&&o.amt)||0;a.shOver+=old}}catch(e){}return r}}
@@ -46,3 +48,11 @@ for(const nm of ['foeTurn','rtAddGo']){if(typeof window[nm]!=='function')continu
 /* ---- 召喚物存在時間、最低 HP ---- */
 {const _rs=rtStep;rtStep=function(dt){const r=_rs.apply(this,arguments);try{const a=A();if(a&&B){a.bt+=dt;if((B.adds||[]).some(f=>f.hp>0&&f.summon7)||(B.summon7))a.sumT+=dt;const hr=S.hp/stats().HP;if(a._mh==null||hr<a._mh)a._mh=hr}}catch(e){}return r}}
 })();
+
+/* ---- MP 來源與消耗（以最內層函式歸屬） ---- */
+(()=>{const ST=[];const A2=()=>SIM.M&&SIM.M.an;
+function mt(name,get){const fn=get();return function(){const a=A2();if(!a||!S)return fn.apply(this,arguments);const fr={c:0};ST.push(fr);const m0=S.mp;let cost=0;
+  if(name==='技能與被動'){try{const k=arguments[0];if(B&&B.chgRel!==k)cost=mpCost6(k)}catch(e){}}
+  try{return fn.apply(this,arguments)}finally{ST.pop();const d=S.mp-m0,own=d-fr.c+cost;if(own>0)a.mpG[name]=(a.mpG[name]||0)+own;if(cost)a.mpCost+=cost;if(ST.length)ST[ST.length-1].c+=d}}}
+pPre7=mt('自然回魔',()=>pPre7);trig6=mt('格擋／迴避／淨化事件',()=>trig6);useSkill6=mt('技能與被動',()=>useSkill6);onCombo7=mt('連擊回魔',()=>onCombo7);
+useItem6=mt('魔力藥',()=>useItem6);onWin6=mt('戰後回復',()=>onWin6);gainExp=mt('升級',()=>gainExp)})();

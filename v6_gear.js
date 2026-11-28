@@ -338,5 +338,9 @@ function gearDmgMul6(o){o=o||{};const s=stats(),M=s.MYTH,F=s.SETFX,f=o.foe||{};l
   if((F.includes('SET06')||F.includes('SET16'))&&f.poison)m*=1.08;
   if((F.includes('SET10')||F.includes('SET20'))&&o.hpPct<.3)m*=1.08;
   return m}
+/* v21.5：迴避觸發的套裝 4 件效果（原本規格有、程式未實作）：疾風／生命 迴避後行動條 +10（冷卻 2 次自身行動）；暗殺／獵人 迴避後下次攻擊增傷 8%（不疊加） */
+function gearEvade6(){if(!B||!B.p6)return;const F=stats().SETFX||[],P=B.p6,now=acOf('p');
+  if((F.includes('SET03')||F.includes('SET13'))&&B.rt&&!(P.set3cd>now)){P.set3cd=now+2+1;B.rt.pgB=(B.rt.pgB||0)+10}
+  if((F.includes('SET08')||F.includes('SET18'))&&!P.nx.some(n=>n.set8))P.nx.push({sk:null,v:8,pen:0,set8:1})}
 function gearFatal6(){if(!B||B.my5)return false;if(!stats().MYTH.includes('MY05'))return false;B.my5=1;return true}
 function gearLowHp6(){if(!B||B.set4hp)return 0;const F=stats().SETFX;if(!F.includes('SET04')&&!F.includes('SET14'))return 0;B.set4hp=1;return Math.round(stats().HP*.1)}

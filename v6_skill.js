@@ -350,9 +350,12 @@ function skFx6(k,s,d,ps,hit){const T=B,dot=x=>1+(effSum('skdot',k)+(rtS6().DOT||
     default:if(typeof fx7Apply==='function')fx7Apply(k,s,d,ps,hit)}}
 
 /* 格擋（玩家按的格擋成功，或 A 線的格擋率被動觸發都呼叫）、閃避、受傷 */
-function onBlock6(){if(!B)return;B.p6=B.p6||{nx:[],once:{},tcd:0,seq:[],third:{},mpUse:0};trig6('block');
+/* v21.5：格擋／迴避事件共用入口規則：同一次敵方攻擊同類事件只算一次；事件處理中不再重入（防反擊、回魔、行動條遞迴） */
+function evGate6(kind){if(!B)return false;if(B.evBusy)return false;if(B.inAtk){B.evTok=B.evTok||{};if(B.evTok[kind]===B.inAtk)return false;B.evTok[kind]=B.inAtk}return true}
+function onBlock6(src){if(!B||!evGate6('block'))return;B.evBusy=1;try{onBlock6x(src)}finally{if(B)B.evBusy=0}}
+function onBlock6x(src){B.p6=B.p6||{nx:[],once:{},tcd:0,seq:[],third:{},mpUse:0};trig6('block');
   for(const e of effK('counter')){/* v21.3：T0532 以 ID 對應 J05S6；反制每觸發 4/3/2 次，該次之後的冷卻 −1（最低 0）；同一行動內不會重複觸發 */const P=B.p6,now=acOf('p'),cd=Math.max(0,e.cd-(P.cntRed||0));if(P.cntT!=null&&P.cntT+cd+1>now)continue;P.cntT=now;P.cntRed=0;P.cntN=(P.cntN||0)+1;for(const t of effK('counterCdn'))if(t.sk===e.from&&P.cntN%t.th===0)P.cntRed=1;const r=hitFoe('ATK',(e.v+effSum('counterAmp'))/100,{sure:1,tag:dmgTag6(battleSkills()[0])});B.log.push(`【反制】反擊 ${r.d}`);(B.pops=B.pops||[]).push({d:r.d,k:'反制'});trig6('hit',{sk:'counter'})}}
-function onEvade6(){if(!B)return;B.p6=B.p6||{nx:[],once:{},tcd:0,seq:[],third:{},mpUse:0};trig6('evade')}
+function onEvade6(src){if(!B||!evGate6('evade'))return;B.evBusy=1;try{B.p6=B.p6||{nx:[],once:{},tcd:0,seq:[],third:{},mpUse:0};trig6('evade');try{gearEvade6()}catch(e){}}finally{if(B)B.evBusy=0}}
 function onHurt6(d,sh0){if(!B||!B.p6)return;const s=rtS6(),P=B.p6;
   if(sh0&&!stHas('p','SHIELD'))trig6('shbreak');
   if(d>0&&stHas('p','GUARD'))trig6('hurtGuard');

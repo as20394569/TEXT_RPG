@@ -81,6 +81,19 @@ const enrage=f=>{const ac=f.ac||0;return ac>=5?Math.min(.45,.15+.10*Math.floor((
 
 {const _ra=rtAuto;rtAuto=function(){try{const k=SIM.knob.react;if(k&&B&&B.rt){const w=B.rtw;if(w&&w.dg&&!B.guard){const rem=w.dur-w.t;if(rem>.95&&rem<2.5&&B.hp>0)return;/* 等到能擋的時機 */
   if(rem>.15&&Math.random()<k){if(SIM.M)SIM.M.mech.react=(SIM.M.mech.react||0)+1;rtDo(w.mg?'@guard':'@parry');return}}}}catch(e){SIM.err(e)}return _ra.apply(this,arguments)}}
+
+/* ---------- v21.5 測試開關：prefix＝模擬修正前（丟掉被動格擋／迴避事件）；pot＝自動藥水門檻與冷卻 ---------- */
+{const _b=onBlock6;onBlock6=function(src){if(SIM.knob&&SIM.knob.prefix&&src==='passive')return;return _b.apply(this,arguments)}}
+{const _e=onEvade6;onEvade6=function(src){if(SIM.knob&&SIM.knob.prefix&&src==='passive')return;return _e.apply(this,arguments)}}
+const HEALK=k=>{const x=SK[k];return !!x&&x.act&&(!!x.heal||k==='J04S3'||k==='J11S3'||!!(FX7[k]&&FX7[k].heal))};
+{const _aa=autoAct;autoAct=function(){const P=SIM.knob&&SIM.knob.pot;if(!P)return _aa.apply(this,arguments);
+  if(!B||B.busy||!B.auto)return;if(B.rt&&(B.rt.pg<100||B.rt.done))return;if(MODAL&&MODAL.k==='foe')return;
+  const s=rtS6(),hpR=S.hp/s.HP,mpR=S.mp/s.MP;if(B.chg7)return pAct('skill',B.chg7);const L=battleSkills(),base=L[L.length-1];
+  if(hpR<P.hp){const hk=L.slice(0,-1).find(k=>HEALK(k)&&skUsable7(k));if(hk){SIM.M&&SIM.M.an&&(SIM.M.an.healFirst=(SIM.M.an.healFirst||0)+1);return pAct('skill',hk)}/* 有效治療優先於藥水 */
+    if(itemReady7()){const p=potBest('hp');if(p&&pAct('item',p)!==false)return}}
+  if(P.mp&&mpR<P.mp&&itemReady7()){const p=potBest('mp');if(p&&pAct('item',p)!==false)return}
+  for(const k of L.slice(0,-1))if(skUsable7(k))return pAct('skill',k);pAct('skill',base)}}
+{const _ui=useItem6;useItem6=function(k,inB){const P=SIM.knob&&SIM.knob.pot;const isH=((ITEMS[k]||{}).use||{}).v6==='恢復最大HP';const r=_ui.apply(this,arguments);try{if(P&&P.cd&&isH&&r!==false&&B&&B.rt&&B.icd>acOf('p'))B.icd=acOf('p')+P.cd+1}catch(e){}return r}}
 /* ---------- 建角色 ---------- */
 const MA={'力':'STR','敏':'DEX','智':'INT'};
 const SLOTTY=()=>{const J=jobEq(),o={};for(const sl of SL6){const ks=Object.keys(V6.EQ).filter(k=>{try{return slotsOfType(k).includes(sl)&&canUseType(k,sl)}catch(e){return false}});o[sl]=ks}return o};

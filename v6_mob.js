@@ -222,8 +222,9 @@ function mobSelfSt6(f,id,v){if(typeof stAdd==='function'){try{stAdd(f,id,{v});re
   const M={HARDEN:{def:.25},WARD:{mres:.25},GUARD:{def:.25},RAGE:{atk:.2},FOCUS:{crit:10},HASTE:{},THORN:{},SHIELD:{}}[id]||{};if(id==='SHIELD')f.fshield=(f.fshield||0)+Math.round(f.max*.08);else f.fb.push(Object.assign({id:'v6'+id,n:(V6.STAT.find(x=>x.id===id)||{n:id}).n,t:2},M))}
 /* 直接攻擊一次：回傳 {d,miss,cr,blk} */
 function foeHit6(f,k,s,o){o=o||{};const mag=k?(k.either?f.mag>=f.atk&&f.role6==='MAGE':!!k.mag):(f.role6==='MAGE'||f.role6==='WARD'),pw=k?k.pow:1,h=k&&k.h||1;
-  let hit=clamp6((f.hit6||100)-(has6(f,'BLIND')?15:0),0,100)/100*(1-clamp6((s.EVA||0)+(typeof buffSum==='function'?buffSum('eva'):0),0,95)/100);
-  if(o.sure)hit=1;if(Math.random()>hit)return{d:0,miss:1};
+  /* v21.5：命中分兩段判定（機率與舊版相同）：先判敵人命中率（自然未命中），再判玩家迴避（被動迴避，會觸發迴避事件） */
+  const acc=clamp6((f.hit6||100)-(has6(f,'BLIND')?15:0),0,100)/100,eva=clamp6((s.EVA||0)+(typeof buffSum==='function'?buffSum('eva'):0),0,95)/100;
+  if(!o.sure){if(Math.random()>acc)return{d:0,miss:1};if(Math.random()<eva)return{d:0,miss:1,ev:1}}
   const hpP=S.hp/Math.max(1,s.HP);
   let am=(f.atkM6||1)*(1+fbSum('atk'))*(has6(f,'RAGE')?1.2:1)*(has6(f,'FEAR')?.9:1)*(!mag&&has6(f,'WEAK')?.85:1)*(mag&&has6(f,'HEX')?.85:1)*(f.st&&f.st.weak>0?.75:1)*grudgeM();
   const ps=f.pass6||[];if(ps.includes('P21')&&f.hp/f.max<.3)am*=1.1;if(f.role6==='BERSERK'&&f.hp/f.max<.3)am*=1.1;if(ps.includes('P26')&&!f.fhit6)am*=1.15;if(ps.includes('P27')&&hpP<.3)am*=1.1;if(ps.includes('P28')&&pDebuff6())am*=1.05;
@@ -257,7 +258,9 @@ function applyHit6(f,r,fx,k,nm,o){o=o||{};const s=stats();let d=r.d;
   if(f.role6==='VENOM'&&Math.random()<.2)inflict6('POISON',f,{dur:2});
   if((f.aff||[]).includes('venom')&&B.pst)B.pst.poison=Math.max(B.pst.poison||0,2);
   if(k&&k.atbHit&&B.rt){B.rt.pg=Math.max(0,B.rt.pg-k.atbHit);blog(`你的行動條被打退了`)}}
-function foeAttack6(f,id,fx,o){o=o||{};const s=stats(),k=id?SKM[id]:null,nm=k?`【${k.n}】`:'攻擊';
+/* v21.5：一次敵方攻擊的範圍，用來讓同一次攻擊的格擋／迴避事件只觸發一次 */
+function foeAttack6(f,id,fx,o){const tok=B?(B.atkN=(B.atkN||0)+1):0,sv=B?B.inAtk:null;if(B)B.inAtk=tok;try{return foeAttack6x(f,id,fx,o)}finally{if(B)B.inAtk=sv}}
+function foeAttack6x(f,id,fx,o){o=o||{};const s=stats(),k=id?SKM[id]:null,nm=k?`【${k.n}】`:'攻擊';
   if(k&&k.v6&&B.rt)f.mcd[id]=(f.ac||0)+(k.cd||0)+1;
   if(k){fx.cut=k.n;fx.fsk=id;dexSkill6(id)}
   if(k&&!k.pow){const ps=[];
@@ -272,8 +275,9 @@ function foeAttack6(f,id,fx,o){o=o||{};const s=stats(),k=id?SKM[id]:null,nm=k?`�
   if(!o.add&&!(B.rt&&(B.rt.pr>B.rt.t||B.rt.ev>B.rt.t))&&allyTgt()){const r=foeHit6(f,k,s,{sure:1});allyHurt(r.d,nm,f.name);return}
   if(B.rt&&rtReact(fx,nm,o.add?f:null,k||(f.role6==='MAGE'?{mag:1}:null),o.big)){return}
   const r=foeHit6(f,k,s);
-  if(r.miss){fx.miss=1;try{SFX.miss()}catch(e){}blog(`你閃開了 ${f.name} 的${nm}`);B.lastE6=1;return}
+  if(r.miss){fx.miss=1;try{SFX.miss()}catch(e){}blog(r.ev?`你閃開了 ${f.name} 的${nm}`:`${f.name} 的${nm}落空了`);B.lastE6=1;if(r.ev&&S.hp>0)try{onEvade6('passive')}catch(e){}return}
   applyHit6(f,r,fx,k,nm,o);
+  if(r.blk&&B&&S.hp>0)try{onBlock6('passive')}catch(e){}/* v21.5：被動格擋也觸發格擋事件 */
   /* 連擊被動：再補 35% */
   if((f.pass6||[]).includes('P36')&&S.hp>0&&Math.random()<.03){const r2=Object.assign({},r,{d:r.d*.35});applyHit6(f,r2,fx,null,'連擊',o)}}
 

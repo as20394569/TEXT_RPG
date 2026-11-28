@@ -20,7 +20,7 @@
    "weak": false,
    "poison": false,
    "stun": false,
-   "hpLost": 88
+   "hpLost": 90
   }
  },
  "P1-1 韌性只算一次": {
@@ -68,9 +68,9 @@
    ],
    "bossMain": false,
    "bossActs": 2,
-   "mcd": 1,
+   "mcd": 2,
    "log": [
-    "凜冬霜龍 的【震波】造成 73 傷害"
+    "凜冬霜龍 的【震波】造成 74 傷害"
    ]
   }
  },
@@ -105,7 +105,7 @@
       182
      ]
     ],
-    "php": 433,
+    "php": 438,
     "step": 1,
     "ac": 1,
     "rt": true
