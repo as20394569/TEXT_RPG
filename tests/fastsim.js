@@ -23,7 +23,7 @@ try{if(W.SN7)for(const k of Object.keys(W.SN7))W.SN7[k]=function(){}}catch(e){}
 try{bgmAuto=function(){};BGM&&(BGM.play=function(){})}catch(e){}
 try{rtPop=function(){}}catch(e){}
 
-const SIM=W.SIM={errs:[],err(e){if(SIM.errs.length<20)SIM.errs.push(String(e&&e.stack||e).slice(0,300))},cand:null,M:null};
+const SIM=W.SIM={knob:{},errs:[],err(e){if(SIM.errs.length<20)SIM.errs.push(String(e&&e.stack||e).slice(0,300))},cand:null,M:null};
 
 /* ---------- 怪物分類（開戰時標記；換位會跟著怪物走） ---------- */
 {const _g=grpDone7;grpDone7=function(){const r=_g.apply(this,arguments);try{const L=[B,...(B.adds||[])];
@@ -44,6 +44,30 @@ function candMul(f){const C=SIM.cand;if(!C)return [1,0];const c=catOf(f);return 
 {const _ui=useItem6;useItem6=function(k,inB){const n=S.items[k]||0;const r=_ui.apply(this,arguments);try{if(SIM.M&&(S.items[k]||0)<n)SIM.M.pots++}catch(e){}return r}}
 {const _l=lose;lose=function(){SIM.res='LOSE';return _l.apply(this,arguments)}}
 
+
+/* ---------- 續航與前期難度測試開關（只在測試）：SIM.knob={luna,win,regen,lvl,z0Atk,z0Hp} ---------- */
+let TD=0;
+function track(name,fn,scale){return function(){const outer=TD===0,h0=S?S.hp:0,m0=S?S.mp:0,lv0=S?S.lv:0;TD++;let r;try{r=fn.apply(this,arguments)}finally{TD--}
+  try{if(S){let dh=S.hp-h0;if(scale&&dh>0){const k=scale(lv0,h0,m0);if(k!=null&&k!==1){S.hp=Math.round(h0+dh*k);dh=S.hp-h0}}if(outer&&SIM.M&&dh>0)SIM.M.heal[name]=(SIM.M.heal[name]||0)+dh}}catch(e){SIM.err(e)}return r}}
+allyAct=track('露娜',allyAct,()=>SIM.knob.luna);
+onWin6=track('戰後回復',onWin6,()=>SIM.knob.win);
+heal6=track('技能與吸血',heal6);
+useItem6=track('藥水',useItem6);
+campPick=track('營地',campPick);
+{const _p=pPre7;pPre7=function(){SIM.inPre=1;SIM.hpDot=null;const h0=S.hp;TD++;let r;try{r=_p.apply(this,arguments)}finally{TD--;SIM.inPre=0}
+  try{const base=SIM.hpDot!=null?SIM.hpDot:h0;let dh=S.hp-base;const k=SIM.knob.regen;if(dh>0&&k!=null&&k!==1){S.hp=Math.round(base+dh*k);dh=S.hp-base}if(TD===0&&SIM.M&&dh>0)SIM.M.heal['自然回復']=(SIM.M.heal['自然回復']||0)+dh}catch(e){SIM.err(e)}return r}}
+{const _st2=stTick;stTick=function(t){const r=_st2.apply(this,arguments);if(t==='p'&&SIM.inPre)SIM.hpDot=S.hp;return r}}
+{const _ge=gainExp;gainExp=function(n){const lv0=S.lv,h0=S.hp,m0=S.mp;TD++;let r;try{r=_ge.apply(this,arguments)}finally{TD--}
+  try{if(S.lv>lv0){const s=stats();if(SIM.knob.lvl){S.hp=Math.min(s.HP,Math.max(h0,h0+Math.round(s.HP*SIM.knob.lvl)));S.mp=Math.min(s.MP,Math.max(m0,m0+Math.round(s.MP*SIM.knob.lvl)))}
+    const dh=S.hp-h0;if(TD===0&&SIM.M&&dh>0)SIM.M.heal['升級回復']=(SIM.M.heal['升級回復']||0)+dh;if(SIM.M)SIM.M.lvups+=S.lv-lv0}}catch(e){SIM.err(e)}return r}}
+/* 怪物速度與開場行動條（測試開關）：knob.spd 全部怪物速度倍率；knob.open 中段強敵與首領開場行動條 */
+{const _mk2=mkFoe;mkFoe=function(){const f=_mk2.apply(this,arguments);try{const k=SIM.knob.spd;if(k&&k!==1&&f&&f.ft6)f.ft6=f.ft6/k}catch(e){}return f}}
+{const _gd=grpDone7;grpDone7=function(){const r=_gd.apply(this,arguments);try{const o=SIM.knob.open;if(o&&B&&(B.mid7||B.kind==='boss'))B.rtg=Math.max(B.rtg||0,o)}catch(e){}return r}}
+/* 露娜傷害與替玩家擋攻擊的機率（測試開關）：knob.lunaPw、knob.tank */
+{const _ma=mkAlly;mkAlly=function(){const a=_ma.apply(this,arguments);try{const k=SIM.knob.lunaPw;if(a&&k&&k!==1)a.pw*=k}catch(e){}return a}}
+{const _at=allyTgt;allyTgt=function(){const t=SIM.knob.tank;if(t==null)return _at.apply(this,arguments);const A=B.ally;if(!A||A.hp<=0)return false;if(B.taunt>0){B.taunt--;return true}return Math.random()<t}}
+{const _sm2=startMid7;startMid7=function(){const r=_sm2.apply(this,arguments);try{const K=SIM.knob;if(B&&RUN&&RUN.area===0&&B.mid7){if(K.z0Atk&&K.z0Atk!==1){B.atk=Math.round(B.atk*K.z0Atk);if(B.mag)B.mag=Math.round(B.mag*K.z0Atk)}if(K.z0Hp&&K.z0Hp!==1){B.max=Math.round(B.max*K.z0Hp);B.hp=B.max}}}catch(e){SIM.err(e)}return r}}
+
 /* ---------- 建角色 ---------- */
 const MA={'力':'STR','敏':'DEX','智':'INT'};
 const SLOTTY=()=>{const J=jobEq(),o={};for(const sl of SL6){const ks=Object.keys(V6.EQ).filter(k=>{try{return slotsOfType(k).includes(sl)&&canUseType(k,sl)}catch(e){return false}});o[sl]=ks}return o};
@@ -55,13 +79,13 @@ SIM.setup=function(o){/* o:{cls,adv,lv,area,build:'auto'|'opt',rar,style,tal} */
   if(o.build==='auto'){const nd=o.drops||24;for(let i=0;i<nd;i++)dropGear6(S.lv,'N',{force:1});for(let i=0;i<(o.drops?0:4);i++)dropGear6(S.lv,'E',{force:1});autoEquip6()}
   else{const T=SLOTTY();for(const sl of SL6){if(sl==='off'&&S.eq.main){const g0=gearBy(S.eq.main);if(g0&&V6.EQ[g0.k].occ===2)continue}const ks=T[sl];if(!ks.length)continue;let best=null;for(const k of ks){const g=genGear(k,Math.max(1,S.lv-(o.glag||0)),o.rar);if(!best||gearPower(g)>gearPower(best))best=g}S.gear.push(best);eqSet(best,sl)}}
   /* 天賦 */
-  S.tal={};if(o.tal!=null&&o.tal>=0){const T=TALS(),br=[...new Set(T.map(t=>t.br))],order=[br[o.tal%br.length],...br.filter((b,i)=>i!==o.tal%br.length)];
+  S.tal={};SIM.talBr=o.tal;if(o.tal!=null&&o.tal>=0){const T=TALS(),br=[...new Set(T.map(t=>t.br))],order=[br[o.tal%br.length],...br.filter((b,i)=>i!==o.tal%br.length)];
     for(let g=0;g<200&&talFree6()>0;g++){let did=false;for(const b of order){const c=T.filter(t=>t.br===b&&talCan6(t)).sort((a,b2)=>a.lv-b2.lv)[0];if(c){S.tal[c.id]=(S.tal[c.id]||0)+1;did=true;break}}if(!did)break}}
   EFC=null;
   /* 技能配置 */
   S.lo7=null;try{const L=lo7();const st=o.style||'均衡',jn=clsName(),R=V6.LOAD.find(x=>x.job===jn&&x.style===st);if(R){const ok=R.a.filter(k=>SK[k]&&skOk6(k));L.a=[baseSk7().id,...ok].slice(0,4);L.p=R.p.filter(k=>SK[k]&&skOk6(k)).slice(0,3)}}catch(e){SIM.err(e)}
-  EFC=null;const best=re=>(V6.CONS.filter(x=>x.lv<=S.lv&&re.test(x.n||'')).sort((a,b)=>b.lv-a.lv)[0]||{}).id;SIM.cons=best(/生命藥/);SIM.cons2=best(/魔力藥/);
-  return {job:clsName(),lv:S.lv,eq:SL6.filter(s=>S.eq[s]).length,pow:power(),tal:talUsed6()}};
+  if(o.party!==undefined)S.party=o.party;else S.party='luna';EFC=null;const best=re=>(V6.CONS.filter(x=>x.lv<=S.lv&&re.test(x.n||'')).sort((a,b)=>b.lv-a.lv)[0]||{}).id;SIM.cons=best(/生命藥/);SIM.cons2=best(/魔力藥/);
+  SIM.snap=JSON.stringify(S);return {job:clsName(),lv:S.lv,eq:SL6.filter(s=>S.eq[s]).length,pow:power(),tal:talUsed6(),luna:typeof withLuna==='function'?withLuna():null,ally:!!mkAlly()}};
 function refill(){const s=stats();S.hp=s.HP;S.mp=s.MP;S.items={};if(SIM.cons)S.items[SIM.cons]=5;if(SIM.cons2)S.items[SIM.cons2]=3;EFC=null}
 
 /* ---------- 戰鬥與流程 ---------- */
@@ -78,13 +102,25 @@ function view(M){if(typeof STORY!=='undefined'&&STORY){try{stNext()}catch(e){STO
 function drive(M){for(let i=0;i<4000;i++){if(SIM.res)return;if(!RUN){if(!SIM.res)SIM.res='LOSE';return}
   if(B){M.where={area:RUN.area,step:RUN.step,dg:RUN.dg?RUN.dg.k:null,foes:[B,...(B.adds||[])].map(f=>(f.cat7||'?')+':'+f.name)};battle(M);continue}
   view(M);adv(30)}SIM.res=SIM.res||'STUCK'}
-function newM(){return {btime:0,battles:0,taken:0,skillT:0,dot:0,mp:0,casts:0,pots:0,fsk:0,zones:0,skillBy:{},takenBy:{},where:null}}
-SIM.run=function(kind,arg){const M=SIM.M=newM();SIM.res='';refill();TAB='adv';RUN=null;B=null;MODAL=null;
+function newM(){return {heal:{},lvups:0,btime:0,battles:0,taken:0,skillT:0,dot:0,mp:0,casts:0,pots:0,fsk:0,zones:0,skillBy:{},takenBy:{},where:null}}
+SIM.run=function(kind,arg,keep){const M=SIM.M=newM();SIM.res='';if(!keep)refill();TAB='adv';RUN=null;B=null;MODAL=null;
   try{if(kind==='dg'){DGDIFF=0;startDg(arg,0)}else startRun(arg)}catch(e){SIM.err(e);return {res:'NOSTART'}}
   if(!RUN)return {res:'NOSTART'};const s=stats(),hpMax=s.HP,mpMax=s.MP;
   try{drive(M)}catch(e){SIM.err(e);SIM.res='ERR'}
   B=null;RUN=null;MODAL=null;STORY=null;Q.length=0;
   return {res:SIM.res,bt:Math.round(M.btime),nb:M.battles,hp:+(M.taken/hpMax).toFixed(2),mp:+(M.mp/mpMax).toFixed(2),pots:M.pots,sk:M.taken?+(M.skillT/M.taken).toFixed(3):0,
-    skillBy:M.skillBy,takenBy:M.takenBy,where:SIM.res==='WIN'?null:M.where,zones:M.zones}};
-SIM.qlen=()=>Q.length;SIM.batch=function(kind,arg,n){const out=[];for(let i=0;i<n;i++)out.push(SIM.run(kind,arg));return out};
+    skillBy:M.skillBy,takenBy:M.takenBy,where:SIM.res==='WIN'?null:M.where,zones:M.zones,heal:Object.fromEntries(Object.entries(M.heal).map(([k,v])=>[k,+(v/hpMax).toFixed(3)])),lvups:M.lvups,lv:S.lv}};
+SIM.qlen=()=>Q.length;
+/* 回城整備（照全自動）：配點（主屬性 2：體力 1）、天賦照原路線、一鍵換裝 */
+function townPrep(){const ma=MA[jobEq().main_attr]||'STR';let n=0;while(S.pts>0&&n<999){const k=(n++%3===2)?'VIT':ma;if(S.attr[k]>=ATTRMAX){const x=Object.keys(ATTR).find(a=>S.attr[a]<ATTRMAX);if(!x)break;S.attr[x]++}else S.attr[k]++;S.pts--}
+  if(SIM.talBr!=null&&SIM.talBr>=0){const T=TALS(),br=[...new Set(T.map(t=>t.br))],order=[br[SIM.talBr%br.length],...br.filter((b,i)=>i!==SIM.talBr%br.length)];S.tal=S.tal||{};
+    for(let g=0;g<200&&talFree6()>0;g++){let did=false;for(const b of order){const c=T.filter(t=>t.br===b&&talCan6(t)).sort((a,b2)=>a.lv-b2.lv)[0];if(c){S.tal[c.id]=(S.tal[c.id]||0)+1;did=true;break}}if(!did)break}}
+  EFC=null;try{autoEquip6()}catch(e){SIM.err(e)}if(S.gear.length>80){S.gear=S.gear.filter(g=>SL6.some(sl=>S.eq[sl]===g.u)||g.lv>=S.lv-5).slice(-80)}EFC=null}
+/* 連續探索：不每趟補滿。第一趟前滿血、生命藥 6／魔力藥 3、金幣＝等級×150；之後每趟回城照全自動規則：HP<70% 或 MP<50% 付錢休息，藥水補到 6／3（留等級×12 G） */
+SIM.chain=function(kind,arg,n){refill();S.items={};if(SIM.cons)S.items[SIM.cons]=6;if(SIM.cons2)S.items[SIM.cons2]=3;S.gold=S.lv*150;const out=[];
+  for(let i=0;i<n;i++){const g0=S.gold,p0=potCount('hp')+potCount('mp');const r=SIM.run(kind,arg,true);r.goldEarn=S.gold-g0;
+    townPrep();let spentRest=0,spentPot=0;const s=stats();if(S.hp<s.HP*.7||S.mp<s.MP*.5){const c=S.lv*4;if(S.gold>=c){S.gold-=c;S.hp=s.HP;S.mp=s.MP;spentRest=c}}
+    const keep=S.lv*12;for(const [kind2,want] of [['hp',6],['mp',3]]){const k=potShop(kind2);while(potCount(kind2)<want&&ITEMS[k]&&S.gold-ITEMS[k].price>=keep){S.gold-=ITEMS[k].price;addItem(k,1);spentPot+=ITEMS[k].price}}
+    r.spentRest=spentRest;r.spentPot=spentPot;r.gold=S.gold;r.hpStart=null;out.push(r)}return out};/* 獨立趟：每趟開始都還原成建角色當下的狀態（等級、經驗、金幣、裝備一致） */
+SIM.batch=function(kind,arg,n){const out=[];for(let i=0;i<n;i++){if(SIM.snap){S=JSON.parse(SIM.snap);EFC=null}out.push(SIM.run(kind,arg))}return out};
 })();

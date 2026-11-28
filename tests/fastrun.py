@@ -22,8 +22,8 @@ async def main():
             await pg.evaluate("()=>{SIM.errs=[]}")
             t = time.time()
             try:
-                info = await pg.evaluate("(o)=>{SIM.cand=o.cand||null;SIM.diff=o.diff||null;return SIM.setup(o)}", c)
-                res = await pg.evaluate("([k,a,n])=>SIM.batch(k,a,n)", [c['kind'], c['arg'], c['n']])
+                info = await pg.evaluate("(o)=>{SIM.cand=o.cand||null;SIM.diff=o.diff||null;SIM.knob=o.knob||{};return SIM.setup(o)}", c)
+                res = await pg.evaluate("([k,a,n,ch])=>ch?SIM.chain(k,a,n):SIM.batch(k,a,n)", [c['kind'], c['arg'], c['n'], c.get('chain', False)])
                 errs = await pg.evaluate("()=>SIM.errs")
             except Exception as e:
                 info, res, errs = None, [], [str(e)[:300]]
